@@ -1,0 +1,12 @@
+export * as AuthService from "./auth.service";
+export * as ClientService from "./client.service";
+export * as ClientNoteService from "./client.note.service";
+export * as ClientContactService from "./client.contact.service";
+export * as ClientMedicationService from "./client.medication.service";
+export * as ClientHealthCareService from "./client.healtcare.service";
+export * as ClientMedicalHistoryService from "./client.medicalHistory.service";
+export * as ClientDocumentService from "./client.document.service";
+export * as DocumentService from "./document.service";
+export * as ClientAccessService from "./client.access.service";
+export * as ClientAppointmentService from "./client.appointment.service";
+export * as UserProfileSettingsService from "./user.profile.settings.service";

@@ -1,0 +1,166 @@
+import React, { useEffect, useState } from "react";
+import { ICONS } from "@agensy/constants";
+import { useClientContext } from "@agensy/context";
+import {
+  AddContactModal,
+  Card,
+  ContactItem,
+  EmptyStateCard,
+} from "@agensy/components";
+import { StringUtils, toast } from "@agensy/utils";
+import type { ClientContact, ContactFormData } from "@agensy/types";
+import {
+  useDeleteClientContactMutation,
+  useUpdateContactMutation,
+} from "@agensy/api";
+import { useAddContactMutation } from "@agensy/api";
+
+export const ContactInfoCard: React.FC = () => {
+  const {
+    selectedClient,
+    addClientContact,
+    updateClientContact,
+    deleteClientContact,
+  } = useClientContext();
+  const addContactMutation = useAddContactMutation();
+  const updateContactMutation = useUpdateContactMutation();
+  const deleteContactMutation = useDeleteClientContactMutation();
+  const [selectedEditContact, setSelectedEditContact] =
+    useState<ClientContact | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isContactModalOpen) {
+      removeEditContact();
+    }
+  }, [isContactModalOpen]);
+
+  useEffect(() => {
+    if (addContactMutation.status === "success") {
+      setIsContactModalOpen(false);
+      addClientContact(addContactMutation.data);
+      toast.success("Contact Added Successfully");
+    } else if (addContactMutation.status === "error") {
+      toast.error("Failed to Add Contact", addContactMutation.error.message);
+    }
+  }, [addContactMutation.status]);
+
+  useEffect(() => {
+    if (updateContactMutation.status === "success") {
+      setIsContactModalOpen(false);
+      updateClientContact(updateContactMutation.data);
+      toast.success("Contact Updated Successfully");
+    } else if (updateContactMutation.status === "error") {
+      toast.error(
+        "Failed to Update Contact",
+        updateContactMutation.error.message
+      );
+    }
+  }, [updateContactMutation.status]);
+
+  useEffect(() => {
+    if (deleteContactMutation.status === "success") {
+      deleteClientContact(deleteContactMutation.variables.contactId);
+      toast.success("Contact Deleted Successfully", "");
+    } else if (deleteContactMutation.status === "error") {
+      toast.error(
+        "Failed to Delete Contact",
+        deleteContactMutation.error.message
+      );
+    }
+  }, [deleteContactMutation.status]);
+
+  const handleCloseContactModal = () => {
+    setIsContactModalOpen(false);
+    removeEditContact();
+  };
+
+  const handleDeleteContact = (contactId: string) => {
+    deleteContactMutation.mutate({
+      contactId,
+      clientId: selectedClient?.id as string,
+    });
+  };
+
+  const handleAddContact = (data: ContactFormData) => {
+    if (!selectedEditContact) {
+      addContactMutation.mutate({
+        ...data,
+        client_id: String(selectedClient?.id),
+      });
+    } else {
+      updateContactMutation.mutate({
+        contactId: String(selectedEditContact.id),
+        clientId: selectedClient?.id as string,
+        data,
+      });
+    }
+  };
+
+  const handleEditContact = (item: ClientContact) => {
+    setSelectedEditContact(item);
+    setIsContactModalOpen(true);
+  };
+
+  const removeEditContact = () => {
+    setTimeout(() => {
+      setSelectedEditContact(null);
+    }, 100);
+  };
+
+  return (
+    <React.Fragment>
+      <Card
+        title="Contact Information"
+        buttonText={<ICONS.plus size={16} />}
+        onButtonClick={() => setIsContactModalOpen(true)}
+        ariaLabel="Add Contact"
+      >
+        <div className="space-y-6">
+          {selectedClient?.contacts && selectedClient?.contacts.length > 0 ? (
+            selectedClient?.contacts
+              .sort((a, b) => {
+                const order = { primary: 1, secondary: 2, emergency: 3 };
+                return order[a.contact_type] - order[b.contact_type];
+              })
+              .map((item, index) => (
+                <ContactItem
+                  key={index}
+                  onEdit={() => handleEditContact(item)}
+                  label={`${StringUtils.capitalizeFirstLetter(
+                    item.contact_type
+                  )}`}
+                  type={item.contact_type}
+                  onDelete={() => handleDeleteContact(item.id as string)}
+                  isDeleting={deleteContactMutation.isPending}
+                >
+                  <div>
+                    <p>
+                      {item.first_name} {item.last_name} (
+                      {StringUtils.capitalizeFirstLetter(item.relationship)})
+                    </p>
+                    <p>{item.phone}</p>
+                  </div>
+                </ContactItem>
+              ))
+          ) : (
+            <EmptyStateCard
+              ICON={ICONS.plus}
+              label="Contact"
+              onClick={() => setIsContactModalOpen(true)}
+            />
+          )}
+        </div>
+      </Card>
+      <AddContactModal
+        isOpen={isContactModalOpen}
+        onClose={handleCloseContactModal}
+        onSubmit={handleAddContact}
+        isLoading={
+          addContactMutation.isPending || updateContactMutation.isPending
+        }
+        editContact={selectedEditContact}
+      />
+    </React.Fragment>
+  );
+};

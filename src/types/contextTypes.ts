@@ -1,0 +1,70 @@
+import type {
+  AccessInfo,
+  Appointment,
+  Client,
+  ClientContact,
+  ClientMedical,
+  ClientMedications,
+  Document,
+  HealthcareProvider,
+  IUser,
+  Note,
+} from "./schemas";
+
+export interface AuthContextType {
+  userData: IUser | null;
+  setUserData: React.Dispatch<React.SetStateAction<IUser | null>>;
+  isAuthLoading: boolean;
+  setIsAuthLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  handleLogout: () => void;
+  clients: Client[];
+  filterHealthCareProvider: (
+    clientId: string,
+    providerId: string
+  ) => HealthcareProvider;
+  filterClient: (clientId: string) => Client;
+  updateUserData: (data: IUser) => void;
+  file: File | null;
+  setFile: React.Dispatch<React.SetStateAction<File | null>>;
+}
+
+export interface ClientContextType {
+  selectedClient: Client | null;
+  setSelectedClient: React.Dispatch<React.SetStateAction<Client | null>>;
+  addClientContact: (contact: ClientContact) => void;
+  updateClientContact: (contact: ClientContact) => void;
+  deleteClientContact: (contactId: string) => void;
+  addClientNote: (note: Note) => void;
+  updateClientNote: (note: Note) => void;
+  deleteClientNote: (noteId: string) => void;
+  addClientMedication: (medication: ClientMedications) => void;
+  updateClientMedication: (medication: ClientMedications) => void;
+  deleteClientMedication: (medicationId: string) => void;
+  addClientHealthCareProvider: (healthCareProvider: HealthcareProvider) => void;
+  updateClientHealthCareProvider: (
+    healthCareProvider: HealthcareProvider
+  ) => void;
+  deleteClientHealthCareProvider: (providerID: string) => void;
+  addClientMedicalHistory: (medicalHistory: ClientMedical) => void;
+  addClientDocument: (document: Document) => void;
+  deleteClientDocument: (documentId: string) => void;
+  handleDownload: (doc: Document) => Promise<void>;
+  addClientAccess: (access: AccessInfo) => void;
+  deleteClientAccess: (userId: string) => void;
+}
+
+export interface DocumentContextType {
+  isAddDocumentModalOpen: boolean;
+  setIsAddDocumentModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface AppointmentsContextType {
+  appointments: Appointment[];
+  setAppointments: React.Dispatch<React.SetStateAction<Appointment[]>>;
+  addAppointment: (appointment: Appointment) => void;
+  isAddAppointmentModalOpen: boolean;
+  setIsAddAppointmentModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  deleteAppointment: (appointmentId: string) => void;
+  editAppointment: (appointment: Appointment) => void;
+  cancelAppointment: (appointmentId: string) => void;
+}

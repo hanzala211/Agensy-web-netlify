@@ -1,0 +1,43 @@
+{
+	"compilerOptions": {
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+		"target": "ES2020",
+		"useDefineForClassFields": true,
+		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"skipLibCheck": true,
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"moduleDetection": "force",
+		"noEmit": true,
+		"jsx": "react-jsx",
+
+		/* Linting */
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"erasableSyntaxOnly": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true,
+
+		/* Path aliases */
+		"baseUrl": ".",
+		"paths": {
+			"@agensy/assets": ["public/assets/*"],
+			"@agensy/components": ["./src/components/components.ts"],
+			"@agensy/constants": ["./src/constants/constants.ts"],
+			"@agensy/pages": ["./src/pages/pages.ts"],
+			"@agensy/types": ["./src/types/types.ts"],
+			"@agensy/context": ["./src/context/context.ts"],
+			"@agensy/layouts": ["./src/layouts/layouts.ts"],
+			"@agensy/services": ["./src/services/services.ts"],
+			"@agensy/utils": ["./src/utils/utils.ts"],
+			"@agensy/hooks": ["./src/hooks/hooks.ts"],
+			"@agensy/config": ["./src/config/config.ts"],
+			"@agensy/api": ["./src/api/api.ts"]
+		}
+	},
+	"include": ["src"]
+}

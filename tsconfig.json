@@ -1,0 +1,24 @@
+{
+	"files": [],
+	"references": [
+		{ "path": "./tsconfig.app.json" },
+		{ "path": "./tsconfig.node.json" }
+	],
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@agensy/assets": ["public/assets/*"],
+			"@agensy/components": ["./src/components/components.ts"],
+			"@agensy/constants": ["./src/constants/constants.ts"],
+			"@agensy/pages": ["./src/pages/pages.ts"],
+			"@agensy/types": ["./src/types/types.ts"],
+			"@agensy/context": ["./src/context/context.ts"],
+			"@agensy/layouts": ["./src/layouts/layouts.ts"],
+			"@agensy/services": ["./src/services/services.ts"],
+			"@agensy/utils": ["./src/utils/utils.ts"],
+			"@agensy/hooks": ["./src/hooks/hooks.ts"],
+			"@agensy/config": ["./src/config/config.ts"],
+			"@agensy/api": ["./src/api/api.ts"]
+		}
+	}
+}
