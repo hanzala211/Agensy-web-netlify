@@ -44,14 +44,14 @@ export const getHeaderDate = (
 ): string => {
   switch (viewMode) {
     case "month":
-      return format(currentDate, "MMMM d, yyyy");
+      return format(currentDate, "MMMM, yyyy");
     case "week":
       return `${format(startOfWeek(currentDate), "MMMM d")} - ${format(
         endOfWeek(currentDate),
         "MMMM d, yyyy"
       )}`;
     case "day":
-      return format(currentDate, "MMMM d, yyyy, hh:mm a");
+      return format(currentDate, "MMMM d, yyyy");
     default:
       return format(currentDate, "MMMM d, yyyy");
   }
@@ -73,8 +73,7 @@ export const getFilteredAppointments = (
       case "month":
         return (
           appointmentStartDate.getFullYear() === valueDate.getFullYear() &&
-          appointmentStartDate.getMonth() === valueDate.getMonth() &&
-          appointmentStartDate.getDate() === valueDate.getDate()
+          appointmentStartDate.getMonth() === valueDate.getMonth()
         );
       case "week":
         return (
@@ -83,8 +82,7 @@ export const getFilteredAppointments = (
         );
       case "day": {
         return (
-          isSameDay(appointmentStartDate, value) &&
-          appointmentStartDate.getHours() === value.getHours()
+          isSameDay(appointmentStartDate, value)
         );
       }
       default:

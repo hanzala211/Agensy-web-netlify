@@ -161,23 +161,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
                   : "Completed"
                 : "Cancelled"}
             </AntdTag>
-            {appointment.active &&
-              new Date(appointment.end_time) > new Date() && (
-                <span
-                  onClick={() => setIsModalOpen(true)}
-                  className={`text-basicRed bg-red-50 border-red-200 ${
-                    cancelClientAppointmentMutation.isPending
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-red-100"
-                  } border cursor-pointer transition-colors duration-200 text-[11px] w-fit focus:outline-none focus:ring-2 px-1 py-0.5 focus:ring-offset-2 focus:ring-basicRed rounded-[5px]`}
-                  aria-label="Cancel Appointment"
-                  title="Cancel Appointment"
-                >
-                  {cancelClientAppointmentMutation.isPending
-                    ? "Cancelling..."
-                    : "Cancel"}
-                </span>
-              )}
             {/* @ts-expect-error // Antd Modal props are not typed */}
             <Modal
               title="Cancel Appointment"
@@ -199,6 +182,23 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
               onEdit={() => onEdit?.(appointment)}
               isDeleting={isDeleting}
             />
+            {appointment.active &&
+              new Date(appointment.end_time) > new Date() && (
+                <button
+                  className={`text-sm ${
+                    cancelClientAppointmentMutation.isPending
+                      ? "opacity-50 cursor-not-allowed"
+                      : "opacity-100 cursor-pointer"
+                  } font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-colors duration-200 text-basicRed hover:text-darkRed focus:ring-basicRed`}
+                  onClick={() => setIsModalOpen(true)}
+                  disabled={cancelClientAppointmentMutation.isPending}
+                  aria-label="Cancel Appointment"
+                >
+                  {cancelClientAppointmentMutation.isPending
+                    ? "Cancelling..."
+                    : "Cancel"}
+                </button>
+              )}
           </div>
         </div>
       </div>

@@ -12,9 +12,6 @@ export const Settings = () => {
           <TabLink to={`${ROUTES.settings}`} end>
             Profile
           </TabLink>
-          <TabLink to={`${ROUTES.settings}/${ROUTES.profileNotifications}`}>
-            Notifications
-          </TabLink>
           <TabLink to={`${ROUTES.settings}/${ROUTES.profileSubscription}`}>
             Subscription
           </TabLink>

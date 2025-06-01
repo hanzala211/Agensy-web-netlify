@@ -15,7 +15,6 @@ export interface IUser extends BaseSchema {
   phone?: string;
   avatar?: string;
   role?: string;
-  lastPassChangeDate?: string;
 }
 
 export interface Client extends BaseSchema {

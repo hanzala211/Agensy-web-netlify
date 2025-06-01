@@ -123,7 +123,7 @@ export const MobileNav: React.FC = () => {
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white text-sm font-medium shadow-sm hover:shadow-md transition-shadow touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryColor/50"
               >
                 <div>
-                  {userData?.email_verified ? (
+                  {userData?.avatar ? (
                     <img
                       src={file ? URL.createObjectURL(file) : userData.avatar}
                       alt="profile"

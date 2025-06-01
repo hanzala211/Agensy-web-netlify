@@ -3,13 +3,11 @@ import {
   confirmResetPassword,
   confirmSignUp,
   fetchAuthSession,
-  fetchUserAttributes,
   resendSignUpCode,
   resetPassword,
   signIn,
   signUp,
   updatePassword,
-  updateUserAttributes,
 } from "aws-amplify/auth";
 import { awsErrorMessage } from "./awsErrorMessage";
 
@@ -26,12 +24,6 @@ export const signup = async (email: string, password: string) => {
       options: {
         userAttributes: { email },
         autoSignIn: true,
-      },
-    });
-    const currentDate = new Date().toISOString();
-    await updateUserAttributes({
-      userAttributes: {
-        "custom:lastChangeDatePass": currentDate,
       },
     });
     return signUpResponse;
@@ -131,20 +123,9 @@ export const changePassword = async (
       oldPassword,
       newPassword,
     });
-    const currentDate = new Date().toISOString();
-    await updateUserAttributes({
-      userAttributes: {
-        "custom:lastChangeDatePass": currentDate,
-      },
-    });
   } catch (err: unknown) {
     const error = err as AuthError;
     console.log(error);
     throw awsErrorMessage(error.name, error.message);
   }
-};
-
-export const getLastPasswordChangeDate = async () => {
-  const userAttributes = await fetchUserAttributes();
-  return userAttributes?.["custom:lastChangeDatePass"] || null;
 };

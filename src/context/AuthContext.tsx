@@ -14,7 +14,7 @@ import React, {
 import { AuthService } from "@agensy/services";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useClientManager } from "@agensy/hooks";
-import { CognitoUtils } from "@agensy/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -25,6 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [userData, setUserData] = useState<IUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     loadAuth();
@@ -32,12 +33,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const loadAuth = async () => {
     try {
-      const lastPassChangeDate = await CognitoUtils.getLastPasswordChangeDate();
-
       const cognitoUser = await getCurrentUser();
       if (cognitoUser) {
         const apiRes = await AuthService.me();
-        setUserData({ ...apiRes, lastPassChangeDate });
+        setUserData({ ...apiRes });
       }
     } catch {
       signOut();
@@ -49,6 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const handleLogout = () => {
     signOut();
     setUserData(null);
+    queryClient.removeQueries();
   };
 
   const filterHealthCareProvider = (clientId: string, providerId: string) => {

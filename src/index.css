@@ -258,6 +258,7 @@ body {
 
 .ant-badge-status-dot {
   margin-left: 4px;
+  margin-bottom: 2px;
 }
 
 .rbc-event {
@@ -286,15 +287,4 @@ body {
 
 .rbc-row-segment .rbc-selected {
   background-color: transparent !important;
-}
-
-@media (max-width: 768px) {
-  .rbc-day-bg {
-    min-height: 100px;
-    touch-action: manipulation;
-  }
-
-  .rbc-month-view {
-    -webkit-tap-highlight-color: transparent;
-  }
 }

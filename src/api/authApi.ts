@@ -32,9 +32,7 @@ export const useSignInMutation = () => {
       console.log(response);
       if (response) {
         const apiRes = await AuthService.login();
-        const lastPassChangeDate =
-          await CognitoUtils.getLastPasswordChangeDate();
-        return { userData: { ...apiRes, lastPassChangeDate } };
+        return { userData: apiRes };
       }
       return null;
     },

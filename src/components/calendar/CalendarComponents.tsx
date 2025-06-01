@@ -7,7 +7,6 @@ import type { Appointment, ViewMode } from "@agensy/types";
 interface WrapperProps {
   appointments: Appointment[];
   viewMode: ViewMode;
-  onSelectSlot?: (date: Date) => void;
 }
 
 interface DateCellProps extends WrapperProps {
@@ -33,7 +32,6 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
   children,
   appointments,
   viewMode,
-  onSelectSlot,
 }) => {
   const dayAppointments = appointments.filter((appointment: Appointment) =>
     isSameDay(new Date(appointment.start_time), value)
@@ -42,14 +40,11 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
   const handleCellClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onSelectSlot) {
-      onSelectSlot(value);
-    }
   };
 
   return (
-    <div 
-      className={`${viewMode === "day" ? "" : "rbc-day-bg"} relative cursor-pointer touch-manipulation`}
+    <div
+      className={`${viewMode === "day" ? "" : "rbc-day-bg"} cursor-default`}
       onClick={handleCellClick}
       onTouchEnd={handleCellClick}
       role="button"
@@ -57,8 +52,10 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
     >
       {children}
       <div
-        className={`custom-badge-container absolute top-0 left-0 ${
-          viewMode === "month" ? "md:flex flex-col md:gap-2 grid grid-cols-2 gap-0" : "hidden"
+        className={`custom-badge-container  ${
+          viewMode === "month"
+            ? "flex flex-col md:gap-2"
+            : "hidden"
         }`}
       >
         {dayAppointments.map((appointment: Appointment) => (
@@ -90,7 +87,6 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
   value,
   children,
   appointments,
-  onSelectSlot,
 }) => {
   const timeSlotAppointments = appointments.filter(
     (appointment: Appointment) => {
@@ -105,26 +101,12 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
     }
   );
 
-  const handleTimeSlotClick = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onSelectSlot) {
-      onSelectSlot(value);
-    }
-  };
-
   return (
-    <div 
-      className="rbc-time-slot cursor-pointer touch-manipulation"
-      onClick={handleTimeSlotClick}
-      onTouchEnd={handleTimeSlotClick}
-      role="button"
-      tabIndex={0}
-    >
+    <div className="rbc-time-slot cursor-default" role="button" tabIndex={0}>
       {children}
       <div className="custom-badge-container">
         {timeSlotAppointments.map((appointment: Appointment) => (
-          <AntdBadge  
+          <AntdBadge
             key={appointment.id}
             status={
               appointment.active
@@ -146,8 +128,7 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
 
 export const createCalendarComponents = (
   appointments: Appointment[],
-  viewMode: ViewMode,
-  onSelectSlot?: (date: Date) => void
+  viewMode: ViewMode
 ): Components<CalendarEvent> => ({
   event: () => null,
   dateCellWrapper: (props) => (
@@ -155,7 +136,6 @@ export const createCalendarComponents = (
       {...(props as unknown as DateCellProps)}
       appointments={appointments}
       viewMode={viewMode}
-      onSelectSlot={onSelectSlot}
     />
   ),
   timeSlotWrapper: (props) => (
@@ -163,7 +143,6 @@ export const createCalendarComponents = (
       {...(props as TimeSlotProps)}
       appointments={appointments}
       viewMode={viewMode}
-      onSelectSlot={onSelectSlot}
     />
   ),
   toolbar: () => null,

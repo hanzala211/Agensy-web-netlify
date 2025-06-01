@@ -1,31 +1,101 @@
 import { useState, useCallback, useEffect } from "react";
-import type { Appointment, ViewMode } from "@agensy/types";
-import { CalendarUtils } from "@agensy/utils";
+import type { Appointment, AppointmentFormData, ViewMode } from "@agensy/types";
+import { CalendarUtils, toast } from "@agensy/utils";
+import { useDeleteClientAppointmentMutation } from "@agensy/api";
+import { useAppointmentsContext } from "@agensy/context";
+import { useEditClientAppointmentMutation } from "@agensy/api";
 
-interface CalendarState {
-  currentDate: Date;
-  viewMode: ViewMode;
-  selectedSlot: Date | null;
-  selectedAppointments: Appointment[];
-  setCurrentDate: (date: Date) => void;
-  setViewMode: (mode: ViewMode) => void;
-  setSelectedSlot: (date: Date | null) => void;
-  handleSelectSlot: (slotInfo: {
-    start: Date;
-    end: Date;
-    action: string;
-  }) => void;
-}
-
-export const useCalendarState = (
-  appointments: Appointment[]
-): CalendarState => {
+export const useCalendarState = (appointments: Appointment[]) => {
+  const deleteClientAppointmentMutation = useDeleteClientAppointmentMutation();
+  const editClientAppointmentMutation = useEditClientAppointmentMutation();
+  const { deleteAppointment, editAppointment } = useAppointmentsContext();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
   const [selectedAppointments, setSelectedAppointments] = useState<
     Appointment[]
   >([]);
+
+  const [editAppointmentData, setEditAppointmentData] =
+    useState<Appointment | null>(null);
+  const [isEditAppointmentModalOpen, setIsEditAppointmentModalOpen] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isEditAppointmentModalOpen) removeEditAppointment();
+  }, [isEditAppointmentModalOpen]);
+
+  useEffect(() => {
+    if (deleteClientAppointmentMutation.status === "success") {
+      deleteAppointment(
+        deleteClientAppointmentMutation.variables.appointmentId
+      );
+      setSelectedAppointments(
+        CalendarUtils.getFilteredAppointments(
+          currentDate,
+          appointments,
+          viewMode
+        )
+      );
+      toast.success("Appointment deleted successfully");
+    } else if (deleteClientAppointmentMutation.status === "error") {
+      toast.error("Failed to delete appointment");
+    }
+  }, [deleteClientAppointmentMutation.status]);
+
+  useEffect(() => {
+    if (editClientAppointmentMutation.status === "success") {
+      toast.success("Appointment updated successfully");
+      editAppointment(editClientAppointmentMutation.data);
+      setSelectedAppointments(
+        CalendarUtils.getFilteredAppointments(
+          currentDate,
+          appointments,
+          viewMode
+        )
+      );
+      setIsEditAppointmentModalOpen(false);
+      setEditAppointmentData(null);
+    } else if (editClientAppointmentMutation.status === "error") {
+      toast.error("Failed to update appointment");
+    }
+  }, [editClientAppointmentMutation.status]);
+
+  const handleEdit = (data: AppointmentFormData) => {
+    const postData = {
+      title: data.title,
+      appointment_type: data.appointment_type,
+      start_time: new Date(data.start_time).toISOString(),
+      end_time: new Date(data.end_time).toISOString(),
+      notes: data.notes,
+      location: data.location,
+      healthcare_provider_id: data.healthcare_provider_id,
+      post_appointment_notes: data.post_appointment_notes || "",
+    };
+    editClientAppointmentMutation.mutate({
+      clientId: data.clientId as string,
+      appointmentId: editAppointmentData?.id as string,
+      items: postData,
+    });
+  };
+
+  const handleDelete = (appointment: Appointment) => {
+    deleteClientAppointmentMutation.mutate({
+      clientId: appointment.client_id,
+      appointmentId: appointment.id,
+    });
+  };
+
+  const handleOpenEditModal = (appointment: Appointment) => {
+    setEditAppointmentData(appointment);
+    setIsEditAppointmentModalOpen(true);
+  };
+
+  const removeEditAppointment = () => {
+    setTimeout(() => {
+      setEditAppointmentData(null);
+    }, 100);
+  };
 
   const handleSelectSlot = useCallback(
     (slotInfo: { start: Date; end: Date; action: string }) => {
@@ -62,5 +132,15 @@ export const useCalendarState = (
     setViewMode,
     setSelectedSlot,
     handleSelectSlot,
+    handleDelete,
+    handleEdit,
+    handleOpenEditModal,
+    removeEditAppointment,
+    isEditAppointmentModalOpen,
+    setIsEditAppointmentModalOpen,
+    editAppointmentData,
+    setEditAppointmentData,
+    deleteClientAppointmentMutation,
+    editClientAppointmentMutation,
   };
 };

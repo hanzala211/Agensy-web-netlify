@@ -3,11 +3,9 @@ import { Card, EditPasswordSettingsModal } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import { useChangePasswordMutation } from "@agensy/api";
 import type { PasswordFormData } from "@agensy/types";
-import { DateUtils, toast } from "@agensy/utils";
-import { useAuthContext } from "@agensy/context";
+import { toast } from "@agensy/utils";
 
 export const PasswordSettingsCard: React.FC = () => {
-  const { userData } = useAuthContext();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const updatePasswordMutation = useChangePasswordMutation();
 
@@ -45,17 +43,6 @@ export const PasswordSettingsCard: React.FC = () => {
             <div className="flex items-center gap-3 p-2 bg-lightGray rounded-xl">
               <ICONS.password size={18} className="text-gray-500" />
               <p className="text-darkGray">••••••••</p>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600">Last Changed</label>
-            <div className="flex items-center gap-3 p-2 bg-lightGray rounded-xl">
-              <ICONS.calendar size={18} className="text-gray-500" />
-              <p className="text-darkGray">
-                {DateUtils.formatDateToRequiredFormat(
-                  userData?.lastPassChangeDate || ""
-                )}
-              </p>
             </div>
           </div>
         </div>
