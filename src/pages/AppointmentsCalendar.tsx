@@ -34,21 +34,46 @@ export const AppointmentsCalendar: React.FC = () => {
     setCurrentDate,
     setViewMode,
     handleSelectSlot,
+    clientFilter,
+    setClientFilter,
+    typeFilter,
+    setTypeFilter,
   } = useCalendarState(appointments);
 
+  const filteredAppointments = useMemo(() => {
+    if (clientFilter === "all" && typeFilter === "all") {
+      return appointments;
+    }
+    if (clientFilter === "all") {
+      return appointments.filter(
+        (appointment) => appointment.appointment_type === typeFilter
+      );
+    }
+    if (typeFilter === "all") {
+      return appointments.filter(
+        (appointment) => appointment.client_id === clientFilter
+      );
+    }
+    return appointments.filter(
+      (appointment) =>
+        appointment.client_id === clientFilter &&
+        appointment.appointment_type === typeFilter
+    );
+  }, [appointments, clientFilter, typeFilter]);
+
   const events = useMemo(() => {
-    return appointments.map((appointment) => ({
+    return filteredAppointments.map((appointment) => ({
       id: appointment.id,
       title: appointment.title,
       start: new Date(appointment.start_time),
       end: new Date(appointment.end_time),
       appointment: appointment,
     }));
-  }, [appointments]);
+  }, [filteredAppointments]);
 
   const components = useMemo(
-    () => createCalendarComponents(appointments, viewMode),
-    [appointments, viewMode, handleSelectSlot]
+    () => createCalendarComponents(filteredAppointments, viewMode),
+    [filteredAppointments, viewMode, handleSelectSlot, clientFilter, typeFilter]
   );
 
   const handlePrevious = () => {
@@ -68,6 +93,10 @@ export const AppointmentsCalendar: React.FC = () => {
           onViewModeChange={setViewMode}
           onPrevious={handlePrevious}
           onNext={handleNext}
+          clientFilter={clientFilter}
+          setClientFilter={setClientFilter}
+          typeFilter={typeFilter}
+          setTypeFilter={setTypeFilter}
         />
         <Calendar
           localizer={localizer}

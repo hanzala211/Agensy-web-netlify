@@ -60,7 +60,9 @@ export const getHeaderDate = (
 export const getFilteredAppointments = (
   value: Date,
   appointments: Appointment[],
-  viewMode: ViewMode
+  viewMode: ViewMode,
+  clientFilter: string,
+  typeFilter: string
 ): Appointment[] => {
   return appointments.filter((appointment) => {
     const appointmentDate = dayjs(appointment.start_time);
@@ -69,24 +71,31 @@ export const getFilteredAppointments = (
     const appointmentStartDate = new Date(appointment.start_time);
     const valueDate = new Date(value);
 
+    const matchesClient =
+      clientFilter === "all" || appointment.client_id === clientFilter;
+
+    const matchesType =
+      typeFilter === "all" || appointment.appointment_type === typeFilter;
+
+    let matchesDate = false;
     switch (viewMode) {
       case "month":
-        return (
+        matchesDate =
           appointmentStartDate.getFullYear() === valueDate.getFullYear() &&
-          appointmentStartDate.getMonth() === valueDate.getMonth()
-        );
+          appointmentStartDate.getMonth() === valueDate.getMonth();
+        break;
       case "week":
-        return (
+        matchesDate =
           appointmentDate.isAfter(weekStartTime) &&
-          appointmentDate.isBefore(weekEndTime)
-        );
-      case "day": {
-        return (
-          isSameDay(appointmentStartDate, value)
-        );
-      }
+          appointmentDate.isBefore(weekEndTime);
+        break;
+      case "day":
+        matchesDate = isSameDay(appointmentStartDate, value);
+        break;
       default:
-        return false;
+        matchesDate = false;
     }
+
+    return matchesClient && matchesType && matchesDate;
   });
 };

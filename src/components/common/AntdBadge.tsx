@@ -16,7 +16,7 @@ export const AntdBadge: React.FC<AntdBadgeProps> = ({ status, size, text }) => {
         size={size}
         style={{ transform: "scale(1.3)" }}
       />
-      <p className="text-[14px]">{text}</p>
+      <p className="text-[12px] xl:text-[14px] line-clamp-2">{text}</p>
     </div>
   );
 };

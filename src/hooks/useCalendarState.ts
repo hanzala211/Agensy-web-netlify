@@ -15,6 +15,8 @@ export const useCalendarState = (appointments: Appointment[]) => {
   const [selectedAppointments, setSelectedAppointments] = useState<
     Appointment[]
   >([]);
+  const [clientFilter, setClientFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
   const [editAppointmentData, setEditAppointmentData] =
     useState<Appointment | null>(null);
@@ -34,7 +36,9 @@ export const useCalendarState = (appointments: Appointment[]) => {
         CalendarUtils.getFilteredAppointments(
           currentDate,
           appointments,
-          viewMode
+          viewMode,
+          clientFilter,
+          typeFilter
         )
       );
       toast.success("Appointment deleted successfully");
@@ -51,7 +55,9 @@ export const useCalendarState = (appointments: Appointment[]) => {
         CalendarUtils.getFilteredAppointments(
           currentDate,
           appointments,
-          viewMode
+          viewMode,
+          clientFilter,
+          typeFilter
         )
       );
       setIsEditAppointmentModalOpen(false);
@@ -103,7 +109,13 @@ export const useCalendarState = (appointments: Appointment[]) => {
       setCurrentDate(start);
       setSelectedSlot(start);
       setSelectedAppointments(
-        CalendarUtils.getFilteredAppointments(start, appointments, viewMode)
+        CalendarUtils.getFilteredAppointments(
+          start,
+          appointments,
+          viewMode,
+          clientFilter,
+          typeFilter
+        )
       );
     },
     [appointments, viewMode]
@@ -111,9 +123,15 @@ export const useCalendarState = (appointments: Appointment[]) => {
 
   useEffect(() => {
     setSelectedAppointments(
-      CalendarUtils.getFilteredAppointments(currentDate, appointments, viewMode)
+      CalendarUtils.getFilteredAppointments(
+        currentDate,
+        appointments,
+        viewMode,
+        clientFilter,
+        typeFilter
+      )
     );
-  }, [viewMode, currentDate, appointments]);
+  }, [viewMode, currentDate, appointments, clientFilter, typeFilter]);
 
   useEffect(() => {
     if (viewMode === "month") {
@@ -142,5 +160,10 @@ export const useCalendarState = (appointments: Appointment[]) => {
     setEditAppointmentData,
     deleteClientAppointmentMutation,
     editClientAppointmentMutation,
+    setSelectedAppointments,
+    clientFilter,
+    setClientFilter,
+    typeFilter,
+    setTypeFilter,
   };
 };
