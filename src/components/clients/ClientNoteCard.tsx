@@ -7,6 +7,7 @@ import {
   ActionButtons,
   AddNoteModal,
   Card,
+  ConfirmationModal,
   EmptyStateCard,
   InfoItem,
 } from "@agensy/components";
@@ -26,6 +27,7 @@ export const ClientNoteCard: React.FC = () => {
   const [selectedEditNote, setSelectedEditNote] = useState<NoteType | null>(
     null
   );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (addNoteMutation.status === "success") {
@@ -72,13 +74,6 @@ export const ClientNoteCard: React.FC = () => {
     removeEditNote();
   };
 
-  const handleDeleteNote = (noteId: string) => {
-    deleteNoteMutation.mutate({
-      noteId,
-      clientId: selectedClient?.id as string,
-    });
-  };
-
   const handleAddNote = (data: NoteFormData) => {
     if (!selectedEditNote) {
       addNoteMutation.mutate({
@@ -98,6 +93,14 @@ export const ClientNoteCard: React.FC = () => {
     setTimeout(() => {
       setSelectedEditNote(null);
     }, 100);
+  };
+
+  const handleDeleteNote = (noteId: string) => {
+    setIsDeleteModalOpen(false);
+    deleteNoteMutation.mutate({
+      noteId,
+      clientId: selectedClient?.id as string,
+    });
   };
 
   return (
@@ -125,13 +128,21 @@ export const ClientNoteCard: React.FC = () => {
                   <div className="flex items-center justify-end gap-2">
                     <ActionButtons
                       onEdit={() => handleEditNote(item)}
-                      onDelete={() => handleDeleteNote(item.id as string)}
+                      onDelete={() => setIsDeleteModalOpen(true)}
                       isDeleting={deleteNoteMutation.isPending}
                       editLabel="Edit Note"
                       deleteLabel="Delete Note"
                     />
                   </div>
                 </div>
+                <ConfirmationModal
+                  title="Delete Note"
+                  isModalOpen={isDeleteModalOpen}
+                  onOk={() => handleDeleteNote(item.id as string)}
+                  onCancel={() => setIsDeleteModalOpen(false)}
+                >
+                  <p>Are you sure you want to delete this note?</p>
+                </ConfirmationModal>
               </InfoItem>
             ))
           ) : (

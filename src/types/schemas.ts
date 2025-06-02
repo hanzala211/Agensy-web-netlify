@@ -153,7 +153,7 @@ export interface Template extends BaseSchema {
   completedDate?: Date;
 }
 
-export interface Appointment {
+export interface Appointment extends BaseSchema {
   id: string;
   client_id: string;
   createdBy: IUser;

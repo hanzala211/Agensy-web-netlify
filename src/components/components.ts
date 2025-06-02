@@ -78,3 +78,4 @@ export * from "./settings/ProfileSettingCard";
 export * from "./settings/EditProfileSettingsModal";
 export * from "./settings/PasswordSettingsCard";
 export * from "./settings/EditPasswordSettingsModal";
+export * from "./common/ConfirmationModal";

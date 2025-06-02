@@ -1,10 +1,10 @@
 import { AddAppointmentModal, AppointmentCard } from "@agensy/components";
 import { EmptyStateCard } from "@agensy/components";
-import { format, startOfWeek, endOfWeek } from "date-fns";
 import { ICONS } from "@agensy/constants";
 import type { Appointment } from "@agensy/types";
 import React from "react";
 import { useCalendarState } from "@agensy/hooks";
+import { CalendarUtils } from "@agensy/utils";
 
 interface AppointmentsCalendarCardProps {
   viewMode: "month" | "week" | "day";
@@ -37,15 +37,7 @@ export const AppointmentsCalendarCard: React.FC<
     <React.Fragment>
       <div className="bg-white rounded-xl p-5 shadow-sm">
         <h3 className="text-lg font-semibold mb-4">
-          Appointments for{" "}
-          {viewMode === "week"
-            ? `Week of ${format(startOfWeek(currentDate), "MMMM d")} - ${format(
-                endOfWeek(currentDate),
-                "MMMM d, yyyy"
-              )}`
-            : viewMode === "month"
-            ? format(currentDate, "MMMM, yyyy")
-            : format(currentDate, "MMMM d, yyyy")}
+          Appointments for {CalendarUtils.getHeaderDate(currentDate, viewMode)}
         </h3>
         <div className="grid gap-4">
           {selectedAppointments.length === 0 ? (

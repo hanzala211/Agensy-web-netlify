@@ -10,3 +10,4 @@ export * as DocumentService from "./document.service";
 export * as ClientAccessService from "./client.access.service";
 export * as ClientAppointmentService from "./client.appointment.service";
 export * as UserProfileSettingsService from "./user.profile.settings.service";
+export * as StripeService from "./stripe.service";

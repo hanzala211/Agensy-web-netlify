@@ -21,7 +21,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { clients } = useClientManager({ initialItemPerPage: 5 });
+  const { clients, loadClients } = useClientManager({ initialItemPerPage: 5 });
   const [userData, setUserData] = useState<IUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
@@ -30,6 +30,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     loadAuth();
   }, []);
+
+  useEffect(() => {
+    if (userData) loadClients();
+  }, [userData]);
 
   const loadAuth = async () => {
     try {

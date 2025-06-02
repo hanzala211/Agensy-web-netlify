@@ -56,11 +56,13 @@ export const useAppointmentManager = ({
       switch (sortBy) {
         case "newest":
           return (
-            new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
+            new Date(String(b.createdAt)).getTime() -
+            new Date(String(a.createdAt)).getTime()
           );
         case "oldest":
           return (
-            new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+            new Date(String(a.createdAt)).getTime() -
+            new Date(String(b.createdAt)).getTime()
           );
         case "title-asc":
           return a.title.localeCompare(b.title);

@@ -52,6 +52,7 @@ import { IoMdAddCircle } from "react-icons/io";
 import { IoHomeSharp, IoPersonAdd } from "react-icons/io5";
 import { CiMedicalCross } from "react-icons/ci";
 import { GrDocumentText } from "react-icons/gr";
+import { BiDollar } from "react-icons/bi";
 
 export const ICONS = {
   mail: MdMailOutline,
@@ -101,5 +102,6 @@ export const ICONS = {
   document: GrDocumentText,
   download: FaDownload,
   print: FiPrinter,
-  share: FiShare2
+  share: FiShare2,
+  dollar: BiDollar,
 };

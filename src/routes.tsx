@@ -23,6 +23,7 @@ import {
   AppointmentsList,
   Settings,
   ProfileSettings,
+  PaymentStatus,
 } from "@agensy/pages";
 import { useAuthContext } from "@agensy/context";
 
@@ -65,6 +66,7 @@ export const Routes: React.FC = () => {
         </Route>
 
         <Route path={ROUTES.clients} element={<Clients />} />
+        <Route path={`${ROUTES.profileSubscription}/${ROUTES.paymentStatus}`} element={<PaymentStatus />} />
 
         <Route path={`${ROUTES.clients}/:clientId`} element={<ClientProfile />}>
           <Route path={ROUTES.clientOverview} element={<ClientOverview />} />

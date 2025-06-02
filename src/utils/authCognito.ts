@@ -126,6 +126,9 @@ export const changePassword = async (
   } catch (err: unknown) {
     const error = err as AuthError;
     console.log(error);
+    if (error.name === ERRORS.notAuthorized) {
+      throw "Invalid password";
+    }
     throw awsErrorMessage(error.name, error.message);
   }
 };

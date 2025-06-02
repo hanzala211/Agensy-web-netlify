@@ -4,12 +4,12 @@ import {
   AntdBadge,
   AntdTag,
   BorderedCard,
+  ConfirmationModal,
 } from "@agensy/components";
 import { APPOINTMENT_TYPES, ICONS } from "@agensy/constants";
 import { useAppointmentsContext, useAuthContext } from "@agensy/context";
 import type { Appointment } from "@agensy/types";
 import { DateUtils, toast } from "@agensy/utils";
-import { Modal } from "antd";
 import React, { useEffect, useState } from "react";
 
 interface AppointmentCardProps {
@@ -32,6 +32,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
     (type) => type.value === appointment.appointment_type
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
   const handleCancelAppointment = () => {
     setIsModalOpen(false);
@@ -52,6 +53,11 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
       toast.error("Failed to cancel appointment");
     }
   }, [cancelClientAppointmentMutation.status]);
+
+  const handleDeleteAppointment = () => {
+    setIsDeleteModalOpen(false);
+    onDelete?.(appointment);
+  };
 
   return (
     <BorderedCard>
@@ -89,7 +95,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 text-sm">
             <div className="flex flex-col gap-2 text-gray-600">
               <div className="flex items-center gap-2 text-gray-600">
                 <ICONS.clockCircle className="text-gray-400" size={14} />
@@ -140,8 +146,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-2 md:items-center items-start">
-          <div className="flex gap-2 items-start">
+        <div className="flex flex-col gap-2 md:items-end items-start lg:min-w-[200px]">
+          <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
             <AntdTag
               color={
                 appointment.active
@@ -161,24 +167,28 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
                   : "Completed"
                 : "Cancelled"}
             </AntdTag>
-            {/* @ts-expect-error // Antd Modal props are not typed */}
-            <Modal
+            <ConfirmationModal
               title="Cancel Appointment"
-              centered
-              open={isModalOpen}
+              isModalOpen={isModalOpen}
               onOk={() => handleCancelAppointment()}
               onCancel={() => setIsModalOpen(false)}
-              okText="Yes"
-              cancelText="No"
             >
               <p>Are you sure you want to cancel this appointment?</p>
-            </Modal>
+            </ConfirmationModal>
+            <ConfirmationModal
+              title="Delete Appointment"
+              isModalOpen={isDeleteModalOpen}
+              onOk={handleDeleteAppointment}
+              onCancel={() => setIsDeleteModalOpen(false)}
+            >
+              <p>Are you sure you want to delete this appointment?</p>
+            </ConfirmationModal>
           </div>
-          <div className="flex gap-2 items-start">
+          <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
             <ActionButtons
               editLabel="Edit Appointment"
               deleteLabel="Delete Appointment"
-              onDelete={() => onDelete?.(appointment)}
+              onDelete={() => setIsDeleteModalOpen(true)}
               onEdit={() => onEdit?.(appointment)}
               isDeleting={isDeleting}
             />

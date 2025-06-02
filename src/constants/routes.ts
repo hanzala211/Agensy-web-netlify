@@ -31,4 +31,5 @@ export const ROUTES = {
   profileNotifications: "notifications",
   profileSubscription: "subscription",
   access: "access",
+  paymentStatus: "payment-status",
 };

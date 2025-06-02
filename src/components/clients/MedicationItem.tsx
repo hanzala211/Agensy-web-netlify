@@ -1,7 +1,11 @@
-import { ActionButtons, BorderedCard } from "@agensy/components";
+import {
+  ActionButtons,
+  BorderedCard,
+  ConfirmationModal,
+} from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import type { ClientMedications } from "@agensy/types";
-import React from "react";
+import React, { useState } from "react";
 
 interface MedicationItemProps {
   medication: ClientMedications;
@@ -16,6 +20,12 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
   onDelete,
   isDeleting = false,
 }) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
+  const handleDeleteMedication = () => {
+    setIsDeleteModalOpen(false);
+    onDelete?.(medication);
+  };
   return (
     <BorderedCard>
       <div className="flex flex-col gap-4 lg:flex-row items-start justify-between">
@@ -79,9 +89,17 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
             editLabel="Edit Medication"
             deleteLabel="Delete Medication"
             onEdit={() => onEdit?.(medication)}
-            onDelete={() => onDelete?.(medication)}
+            onDelete={() => setIsDeleteModalOpen(true)}
             isDeleting={isDeleting}
           />
+          <ConfirmationModal
+            title="Delete Medication"
+            isModalOpen={isDeleteModalOpen}
+            onOk={handleDeleteMedication}
+            onCancel={() => setIsDeleteModalOpen(false)}
+          >
+            <p>Are you sure you want to delete this medication?</p>
+          </ConfirmationModal>
         </div>
       </div>
       {medication?.notes && (

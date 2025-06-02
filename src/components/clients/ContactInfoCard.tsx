@@ -4,6 +4,7 @@ import { useClientContext } from "@agensy/context";
 import {
   AddContactModal,
   Card,
+  ConfirmationModal,
   ContactItem,
   EmptyStateCard,
 } from "@agensy/components";
@@ -28,6 +29,7 @@ export const ContactInfoCard: React.FC = () => {
   const [selectedEditContact, setSelectedEditContact] =
     useState<ClientContact | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isContactModalOpen) {
@@ -75,13 +77,6 @@ export const ContactInfoCard: React.FC = () => {
     removeEditContact();
   };
 
-  const handleDeleteContact = (contactId: string) => {
-    deleteContactMutation.mutate({
-      contactId,
-      clientId: selectedClient?.id as string,
-    });
-  };
-
   const handleAddContact = (data: ContactFormData) => {
     if (!selectedEditContact) {
       addContactMutation.mutate({
@@ -108,6 +103,14 @@ export const ContactInfoCard: React.FC = () => {
     }, 100);
   };
 
+  const handleDeleteContact = (contactId: string) => {
+    setIsDeleteModalOpen(false);
+    deleteContactMutation.mutate({
+      contactId,
+      clientId: selectedClient?.id as string,
+    });
+  };
+
   return (
     <React.Fragment>
       <Card
@@ -131,7 +134,7 @@ export const ContactInfoCard: React.FC = () => {
                     item.contact_type
                   )}`}
                   type={item.contact_type}
-                  onDelete={() => handleDeleteContact(item.id as string)}
+                  onDelete={() => setIsDeleteModalOpen(true)}
                   isDeleting={deleteContactMutation.isPending}
                 >
                   <div>
@@ -141,6 +144,14 @@ export const ContactInfoCard: React.FC = () => {
                     </p>
                     <p>{item.phone}</p>
                   </div>
+                  <ConfirmationModal
+                    title="Delete Contact"
+                    isModalOpen={isDeleteModalOpen}
+                    onOk={() => handleDeleteContact(item.id as string)}
+                    onCancel={() => setIsDeleteModalOpen(false)}
+                  >
+                    <p>Are you sure you want to delete this contact?</p>
+                  </ConfirmationModal>
                 </ContactItem>
               ))
           ) : (

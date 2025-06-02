@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { ICONS } from "@agensy/constants";
 import { DateUtils, StringUtils } from "@agensy/utils";
 import type { HealthcareProvider } from "@agensy/types";
 import { ActionButtons } from "./ActionButtons";
-import { BorderedCard } from "@agensy/components";
+import { BorderedCard, ConfirmationModal } from "@agensy/components";
 
 interface HealthcareProviderProps {
   provider: HealthcareProvider;
@@ -18,6 +18,12 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
   provider,
   isDeleting,
 }) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
+  const handleDeleteHealthCare = () => {
+    setIsDeleteModalOpen(false);
+    onDelete?.(provider as HealthcareProvider);
+  };
   return (
     <BorderedCard>
       <div className="flex items-start gap-4">
@@ -42,7 +48,7 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
                 editLabel="Edit Healthcare Provider"
                 deleteLabel="Delete Healthcare Provider"
                 onEdit={() => onEdit?.(provider as HealthcareProvider)}
-                onDelete={() => onDelete?.(provider as HealthcareProvider)}
+                onDelete={() => setIsDeleteModalOpen(true)}
                 isDeleting={isDeleting}
               />
             </div>
@@ -106,6 +112,14 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        title="Delete Healthcare Provider"
+        isModalOpen={isDeleteModalOpen}
+        onOk={handleDeleteHealthCare}
+        onCancel={() => setIsDeleteModalOpen(false)}
+      >
+        <p>Are you sure you want to delete this healthcare provider?</p>
+      </ConfirmationModal>
     </BorderedCard>
   );
 };

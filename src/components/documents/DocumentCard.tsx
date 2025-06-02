@@ -1,7 +1,13 @@
-import { AntdTag, BorderedCard, TertiaryButton } from "@agensy/components";
+import {
+  AntdTag,
+  BorderedCard,
+  ConfirmationModal,
+  TertiaryButton,
+} from "@agensy/components";
 import { COLORS, DOCUMENT_CATEGORY_OPTIONS, ICONS } from "@agensy/constants";
 import type { Document } from "@agensy/types";
 import { DateUtils, StringUtils } from "@agensy/utils";
+import { useState } from "react";
 
 interface DocumentCardProps {
   doc: Document;
@@ -20,6 +26,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   showLabel = false,
   showClientName = false,
 }) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const formatFileSize = (bytes: number): string => {
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(2)} MB`;
@@ -32,6 +39,11 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
       return "PDF";
     }
     return StringUtils.capitalizeFirstLetter(fileType.split("/")[0]);
+  };
+
+  const handleDeleteDocument = () => {
+    setIsDeleteModalOpen(false);
+    onDelete(doc.id as string, doc.client_id as string);
   };
 
   return (
@@ -106,9 +118,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
               className={`hover:bg-red-50 hover:text-red-500 hover:border-red-300 ${
                 isDeleting ? "opacity-50 cursor-not-allowed" : ""
               }`}
-              onClick={() =>
-                onDelete(doc.id as string, doc.client_id as string)
-              }
+              onClick={() => setIsDeleteModalOpen(true)}
               disabled={isDeleting}
             >
               <ICONS.delete size={16} />
@@ -116,6 +126,14 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        title="Delete Document"
+        isModalOpen={isDeleteModalOpen}
+        onOk={handleDeleteDocument}
+        onCancel={() => setIsDeleteModalOpen(false)}
+      >
+        <p>Are you sure you want to delete this document?</p>
+      </ConfirmationModal>
     </BorderedCard>
   );
 };
