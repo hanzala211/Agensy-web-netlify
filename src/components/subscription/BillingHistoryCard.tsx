@@ -28,7 +28,6 @@ export const BillingHistoryCard: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success("Invoice Downloaded Successfully");
   };
 
   useEffect(() => {
