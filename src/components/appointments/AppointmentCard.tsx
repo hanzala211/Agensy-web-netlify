@@ -146,6 +146,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             </div>
           )}
         </div>
+        
         <div className="flex flex-col gap-2 md:items-end items-start lg:min-w-[200px]">
           <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
             <AntdTag

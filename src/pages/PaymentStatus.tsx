@@ -1,5 +1,5 @@
 import { CommonLoader, PrimaryButton } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { COLORS, ICONS, ROUTES } from "@agensy/constants";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   useGetSessionDetailsQuery,
@@ -36,7 +36,16 @@ export const PaymentStatus = () => {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4">
+    <div className="w-full h-full flex items-center justify-center p-4 relative">
+      <button
+        onClick={() =>
+          navigate(`${ROUTES.settings}/${ROUTES.profileSubscription}`)
+        }
+        title="Back"
+        className="bg-basicBlue h-[25px] w-[25px] sm:h-[30px] sm:w-[30px] flex-shrink-0 flex items-center justify-center text-[12px] sm:text-[15px] rounded-full absolute left-4 md:top-7 top-5"
+      >
+        <ICONS.fullLeftArrow color={COLORS.basicWhite} />
+      </button>
       {isSessionDetailsLoading ? (
         <div className="w-full h-full flex items-center justify-center">
           <CommonLoader />
@@ -44,17 +53,19 @@ export const PaymentStatus = () => {
       ) : (
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full flex flex-col items-center">
           <div
-            className={`w-12 h-12 ${sessionDetailsStatus === "success" ? "bg-green-100" : "bg-red-100"
-              } rounded-md flex items-center justify-center mb-6`}
+            className={`w-12 h-12 ${
+              sessionDetailsStatus === "success" ? "bg-green-100" : "bg-red-100"
+            } rounded-md flex items-center justify-center mb-6`}
           >
             <div
-              className={`border p-1 rounded-xl ${sessionDetailsStatus === "success"
+              className={`border p-1 rounded-xl ${
+                sessionDetailsStatus === "success"
                   ? "border-green-500"
                   : "border-red-500"
-                }`}
+              }`}
             >
               {sessionDetailsStatus === "success" &&
-                sessionDetails?.payment_status === "paid" ? (
+              sessionDetails?.payment_status === "paid" ? (
                 <ICONS.dollar className={`text-green-500`} size={20} />
               ) : (
                 <ICONS.close className={`text-red-500`} size={20} />
@@ -63,13 +74,13 @@ export const PaymentStatus = () => {
           </div>
           <h1 className="text-2xl font-semibold text-gray-800 mb-2">
             {sessionDetailsStatus === "success" &&
-              sessionDetails?.payment_status === "paid"
+            sessionDetails?.payment_status === "paid"
               ? "Payment Successful"
               : "Payment Failed"}
           </h1>
 
           {sessionDetailsStatus === "success" &&
-            sessionDetails?.payment_status === "paid" ? (
+          sessionDetails?.payment_status === "paid" ? (
             <div className="w-full space-y-4 mb-8">
               <div className="border-b pb-4">
                 <h2 className="text-lg font-medium text-gray-700 mb-4">
@@ -103,11 +114,6 @@ export const PaymentStatus = () => {
                     </span>
                   </p>
                 </div>
-              </div>
-              <div>
-                <p className="text-gray-600">
-                  {/*  todo Add Download invoice button */}
-                </p>
               </div>
             </div>
           ) : (

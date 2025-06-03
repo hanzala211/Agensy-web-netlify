@@ -23,3 +23,4 @@ export * from "./AppointmentsList";
 export * from "./Settings";
 export * from "./ProfileSettings";
 export * from "./PaymentStatus";
+export * from "./Subscription";

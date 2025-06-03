@@ -4,7 +4,7 @@ export const getSessionDetails = async (sessionId: string) => {
   try {
     const response = await sendRequest({
       method: "GET",
-      url: `/stripe/session/${sessionId}`,
+      url: `/subscription/session/${sessionId}`,
     });
     return response.data.data;
   } catch (error) {
@@ -17,7 +17,7 @@ export const createCheckoutSession = async () => {
   try {
     const response = await sendRequest({
       method: "POST",
-      url: "/stripe/checkout-session",
+      url: "/subscription/checkout-session",
     });
     return response.data.data;
   } catch (error) {

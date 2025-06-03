@@ -49,7 +49,7 @@ import {
 } from "react-icons/fa6";
 import { PiNotePencilBold } from "react-icons/pi";
 import { IoMdAddCircle } from "react-icons/io";
-import { IoHomeSharp, IoPersonAdd } from "react-icons/io5";
+import { IoCheckmarkOutline, IoHomeSharp, IoPersonAdd } from "react-icons/io5";
 import { CiMedicalCross } from "react-icons/ci";
 import { GrDocumentText } from "react-icons/gr";
 import { BiDollar } from "react-icons/bi";
@@ -104,4 +104,5 @@ export const ICONS = {
   print: FiPrinter,
   share: FiShare2,
   dollar: BiDollar,
+  check: IoCheckmarkOutline,
 };

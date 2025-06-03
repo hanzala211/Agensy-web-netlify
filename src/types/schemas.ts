@@ -15,6 +15,7 @@ export interface IUser extends BaseSchema {
   phone?: string;
   avatar?: string;
   role?: string;
+  subscription_status: "active" | "inactive";
 }
 
 export interface Client extends BaseSchema {
