@@ -24,7 +24,7 @@ export const Card: React.FC<CardProps> = ({
       className={`bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-100/60 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden h-full flex flex-col ${className}`}
     >
       {title && (
-        <div className="px-6 pt-6 pb-3 border-b flex justify-between items-center border-gray-100/80 bg-gradient-to-r from-white to-gray-50/80">
+        <div className="px-6 pt-6 pb-3 border-b flex justify-between items-center border-gray-200 bg-gradient-to-r from-white to-gray-50/80">
           <h2 className="text-xl font-semibold text-gray-800 flex items-center">
             {title}
           </h2>

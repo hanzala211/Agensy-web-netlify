@@ -17,6 +17,7 @@ interface AppointmentCardProps {
   onEdit?: (appointment: Appointment) => void;
   onDelete?: (appointment: Appointment) => void;
   isDeleting?: boolean;
+  showActions?: boolean;
 }
 
 export const AppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -24,6 +25,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
   onEdit,
   onDelete,
   isDeleting = false,
+  showActions = true,
 }) => {
   const cancelClientAppointmentMutation = useCancelAppointmentMutation();
   const { filterHealthCareProvider, filterClient } = useAuthContext();
@@ -95,7 +97,11 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 text-sm">
+          <div
+            className={`grid grid-cols-1 ${
+              showActions ? "lg:grid-cols-2" : "2xl:grid-cols-2"
+            } gap-2 text-sm`}
+          >
             <div className="flex flex-col gap-2 text-gray-600">
               <div className="flex items-center gap-2 text-gray-600">
                 <ICONS.clockCircle className="text-gray-400" size={14} />
@@ -146,7 +152,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             </div>
           )}
         </div>
-        
+
         <div className="flex flex-col gap-2 md:items-end items-start lg:min-w-[200px]">
           <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
             <AntdTag
@@ -185,32 +191,34 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
               <p>Are you sure you want to delete this appointment?</p>
             </ConfirmationModal>
           </div>
-          <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
-            <ActionButtons
-              editLabel="Edit Appointment"
-              deleteLabel="Delete Appointment"
-              onDelete={() => setIsDeleteModalOpen(true)}
-              onEdit={() => onEdit?.(appointment)}
-              isDeleting={isDeleting}
-            />
-            {appointment.active &&
-              new Date(appointment.end_time) > new Date() && (
-                <button
-                  className={`text-sm ${
-                    cancelClientAppointmentMutation.isPending
-                      ? "opacity-50 cursor-not-allowed"
-                      : "opacity-100 cursor-pointer"
-                  } font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-colors duration-200 text-basicRed hover:text-darkRed focus:ring-basicRed`}
-                  onClick={() => setIsModalOpen(true)}
-                  disabled={cancelClientAppointmentMutation.isPending}
-                  aria-label="Cancel Appointment"
-                >
-                  {cancelClientAppointmentMutation.isPending
-                    ? "Cancelling..."
-                    : "Cancel"}
-                </button>
-              )}
-          </div>
+          {showActions && (
+            <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
+              <ActionButtons
+                editLabel="Edit Appointment"
+                deleteLabel="Delete Appointment"
+                onDelete={() => setIsDeleteModalOpen(true)}
+                onEdit={() => onEdit?.(appointment)}
+                isDeleting={isDeleting}
+              />
+              {appointment.active &&
+                new Date(appointment.end_time) > new Date() && (
+                  <button
+                    className={`text-sm ${
+                      cancelClientAppointmentMutation.isPending
+                        ? "opacity-50 cursor-not-allowed"
+                        : "opacity-100 cursor-pointer"
+                    } font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-colors duration-200 text-basicRed hover:text-darkRed focus:ring-basicRed`}
+                    onClick={() => setIsModalOpen(true)}
+                    disabled={cancelClientAppointmentMutation.isPending}
+                    aria-label="Cancel Appointment"
+                  >
+                    {cancelClientAppointmentMutation.isPending
+                      ? "Cancelling..."
+                      : "Cancel"}
+                  </button>
+                )}
+            </div>
+          )}
         </div>
       </div>
     </BorderedCard>

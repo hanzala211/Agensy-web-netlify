@@ -11,11 +11,12 @@ import { useState } from "react";
 
 interface DocumentCardProps {
   doc: Document;
-  onDelete: (documentId: string, clientId?: string) => void;
+  onDelete?: (documentId: string, clientId?: string) => void;
   isDeleting?: boolean;
   onPreview?: (documentId: string) => void;
   showLabel?: boolean;
   showClientName?: boolean;
+  showActions?: boolean;
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -25,6 +26,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   onPreview,
   showLabel = false,
   showClientName = false,
+  showActions = true,
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const formatFileSize = (bytes: number): string => {
@@ -43,7 +45,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
 
   const handleDeleteDocument = () => {
     setIsDeleteModalOpen(false);
-    onDelete(doc.id as string, doc.client_id as string);
+    onDelete?.(doc.id as string, doc.client_id as string);
   };
 
   return (
@@ -113,16 +115,18 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
             >
               <ICONS.eyeOn size={16} />
             </TertiaryButton>
-            <TertiaryButton
-              aria_label="Delete document"
-              className={`hover:bg-red-50 hover:text-red-500 hover:border-red-300 ${
-                isDeleting ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              onClick={() => setIsDeleteModalOpen(true)}
-              disabled={isDeleting}
-            >
-              <ICONS.delete size={16} />
-            </TertiaryButton>
+            {showActions && (
+              <TertiaryButton
+                aria_label="Delete document"
+                className={`hover:bg-red-50 hover:text-red-500 hover:border-red-300 ${
+                  isDeleting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onClick={() => setIsDeleteModalOpen(true)}
+                disabled={isDeleting}
+              >
+                <ICONS.delete size={16} />
+              </TertiaryButton>
+            )}
           </div>
         </div>
       </div>

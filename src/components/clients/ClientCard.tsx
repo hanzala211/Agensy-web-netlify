@@ -9,6 +9,7 @@ interface ClientCardProps {
   onViewProfile: () => void;
   loadClients?: () => void;
   showStatus?: boolean;
+  showActions?: boolean;
 }
 
 export const ClientCard: React.FC<ClientCardProps> = ({
@@ -16,6 +17,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
   onViewProfile,
   loadClients,
   showStatus = true,
+  showActions = true,
 }) => {
   const updateClientStatusMutation = useUpdateClientStatusMutation();
 
@@ -84,7 +86,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
           >
             {showStatus ? "View Profile" : "View Appointments"}
           </button>
-          {showStatus && (
+          {showActions && (
             <button
               className={`text-sm ${
                 updateClientStatusMutation.isPending

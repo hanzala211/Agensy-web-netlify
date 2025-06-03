@@ -22,3 +22,17 @@ export const useCancelSubscriptionMutation = () => {
     mutationFn: async () => await StripeService.cancelSubscription(),
   });
 };
+
+export const useGetBillingHistoryQuery = () => {
+  return useQuery({
+    queryKey: ["stripe-billing-history"],
+    queryFn: async () => await StripeService.getBillingHistory(),
+  });
+};
+
+export const useGetInvoiceLinkMutation = () => {
+  return useMutation({
+    mutationFn: async (invoiceId: string) =>
+      await StripeService.getInvoiceLink(invoiceId),
+  });
+};

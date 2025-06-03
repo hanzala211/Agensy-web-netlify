@@ -41,3 +41,29 @@ export const cancelSubscription = async () => {
     throw error;
   }
 };
+
+export const getBillingHistory = async () => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: "/subscription/history",
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(`Stripe Session Service [getBillingHistory] error: ${error}`);
+    throw error;
+  }
+};
+
+export const getInvoiceLink = async (invoiceId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/subscription/${invoiceId}`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(`Stripe Session Service [getInvoiceLink] error: ${error}`);
+    throw error;
+  }
+};

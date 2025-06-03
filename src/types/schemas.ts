@@ -172,3 +172,31 @@ export interface Appointment extends BaseSchema {
   healthcare_provider_id: string;
   post_appointment_notes?: string;
 }
+
+export interface Message extends BaseSchema {
+  subject: string;
+  content: string;
+  sender_id: string;
+  receiver_id: string;
+  read: boolean;
+  priority: "low" | "medium" | "high";
+  category: "general" | "medical" | "appointment" | "document";
+  related_client_id?: string;
+}
+
+export interface BillingHistory extends BaseSchema {
+  status: "active" | "inactive";
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  amount: number;
+  currency: string;
+  payment_method: {
+    type: string;
+    last4: string;
+    brand: string;
+    exp_month: number;
+    exp_year: number;
+  };
+  latest_invoice: string;
+}

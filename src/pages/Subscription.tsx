@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { SubscriptionCard } from "@agensy/components";
+import { SubscriptionCard, BillingHistoryCard } from "@agensy/components";
 import { useAuthContext } from "@agensy/context";
 import { useCancelSubscriptionMutation } from "@agensy/api";
 import { toast } from "@agensy/utils";
@@ -67,6 +67,10 @@ export const Subscription: React.FC = () => {
           onCancelSubscription={handleCancelSubscription}
           cancelSubscriptionPending={cancelSubscription.isPending}
         />
+      </div>
+
+      <div className="mt-12 max-w-5xl mx-auto">
+        <BillingHistoryCard />
       </div>
     </div>
   );
