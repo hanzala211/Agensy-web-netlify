@@ -122,6 +122,15 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
 
+        {userData?.subscription_status === "inactive" && (
+          <div className="border-t p-2 border-gray-100">
+            <SidebarItem
+              link={`${ROUTES.settings}/${ROUTES.profileSubscription}`}
+              icon={ICONS.subscription}
+              label="Subscribe"
+            />
+          </div>
+        )}
         <div className="p-4 border-t border-gray-100">
           <div
             className="flex items-center p-2 rounded-full cursor-pointer hover:bg-lightGray transition-all mb-3"
@@ -145,7 +154,9 @@ export const Sidebar: React.FC = () => {
               )}
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-darkGray">User Profile</p>
+              <p className="text-sm font-medium text-darkGray line-clamp-2 truncate max-w-[9rem] overflow-hidden">
+                {userData?.first_name} {userData?.last_name}
+              </p>
               <p className="text-xs text-slateGrey">View account</p>
             </div>
           </div>

@@ -29,6 +29,7 @@ import {
   MdMailOutline,
   MdMenu,
   MdOutlineEditNote,
+  MdPayment,
 } from "react-icons/md";
 import { RxDropdownMenu } from "react-icons/rx";
 import { TbPassword } from "react-icons/tb";
@@ -105,4 +106,5 @@ export const ICONS = {
   share: FiShare2,
   dollar: BiDollar,
   check: IoCheckmarkOutline,
+  subscription: MdPayment,
 };

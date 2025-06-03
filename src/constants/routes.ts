@@ -29,7 +29,7 @@ export const ROUTES = {
   settings: "/settings",
   profileSettings: "profile",
   profileNotifications: "notifications",
-  profileSubscription: "subscription",
+  profileSubscription: "billing",
   access: "access",
   paymentStatus: "payment-status",
 };

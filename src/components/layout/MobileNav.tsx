@@ -141,8 +141,8 @@ export const MobileNav: React.FC = () => {
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
                   <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-darkGray">
-                      User Profile
+                    <p className="text-sm font-medium text-darkGray line-clamp-2 truncate max-w-[9rem] overflow-hidden">
+                      {userData?.first_name} {userData?.last_name}
                     </p>
                     <p
                       className="text-xs text-slateGrey truncate"

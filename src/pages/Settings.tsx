@@ -13,7 +13,7 @@ export const Settings = () => {
             Profile
           </TabLink>
           <TabLink to={`${ROUTES.settings}/${ROUTES.profileSubscription}`}>
-            Subscription
+            Billing
           </TabLink>
         </div>
       </div>

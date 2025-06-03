@@ -87,6 +87,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         updateUserData,
         file,
         setFile,
+        loadAuth
       }}
     >
       {children}

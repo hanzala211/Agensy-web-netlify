@@ -26,6 +26,7 @@ export interface AuthContextType {
   updateUserData: (data: IUser) => void;
   file: File | null;
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
+  loadAuth: () => void;
 }
 
 export interface ClientContextType {

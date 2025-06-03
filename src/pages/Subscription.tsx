@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SubscriptionCard } from "@agensy/components";
 import { useAuthContext } from "@agensy/context";
+import { useCancelSubscriptionMutation } from "@agensy/api";
+import { toast } from "@agensy/utils";
 
 export const Subscription: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { userData, loadAuth } = useAuthContext();
+  const cancelSubscription = useCancelSubscriptionMutation();
+
+  useEffect(() => {
+    if (cancelSubscription.status === "success") {
+      loadAuth();
+      toast.success("Subscription cancelled successfully");
+    } else if (cancelSubscription.status === "error") {
+      toast.error("Failed to cancel subscription");
+    }
+  }, [cancelSubscription.status]);
+
+  const handleCancelSubscription = () => {
+    cancelSubscription.mutate();
+  };
+
   return (
     <div className="mx-auto md:px-4 py-12">
       <div className="text-center mb-12">
@@ -17,38 +34,38 @@ export const Subscription: React.FC = () => {
 
       <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
         <SubscriptionCard
-          title="Individuals"
+          title="Free Plan"
           price={0}
           period="month"
-          description="Good for solo clients."
+          description="No features are available on Free."
           features={[
-            "1 user",
-            "Unlimited Calendars",
-            "Unlimited Appointments",
-            "Unlimited Documents",
-            "Messages",
-            "Unlimited Clients",
+            "Client Management Tools",
+            "Document Handling",
+            "Communication Features",
+            "Care Planning",
+            "Appointment Management",
+            "User Role Management",
           ]}
           buttonText="Choose Plan"
           isFeatured={userData?.subscription_status === "inactive"}
-          onSubscribe={() => null}
         />
         <SubscriptionCard
-          title="Teams"
-          price={9}
+          title="Standard Plan"
+          price={9.99}
           period="month"
-          description="Good for solo clients."
+          description="Subscribers receive access to a broad suite of features, including:"
           features={[
-            "1 user",
-            "Unlimited Calendars",
-            "Unlimited Appointments",
-            "Unlimited Documents",
-            "Messages",
-            "Unlimited Clients",
+            "Client Management Tools",
+            "Document Handling",
+            "Communication Features",
+            "Care Planning",
+            "Appointment Management",
+            "User Role Management",
           ]}
           buttonText="Choose Plan"
           isFeatured={userData?.subscription_status === "active"}
-          onSubscribe={() => null}
+          onCancelSubscription={handleCancelSubscription}
+          cancelSubscriptionPending={cancelSubscription.isPending}
         />
       </div>
     </div>

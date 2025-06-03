@@ -16,3 +16,9 @@ export const useCreateCheckoutSessionMutation = () => {
     mutationFn: async () => await StripeService.createCheckoutSession(),
   });
 };
+
+export const useCancelSubscriptionMutation = () => {
+  return useMutation({
+    mutationFn: async () => await StripeService.cancelSubscription(),
+  });
+};
