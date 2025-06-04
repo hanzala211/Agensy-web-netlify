@@ -121,16 +121,6 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {userData?.subscription_status === "inactive" && (
-          <div className="border-t p-2 border-gray-100">
-            <SidebarItem
-              link={`${ROUTES.settings}/${ROUTES.profileSubscription}`}
-              icon={ICONS.subscription}
-              label="Subscribe"
-            />
-          </div>
-        )}
         <div className="p-4 border-t border-gray-100">
           <div
             className="flex items-center p-2 rounded-full cursor-pointer hover:bg-lightGray transition-all mb-3"

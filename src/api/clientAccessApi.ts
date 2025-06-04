@@ -14,3 +14,18 @@ export const useDeleteClientAccessMutation = () => {
       await ClientAccessService.deleteClientAccess(data.clientId, data.userId),
   });
 };
+
+export const useEditClientAccessMutation = () => {
+  return useMutation({
+    mutationFn: async (data: {
+      clientId: string;
+      userId: string;
+      data: unknown;
+    }) =>
+      await ClientAccessService.editClientAccessUser(
+        data.clientId,
+        data.userId,
+        data.data
+      ),
+  });
+};

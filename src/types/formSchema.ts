@@ -327,6 +327,22 @@ export const accessSchema = z.object({
 
 export type AccessFormData = z.infer<typeof accessSchema>;
 
+export const editAccessSchema = z.object({
+  first_name: z
+    .string()
+    .min(1, "First Name is required")
+    .max(12, "First Name must be less than 12 characters"),
+  last_name: z
+    .string()
+    .min(1, "Last Name is required")
+    .max(12, "Last Name must be less than 12 characters"),
+  relation: z.string().min(1, "Relationship is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  role: z.string().min(1, "Role is required"),
+});
+
+export type EditAccessFormData = z.infer<typeof editAccessSchema>;
+
 export const appointmentSchema = z
   .object({
     title: z

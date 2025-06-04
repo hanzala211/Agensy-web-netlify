@@ -176,10 +176,7 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
       if (!prev) return null;
       return {
         ...prev,
-        Users: [
-          { ...access, assignedBy: userData as IUser },
-          ...prev.Users,
-        ],
+        Users: [{ ...access, assignedBy: userData as IUser }, ...prev.Users],
       };
     });
   };
@@ -194,6 +191,15 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const updateClientAccess = (userId: string, data: AccessInfo) => {
+    setSelectedClient((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        Users: prev.Users.map((u) => (u.id === userId ? { ...u, ...data } : u)),
+      };
+    });
+  };
   const handleDownload = async (doc: Document) => {
     try {
       toast.info("Processing Document...");
@@ -244,6 +250,7 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
         handleDownload,
         addClientAccess,
         deleteClientAccess,
+        updateClientAccess,
       }}
     >
       {children}

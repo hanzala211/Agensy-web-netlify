@@ -18,12 +18,14 @@ interface AccessCardProps {
   access: AccessInfo;
   onDelete?: () => void;
   isDeleting?: boolean;
+  onEdit?: () => void;
 }
 
 export const AccessCard: React.FC<AccessCardProps> = ({
   access,
   onDelete,
   isDeleting,
+  onEdit,
 }) => {
   const { userData } = useAuthContext();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -128,7 +130,7 @@ export const AccessCard: React.FC<AccessCardProps> = ({
                 isDeleting={isDeleting}
                 deleteLabel={`Remove contact ${access.first_name} ${access.last_name}`}
                 editLabel={`Edit contact ${access.first_name} ${access.last_name}`}
-                onEdit={() => null}
+                onEdit={onEdit}
               />
               <ConfirmationModal
                 title="Delete User"

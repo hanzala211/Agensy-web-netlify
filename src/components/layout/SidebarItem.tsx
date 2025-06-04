@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import type { ElementType } from "react";
 import React from "react";
+import { useAuthContext } from "@agensy/context";
 
 interface SidebarItemProps {
   link: string;
@@ -17,6 +18,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   onClick,
   isIconType = false,
 }) => {
+  const { userData } = useAuthContext();
   return (
     <NavLink
       to={link}
@@ -25,6 +27,10 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
           isActive
             ? "bg-primaryColor/10 text-primaryColor font-medium"
             : "text-darkGray hover:bg-lightGray"
+        } ${
+          userData?.subscription_status === "inactive"
+            ? "cursor-not-allowed pointer-events-none"
+            : ""
         } touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20`
       }
       onClick={onClick}

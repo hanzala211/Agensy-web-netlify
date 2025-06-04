@@ -52,6 +52,7 @@ export interface ClientContextType {
   handleDownload: (doc: Document) => Promise<void>;
   addClientAccess: (access: AccessInfo) => void;
   deleteClientAccess: (userId: string) => void;
+  updateClientAccess: (userId: string, data: AccessInfo) => void;
 }
 
 export interface DocumentContextType {

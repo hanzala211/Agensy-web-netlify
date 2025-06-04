@@ -5,17 +5,23 @@ import {
   Pagination,
   EmptyStateCard,
   AddAccessModal,
+  EditAccessModal,
 } from "@agensy/components";
 import {
   ACCESS_ROLE_FILTERS,
   ACCESS_SORT_OPTIONS,
   ICONS,
 } from "@agensy/constants";
-import type { AccessFormData, AccessInfo } from "@agensy/types";
+import type {
+  AccessFormData,
+  AccessInfo,
+  EditAccessFormData,
+} from "@agensy/types";
 import { useClientContext } from "@agensy/context";
 import {
   useAddClientAccessMutation,
   useDeleteClientAccessMutation,
+  useEditClientAccessMutation,
 } from "@agensy/api";
 import { toast } from "@agensy/utils";
 
@@ -24,14 +30,22 @@ const itemsPerPage = 4;
 export const ClientAccess: React.FC = () => {
   const addClientAccessMutation = useAddClientAccessMutation();
   const deleteClientAccessMutation = useDeleteClientAccessMutation();
-  const { selectedClient, addClientAccess, deleteClientAccess } =
-    useClientContext();
+  const editClientAccessMutation = useEditClientAccessMutation();
+  const {
+    selectedClient,
+    addClientAccess,
+    deleteClientAccess,
+    updateClientAccess,
+  } = useClientContext();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filterBy, setFilterBy] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name-asc");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isAddAccessModalOpen, setIsAddAccessModalOpen] =
     useState<boolean>(false);
+  const [isEditAccessModalOpen, setIsEditAccessModalOpen] =
+    useState<boolean>(false);
+  const [editData, setEditData] = useState<AccessInfo | null>(null);
 
   useEffect(() => {
     if (addClientAccessMutation.status === "success") {
@@ -54,6 +68,23 @@ export const ClientAccess: React.FC = () => {
       );
     }
   }, [deleteClientAccessMutation.status]);
+
+  useEffect(() => {
+    if (editClientAccessMutation.status === "success") {
+      toast.success("User updated successfully");
+      updateClientAccess(
+        editClientAccessMutation.variables.userId,
+        editClientAccessMutation.data
+      );
+      setIsEditAccessModalOpen(false);
+      setEditData(null);
+    } else if (editClientAccessMutation.status === "error") {
+      toast.error(
+        "Failed to update user",
+        String(editClientAccessMutation.error)
+      );
+    }
+  }, [editClientAccessMutation.status]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -153,6 +184,14 @@ export const ClientAccess: React.FC = () => {
     });
   };
 
+  const handleEditUser = (data: EditAccessFormData) => {
+    editClientAccessMutation.mutate({
+      clientId: selectedClient?.id as string,
+      userId: editData?.id as string,
+      data,
+    });
+  };
+
   return (
     <div className="w-full px-4">
       <SearchFilterBar
@@ -186,6 +225,10 @@ export const ClientAccess: React.FC = () => {
               access={access}
               onDelete={() => handleDelete(String(access.id))}
               isDeleting={deleteClientAccessMutation.isPending}
+              onEdit={() => {
+                setIsEditAccessModalOpen(true);
+                setEditData(access);
+              }}
             />
           ))
         )}
@@ -203,6 +246,16 @@ export const ClientAccess: React.FC = () => {
         onClose={() => setIsAddAccessModalOpen(false)}
         onSubmit={handleAddUser}
         isLoading={addClientAccessMutation.isPending}
+      />
+      <EditAccessModal
+        isOpen={isEditAccessModalOpen}
+        onClose={() => {
+          setIsEditAccessModalOpen(false);
+          setEditData(null);
+        }}
+        editData={editData as AccessInfo}
+        onSubmit={handleEditUser}
+        isLoading={editClientAccessMutation.isPending}
       />
     </div>
   );

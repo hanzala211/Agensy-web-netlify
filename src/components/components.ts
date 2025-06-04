@@ -87,3 +87,4 @@ export * from "./dashboard/AppointmentsDashboardCard";
 export * from "./dashboard/MessagesDashboardCard";
 export * from "./dashboard/DocumentsDashboardCard";
 export * from "./dashboard/DashboardWidget";
+export * from "./clients/EditAccessModal";
