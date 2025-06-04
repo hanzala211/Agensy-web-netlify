@@ -155,7 +155,12 @@ export const ClientNoteCard: React.FC = () => {
             <EmptyStateCard
               ICON={ICONS.plus}
               label="Notes"
-              onClick={() => setIsNoteModalOpen(true)}
+              showText={userPermissions.includes(APP_ACTIONS.EditClientNotes)}
+              onClick={() => {
+                if (userPermissions.includes(APP_ACTIONS.EditClientNotes)) {
+                  setIsNoteModalOpen(true);
+                }
+              }}
             />
           )}
         </div>

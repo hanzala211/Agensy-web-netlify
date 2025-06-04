@@ -17,7 +17,7 @@ export const EmptyStateCard = ({
     <div
       onClick={onClick}
       className={`flex flex-col items-center justify-center p-10 text-gray-500 bg-gray-50/50 rounded-lg border border-dashed border-gray-200 ${
-        onClick ? "hover:bg-gray-50/70 cursor-pointer" : ""
+        showText ? "hover:bg-gray-50/70 cursor-pointer" : ""
       }`}
     >
       <ICON size={32} className="text-gray-300 mb-3" />

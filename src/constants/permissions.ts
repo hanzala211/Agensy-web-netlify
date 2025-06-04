@@ -17,5 +17,5 @@ export const PERMISSIONS = {
     APP_ACTIONS.EditClientMedicalInfo,
     APP_ACTIONS.ClientAppointmentInfoEdit,
   ],
-  family_admin: [""],
+  family_member: [""],
 };

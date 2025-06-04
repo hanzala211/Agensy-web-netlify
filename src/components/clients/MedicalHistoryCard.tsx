@@ -138,7 +138,14 @@ export const MedicalHistoryCard: React.FC = () => {
           <EmptyStateCard
             ICON={ICONS.plus}
             label="Medical History"
-            onClick={() => setIsAddMedicalHistoryModalOpen(true)}
+            onClick={() => {
+              if (userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)) {
+                setIsAddMedicalHistoryModalOpen(true);
+              }
+            }}
+            showText={userPermissions.includes(
+              APP_ACTIONS.EditClientMedicalInfo
+            )}
           />
         )}
       </Card>

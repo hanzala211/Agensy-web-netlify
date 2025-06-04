@@ -124,8 +124,15 @@ export const HealthCareCard: React.FC = () => {
           <EmptyStateCard
             ICON={ICONS.edit}
             label="Healthcare Information"
-            onClick={() => setIsEditHealthcareModalOpen(true)}
+            onClick={() => {
+              if (userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)) {
+                setIsEditHealthcareModalOpen(true);
+              }
+            }}
             isEdit={true}
+            showText={userPermissions.includes(
+              APP_ACTIONS.EditClientMedicalInfo
+            )}
           />
         )}
       </Card>

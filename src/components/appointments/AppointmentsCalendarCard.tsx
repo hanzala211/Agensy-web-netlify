@@ -48,8 +48,18 @@ export const AppointmentsCalendarCard: React.FC<
             <EmptyStateCard
               ICON={ICONS.plus}
               label="Appointments"
-              showText={true}
-              onClick={() => setIsAddAppointmentModalOpen(true)}
+              showText={userPermissions.includes(
+                APP_ACTIONS.ClientAppointmentInfoEdit
+              )}
+              onClick={() => {
+                if (
+                  userPermissions.includes(
+                    APP_ACTIONS.ClientAppointmentInfoEdit
+                  )
+                ) {
+                  setIsAddAppointmentModalOpen(true);
+                }
+              }}
             />
           ) : (
             selectedAppointments.map((appointment) => (
@@ -59,7 +69,9 @@ export const AppointmentsCalendarCard: React.FC<
                 onEdit={handleOpenEditModal}
                 onDelete={handleDelete}
                 isDeleting={deleteClientAppointmentMutation.isPending}
-                showActions={userPermissions.includes(APP_ACTIONS.ClientAppointmentInfoEdit)}
+                showActions={userPermissions.includes(
+                  APP_ACTIONS.ClientAppointmentInfoEdit
+                )}
               />
             ))
           )}

@@ -133,7 +133,16 @@ export const HealthCareProviderCard: React.FC = () => {
             <EmptyStateCard
               ICON={ICONS.plus}
               label="Healthcare Providers"
-              onClick={() => setIsHealthCareModalOpen(true)}
+              showText={userPermissions.includes(
+                APP_ACTIONS.EditClientMedicalInfo
+              )}
+              onClick={() => {
+                if (
+                  userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)
+                ) {
+                  setIsHealthCareModalOpen(true);
+                }
+              }}
             />
           )}
         </div>

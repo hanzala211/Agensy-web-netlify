@@ -165,7 +165,14 @@ export const ContactInfoCard: React.FC = () => {
             <EmptyStateCard
               ICON={ICONS.plus}
               label="Contact"
-              onClick={() => setIsContactModalOpen(true)}
+              onClick={() => {
+                if (userPermissions.includes(APP_ACTIONS.EditClientBasicInfo)) {
+                  setIsContactModalOpen(true);
+                }
+              }}
+              showText={userPermissions.includes(
+                APP_ACTIONS.EditClientBasicInfo
+              )}
             />
           )}
         </div>

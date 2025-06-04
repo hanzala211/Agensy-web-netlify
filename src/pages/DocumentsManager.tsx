@@ -149,9 +149,14 @@ export const DocumentsManager: React.FC = () => {
       <div className="mt-8 space-y-7 ">
         {!paginatedDocuments || paginatedDocuments.length === 0 ? (
           <EmptyStateCard
-            onClick={() => setIsAddDocumentModalOpen(true)}
+            showText={userPermissions.includes(APP_ACTIONS.AddDocs)}
+            onClick={() => {
+              if (userPermissions.includes(APP_ACTIONS.AddDocs)) {
+                setIsAddDocumentModalOpen(true);
+              }
+            }}
             ICON={ICONS.plus}
-            label="Documents"
+            label={"Documents"}
           />
         ) : (
           paginatedDocuments.map((doc) => (

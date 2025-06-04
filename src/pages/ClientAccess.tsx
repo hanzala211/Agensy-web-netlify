@@ -229,7 +229,12 @@ export const ClientAccess: React.FC = () => {
       <div className="mt-8 space-y-6">
         {!paginatedAccess || paginatedAccess.length === 0 ? (
           <EmptyStateCard
-            onClick={() => setIsAddAccessModalOpen(true)}
+            onClick={() => {
+              if (userPermissions.includes(APP_ACTIONS.AccessControl)) {
+                setIsAddAccessModalOpen(true);
+              }
+            }}
+            showText={userPermissions.includes(APP_ACTIONS.AccessControl)}
             ICON={ICONS.plus}
             label="Contacts"
           />
