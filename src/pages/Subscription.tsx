@@ -3,10 +3,14 @@ import { SubscriptionCard, BillingHistoryCard } from "@agensy/components";
 import { useAuthContext } from "@agensy/context";
 import { useCancelSubscriptionMutation } from "@agensy/api";
 import { toast } from "@agensy/utils";
+import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
+import { Navigate } from "react-router-dom";
 
 export const Subscription: React.FC = () => {
   const { userData, loadAuth } = useAuthContext();
   const cancelSubscription = useCancelSubscriptionMutation();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (cancelSubscription.status === "success") {
@@ -20,6 +24,9 @@ export const Subscription: React.FC = () => {
   const handleCancelSubscription = () => {
     cancelSubscription.mutate();
   };
+
+  if (!userPermissions.includes(APP_ACTIONS.BillingPage))
+    return <Navigate to={ROUTES.settings} />;
 
   return (
     <div className="mx-auto md:px-4 py-12">

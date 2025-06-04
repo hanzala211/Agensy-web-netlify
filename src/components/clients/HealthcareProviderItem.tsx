@@ -10,6 +10,7 @@ interface HealthcareProviderProps {
   onEdit?: (provider: HealthcareProvider) => void;
   onDelete?: (provider: HealthcareProvider) => void;
   isDeleting?: boolean;
+  showActions?: boolean;
 }
 
 export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
@@ -17,6 +18,7 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
   onDelete,
   provider,
   isDeleting,
+  showActions = true,
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
@@ -44,13 +46,15 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
               )}
             </div>
             <div className="flex gap-2">
-              <ActionButtons
-                editLabel="Edit Healthcare Provider"
-                deleteLabel="Delete Healthcare Provider"
-                onEdit={() => onEdit?.(provider as HealthcareProvider)}
-                onDelete={() => setIsDeleteModalOpen(true)}
-                isDeleting={isDeleting}
-              />
+              {showActions && (
+                <ActionButtons
+                  editLabel="Edit Healthcare Provider"
+                  deleteLabel="Delete Healthcare Provider"
+                  onEdit={() => onEdit?.(provider as HealthcareProvider)}
+                  onDelete={() => setIsDeleteModalOpen(true)}
+                  isDeleting={isDeleting}
+                />
+              )}
             </div>
           </div>
 

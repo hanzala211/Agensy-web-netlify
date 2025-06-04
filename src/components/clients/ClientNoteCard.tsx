@@ -11,13 +11,14 @@ import {
   EmptyStateCard,
   InfoItem,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import type { NoteFormData, Note as NoteType } from "@agensy/types";
 import { DateUtils, toast } from "@agensy/utils";
 import React, { useEffect, useState } from "react";
 
 export const ClientNoteCard: React.FC = () => {
+  const { userData } = useAuthContext();
   const { selectedClient, addClientNote, updateClientNote, deleteClientNote } =
     useClientContext();
   const addNoteMutation = useAddNoteMutation();
@@ -28,6 +29,8 @@ export const ClientNoteCard: React.FC = () => {
     null
   );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addNoteMutation.status === "success") {
@@ -110,6 +113,7 @@ export const ClientNoteCard: React.FC = () => {
         buttonText={<ICONS.plus size={16} />}
         ariaLabel="Add Note"
         onButtonClick={() => setIsNoteModalOpen(true)}
+        showButton={userPermissions.includes(APP_ACTIONS.EditClientNotes)}
       >
         <div className="space-y-4">
           {selectedClient?.clientNotes &&
@@ -126,13 +130,15 @@ export const ClientNoteCard: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex items-center justify-end gap-2">
-                    <ActionButtons
-                      onEdit={() => handleEditNote(item)}
-                      onDelete={() => setIsDeleteModalOpen(true)}
-                      isDeleting={deleteNoteMutation.isPending}
-                      editLabel="Edit Note"
-                      deleteLabel="Delete Note"
-                    />
+                    {userPermissions.includes(APP_ACTIONS.EditClientNotes) && (
+                      <ActionButtons
+                        onEdit={() => handleEditNote(item)}
+                        onDelete={() => setIsDeleteModalOpen(true)}
+                        isDeleting={deleteNoteMutation.isPending}
+                        editLabel="Edit Note"
+                        deleteLabel="Delete Note"
+                      />
+                    )}
                   </div>
                 </div>
                 <ConfirmationModal

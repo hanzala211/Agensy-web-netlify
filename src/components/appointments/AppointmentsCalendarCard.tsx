@@ -1,10 +1,11 @@
 import { AddAppointmentModal, AppointmentCard } from "@agensy/components";
 import { EmptyStateCard } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import type { Appointment } from "@agensy/types";
 import React from "react";
 import { useCalendarState } from "@agensy/hooks";
 import { CalendarUtils } from "@agensy/utils";
+import { useAuthContext } from "@agensy/context";
 
 interface AppointmentsCalendarCardProps {
   viewMode: "month" | "week" | "day";
@@ -32,6 +33,9 @@ export const AppointmentsCalendarCard: React.FC<
     handleDelete,
     deleteClientAppointmentMutation,
   } = useCalendarState(selectedAppointments);
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   return (
     <React.Fragment>
@@ -55,6 +59,7 @@ export const AppointmentsCalendarCard: React.FC<
                 onEdit={handleOpenEditModal}
                 onDelete={handleDelete}
                 isDeleting={deleteClientAppointmentMutation.isPending}
+                showActions={userPermissions.includes(APP_ACTIONS.ClientAppointmentInfoEdit)}
               />
             ))
           )}

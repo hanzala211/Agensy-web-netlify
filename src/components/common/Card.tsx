@@ -9,6 +9,7 @@ interface CardProps {
   onButtonClick?: () => void;
   className?: string;
   ariaLabel?: string;
+  showButton?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -18,6 +19,7 @@ export const Card: React.FC<CardProps> = ({
   onButtonClick,
   className = "",
   ariaLabel,
+  showButton = true,
 }) => {
   return (
     <div
@@ -28,7 +30,7 @@ export const Card: React.FC<CardProps> = ({
           <h2 className="text-xl font-semibold text-gray-800 flex items-center">
             {title}
           </h2>
-          {buttonText && (
+          {buttonText && showButton && (
             <div className="flex">
               <SecondaryButton
                 aria_label={ariaLabel}

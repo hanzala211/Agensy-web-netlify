@@ -29,7 +29,7 @@ export const ClientProfileSkeleton: React.FC = () => {
 
       {/* Tab navigation skeleton */}
       <div className="border-[1px] border-mediumGray px-2 sm:px-5 rounded-xl mt-4">
-        <div className="flex flex-wrap md:flex-nowrap border-b border-mediumGray w-full">
+        <div className="flex flex-wrap lg:flex-nowrap border-b border-mediumGray w-full">
           {[1, 2, 3, 4, 5].map((item) => (
             <div
               key={item}

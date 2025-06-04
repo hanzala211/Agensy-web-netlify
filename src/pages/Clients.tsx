@@ -9,9 +9,11 @@ import {
   EmptyStateCard,
 } from "@agensy/components";
 import {
+  APP_ACTIONS,
   CLIENTS_FILTERS,
   CLIENTS_SORT_OPTIONS,
   ICONS,
+  PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
 import type { Client, ClientAddRequestData } from "@agensy/types";
@@ -19,9 +21,10 @@ import { useNavigate } from "react-router-dom";
 import { useAddClientMutation } from "@agensy/api";
 import { toast } from "@agensy/utils";
 import { useClientManager } from "@agensy/hooks";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 
 export const Clients: React.FC = () => {
+  const { userData } = useAuthContext();
   const {
     clients,
     isLoading,
@@ -45,6 +48,8 @@ export const Clients: React.FC = () => {
   const [isAddClientModalOpen, setIsAddClientModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addClientMutation.status === "success") {
@@ -79,6 +84,7 @@ export const Clients: React.FC = () => {
       <PageHeader
         title="Clients"
         buttonText="Add Client"
+        showButton={userPermissions.includes(APP_ACTIONS.AddClient)}
         buttonAriaLabel="Add new client"
         onButtonClick={() => setIsAddClientModalOpen(true)}
       />

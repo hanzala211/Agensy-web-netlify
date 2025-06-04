@@ -5,12 +5,13 @@ import {
   PageHeader,
   PersonalInfoBar,
 } from "@agensy/components";
-import { ROUTES } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import React, { useEffect } from "react";
 import { useNavigate, Outlet, useParams } from "react-router-dom";
 
 export const ClientProfile: React.FC = () => {
+  const { userData } = useAuthContext();
   const params = useParams();
   const { selectedClient, setSelectedClient } = useClientContext();
   const {
@@ -20,6 +21,8 @@ export const ClientProfile: React.FC = () => {
     status: loadClientStatus,
   } = useGetSingleClientQuery(params.clientId as string);
   const navigate = useNavigate();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     loadClient();
@@ -87,12 +90,14 @@ export const ClientProfile: React.FC = () => {
           >
             Messages
           </TabLink>
-          <TabLink
-            to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.access}`}
-            className="min-w-[100px] sm:min-w-0"
-          >
-            Access
-          </TabLink>
+          {userPermissions.includes(APP_ACTIONS.AccessControl) && (
+            <TabLink
+              to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.access}`}
+              className="min-w-[100px] sm:min-w-0"
+            >
+              Access
+            </TabLink>
+          )}
         </div>
       </div>
       <div className="mt-4">

@@ -10,24 +10,29 @@ import {
 import {
   ACCESS_ROLE_FILTERS,
   ACCESS_SORT_OPTIONS,
+  APP_ACTIONS,
   ICONS,
+  PERMISSIONS,
+  ROUTES,
 } from "@agensy/constants";
 import type {
   AccessFormData,
   AccessInfo,
   EditAccessFormData,
 } from "@agensy/types";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import {
   useAddClientAccessMutation,
   useDeleteClientAccessMutation,
   useEditClientAccessMutation,
 } from "@agensy/api";
 import { toast } from "@agensy/utils";
+import { Navigate, useParams } from "react-router-dom";
 
 const itemsPerPage = 4;
 
 export const ClientAccess: React.FC = () => {
+  const params = useParams();
   const addClientAccessMutation = useAddClientAccessMutation();
   const deleteClientAccessMutation = useDeleteClientAccessMutation();
   const editClientAccessMutation = useEditClientAccessMutation();
@@ -46,6 +51,9 @@ export const ClientAccess: React.FC = () => {
   const [isEditAccessModalOpen, setIsEditAccessModalOpen] =
     useState<boolean>(false);
   const [editData, setEditData] = useState<AccessInfo | null>(null);
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addClientAccessMutation.status === "success") {
@@ -191,6 +199,13 @@ export const ClientAccess: React.FC = () => {
       data,
     });
   };
+
+  if (!userPermissions.includes(APP_ACTIONS.AccessControl))
+    return (
+      <Navigate
+        to={`/${ROUTES.clients}/${params.clientId}/${ROUTES.clientOverview}`}
+      />
+    );
 
   return (
     <div className="w-full px-4">

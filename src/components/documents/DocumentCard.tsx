@@ -95,7 +95,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
             </div>
           )}
         </div>
-        <div className="flex flex-col items-center gap-3 mt-4 md:mt-0">
+        <div className="flex flex-col md:items-center items-start gap-3 mt-4 md:mt-0">
           <div>
             {showLabel && (
               <AntdTag

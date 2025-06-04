@@ -3,6 +3,8 @@ import type { Client } from "@agensy/types";
 import { DateUtils, toast, StringUtils } from "@agensy/utils";
 import { useUpdateClientStatusMutation } from "@agensy/api";
 import { BorderedCard } from "@agensy/components";
+import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
+import { useAuthContext } from "@agensy/context";
 
 interface ClientCardProps {
   client: Client;
@@ -19,7 +21,10 @@ export const ClientCard: React.FC<ClientCardProps> = ({
   showStatus = true,
   showActions = true,
 }) => {
+  const { userData } = useAuthContext();
   const updateClientStatusMutation = useUpdateClientStatusMutation();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (updateClientStatusMutation.status === "success") {
@@ -86,30 +91,31 @@ export const ClientCard: React.FC<ClientCardProps> = ({
           >
             {showStatus ? "View Profile" : "View Appointments"}
           </button>
-          {showActions && (
-            <button
-              className={`text-sm ${
-                updateClientStatusMutation.isPending
-                  ? "opacity-50 cursor-not-allowed"
-                  : "opacity-100 cursor-pointer"
-              } font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-colors duration-200 ${
-                client.active
-                  ? "text-basicRed hover:text-darkRed focus:ring-basicRed"
-                  : "text-darkGreen hover:text-darkGreen focus:ring-darkGreen"
-              }`}
-              onClick={() => handleToggleActive(!client.active)}
-              disabled={updateClientStatusMutation.isPending}
-              aria-label={
-                client.active ? "Deactivate client" : "Activate client"
-              }
-            >
-              {updateClientStatusMutation.isPending
-                ? "Updating..."
-                : client.active
-                ? "Deactivate"
-                : "Activate"}
-            </button>
-          )}
+          {showActions &&
+            userPermissions.includes(APP_ACTIONS.ChangeClientStatus) && (
+              <button
+                className={`text-sm ${
+                  updateClientStatusMutation.isPending
+                    ? "opacity-50 cursor-not-allowed"
+                    : "opacity-100 cursor-pointer"
+                } font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-colors duration-200 ${
+                  client.active
+                    ? "text-basicRed hover:text-darkRed focus:ring-basicRed"
+                    : "text-darkGreen hover:text-darkGreen focus:ring-darkGreen"
+                }`}
+                onClick={() => handleToggleActive(!client.active)}
+                disabled={updateClientStatusMutation.isPending}
+                aria-label={
+                  client.active ? "Deactivate client" : "Activate client"
+                }
+              >
+                {updateClientStatusMutation.isPending
+                  ? "Updating..."
+                  : client.active
+                  ? "Deactivate"
+                  : "Activate"}
+              </button>
+            )}
         </div>
       </div>
     </BorderedCard>

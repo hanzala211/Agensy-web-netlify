@@ -1,7 +1,7 @@
 import { EmptyStateCard } from "@agensy/components";
 import { MedicationItem } from "./MedicationItem";
 import { Card } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { ICONS, PERMISSIONS, APP_ACTIONS } from "@agensy/constants";
 import type { ClientMedications, MedicationFormData } from "@agensy/types";
 import React, { useEffect, useState } from "react";
 import AddMedicationModal from "./AddMedicationModal";
@@ -10,10 +10,11 @@ import {
   useDeleteClientMedicationMutation,
   useEditClientMedicationMutation,
 } from "@agensy/api";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { toast } from "@agensy/utils";
 
 export const MedicationCard: React.FC = () => {
+  const { userData } = useAuthContext();
   const addClientMedicationMutation = useAddClientMedicationMutation();
   const editClientMedicationMutation = useEditClientMedicationMutation();
   const deleteClientMedicationMutation = useDeleteClientMedicationMutation();
@@ -27,6 +28,8 @@ export const MedicationCard: React.FC = () => {
     useState<boolean>(false);
   const [selectedEditMedication, setSelectedEditMedication] =
     useState<ClientMedications | null>(null);
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (!isAddMedicationModalOpen) {
@@ -109,6 +112,7 @@ export const MedicationCard: React.FC = () => {
         buttonText={<ICONS.plus size={16} />}
         ariaLabel="Add New Medication"
         onButtonClick={() => setIsAddMedicationModalOpen(true)}
+        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
       >
         <div className="flex flex-col gap-5">
           {selectedClient?.medications?.map((medication: ClientMedications) => (
@@ -123,6 +127,9 @@ export const MedicationCard: React.FC = () => {
                 });
               }}
               isDeleting={deleteClientMedicationMutation.isPending}
+              showActions={userPermissions.includes(
+                APP_ACTIONS.EditClientMedicalInfo
+              )}
             />
           ))}
 

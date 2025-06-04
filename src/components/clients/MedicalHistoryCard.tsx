@@ -5,8 +5,8 @@ import {
   InfoItem,
   Card,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import React, { useEffect, useState } from "react";
 import {
   useAddClientMedicalHistoryMutation,
@@ -19,12 +19,15 @@ import type {
 import ItemList from "./ItemList";
 
 export const MedicalHistoryCard: React.FC = () => {
+  const { userData } = useAuthContext();
   const addClientMedicalHistoryMutation = useAddClientMedicalHistoryMutation();
   const updateClientMedicalHistoryMutation =
     useUpdateClientMedicalHistoryMutation();
   const { selectedClient, addClientMedicalHistory } = useClientContext();
   const [isAddMedicalHistoryModalOpen, setIsAddMedicalHistoryModalOpen] =
     useState<boolean>(false);
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addClientMedicalHistoryMutation.status === "success") {
@@ -83,6 +86,7 @@ export const MedicalHistoryCard: React.FC = () => {
             ? "Edit Client Medical History"
             : "Add Client Medical History"
         }
+        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
       >
         {selectedClient?.medical ? (
           <div className="grid lg:grid-cols-2 gap-5">

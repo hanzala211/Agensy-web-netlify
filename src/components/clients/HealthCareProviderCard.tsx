@@ -9,8 +9,8 @@ import {
   EmptyStateCard,
   HealthcareProviderItem,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import type {
   ClientHealthProviderFormData,
   HealthcareProvider,
@@ -19,6 +19,7 @@ import { toast } from "@agensy/utils";
 import React, { useEffect, useState } from "react";
 
 export const HealthCareProviderCard: React.FC = () => {
+  const { userData } = useAuthContext();
   const addHealthCareProviderMutation = useAddHealthCareMutation();
   const updateHealthCareProviderMutation = useUpdateHealthCareMutation();
   const deleteHealthCareProviderMutation = useDeleteHealthCareMutation();
@@ -32,6 +33,8 @@ export const HealthCareProviderCard: React.FC = () => {
     useState<boolean>(false);
   const [selectedEditHealthCareProvider, setSelectedEditHealthCareProvider] =
     useState<HealthcareProvider | null>(null);
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addHealthCareProviderMutation.status === "success") {
@@ -109,6 +112,7 @@ export const HealthCareProviderCard: React.FC = () => {
         buttonText={<ICONS.plus size={16} />}
         onButtonClick={() => setIsHealthCareModalOpen(true)}
         ariaLabel="Add New HealthCare Provider"
+        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
       >
         <div className="flex flex-col gap-6">
           {selectedClient?.healthcareProviders &&
@@ -120,6 +124,9 @@ export const HealthCareProviderCard: React.FC = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 isDeleting={deleteHealthCareProviderMutation.isPending}
+                showActions={userPermissions.includes(
+                  APP_ACTIONS.EditClientMedicalInfo
+                )}
               />
             ))
           ) : (

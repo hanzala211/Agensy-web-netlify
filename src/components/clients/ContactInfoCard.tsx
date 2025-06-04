@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ICONS } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import {
   AddContactModal,
   Card,
@@ -17,6 +17,7 @@ import {
 import { useAddContactMutation } from "@agensy/api";
 
 export const ContactInfoCard: React.FC = () => {
+  const { userData } = useAuthContext();
   const {
     selectedClient,
     addClientContact,
@@ -30,6 +31,8 @@ export const ContactInfoCard: React.FC = () => {
     useState<ClientContact | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (!isContactModalOpen) {
@@ -118,6 +121,7 @@ export const ContactInfoCard: React.FC = () => {
         buttonText={<ICONS.plus size={16} />}
         onButtonClick={() => setIsContactModalOpen(true)}
         ariaLabel="Add Contact"
+        showButton={userPermissions.includes(APP_ACTIONS.EditClientBasicInfo)}
       >
         <div className="space-y-6">
           {selectedClient?.contacts && selectedClient?.contacts.length > 0 ? (
@@ -136,6 +140,9 @@ export const ContactInfoCard: React.FC = () => {
                   type={item.contact_type}
                   onDelete={() => setIsDeleteModalOpen(true)}
                   isDeleting={deleteContactMutation.isPending}
+                  showActions={userPermissions.includes(
+                    APP_ACTIONS.EditClientBasicInfo
+                  )}
                 >
                   <div>
                     <p>

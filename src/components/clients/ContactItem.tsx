@@ -10,6 +10,7 @@ interface ContactItemProps {
   onDelete?: () => void;
   type?: "primary" | "secondary" | "emergency";
   isDeleting?: boolean;
+  showActions?: boolean;
 }
 
 export const ContactItem: React.FC<ContactItemProps> = ({
@@ -20,6 +21,7 @@ export const ContactItem: React.FC<ContactItemProps> = ({
   onDelete,
   type = "primary",
   isDeleting = false,
+  showActions = true,
 }) => {
   return (
     <div
@@ -48,15 +50,17 @@ export const ContactItem: React.FC<ContactItemProps> = ({
             >
               {label}
             </AntdTag>
-            <div className="flex flex-row gap-2">
-              <ActionButtons
-                editLabel="Edit Contact"
-                deleteLabel="Delete Contact"
-                onEdit={onEdit}
-                onDelete={onDelete}
-                isDeleting={isDeleting}
-              />
-            </div>
+            {showActions && (
+              <div className="flex flex-row gap-2">
+                <ActionButtons
+                  editLabel="Edit Contact"
+                  deleteLabel="Delete Contact"
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  isDeleting={isDeleting}
+                />
+              </div>
+            )}
           </div>
         </BorderedCard>
       </div>

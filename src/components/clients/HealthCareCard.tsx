@@ -4,8 +4,8 @@ import {
   EmptyStateCard,
   HealthcareItem,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import React, { useEffect, useMemo, useState } from "react";
 import { useUpdateClientHealthcareMutation } from "@agensy/api";
 import type { HospitalFormData } from "@agensy/types";
@@ -13,11 +13,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@agensy/utils";
 
 export const HealthCareCard: React.FC = () => {
+  const { userData } = useAuthContext();
   const updateClientHealthcareMutation = useUpdateClientHealthcareMutation();
   const { selectedClient } = useClientContext();
   const [isEditHealthcareModalOpen, setIsEditHealthcareModalOpen] =
     useState<boolean>(false);
   const queryClient = useQueryClient();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (updateClientHealthcareMutation.isSuccess) {
@@ -69,6 +72,7 @@ export const HealthCareCard: React.FC = () => {
         buttonText={<ICONS.edit />}
         onButtonClick={() => setIsEditHealthcareModalOpen(true)}
         ariaLabel="Edit Healthcare Information"
+        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
       >
         {selectedClient?.preferred_hospital ? (
           <div className="flex flex-col gap-6">

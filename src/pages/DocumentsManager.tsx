@@ -1,4 +1,5 @@
 import {
+  APP_ACTIONS,
   DOCUMENT_CATEGORY_OPTIONS,
   DOCUMENT_SORT_OPTIONS,
   DOCUMENT_UPLOAD_TYPE_OPTIONS,
@@ -18,7 +19,8 @@ import {
   useDeleteGeneralDocumentMutation,
   useGetGeneralDocumentsQuery,
 } from "@agensy/api";
-import { useDocumentContext } from "@agensy/context";
+import { useAuthContext, useDocumentContext } from "@agensy/context";
+import { PERMISSIONS } from "@agensy/constants";
 import { toast } from "@agensy/utils";
 import { useNavigate } from "react-router-dom";
 import { useDocumentManager } from "@agensy/hooks";
@@ -56,6 +58,9 @@ export const DocumentsManager: React.FC = () => {
   });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     loadGeneralDocuments();
@@ -161,6 +166,7 @@ export const DocumentsManager: React.FC = () => {
               onPreview={() => navigate(`${doc.id}`)}
               showLabel={true}
               showClientName={doc.client_id ? true : false}
+              showActions={userPermissions.includes(APP_ACTIONS.DeleteDocs)}
             />
           ))
         )}

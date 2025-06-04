@@ -12,6 +12,7 @@ interface MedicationItemProps {
   onEdit?: (item: ClientMedications) => void;
   onDelete?: (item: ClientMedications) => void;
   isDeleting?: boolean;
+  showActions?: boolean;
 }
 
 export const MedicationItem: React.FC<MedicationItemProps> = ({
@@ -19,6 +20,7 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
   onEdit,
   onDelete,
   isDeleting = false,
+  showActions = true,
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
@@ -85,13 +87,15 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
           )}
         </div>
         <div className="mt-4 flex items-start gap-2 md:mt-0 md:ml-4">
-          <ActionButtons
-            editLabel="Edit Medication"
-            deleteLabel="Delete Medication"
-            onEdit={() => onEdit?.(medication)}
-            onDelete={() => setIsDeleteModalOpen(true)}
-            isDeleting={isDeleting}
-          />
+          {showActions && (
+            <ActionButtons
+              editLabel="Edit Medication"
+              deleteLabel="Delete Medication"
+              onEdit={() => onEdit?.(medication)}
+              onDelete={() => setIsDeleteModalOpen(true)}
+              isDeleting={isDeleting}
+            />
+          )}
           <ConfirmationModal
             title="Delete Medication"
             isModalOpen={isDeleteModalOpen}
@@ -101,12 +105,12 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
             <p>Are you sure you want to delete this medication?</p>
           </ConfirmationModal>
         </div>
+        {medication?.notes && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <p className="text-sm italic text-gray-600">{medication?.notes}</p>
+          </div>
+        )}
       </div>
-      {medication?.notes && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
-          <p className="text-sm italic text-gray-600">{medication?.notes}</p>
-        </div>
-      )}
     </BorderedCard>
   );
 };

@@ -1,7 +1,9 @@
 import {
+  APP_ACTIONS,
   DOCUMENT_CATEGORY_OPTIONS,
   DOCUMENT_SORT_OPTIONS,
   ICONS,
+  PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
 import {
@@ -14,7 +16,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { EmptyStateCard } from "@agensy/components";
 import { useAddDocumentMutation, useDeleteDocumentMutation } from "@agensy/api";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import type { DocumentFormData } from "@agensy/types";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,6 +26,7 @@ import { useDocumentManager } from "@agensy/hooks";
 const itemsPerPage = 3;
 
 export const ClientDocuments: React.FC = () => {
+  const { userData } = useAuthContext();
   const addDocumentMutation = useAddDocumentMutation();
   const deleteDocumentMutation = useDeleteDocumentMutation();
   const { selectedClient, addClientDocument, deleteClientDocument } =
@@ -48,6 +51,8 @@ export const ClientDocuments: React.FC = () => {
     useState<boolean>(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addDocumentMutation.status === "success") {
@@ -110,7 +115,7 @@ export const ClientDocuments: React.FC = () => {
   return (
     <div className="w-full px-4">
       <SearchFilterBar
-        showButton={true}
+        showButton={userPermissions.includes(APP_ACTIONS.AddDocs)}
         searchPlaceholder="Search documents..."
         searchValue={searchTerm}
         setSearchValue={setSearchTerm}
@@ -147,6 +152,7 @@ export const ClientDocuments: React.FC = () => {
                   `/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.clientDocuments}/${doc.id}`
                 )
               }
+              showActions={userPermissions.includes(APP_ACTIONS.DeleteDocs)}
             />
           ))
         )}
