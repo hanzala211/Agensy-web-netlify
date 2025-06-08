@@ -11,6 +11,7 @@ interface PageHeaderProps {
   onButtonClick?: () => void;
   showButton?: boolean;
   showBackButton?: boolean;
+  className?: string
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
@@ -20,11 +21,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   onButtonClick,
   showButton = true,
   showBackButton,
+  className = "mb-6"
 }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+    <div className={`flex flex-col md:flex-row justify-between items-start md:items-center ${className}`}>
       <H1 className="text-xl md:my-4 sm:text-2xl md:text-3xl flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         {showBackButton && (
           <button

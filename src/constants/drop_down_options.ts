@@ -144,3 +144,8 @@ export const USER_ROLES = [
   { label: "Primary User", value: "primary_user" },
   ...ACCESS_ROLE_OPTIONS,
 ];
+
+export const MESSAGING_TYPES = [
+  { label: "Client", value: "client" },
+  { label: "General", value: "general" },
+];

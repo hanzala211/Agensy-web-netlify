@@ -4,9 +4,17 @@ import dayjs from "dayjs";
 export const formatRelativeTime = (isoDate: string): string => {
   const date = dayjs(isoDate);
   const now = dayjs();
+  const diffMinutes = now.diff(date, "minute");
+  const diffHours = now.diff(date, "hour");
   const diffDays = now.diff(date, "day");
 
-  if (diffDays === 0) {
+  if (diffMinutes < 1) {
+    return "Just now";
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
+  } else if (diffHours < 24) {
+    return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+  } else if (diffDays === 0) {
     return "Today";
   } else if (diffDays === 1) {
     return "Yesterday";
@@ -34,4 +42,22 @@ export const formatDateToRequiredFormat = (isoDateString: string): string => {
 export const formatDateTime = (isoDateString: string): string => {
   const date = dayjs(isoDateString);
   return date.format(`${DATE_FOMRAT} hh:mm A`);
+};
+
+export const formatToTime = (dateStr: string): string => {
+  return dayjs(dateStr).format("hh:mm A");
+};
+
+export const formatSimpleDate = (isoDate: string): string => {
+  const date = dayjs(isoDate);
+  const now = dayjs();
+  const diffDays = now.diff(date, "day");
+
+  if (diffDays === 0) {
+    return "Today";
+  } else if (diffDays === 1) {
+    return "Yesterday";
+  } else {
+    return date.format(DATE_FOMRAT);
+  }
 };

@@ -18,6 +18,8 @@ export const AppLayout: React.FC = () => {
     }
   }, [userData, location.pathname]);
 
+
+
   if (!userData) return <Navigate to={`${ROUTES.auth}/${ROUTES.login}`} />;
 
   return (

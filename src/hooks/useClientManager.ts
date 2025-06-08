@@ -1,6 +1,6 @@
 import { useGetClientsQuery } from "@agensy/api";
 import type { Client } from "@agensy/types";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 export const useClientManager = ({
   initialItemPerPage = 5,
@@ -18,10 +18,6 @@ export const useClientManager = ({
   const [filterBy, setFilterBy] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name");
   const [itemsPerPage] = useState<number>(initialItemPerPage);
-
-  useEffect(() => {
-    loadClients();
-  }, []);
 
   const filteredClients = useMemo(
     () =>

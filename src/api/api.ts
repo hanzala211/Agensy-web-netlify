@@ -11,3 +11,4 @@ export * from "./clientAccessApi";
 export * from "./clientAppointmentApi";
 export * from "./userProfileSettingsServiceApi";
 export * from "./stripeApi";
+export * from "./messageThreadApi";

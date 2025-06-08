@@ -645,3 +645,62 @@ export const DASHBOARD_DUMMY_DOCUMENTS = [
     updatedAt: new Date(),
   },
 ] as const;
+
+export const MOCK_THREADS = [
+  {
+    id: "1",
+    primary_user_id: "1",
+    user_id: "2",
+    started_at: new Date("2024-03-20T10:00:00Z"),
+    last_message: "When can we schedule the next appointment?",
+    last_message_time: new Date("2024-03-20T10:30:00Z"),
+    last_message_sender_id: "2",
+    type: "client",
+    subType: "one-to-one",
+    created_by: "1",
+    messages: [
+      {
+        id: "1",
+        thread_id: "1",
+        sender_id: "1",
+        content: "Hello, how can I help you today?",
+        sent_at: new Date("2024-03-20T10:00:00Z"),
+      },
+      {
+        id: "2",
+        thread_id: "1",
+        sender_id: "2",
+        content: "When can we schedule the next appointment?",
+        sent_at: new Date("2024-03-20T10:30:00Z"),
+      },
+    ],
+  },
+  {
+    id: "2",
+    primary_user_id: "1",
+    user_id: "3",
+    started_at: new Date("2024-03-19T15:00:00Z"),
+    last_message: "The documents have been uploaded.",
+    last_message_time: new Date("2024-03-19T15:45:00Z"),
+    last_message_sender_id: "1",
+    type: "general",
+    subType: "one-to-one",
+    created_by: "1",
+    messages: [
+      {
+        id: "3",
+        thread_id: "2",
+        sender_id: "3",
+        content: "Could you please check the latest medical reports?",
+        sent_at: new Date("2024-03-19T15:00:00Z"),
+      },
+      {
+        id: "4",
+        thread_id: "2",
+        sender_id: "1",
+        content: "The documents have been uploaded.",
+        sent_at: new Date("2024-03-19T15:45:00Z"),
+      },
+    ],
+  },
+] as const;

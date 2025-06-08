@@ -73,52 +73,33 @@ export const Sidebar: React.FC = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto py-5 px-3">
-          <div className="space-y-6">
-            <div>
-              <p className="text-xs uppercase text-slateGrey tracking-widest font-medium mb-3 ml-3">
-                Navigation
-              </p>
-              <nav className="space-y-1">
-                <SidebarItem
-                  link={"/"}
-                  icon={ICONS.homeIcon}
-                  label="Dashboard"
-                />
-                <SidebarItem
-                  link={`/${ROUTES.clients}`}
-                  icon={ICONS.users}
-                  label="Clients"
-                />
-                <SidebarItem
-                  link={ROUTES.documents}
-                  icon={ICONS.fileIcon}
-                  label="Documents"
-                />
-              </nav>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase text-slateGrey tracking-widest font-medium mb-3 ml-3">
-                Workflow
-              </p>
-              <nav className="space-y-1">
-                {/* <SidebarItem
+          <div className="space-y-2">
+            <SidebarItem link={"/"} icon={ICONS.homeIcon} label="Dashboard" />
+            <SidebarItem
+              link={`/${ROUTES.clients}`}
+              icon={ICONS.users}
+              label="Clients"
+            />
+            <SidebarItem
+              link={ROUTES.documents}
+              icon={ICONS.fileIcon}
+              label="Documents"
+            />
+            {/* <SidebarItem
                   link={ROUTES.templates}
                   icon={ICONS.fileTextIcon}
                   label="Templates"
                 /> */}
-                <SidebarItem
-                  link={ROUTES.appointments}
-                  icon={ICONS.calendarIcon}
-                  label="Appointments"
-                />
-                <SidebarItem
-                  link={ROUTES.messages}
-                  icon={ICONS.messageIcon}
-                  label="Messages"
-                />
-              </nav>
-            </div>
+            <SidebarItem
+              link={ROUTES.appointments}
+              icon={ICONS.calendarIcon}
+              label="Appointments"
+            />
+            <SidebarItem
+              link={ROUTES.messages}
+              icon={ICONS.messageIcon}
+              label="Messages"
+            />
           </div>
         </div>
         <div className="p-4 border-t border-gray-100">

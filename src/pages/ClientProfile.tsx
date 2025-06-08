@@ -8,10 +8,11 @@ import {
 import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import React, { useEffect } from "react";
-import { useNavigate, Outlet, useParams } from "react-router-dom";
+import { useNavigate, Outlet, useParams, useLocation } from "react-router-dom";
 
 export const ClientProfile: React.FC = () => {
   const { userData } = useAuthContext();
+  const location = useLocation();
   const params = useParams();
   const { selectedClient, setSelectedClient } = useClientContext();
   const {
@@ -100,7 +101,11 @@ export const ClientProfile: React.FC = () => {
           )}
         </div>
       </div>
-      <div className="mt-4">
+      <div
+        className={`${
+          location.pathname.includes(ROUTES.clientMessages) ? "px-1" : ""
+        } mt-4`}
+      >
         <Outlet />
       </div>
     </div>

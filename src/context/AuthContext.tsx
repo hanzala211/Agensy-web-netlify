@@ -11,10 +11,11 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
-import { AuthService } from "@agensy/services";
+import { AuthService, ClientAccessService } from "@agensy/services";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useClientManager } from "@agensy/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSocketContext } from "@agensy/context";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -25,14 +26,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [userData, setUserData] = useState<IUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
+  const [accessUsers, setAccessUsers] = useState<IUser[]>([]);
   const queryClient = useQueryClient();
+  const { connectSocket } = useSocketContext();
 
   useEffect(() => {
     loadAuth();
   }, []);
 
   useEffect(() => {
-    if (userData) loadClients();
+    if (userData) {
+      loadClients();
+      loadAllUsers();
+      connectSocket();
+    }
   }, [userData]);
 
   const loadAuth = async () => {
@@ -46,6 +53,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       signOut();
     } finally {
       setIsAuthLoading(false);
+    }
+  };
+
+  const loadAllUsers = async () => {
+    try {
+      const response = await ClientAccessService.getAllClientSubUsers();
+      setAccessUsers(
+        response.filter((user: IUser) => user.id !== userData?.id)
+      );
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -87,7 +105,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         updateUserData,
         file,
         setFile,
-        loadAuth
+        loadAuth,
+        accessUsers,
       }}
     >
       {children}

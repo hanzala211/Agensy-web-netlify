@@ -11,7 +11,7 @@ export const ROUTES = {
   clientMedical: "medical",
   clientDocuments: "documents",
   clientAppointments: "appointments",
-  clientMessages: "messages",
+  clientMessages: "message",
   documents: "/documents",
   documentCategories: "categories",
   documentView: "view",

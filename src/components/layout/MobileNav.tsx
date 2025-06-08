@@ -47,7 +47,6 @@ export const MobileNav: React.FC = () => {
   const NAV_SECTIONS = [
     {
       id: "navigation",
-      category: "Navigation",
       links: [
         {
           id: "dashboard",
@@ -70,12 +69,6 @@ export const MobileNav: React.FC = () => {
           path: ROUTES.documents,
           isActiveFn: (path: string) => path.includes(ROUTES.documents),
         },
-      ],
-    },
-    {
-      id: "workflow",
-      category: "Workflow",
-      links: [
         // {
         //   id: "templates",
         //   icon: ICONS.fileTextIcon,
@@ -213,13 +206,7 @@ export const MobileNav: React.FC = () => {
                 key={section.id}
                 className={section.id !== NAV_SECTIONS[0].id ? "mt-6" : ""}
               >
-                <div className="flex items-center mb-3">
-                  <div className="w-1.5 h-4 bg-primaryColor rounded-full mr-2"></div>
-                  <p className="text-xs uppercase text-primaryColor tracking-widest font-medium">
-                    {section.category}
-                  </p>
-                </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {section.links.map((link) => (
                     <NavItem
                       key={link.id}

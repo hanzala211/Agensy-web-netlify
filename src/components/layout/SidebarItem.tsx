@@ -19,6 +19,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   isIconType = false,
 }) => {
   const { userData } = useAuthContext();
+
   return (
     <NavLink
       to={link}

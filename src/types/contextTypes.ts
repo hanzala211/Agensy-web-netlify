@@ -8,7 +8,9 @@ import type {
   Document,
   HealthcareProvider,
   IUser,
+  Message,
   Note,
+  Thread,
 } from "./schemas";
 
 export interface AuthContextType {
@@ -27,6 +29,7 @@ export interface AuthContextType {
   file: File | null;
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
   loadAuth: () => void;
+  accessUsers: IUser[];
 }
 
 export interface ClientContextType {
@@ -69,4 +72,31 @@ export interface AppointmentsContextType {
   deleteAppointment: (appointmentId: string) => void;
   editAppointment: (appointment: Appointment) => void;
   cancelAppointment: (appointmentId: string) => void;
+}
+
+export interface MessagesContextType {
+  selectedThread: Thread | null;
+  setSelectedThread: React.Dispatch<React.SetStateAction<Thread | null>>;
+  showThreadList: boolean;
+  setShowThreadList: React.Dispatch<React.SetStateAction<boolean>>;
+  isThreadsLoading: boolean;
+  currentThreadMessages: Message[];
+  setCurrentThreadMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  threads: Thread[];
+  setThreads: React.Dispatch<React.SetStateAction<Thread[]>>;
+  updateThreads: (
+    threadId: string,
+    lastMessageSender: string,
+    message: string
+  ) => void;
+  updateSelectedThread: (
+    threadId: string,
+    lastMessageSender: string,
+    message: string
+  ) => void;
+  updateCurrentThreadMessages: (
+    message: string,
+    thread: string,
+    senderID: string
+  ) => void;
 }

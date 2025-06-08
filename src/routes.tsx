@@ -25,6 +25,9 @@ import {
   ProfileSettings,
   PaymentStatus,
   Subscription,
+  Messages,
+  ChatPage,
+  ClientMessages,
 } from "@agensy/pages";
 import { useAuthContext } from "@agensy/context";
 
@@ -68,6 +71,9 @@ export const Routes: React.FC = () => {
         </Route>
 
         <Route path={ROUTES.clients} element={<Clients />} />
+        <Route path={ROUTES.messages} element={<Messages />}>
+          <Route path={`${ROUTES.messages}/:threadId`} element={<ChatPage />} />
+        </Route>
         <Route
           path={`${ROUTES.profileSubscription}/${ROUTES.paymentStatus}`}
           element={<PaymentStatus />}
@@ -82,6 +88,12 @@ export const Routes: React.FC = () => {
             element={<DocumentPreview />}
           />
           <Route path={ROUTES.access} element={<ClientAccess />} />
+          <Route path={ROUTES.clientMessages} element={<ClientMessages />}>
+            <Route
+              path={`:threadId`}
+              element={<ChatPage />}
+            />
+          </Route>
         </Route>
       </Route>
     </RouterRoutes>

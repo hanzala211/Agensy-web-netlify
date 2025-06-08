@@ -417,3 +417,11 @@ export const passwordSchema = z
   });
 
 export type PasswordFormData = z.infer<typeof passwordSchema>;
+
+export const addThreadFormSchema = z.object({
+  client_id: z.string().optional(),
+  type: z.string().min(1, "Type is Required"),
+  participant_id: z.string().min(1, "Participant ID is Required"),
+});
+
+export type AddThreadFormData = z.infer<typeof addThreadFormSchema>;

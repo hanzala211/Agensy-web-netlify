@@ -24,3 +24,6 @@ export * from "./Settings";
 export * from "./ProfileSettings";
 export * from "./PaymentStatus";
 export * from "./Subscription";
+export * from "./Messages";
+export * from "./ChatPage";
+export * from "./ClientMessages";

@@ -88,3 +88,7 @@ export * from "./dashboard/MessagesDashboardCard";
 export * from "./dashboard/DocumentsDashboardCard";
 export * from "./dashboard/DashboardWidget";
 export * from "./clients/EditAccessModal";
+export * from "./messages/MessageList";
+export * from "./messages/MessageForm";
+export * from "./messages/ThreadList";
+export * from "./messages/AddThreadModal";

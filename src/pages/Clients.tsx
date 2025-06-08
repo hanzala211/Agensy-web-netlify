@@ -52,6 +52,10 @@ export const Clients: React.FC = () => {
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
+    loadClients();
+  }, []);
+
+  useEffect(() => {
     if (addClientMutation.status === "success") {
       setIsAddClientModalOpen(false);
       addClientMutation.reset();

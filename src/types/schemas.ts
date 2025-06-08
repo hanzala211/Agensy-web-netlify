@@ -174,14 +174,28 @@ export interface Appointment extends BaseSchema {
 }
 
 export interface Message extends BaseSchema {
-  subject: string;
-  content: string;
+  thread_id: string;
   sender_id: string;
-  receiver_id: string;
-  read: boolean;
-  priority: "low" | "medium" | "high";
-  category: "general" | "medical" | "appointment" | "document";
-  related_client_id?: string;
+  content: string;
+  read_at?: Date;
+  thread?: Thread;
+}
+
+export interface Thread extends BaseSchema {
+  primary_user_id?: string;
+  user_id: string;
+  started_at: Date;
+  last_message?: string;
+  last_message_time?: Date;
+  last_message_sender_id?: string;
+  client_id?: string;
+  type: "general" | "client";
+  subType: "one-to-one" | "group";
+  created_by: string;
+  messages?: Message[];
+  client: Client;
+  participants: IUser[];
+  has_unread_messages?: boolean;
 }
 
 export interface BillingHistory extends BaseSchema {
