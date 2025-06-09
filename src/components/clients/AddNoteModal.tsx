@@ -61,7 +61,7 @@ export const AddNoteModal: React.FC<AddNoteModalProps> = ({
       onClose={handleClose}
       title={`${initialNote ? "Edit Note" : "Add Note"}`}
       maxWidth="max-w-md"
-      height="h-[60vh]"
+      height="h-[36rem]"
       footer={
         <PrimaryButton
           onClick={() => inputRef.current?.click()}

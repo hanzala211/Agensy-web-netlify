@@ -109,7 +109,6 @@ export const DocumentsManager: React.FC = () => {
   };
 
   const handleDelete = (documentId: string, clientId?: string) => {
-    console.log(documentId);
     if (clientId) {
       deleteClientDocumentMutation.mutate({
         clientId,

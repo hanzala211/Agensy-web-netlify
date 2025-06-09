@@ -88,7 +88,7 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
       onClose={handleClose}
       title="Start Messaging"
       maxWidth="max-w-lg"
-      height={showType ? "sm:h-[45vh] h-[70vh]" : "sm:h-[35vh] h-[50vh]"}
+      height={showType ? "sm:h-[29rem] h-[27rem]" : "h-[20rem]"}
       footer={
         <PrimaryButton
           onClick={() => inputRef.current?.click()}

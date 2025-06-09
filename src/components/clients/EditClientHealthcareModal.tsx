@@ -83,7 +83,6 @@ export const EditClientHealthcareModal: React.FC<
   };
 
   const onSubmit = (data: HospitalFormData) => {
-    console.log(data);
     if (onSubmitProp) onSubmitProp(data);
   };
 

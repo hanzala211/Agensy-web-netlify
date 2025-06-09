@@ -1,13 +1,16 @@
 import { z } from "zod";
 import zxcvbn from "zxcvbn";
 
+const trimString = (val: string) => val.trim();
+
 export const signUpSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
+  first_name: z.string().min(1, "First name is required").transform(trimString),
+  last_name: z.string().min(1, "Last name is required").transform(trimString),
   email_address: z
     .string()
     .min(1, "Email is required")
-    .email({ message: "Invalid email address" }),
+    .email({ message: "Invalid email address" })
+    .transform(trimString),
   password: z
     .string()
     .min(12, "Password must be at least 12 characters long")
@@ -22,14 +25,18 @@ export const loginSchema = z.object({
   email_address: z
     .string()
     .min(1, "Email is required")
-    .email({ message: "Invalid email address" }),
+    .email({ message: "Invalid email address" })
+    .transform(trimString),
   password: z.string().min(12, "Password must be at least 12 characters long"),
 });
 
 export type LoginSchema = z.infer<typeof loginSchema>;
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z
+    .string()
+    .email("Please enter a valid email address")
+    .transform(trimString),
 });
 
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -61,17 +68,32 @@ export type VerificationFormData = z.infer<typeof verificationSchema>;
 export const hospitalSchema = z.object({
   preferred_hospital: z
     .string()
-    .min(1, { message: "Preferred Hospital Name is required" }),
+    .min(1, { message: "Preferred Hospital Name is required" })
+    .transform(trimString),
   hospital_address: z
     .string()
-    .min(1, { message: "Hospital address is required" }),
-  hospital_phone: z.string().min(1, { message: "Hospital phone is required" }),
-  pharmacy_name: z.string().min(1, { message: "Pharmacy name is required" }),
+    .min(1, { message: "Hospital address is required" })
+    .transform(trimString),
+  hospital_phone: z
+    .string()
+    .min(1, { message: "Hospital phone is required" })
+    .transform(trimString),
+  pharmacy_name: z
+    .string()
+    .min(1, { message: "Pharmacy name is required" })
+    .transform(trimString),
   pharmacy_address: z
     .string()
-    .min(1, { message: "Pharmacy address is required" }),
-  pharmacy_phone: z.string().min(1, { message: "Pharmacy phone is required" }),
-  pharmacy_fax: z.string().min(1, { message: "Pharmacy fax is required" }),
+    .min(1, { message: "Pharmacy address is required" })
+    .transform(trimString),
+  pharmacy_phone: z
+    .string()
+    .min(1, { message: "Pharmacy phone is required" })
+    .transform(trimString),
+  pharmacy_fax: z
+    .string()
+    .min(1, { message: "Pharmacy fax is required" })
+    .transform(trimString),
 });
 
 export type HospitalFormData = z.infer<typeof hospitalSchema>;
@@ -81,49 +103,77 @@ export const clientSchema = z
     firstName: z
       .string()
       .min(2, { message: "First name is required" })
-      .max(12, "First name must be less than 12 characters"),
+      .max(12, "First name must be less than 12 characters")
+      .transform(trimString),
     lastName: z
       .string()
       .min(2, { message: "Last name is required" })
-      .max(12, "Last name must be less than 12 characters"),
-    dateOfBirth: z.string().min(1, { message: "Date of birth is required" }),
+      .max(12, "Last name must be less than 12 characters")
+      .transform(trimString),
+    dateOfBirth: z
+      .string()
+      .min(1, { message: "Date of birth is required" })
+      .transform(trimString),
     gender: z.enum(["male", "female", "other"]),
-    maritalStatus: z.string().min(1, { message: "Marital status is required" }),
-    address: z.string().min(5, { message: "Address is required" }),
-    city: z.string().min(2, { message: "City is required" }),
-    state: z.string().min(2, { message: "State is required" }),
-    zipCode: z.string().min(5, { message: "Valid ZIP code is required" }),
+    maritalStatus: z
+      .string()
+      .min(1, { message: "Marital status is required" })
+      .transform(trimString),
+    address: z
+      .string()
+      .min(5, { message: "Address is required" })
+      .transform(trimString),
+    city: z
+      .string()
+      .min(2, { message: "City is required" })
+      .transform(trimString),
+    state: z
+      .string()
+      .min(2, { message: "State is required" })
+      .transform(trimString),
+    zipCode: z
+      .string()
+      .min(5, { message: "Valid ZIP code is required" })
+      .transform(trimString),
     livingSituation: z
       .string()
-      .min(1, { message: "Living situation is required" }),
+      .min(1, { message: "Living situation is required" })
+      .transform(trimString),
     pharmacy_name: z
       .string()
       .min(1, { message: "Pharmacy name is required" })
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
     pharmacy_address: z
       .string()
       .min(1, { message: "Pharmacy address is required" })
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
     pharmacy_phone: z
       .string()
       .min(1, { message: "Pharmacy phone is required" })
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
     pharmacy_fax: z
       .string()
       .min(1, { message: "Pharmacy fax is required" })
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
     preferred_hospital: z
       .string()
       .min(1, { message: "Preferred Hospital Name is required" })
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
     hospital_address: z
       .string()
       .min(1, { message: "Hospital address is required" })
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
     hospital_phone: z
       .string()
       .min(1, { message: "Hospital phone is required" })
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
     isEdit: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
@@ -184,16 +234,22 @@ export type ClientFormData = z.infer<typeof clientSchema>;
 
 export const contactSchema = z.object({
   contact_type: z.enum(["primary", "secondary", "emergency"]),
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  relationship: z.string().min(1, "Relationship is required"),
-  phone: z.string().min(1, "Phone number is required"),
+  first_name: z.string().min(1, "First name is required").transform(trimString),
+  last_name: z.string().min(1, "Last name is required").transform(trimString),
+  relationship: z
+    .string()
+    .min(1, "Relationship is required")
+    .transform(trimString),
+  phone: z.string().min(1, "Phone number is required").transform(trimString),
 });
 
 export type ContactFormData = z.infer<typeof contactSchema>;
 
 export const noteSchema = z.object({
-  note: z.string().min(1, { message: "Note is required" }),
+  note: z
+    .string()
+    .min(1, { message: "Note is required" })
+    .transform(trimString),
 });
 
 export type NoteFormData = z.infer<typeof noteSchema>;
@@ -203,21 +259,40 @@ export const medicationSchema = z
     medication_name: z
       .string()
       .min(1, { message: "Medication name is required" })
-      .max(35, { message: "Medication name must be less than 35 characters" }),
+      .max(35, { message: "Medication name must be less than 35 characters" })
+      .transform(trimString),
     dosage: z
       .string()
-      .min(3, { message: "Dosage is required (min 3 characters)" }),
-    frequency: z.string().min(1, { message: "Frequency is required" }),
+      .min(3, { message: "Dosage is required (min 3 characters)" })
+      .transform(trimString),
+    frequency: z
+      .string()
+      .min(1, { message: "Frequency is required" })
+      .transform(trimString),
     purpose: z
       .string()
-      .min(3, { message: "Purpose is required (min 3 characters)" }),
+      .min(3, { message: "Purpose is required (min 3 characters)" })
+      .transform(trimString),
     prescribing_doctor: z
       .string()
-      .min(1, { message: "Prescribing doctor is required" }),
-    start_date: z.string().min(1, { message: "Start date is required" }),
-    end_date: z.string().min(1, { message: "End date is required" }),
-    refill_due: z.string().min(1, { message: "Refill due is required" }),
-    notes: z.string().optional(),
+      .min(1, { message: "Prescribing doctor is required" })
+      .transform(trimString),
+    start_date: z
+      .string()
+      .min(1, { message: "Start date is required" })
+      .transform(trimString),
+    end_date: z
+      .string()
+      .min(1, { message: "End date is required" })
+      .transform(trimString),
+    refill_due: z
+      .string()
+      .min(1, { message: "Refill due is required" })
+      .transform(trimString),
+    notes: z
+      .string()
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
   })
   .refine((data) => new Date(data.start_date) <= new Date(data.end_date), {
     message: "End date cannot be before start date",
@@ -236,15 +311,30 @@ export type MedicationFormData = z.infer<typeof medicationSchema>;
 
 export const clientHealthProviderSchema = z
   .object({
-    provider_type: z.string().min(1, "Provider type is required"),
-    provider_name: z.string().min(1, "Provider name is required"),
-    specialty: z.string().min(1, "Specialty is required"),
-    address: z.string().min(1, "Address is required"),
-    phone: z.string().min(1, "Phone number is required"),
-    fax: z.string().min(1, "Fax is required"),
-    last_visit: z.string().min(1, "Last visit is required"),
-    next_visit: z.string().min(1, "Next visit is required"),
-    notes: z.string().optional(),
+    provider_type: z
+      .string()
+      .min(1, "Provider type is required")
+      .transform(trimString),
+    provider_name: z
+      .string()
+      .min(1, "Provider name is required")
+      .transform(trimString),
+    specialty: z.string().min(1, "Specialty is required").transform(trimString),
+    address: z.string().min(1, "Address is required").transform(trimString),
+    phone: z.string().min(1, "Phone number is required").transform(trimString),
+    fax: z.string().min(1, "Fax is required").transform(trimString),
+    last_visit: z
+      .string()
+      .min(1, "Last visit is required")
+      .transform(trimString),
+    next_visit: z
+      .string()
+      .min(1, "Next visit is required")
+      .transform(trimString),
+    notes: z
+      .string()
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
   })
   .refine(
     (data) => {
@@ -264,32 +354,52 @@ export type ClientHealthProviderFormData = z.infer<
 
 export const medicalHistorySchema = z.object({
   diagnoses: z
-    .array(z.string().min(1, "Diagnosis cannot be empty"))
+    .array(z.string().min(1, "Diagnosis cannot be empty").transform(trimString))
     .min(1, "At least one diagnosis is required"),
   allergies: z
-    .array(z.string().min(1, "Allergy cannot be empty"))
+    .array(z.string().min(1, "Allergy cannot be empty").transform(trimString))
     .min(1, "At least one allergy is required"),
   dietary_restrictions: z
-    .array(z.string().min(1, "Dietary restriction cannot be empty"))
+    .array(
+      z
+        .string()
+        .min(1, "Dietary restriction cannot be empty")
+        .transform(trimString)
+    )
     .min(1, "At least one dietary restriction is required"),
   surgical_history: z
-    .array(z.string().min(1, "Surgical history cannot be empty"))
+    .array(
+      z
+        .string()
+        .min(1, "Surgical history cannot be empty")
+        .transform(trimString)
+    )
     .min(1, "At least one surgical history is required"),
-  cognitive_status: z.string().min(1, "Cognitive status is required"),
+  cognitive_status: z
+    .string()
+    .min(1, "Cognitive status is required")
+    .transform(trimString),
   last_cognitive_screening: z
     .string()
-    .min(1, "Last cognitive screening date is required"),
+    .min(1, "Last cognitive screening date is required")
+    .transform(trimString),
   cognitive_score: z.number().min(1, "Cognitive score is required"),
   total_score: z.number().min(1, "Total score is required"),
-  notes: z.string().optional(),
+  notes: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
 });
 
 export type MedicalHistoryFormData = z.infer<typeof medicalHistorySchema>;
 
 export const documentSchema = z.object({
-  documentType: z.string().min(1, "Category is required"),
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
+  documentType: z.string().min(1, "Category is required").transform(trimString),
+  title: z.string().min(1, "Title is required").transform(trimString),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .transform(trimString),
   file: z.instanceof(File, { message: "File is required" }),
 });
 
@@ -299,15 +409,17 @@ export const accessSchema = z.object({
   first_name: z
     .string()
     .min(1, "First Name is required")
-    .max(12, "First Name must be less than 12 characters"),
+    .max(12, "First Name must be less than 12 characters")
+    .transform(trimString),
   last_name: z
     .string()
     .min(1, "Last Name is required")
-    .max(12, "Last Name must be less than 12 characters"),
-  relation: z.string().min(1, "Relationship is required"),
-  email: z.string().email("Valid email is required"),
-  phone: z.string().min(1, "Phone number is required"),
-  role: z.string().min(1, "Role is required"),
+    .max(12, "Last Name must be less than 12 characters")
+    .transform(trimString),
+  relation: z.string().min(1, "Relationship is required").transform(trimString),
+  email: z.string().email("Valid email is required").transform(trimString),
+  phone: z.string().min(1, "Phone number is required").transform(trimString),
+  role: z.string().min(1, "Role is required").transform(trimString),
   password: z
     .string()
     .min(12, "Password must be at least 12 characters long")
@@ -331,14 +443,16 @@ export const editAccessSchema = z.object({
   first_name: z
     .string()
     .min(1, "First Name is required")
-    .max(12, "First Name must be less than 12 characters"),
+    .max(12, "First Name must be less than 12 characters")
+    .transform(trimString),
   last_name: z
     .string()
     .min(1, "Last Name is required")
-    .max(12, "Last Name must be less than 12 characters"),
-  relation: z.string().min(1, "Relationship is required"),
-  phone: z.string().min(1, "Phone number is required"),
-  role: z.string().min(1, "Role is required"),
+    .max(12, "Last Name must be less than 12 characters")
+    .transform(trimString),
+  relation: z.string().min(1, "Relationship is required").transform(trimString),
+  phone: z.string().min(1, "Phone number is required").transform(trimString),
+  role: z.string().min(1, "Role is required").transform(trimString),
 });
 
 export type EditAccessFormData = z.infer<typeof editAccessSchema>;
@@ -348,23 +462,33 @@ export const appointmentSchema = z
     title: z
       .string()
       .min(1, "Title is required")
-      .max(30, "Title must be less than 30 characters"),
-    appointment_type: z.string().min(1, "Appointment type is required"),
-    location: z.string().min(1, "Location is required"),
-    start_time: z.string().min(1, "Start time is required"),
-    end_time: z.string().min(1, "End time is required"),
+      .max(30, "Title must be less than 30 characters")
+      .transform(trimString),
+    appointment_type: z
+      .string()
+      .min(1, "Appointment type is required")
+      .transform(trimString),
+    location: z.string().min(1, "Location is required").transform(trimString),
+    start_time: z
+      .string()
+      .min(1, "Start time is required")
+      .transform(trimString),
+    end_time: z.string().min(1, "End time is required").transform(trimString),
     notes: z
       .string()
       .max(50, "Notes must be less than 50 characters")
-      .optional(),
-    clientId: z.string().min(1, "Client is required"),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
+    clientId: z.string().min(1, "Client is required").transform(trimString),
     healthcare_provider_id: z
       .string()
-      .min(1, "Healthcare provider is required"),
+      .min(1, "Healthcare provider is required")
+      .transform(trimString),
     post_appointment_notes: z
       .string()
       .max(50, "Post appointment notes must be less than 50 characters")
-      .optional(),
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
   })
   .refine(
     (data) => {
@@ -381,9 +505,9 @@ export const appointmentSchema = z
 export type AppointmentFormData = z.infer<typeof appointmentSchema>;
 
 export const profileSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  phone: z.string().min(1, "Phone number is required"),
+  first_name: z.string().min(1, "First name is required").transform(trimString),
+  last_name: z.string().min(1, "Last name is required").transform(trimString),
+  phone: z.string().min(1, "Phone number is required").transform(trimString),
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
@@ -419,9 +543,15 @@ export const passwordSchema = z
 export type PasswordFormData = z.infer<typeof passwordSchema>;
 
 export const addThreadFormSchema = z.object({
-  client_id: z.string().optional(),
-  type: z.string().min(1, "Type is Required"),
-  participant_id: z.string().min(1, "Participant ID is Required"),
+  client_id: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  type: z.string().min(1, "Type is Required").transform(trimString),
+  participant_id: z
+    .string()
+    .min(1, "Participant ID is Required")
+    .transform(trimString),
 });
 
 export type AddThreadFormData = z.infer<typeof addThreadFormSchema>;

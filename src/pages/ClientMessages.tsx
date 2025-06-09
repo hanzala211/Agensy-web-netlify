@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import type { AddThreadFormData, Thread } from "@agensy/types";
 import { AddThreadModal, ThreadList } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { ICONS, ROUTES } from "@agensy/constants";
 import { useMessagesContext } from "@agensy/context";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useCreateThread } from "@agensy/api";
@@ -10,17 +10,29 @@ import { toast } from "@agensy/utils";
 export const ClientMessages: React.FC = () => {
   const createThreadMutation = useCreateThread();
   const params = useParams();
-  const { showThreadList, setShowThreadList, setThreads, threads } =
-    useMessagesContext();
+  const {
+    showThreadList,
+    setShowThreadList,
+    threads,
+    updateThreadAndNavigateToExistingOne,
+  } = useMessagesContext();
   const [isAddThreadModalOpen, setIsAddThreadModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
+
   const clientThreads = useMemo(
     () =>
-      threads?.filter(
-        (thread) =>
-          thread.type === "client" && params.clientId === thread.client_id
-      ),
+      threads
+        ?.filter(
+          (thread) =>
+            thread.type === "client" && params.clientId === thread.client_id
+        )
+        .sort((a, b) => {
+          return (
+            new Date(String(b.last_message_time)).getTime() -
+            new Date(String(a.last_message_time)).getTime()
+          );
+        }),
     [threads, params.clientId]
   );
 
@@ -32,12 +44,15 @@ export const ClientMessages: React.FC = () => {
 
   useEffect(() => {
     if (createThreadMutation.status === "success") {
-      toast.success("Thread created successfully");
       setIsAddThreadModalOpen(false);
-      setThreads((prev) => [
-        ...(prev || []),
+      updateThreadAndNavigateToExistingOne(
         createThreadMutation.data as Thread,
-      ]);
+        () => {
+          navigate(
+            `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}/${createThreadMutation.data?.id}`
+          );
+        }
+      );
     } else if (createThreadMutation.status === "error") {
       toast.error("Failed to create thread");
     }

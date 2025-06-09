@@ -10,8 +10,12 @@ import { toast } from "@agensy/utils";
 export const Messages: React.FC = () => {
   const createThreadMutation = useCreateThread();
   const params = useParams();
-  const { showThreadList, setShowThreadList, setThreads, threads } =
-    useMessagesContext();
+  const {
+    showThreadList,
+    setShowThreadList,
+    threads,
+    updateThreadAndNavigateToExistingOne,
+  } = useMessagesContext();
   const [isAddThreadModalOpen, setIsAddThreadModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
@@ -24,12 +28,13 @@ export const Messages: React.FC = () => {
 
   useEffect(() => {
     if (createThreadMutation.status === "success") {
-      toast.success("Thread created successfully");
       setIsAddThreadModalOpen(false);
-      setThreads((prev) => [
-        ...(prev || []),
+      updateThreadAndNavigateToExistingOne(
         createThreadMutation.data as Thread,
-      ]);
+        () => {
+          navigate(`${ROUTES.messages}/${createThreadMutation.data?.id}`);
+        }
+      );
     } else if (createThreadMutation.status === "error") {
       toast.error("Failed to create thread");
     }

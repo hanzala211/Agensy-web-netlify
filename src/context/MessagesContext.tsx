@@ -4,6 +4,7 @@ import { useSocketContext } from "./SocketContext";
 import { useLocation } from "react-router-dom";
 import { useAuthContext } from "./AuthContext";
 import { useGetAllThreadsQuery } from "@agensy/api";
+import { toast } from "@agensy/utils";
 
 const MessagesContext = createContext<MessagesContextType | undefined>(
   undefined
@@ -28,16 +29,16 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   } = useGetAllThreadsQuery();
 
   useEffect(() => {
-    if (userData) {
-      loadThreads();
-    }
+    if (userData) loadThreads();
   }, [userData]);
 
   useEffect(() => {
-    if (threadsData) {
-      setThreads(threadsData);
-    }
+    if (threadsData) setThreads(threadsData);
   }, [threadsData]);
+
+  useEffect(() => {
+    if (threads) updateThreadsSorting();
+  }, [threads]);
 
   useEffect(() => {
     if (
@@ -53,18 +54,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     socket?.on(
       "receiveMessage",
       (data: { threadId: string; message: Message }) => {
-        console.log(data);
         setThreads((prev) => {
           return prev.map((thread) => {
             if (thread.id === data?.threadId) {
-              const isCurrentUserSender =
-                data.message.sender_id === userData?.id;
               return {
                 ...thread,
                 messages: [...(thread.messages || []), data.message],
-                has_unread_messages: !isCurrentUserSender
-                  ? true
-                  : thread.has_unread_messages,
+                has_unread_messages: true,
                 last_message: data.message.content,
                 last_message_time: data.message.createdAt,
                 last_message_sender_id: data.message.sender_id,
@@ -75,8 +71,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         setSelectedThread((prev) => {
           if (!prev) return prev;
-          const isCurrentUserSender = data.message.sender_id === userData?.id;
-          return prev.id === data?.threadId && !isCurrentUserSender
+          return prev.id === data?.threadId
             ? {
                 ...prev,
                 messages: [...(prev.messages || []), data.message],
@@ -93,6 +88,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
           }
           return prev;
         });
+        updateThreadsSorting();
       }
     );
   }, [socket]);
@@ -173,6 +169,39 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     ]);
   };
 
+  const updateThreadAndNavigateToExistingOne = (
+    thread: Thread,
+    navigate: () => void
+  ) => {
+    if (threads?.find((t) => t.id === thread.id)) {
+      toast.success(
+        "You're already part of this thread. Redirected you there!"
+      );
+      setSelectedThread(thread);
+      navigate();
+      return;
+    }
+    console.log("thread")
+
+    toast.success("Thread created successfully");
+    setThreads((prev) => [thread, ...(prev || [])]);
+    setSelectedThread(thread);
+  };
+
+  const updateThreadsSorting = () => {
+    setThreads((prev) => {
+      return prev.sort((a, b) => {
+        if (!a.last_message_time && !b.last_message_time) return 0;
+        if (!a.last_message_time) return 1;
+        if (!b.last_message_time) return -1;
+        return (
+          new Date(String(b.last_message_time)).getTime() -
+          new Date(String(a.last_message_time)).getTime()
+        );
+      });
+    });
+  };
+
   return (
     <MessagesContext.Provider
       value={{
@@ -188,6 +217,8 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         updateThreads,
         updateSelectedThread,
         updateCurrentThreadMessages,
+        updateThreadAndNavigateToExistingOne,
+        updateThreadsSorting,
       }}
     >
       {children}

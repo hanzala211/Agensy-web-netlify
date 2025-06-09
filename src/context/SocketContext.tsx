@@ -36,13 +36,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
           }`
         );
         setConnected(true);
-
-        socket.current?.emit("joinThreads");
-        console.log("Emitted joinThreads event");
-      });
-
-      socket.current.on("joinThreads", (data) => {
-        console.log("Received joinThreads event with data:", data);
       });
 
       socket.current.on("connect_error", (error) => {

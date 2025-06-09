@@ -48,10 +48,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           <TertiaryButton
             onClick={() => {
               if (showCompletedDate) {
-                console.log("Tsst");
                 navigate(`fill/${template.id}`);
-              } else if (!showCompletedDate) {
-                console.log("Test");
               }
             }}
             aria_label={showCompletedDate ? "Download template" : "Fill form"}

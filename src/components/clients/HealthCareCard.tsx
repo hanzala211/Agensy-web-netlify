@@ -58,6 +58,7 @@ export const HealthCareCard: React.FC = () => {
       pharmacy_name: data.pharmacy_name,
       pharmacy_address: data.pharmacy_address,
       pharmacy_phone: data.pharmacy_phone,
+      pharmacy_fax: data.pharmacy_fax,
     };
     updateClientHealthcareMutation.mutate({
       clientId: selectedClient?.id as string,

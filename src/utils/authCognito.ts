@@ -29,7 +29,6 @@ export const signup = async (email: string, password: string) => {
     return signUpResponse;
   } catch (err: unknown) {
     const error = err as AuthError;
-    console.log(error);
 
     if (error.name !== ERRORS.userNameExists) {
       throw awsErrorMessage(error.name, error.message);
@@ -125,7 +124,6 @@ export const changePassword = async (
     });
   } catch (err: unknown) {
     const error = err as AuthError;
-    console.log(error);
     if (error.name === ERRORS.notAuthorized) {
       throw "Invalid password";
     }

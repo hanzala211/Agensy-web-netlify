@@ -29,7 +29,6 @@ export const useSignInMutation = () => {
         data.email_address,
         data.password
       );
-      console.log(response);
       if (response) {
         const apiRes = await AuthService.login();
         return { userData: apiRes };

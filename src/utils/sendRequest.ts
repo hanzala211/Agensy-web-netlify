@@ -6,7 +6,6 @@ export const sendRequest = async (
   configs: AxiosRequestConfig
 ): Promise<AxiosResponse> => {
   const { accessToken: token } = await getJwtToken();
-  console.log("token", token);
   const headers = { ...(configs.headers || {}) } as Record<string, string>;
   if (token) {
     headers.Authorization = `Bearer ${token}`;

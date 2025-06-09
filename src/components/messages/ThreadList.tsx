@@ -1,5 +1,5 @@
 import React from "react";
-import type { Thread, Message } from "@agensy/types";
+import type { Thread } from "@agensy/types";
 import { BorderedCard } from "../common/BorderedCard";
 import { DateUtils, StringUtils } from "@agensy/utils";
 import { AntdTag, CardSkeleton } from "@agensy/components";
@@ -24,16 +24,16 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   const { userData } = useAuthContext();
   const {
     isThreadsLoading,
-    setCurrentThreadMessages,
     setThreads,
     setSelectedThread,
     setShowThreadList,
+    setCurrentThreadMessages,
   } = useMessagesContext();
 
   const handleThreadClick = (thread: Thread) => {
     onThreadClick(thread);
     setSelectedThread(thread);
-    setCurrentThreadMessages(thread.messages as Message[]);
+    setCurrentThreadMessages(thread.messages || []);
     setThreads((prev) => {
       return prev.map((t) => {
         if (t.id === thread.id) {
@@ -76,10 +76,10 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                 return (
                   <BorderedCard
                     key={thread.id}
-                    className={`cursor-pointer relative  hover:bg-gray-50 transition-colors p-3 sm:p-4 ${
+                    className={`cursor-pointer relative transition-colors p-3 sm:p-4  ${
                       selectedThreadId === thread.id
-                        ? "border-primaryColor border-2"
-                        : ""
+                        ? "bg-gradient-to-r from-blue-50 to-blue-100 border-2"
+                        : "" 
                     }`}
                     onClick={() => handleThreadClick(thread)}
                   >

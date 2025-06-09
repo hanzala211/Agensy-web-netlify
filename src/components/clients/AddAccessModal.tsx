@@ -72,7 +72,7 @@ export const AddAccessModal: React.FC<AddAccessModalProps> = ({
       onClose={handleClose}
       title={"Add User"}
       maxWidth="max-w-3xl"
-      height="h-[90vh]"
+      height="h-[90%]"
       footer={
         <div className="flex gap-4 justify-end">
           <PrimaryButton

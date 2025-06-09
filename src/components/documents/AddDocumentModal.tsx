@@ -105,7 +105,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       onClose={handleCancel}
       title="Add Document"
       maxWidth="max-w-3xl"
-      height="h-[90vh]"
+      height="h-[90%]"
       footer={
         <div className="flex gap-4 justify-end">
           <PrimaryButton

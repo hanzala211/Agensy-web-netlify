@@ -101,7 +101,6 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   };
 
   const onSubmit = (data: ClientFormData) => {
-    console.log(data);
     const postData = {
       first_name: data.firstName,
       last_name: data.lastName,

@@ -113,7 +113,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
       onClose={handleClose}
       title={editData ? "Edit Appointment" : "Add Appointment"}
       maxWidth="max-w-2xl"
-      height="h-[80vh]"
+      height="h-[80%]"
       footer={
         <PrimaryButton
           onClick={() => inputRef.current?.click()}

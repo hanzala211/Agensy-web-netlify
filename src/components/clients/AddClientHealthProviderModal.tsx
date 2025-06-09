@@ -98,7 +98,6 @@ export const AddClientHealthProviderModal: React.FC<
   };
 
   const onSubmit = (data: ClientHealthProviderFormData) => {
-    console.log(data);
     if (onSubmitProp) {
       onSubmitProp(data);
     }

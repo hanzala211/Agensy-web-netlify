@@ -99,4 +99,9 @@ export interface MessagesContextType {
     thread: string,
     senderID: string
   ) => void;
+  updateThreadAndNavigateToExistingOne: (
+    thread: Thread,
+    navigate: () => void
+  ) => void;
+  updateThreadsSorting: () => void;
 }

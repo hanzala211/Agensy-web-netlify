@@ -85,6 +85,13 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
               )}
             </div>
           )}
+          {medication?.notes && (
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <p className="text-sm italic text-gray-600">
+                {medication?.notes}
+              </p>
+            </div>
+          )}
         </div>
         <div className="mt-4 flex items-start gap-2 md:mt-0 md:ml-4">
           {showActions && (
@@ -105,11 +112,6 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
             <p>Are you sure you want to delete this medication?</p>
           </ConfirmationModal>
         </div>
-        {medication?.notes && (
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <p className="text-sm italic text-gray-600">{medication?.notes}</p>
-          </div>
-        )}
       </div>
     </BorderedCard>
   );

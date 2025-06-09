@@ -17,8 +17,12 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   isLoading,
 }) => {
   const { userData } = useAuthContext();
-  const { updateSelectedThread, updateCurrentThreadMessages } =
-    useMessagesContext();
+  const {
+    updateSelectedThread,
+    updateCurrentThreadMessages,
+    updateThreads,
+    updateThreadsSorting,
+  } = useMessagesContext();
   const params = useParams();
   const { socket } = useSocketContext();
   const [message, setMessage] = useState<string>("");
@@ -35,11 +39,19 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       message.trim()
     );
 
+    updateThreads(
+      params.threadId as string,
+      String(userData.id),
+      message.trim()
+    );
+
     updateCurrentThreadMessages(
       message.trim(),
       params.threadId as string,
       String(userData.id)
     );
+
+    updateThreadsSorting();
 
     socket.emit("sendMessage", {
       content: message.trim(),

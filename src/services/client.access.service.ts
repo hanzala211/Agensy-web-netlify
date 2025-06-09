@@ -7,7 +7,6 @@ export const addClientAccess = async (data: unknown, clientId: string) => {
       url: `/client/${clientId}/users`,
       data,
     });
-    console.log(response);
     return response.data.data;
   } catch (error) {
     console.log(`Client Access Service [addClientAccess] error: ${error}`);
