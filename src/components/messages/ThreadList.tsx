@@ -78,8 +78,8 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                     key={thread.id}
                     className={`cursor-pointer relative transition-colors p-3 sm:p-4  ${
                       selectedThreadId === thread.id
-                        ? "bg-gradient-to-r from-blue-50 to-blue-100 border-2"
-                        : "" 
+                        ? "!bg-gradient-to-r !from-blue-100 !to-blue-100 border-2"
+                        : ""
                     }`}
                     onClick={() => handleThreadClick(thread)}
                   >
@@ -106,7 +106,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                                 ? `${user.first_name} ${user.last_name} (${
                                     USER_ROLES.find(
                                       (role) => role.value === user?.role
-                                    )?.label
+                                    )?.label || "Unknown"
                                   })`
                                 : "Unknown User"}
                             </h4>

@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import type { Client } from "@agensy/types";
 import { DateUtils, toast, StringUtils } from "@agensy/utils";
 import { useUpdateClientStatusMutation } from "@agensy/api";
-import { BorderedCard } from "@agensy/components";
+import { BorderedCard, ConfirmationModal } from "@agensy/components";
 import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
 import { useAuthContext } from "@agensy/context";
 
@@ -23,6 +23,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
 }) => {
   const { userData } = useAuthContext();
   const updateClientStatusMutation = useUpdateClientStatusMutation();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const userPermissions =
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
@@ -41,8 +42,10 @@ export const ClientCard: React.FC<ClientCardProps> = ({
     }
   }, [updateClientStatusMutation.status]);
 
-  const handleToggleActive = (status: boolean) =>
+  const handleToggleActive = (status: boolean) => {
+    setIsModalOpen(false);
     updateClientStatusMutation.mutate({ id: String(client.id), status });
+  };
 
   return (
     <BorderedCard key={client.id}>
@@ -103,7 +106,13 @@ export const ClientCard: React.FC<ClientCardProps> = ({
                     ? "text-basicRed hover:text-darkRed focus:ring-basicRed"
                     : "text-darkGreen hover:text-darkGreen focus:ring-darkGreen"
                 }`}
-                onClick={() => handleToggleActive(!client.active)}
+                onClick={() => {
+                  if (!client.active) {
+                    handleToggleActive(!client.active);
+                  } else {
+                    setIsModalOpen(true);
+                  }
+                }}
                 disabled={updateClientStatusMutation.isPending}
                 aria-label={
                   client.active ? "Deactivate client" : "Activate client"
@@ -118,6 +127,14 @@ export const ClientCard: React.FC<ClientCardProps> = ({
             )}
         </div>
       </div>
+      <ConfirmationModal
+        title="Deactivate Client"
+        isModalOpen={isModalOpen}
+        onOk={() => handleToggleActive(!client.active)}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        <p>Are you sure you want to deactivate this client?</p>
+      </ConfirmationModal>
     </BorderedCard>
   );
 };

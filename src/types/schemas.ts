@@ -179,6 +179,7 @@ export interface Message extends BaseSchema {
   content: string;
   read_at?: Date;
   thread?: Thread;
+  sender?: IUser;
 }
 
 export interface Thread extends BaseSchema {
@@ -193,7 +194,7 @@ export interface Thread extends BaseSchema {
   subType: "one-to-one" | "group";
   created_by: string;
   messages?: Message[];
-  client: Client;
+  client?: Client | null;
   participants: IUser[];
   has_unread_messages?: boolean;
 }

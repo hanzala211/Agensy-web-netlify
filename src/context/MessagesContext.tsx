@@ -1,4 +1,9 @@
-import type { Message, MessagesContextType, Thread } from "@agensy/types";
+import type {
+  IUser,
+  Message,
+  MessagesContextType,
+  Thread,
+} from "@agensy/types";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSocketContext } from "./SocketContext";
 import { useLocation } from "react-router-dom";
@@ -13,7 +18,7 @@ const MessagesContext = createContext<MessagesContextType | undefined>(
 export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { userData } = useAuthContext();
+  const { userData, accessUsers } = useAuthContext();
   const location = useLocation();
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [showThreadList, setShowThreadList] = useState<boolean>(true);
@@ -33,12 +38,11 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [userData]);
 
   useEffect(() => {
-    if (threadsData) setThreads(threadsData);
+    if (threadsData) {
+      const sortedThreads = updateParamThreads([...threadsData]);
+      setThreads(sortedThreads);
+    }
   }, [threadsData]);
-
-  useEffect(() => {
-    if (threads) updateThreadsSorting();
-  }, [threads]);
 
   useEffect(() => {
     if (
@@ -55,20 +59,51 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       "receiveMessage",
       (data: { threadId: string; message: Message }) => {
         setThreads((prev) => {
-          return prev.map((thread) => {
-            if (thread.id === data?.threadId) {
-              return {
-                ...thread,
-                messages: [...(thread.messages || []), data.message],
-                has_unread_messages: true,
-                last_message: data.message.content,
-                last_message_time: data.message.createdAt,
-                last_message_sender_id: data.message.sender_id,
-              };
-            }
-            return thread;
-          });
+          // Check if thread exists
+          const existingThread = prev.find((t) => t.id === data.threadId);
+
+          if (existingThread) {
+            // Update existing thread
+            return prev.map((thread) => {
+              if (thread.id === data.threadId) {
+                return {
+                  ...thread,
+                  messages: [...(thread.messages || []), data.message],
+                  has_unread_messages: true,
+                  last_message: data.message.content,
+                  last_message_time: data.message.createdAt,
+                  last_message_sender_id: data.message.sender_id,
+                };
+              }
+              return thread;
+            });
+          }
+
+          const role = accessUsers.find(
+            (user) => user.id === data.message.sender_id
+          )?.role;
+
+          const newThread: Thread = {
+            id: data.threadId,
+            user_id: data.message.sender_id,
+            started_at: new Date(),
+            type: data.message.thread?.type || "general", // Default type
+            subType: "one-to-one", // Default subType
+            created_by: data.message.sender_id,
+            messages: [data.message],
+            has_unread_messages: true,
+            last_message: data.message.content,
+            last_message_time: data.message.createdAt,
+            last_message_sender_id: data.message.sender_id,
+            participants: [
+              { ...data.message.sender, role } as IUser,
+              userData as IUser,
+            ],
+            client: null,
+          };
+          return [...prev, newThread];
         });
+
         setSelectedThread((prev) => {
           if (!prev) return prev;
           return prev.id === data?.threadId
@@ -78,6 +113,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
               }
             : prev;
         });
+
         setCurrentThreadMessages((prev) => {
           if (
             prev &&
@@ -181,11 +217,11 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       navigate();
       return;
     }
-    console.log("thread")
 
     toast.success("Thread created successfully");
     setThreads((prev) => [thread, ...(prev || [])]);
     setSelectedThread(thread);
+    navigate();
   };
 
   const updateThreadsSorting = () => {
@@ -199,6 +235,18 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
           new Date(String(a.last_message_time)).getTime()
         );
       });
+    });
+  };
+
+  const updateParamThreads = (threads: Thread[]) => {
+    return threads.sort((a, b) => {
+      if (!a.last_message_time && !b.last_message_time) return 0;
+      if (!a.last_message_time) return 1;
+      if (!b.last_message_time) return -1;
+      return (
+        new Date(String(b.last_message_time)).getTime() -
+        new Date(String(a.last_message_time)).getTime()
+      );
     });
   };
 
