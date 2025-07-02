@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { ICONS } from "@agensy/constants";
-import { BorderedCard } from "@agensy/components";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type { FolderData, FolderItem } from "@agensy/types";
 
@@ -91,7 +90,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   };
 
   return (
-    <BorderedCard className="!p-0 overflow-hidden">
+    <div className="!p-0 overflow-hidden border-2 border-gray-200 rounded-lg">
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -125,7 +124,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
         </div>
         {!isShowingFileContent && currentPath.length > 0 && (
           <div className="mt-2 text-xs text-gray-400 flex items-center gap-1">
-            <span 
+            <span
               className="hover:text-blue-600 cursor-pointer transition-colors"
               onClick={() => onPathClick?.(-1)}
             >
@@ -162,7 +161,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           )}
         </div>
       )}
-    </BorderedCard>
+    </div>
   );
 };
 
