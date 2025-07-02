@@ -54,6 +54,7 @@ import { IoChatbubbleOutline, IoCheckmarkOutline, IoHomeSharp, IoPersonAdd } fro
 import { CiMedicalCross } from "react-icons/ci";
 import { GrDocumentText } from "react-icons/gr";
 import { BiDollar } from "react-icons/bi";
+import { FaFolder, FaFolderOpen, FaFileAlt } from "react-icons/fa";
 
 export const ICONS = {
   mail: MdMailOutline,
@@ -107,5 +108,8 @@ export const ICONS = {
   dollar: BiDollar,
   check: IoCheckmarkOutline,
   subscription: MdPayment,
-  chat: IoChatbubbleOutline
+  chat: IoChatbubbleOutline,
+  folder: FaFolder,
+  folderOpen: FaFolderOpen,
+  fileAlt: FaFileAlt
 };

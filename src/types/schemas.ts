@@ -215,3 +215,4 @@ export interface BillingHistory extends BaseSchema {
   };
   latest_invoice: string;
 }
+

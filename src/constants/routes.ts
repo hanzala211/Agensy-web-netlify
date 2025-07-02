@@ -32,4 +32,5 @@ export const ROUTES = {
   profileSubscription: "billing",
   access: "access",
   paymentStatus: "payment-status",
+  agensyForms: "agensy-forms",
 };

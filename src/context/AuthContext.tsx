@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         response.filter((user: IUser) => user.id !== userData?.id)
       );
     } catch (error) {
-      (error);
+      console.log(error);
     }
   };
 

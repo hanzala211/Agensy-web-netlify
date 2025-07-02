@@ -149,3 +149,23 @@ export const MESSAGING_TYPES = [
   { label: "Client", value: "client" },
   { label: "General", value: "general" },
 ];
+
+export const CODE_STATUS_OPTIONS = [
+  { label: "Full Code", value: "full_code" },
+  { label: "DNR", value: "dnr" },
+  { label: "DNI", value: "dni" },
+  { label: "Comfort Care", value: "comfort_care" },
+];
+
+export const ADVANCE_DIRECTIVE_OPTIONS = [
+  { label: "Yes", value: "yes" },
+  { label: "No", value: "no" },
+  { label: "Unknown", value: "unknown" },
+];
+
+export const SEVERITY_OPTIONS = [
+  { label: "Mild", value: "mild" },
+  { label: "Moderate", value: "moderate" },
+  { label: "Severe", value: "severe" },
+  { label: "Life-threatening", value: "life_threatening" },
+];

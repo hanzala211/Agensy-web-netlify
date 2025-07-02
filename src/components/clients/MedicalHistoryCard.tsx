@@ -89,50 +89,56 @@ export const MedicalHistoryCard: React.FC = () => {
         showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
       >
         {selectedClient?.medical ? (
-          <div className="grid lg:grid-cols-2 gap-5">
-            <ItemList
-              label="Diagnosis:"
-              items={selectedClient?.medical?.diagnoses.split(", ")}
-            />
+          <div className="grid lg:grid-cols-2 gap-5 items-start">
+            <div className="grid gap-4">
+              <ItemList
+                label="Diagnosis:"
+                items={selectedClient?.medical?.diagnoses.split(", ")}
+              />
 
-            <ItemList
-              label="Allergies:"
-              items={selectedClient?.medical?.allergies.split(", ")}
-            />
-
-            <ItemList
-              label="Dietary Restrictions:"
-              items={selectedClient?.medical?.dietary_restrictions.split(", ")}
-            />
-
-            <ItemList
-              label="Surgical History:"
-              items={selectedClient?.medical?.surgical_history.split(", ")}
-            />
-
-            <InfoItem label="Cognitive Status:">
-              <p>{selectedClient?.medical.cognitive_status}</p>
-            </InfoItem>
-
-            <InfoItem label="Last Screening:">
-              <p>
-                {DateUtils.formatDateToRequiredFormat(
-                  selectedClient?.medical.last_cognitive_screening
+              <ItemList
+                label="Dietary Restrictions:"
+                items={selectedClient?.medical?.dietary_restrictions.split(
+                  ", "
                 )}
-              </p>
-            </InfoItem>
+              />
 
-            <InfoItem label="Cognitive Score:">
-              <p>
-                {selectedClient.medical.cognitive_score.split("/")[0]} out of{" "}
-                {selectedClient.medical.cognitive_score.split("/")[1]}
-              </p>
-            </InfoItem>
-            {selectedClient?.medical.notes && (
-              <InfoItem label="Note:">
-                <p>{selectedClient.medical.notes}</p>
+              <InfoItem label="Cognitive Status:">
+                <p>{selectedClient?.medical.cognitive_status}</p>
               </InfoItem>
-            )}
+
+              <InfoItem label="Cognitive Score:">
+                <p>
+                  {selectedClient.medical.cognitive_score.split("/")[0]} out of{" "}
+                  {selectedClient.medical.cognitive_score.split("/")[1]}
+                </p>
+              </InfoItem>
+            </div>
+            <div className="grid gap-4">
+              <ItemList
+                label="Allergies:"
+                items={selectedClient?.medical?.allergies.split(", ")}
+              />
+
+              <ItemList
+                label="Surgical History:"
+                items={selectedClient?.medical?.surgical_history.split(", ")}
+              />
+
+              <InfoItem label="Last Screening:">
+                <p>
+                  {DateUtils.formatDateToRequiredFormat(
+                    selectedClient?.medical.last_cognitive_screening
+                  )}
+                </p>
+              </InfoItem>
+
+              {selectedClient?.medical.notes && (
+                <InfoItem label="Note:">
+                  <p>{selectedClient.medical.notes}</p>
+                </InfoItem>
+              )}
+            </div>
           </div>
         ) : (
           <EmptyStateCard

@@ -54,7 +54,19 @@ export const ProfileSettingCard: React.FC = () => {
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+
+    if (!file) {
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.error("Image size must be less than 2MB");
+      return;
+    }
+
+    if (file.type.startsWith("image/")) {
       setFile(file);
       setIsHovered(false);
       const formData = new FormData();

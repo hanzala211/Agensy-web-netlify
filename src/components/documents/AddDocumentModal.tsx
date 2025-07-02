@@ -68,10 +68,19 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (
-      file &&
-      (file.type === "application/pdf" || file.type.startsWith("image/"))
-    ) {
+    const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+
+    if (!file) {
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.error("File size must be less than 20MB");
+      return;
+    }
+
+    if (file.type === "application/pdf" || file.type.startsWith("image/")) {
       setFile(file);
       setFileName(file.name);
       setValue("file", file);

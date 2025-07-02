@@ -555,3 +555,91 @@ export const addThreadFormSchema = z.object({
 });
 
 export type AddThreadFormData = z.infer<typeof addThreadFormSchema>;
+
+export const faceSheetShortFormSchema = z.object({
+  // Personal Information
+  name: z.string().min(1, "Name is required"),
+  address: z.string().min(1, "Address is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  ssn: z.string().optional(),
+
+  // Emergency Contact
+  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
+  emergencyContactPhone: z
+    .string()
+    .min(1, "Emergency contact phone is required"),
+  emergencyContactRelationship: z.string().min(1, "Relationship is required"),
+  emergencyContactEmail: z.string().email().optional().or(z.literal("")),
+  emergencyContactAddress: z.string().optional(),
+
+  // Medical Settings
+  codeStatus: z.string().optional(),
+  advanceDirective: z.string().optional(),
+
+  // Hospital Preference
+  hospitalPreference: z.string().optional(),
+  hospitalAddress: z.string().optional(),
+  hospitalPhoneNumber: z.string().optional(),
+
+  // Insurance
+  insuranceGroupNumber: z.string().optional(),
+  medicareIdNumber: z.string().optional(),
+
+  // Pharmacy
+  pharmacyName: z.string().optional(),
+  pharmacyAddress: z.string().optional(),
+  pharmacyPhone: z.string().optional(),
+  pharmacyFax: z.string().optional(),
+
+  // MPOA/DPOA
+  mpoaName: z.string().optional(),
+  mpoaAddress: z.string().optional(),
+  mpoaPhone: z.string().optional(),
+  dpoaName: z.string().optional(),
+  dpoaAddress: z.string().optional(),
+  dpoaPhone: z.string().optional(),
+
+  // Dynamic Arrays - all in one schema
+  providers: z.array(
+    z.object({
+      providerName: z.string().optional(),
+      specialty: z.string().optional(),
+      address: z.string().optional(),
+      phone: z.string().optional(),
+      fax: z.string().optional(),
+      lastVisit: z.string().optional(),
+      nextVisit: z.string().optional(),
+    })
+  ),
+
+  medications: z.array(
+    z.object({
+      medicationName: z.string().optional(),
+      dose: z.string().optional(),
+      usedToTreat: z.string().optional(),
+      prescriber: z.string().optional(),
+      refillDue: z.string().optional(),
+    })
+  ),
+
+  diagnoses: z.array(
+    z.object({
+      diagnosis: z.string().optional(),
+    })
+  ),
+
+  allergies: z.array(
+    z.object({
+      allergen: z.string().optional(),
+    })
+  ),
+
+  surgicalHistory: z.array(
+    z.object({
+      surgicalHistory: z.string().optional(),
+    })
+  ),
+});
+
+export type FaceSheetShortFormData = z.infer<typeof faceSheetShortFormSchema>;

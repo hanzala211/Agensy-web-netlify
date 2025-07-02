@@ -92,3 +92,6 @@ export * from "./messages/MessageList";
 export * from "./messages/MessageForm";
 export * from "./messages/ThreadList";
 export * from "./messages/AddThreadModal";
+export * from "./forms/FolderExplorer";
+export * from "./forms/FileContentDisplay";
+export * from "./forms/FaceSheetShortForm";
