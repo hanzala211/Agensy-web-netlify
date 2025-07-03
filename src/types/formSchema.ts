@@ -558,24 +558,24 @@ export type AddThreadFormData = z.infer<typeof addThreadFormSchema>;
 
 export const faceSheetShortFormSchema = z.object({
   // Personal Information
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   address: z.string().min(1, "Address is required"),
   phoneNumber: z.string().min(1, "Phone number is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
-  ssn: z.string().optional(),
+  ssn: z.string().min(1, "SSN is required"),
 
   // Emergency Contact
-  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
-  emergencyContactPhone: z
-    .string()
-    .min(1, "Emergency contact phone is required"),
+  emergencyContactFirstName: z.string().min(1, "First name is required"),
+  emergencyContactLastName: z.string().min(1, "Last name is required"),
+  emergencyContactPhone: z.string().min(1, "Phone number is required"),
   emergencyContactRelationship: z.string().min(1, "Relationship is required"),
-  emergencyContactEmail: z.string().email().optional().or(z.literal("")),
-  emergencyContactAddress: z.string().optional(),
+  emergencyContactEmail: z.string().email().min(1, "Email is required"),
+  emergencyContactAddress: z.string().min(1, "Address is required"),
 
   // Medical Settings
-  codeStatus: z.string().optional(),
-  advanceDirective: z.string().optional(),
+  codeStatus: z.string().min(1, "Code status is required"),
+  advanceDirective: z.string().min(1, "Advance directive is required"),
 
   // Hospital Preference
   hospitalPreference: z.string().optional(),
@@ -583,8 +583,10 @@ export const faceSheetShortFormSchema = z.object({
   hospitalPhoneNumber: z.string().optional(),
 
   // Insurance
-  insuranceGroupNumber: z.string().optional(),
-  medicareIdNumber: z.string().optional(),
+  insurance: z.string().optional(),
+  groupNumber: z.string().optional(),
+  idNumber: z.string().optional(),
+  medicare: z.string().optional(),
 
   // Pharmacy
   pharmacyName: z.string().optional(),
@@ -610,6 +612,8 @@ export const faceSheetShortFormSchema = z.object({
       fax: z.string().optional(),
       lastVisit: z.string().optional(),
       nextVisit: z.string().optional(),
+      id: z.string().optional().nullish().nullable(),
+      providerType: z.string().optional(),
     })
   ),
 
@@ -620,6 +624,7 @@ export const faceSheetShortFormSchema = z.object({
       usedToTreat: z.string().optional(),
       prescriber: z.string().optional(),
       refillDue: z.string().optional(),
+      id: z.string().optional().nullable().nullish(),
     })
   ),
 
