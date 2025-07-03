@@ -122,7 +122,6 @@ export const FaceSheetShortForm: React.FC = () => {
         {/* Insurance Section */}
         <InsuranceInformationSection
           register={register}
-          control={control}
           errors={errors}
         />
 

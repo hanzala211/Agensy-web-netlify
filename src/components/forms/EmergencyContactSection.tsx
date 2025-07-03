@@ -1,7 +1,8 @@
 import React from "react";
 import type { Control, UseFormRegister, FieldErrors } from "react-hook-form";
 import type { FaceSheetShortFormData } from "@agensy/types";
-import { Input, Card, PhoneNumberInput } from "@agensy/components";
+import { Input, Card, PhoneNumberInput, Select } from "@agensy/components";
+import { RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
 
 interface EmergencyContactSectionProps {
   register: UseFormRegister<FaceSheetShortFormData>;
@@ -14,21 +15,29 @@ export const EmergencyContactSection: React.FC<
 > = ({ register, control, errors }) => {
   return (
     <Card title="Emergency Contact">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <Input
-          label="Emergency Contact Name"
-          register={register("emergencyContactName")}
-          error={errors.emergencyContactName?.message}
+          label="First Name"
+          register={register("emergencyContactFirstName")}
+          error={errors.emergencyContactFirstName?.message}
+        />
+        <Input
+          label="Last Name"
+          register={register("emergencyContactLastName")}
+          error={errors.emergencyContactLastName?.message}
         />
         <PhoneNumberInput
           label="Phone"
           control={control}
           name="emergencyContactPhone"
         />
-        <Input
+
+        <Select
+          control={control}
+          name="emergencyContactRelationship"
+          data={RELATIONSHIP_TO_CLIENT}
           label="Relationship"
-          register={register("emergencyContactRelationship")}
-          error={errors.emergencyContactRelationship?.message}
+          labelOption="Relationship"
         />
         <Input
           label="Email"
@@ -36,13 +45,11 @@ export const EmergencyContactSection: React.FC<
           register={register("emergencyContactEmail")}
           error={errors.emergencyContactEmail?.message}
         />
-        <div className="lg:col-span-4">
-          <Input
-            label="Address"
-            register={register("emergencyContactAddress")}
-            error={errors.emergencyContactAddress?.message}
-          />
-        </div>
+        <Input
+          label="Address"
+          register={register("emergencyContactAddress")}
+          error={errors.emergencyContactAddress?.message}
+        />
       </div>
     </Card>
   );

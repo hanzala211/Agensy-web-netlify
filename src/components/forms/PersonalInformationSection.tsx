@@ -19,11 +19,16 @@ export const PersonalInformationSection: React.FC<
 > = ({ register, control, errors }) => {
   return (
     <Card title="Personal Information">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <Input
-          label="Full Name"
-          register={register("name")}
-          error={errors.name?.message}
+          label="First Name"
+          register={register("firstName")}
+          error={errors.firstName?.message}
+        />
+        <Input
+          label="Last Name"
+          register={register("lastName")}
+          error={errors.lastName?.message}
         />
         <PhoneNumberInput
           label="Phone Number"
@@ -40,13 +45,11 @@ export const PersonalInformationSection: React.FC<
           register={register("ssn")}
           error={errors.ssn?.message}
         />
-        <div className="lg:col-span-4">
-          <Input
-            label="Address"
-            register={register("address")}
-            error={errors.address?.message}
-          />
-        </div>
+        <Input
+          label="Address"
+          register={register("address")}
+          error={errors.address?.message}
+        />
       </div>
     </Card>
   );
