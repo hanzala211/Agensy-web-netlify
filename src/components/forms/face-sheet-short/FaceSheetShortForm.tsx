@@ -416,11 +416,7 @@ export const FaceSheetShortForm: React.FC = () => {
         />
 
         {/* Insurance Section */}
-        <InsuranceInformationSection
-          register={register}
-          control={control}
-          errors={errors}
-        />
+        <InsuranceInformationSection register={register} errors={errors} />
 
         {/* Pharmacy Section */}
         <PharmacyInformationSection

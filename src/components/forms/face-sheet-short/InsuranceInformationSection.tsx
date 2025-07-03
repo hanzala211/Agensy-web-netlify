@@ -1,11 +1,10 @@
 import React from "react";
-import type { Control, UseFormRegister, FieldErrors } from "react-hook-form";
+import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import type { FaceSheetShortFormData } from "@agensy/types";
 import { Input, Card } from "@agensy/components";
 
 interface InsuranceInformationSectionProps {
   register: UseFormRegister<FaceSheetShortFormData>;
-  control: Control<FaceSheetShortFormData>;
   errors: FieldErrors<FaceSheetShortFormData>;
 }
 
