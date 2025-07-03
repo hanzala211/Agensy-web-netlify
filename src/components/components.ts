@@ -94,4 +94,4 @@ export * from "./messages/ThreadList";
 export * from "./messages/AddThreadModal";
 export * from "./forms/FolderExplorer";
 export * from "./forms/FileContentDisplay";
-export * from "./forms/FaceSheetShortForm";
+export * from "./forms/face-sheet-short/FaceSheetShortForm";

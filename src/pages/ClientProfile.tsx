@@ -92,7 +92,7 @@ export const ClientProfile: React.FC = () => {
             Messages
           </TabLink>
           <TabLink
-            to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.agensyForms}`}
+            to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.agensyFormsFolders}`}
             className="min-w-[100px] sm:min-w-0"
           >
             Agensy Forms

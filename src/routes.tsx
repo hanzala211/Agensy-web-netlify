@@ -92,7 +92,9 @@ export const Routes: React.FC = () => {
           <Route path={ROUTES.clientMessages} element={<ClientMessages />}>
             <Route path={`:threadId`} element={<ChatPage />} />
           </Route>
-          <Route path={ROUTES.agensyForms} element={<AgensyForms />} />
+          <Route path={ROUTES.agensyFormsFolders} element={<AgensyForms />} />
+          <Route path={ROUTES.agensyFormsForms} element={<AgensyForms />} />
+          <Route path={ROUTES.agensyFormsForm} element={<AgensyForms />} />
         </Route>
       </Route>
     </RouterRoutes>

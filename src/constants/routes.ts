@@ -32,5 +32,7 @@ export const ROUTES = {
   profileSubscription: "billing",
   access: "access",
   paymentStatus: "payment-status",
-  agensyForms: "agensy-forms",
+  agensyFormsFolders: "agensy-forms",
+  agensyFormsForms: "agensy-forms/:folderSlug",
+  agensyFormsForm: "agensy-forms/:folderSlug/:formSlug",
 };

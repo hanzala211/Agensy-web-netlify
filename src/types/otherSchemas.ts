@@ -11,6 +11,7 @@ export interface FolderItem {
   name: string;
   type: "folder" | "file";
   children?: FolderItem[];
+  slug: string;
 }
 
 export interface FolderData {
