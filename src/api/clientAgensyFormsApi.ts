@@ -15,3 +15,18 @@ export const usePostFaceSheetShortFormMutation = () => {
       ClientAgensyFormsService.postFaceSheetShortForm(clientId, data),
   });
 };
+
+export const useGetFaceSheetLongForm = (clientId: string) => {
+  return useQuery({
+    queryKey: ["face-sheet-long-form", clientId],
+    queryFn: () => ClientAgensyFormsService.getFaceSheetLongForm(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostFaceSheetLongFormMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postFaceSheetLongForm(clientId, data),
+  });
+};

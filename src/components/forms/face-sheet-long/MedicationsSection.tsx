@@ -1,29 +1,21 @@
 import type {
-  Control,
   UseFormRegister,
   FieldErrors,
   UseFieldArrayReturn,
   FieldValues,
   Path,
 } from "react-hook-form";
-import {
-  Input,
-  Card,
-  DatePickerField,
-  TertiaryButton,
-} from "@agensy/components";
+import { Input, Card, TertiaryButton } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 
 interface MedicationsSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
-  control: Control<T>;
   errors: FieldErrors<T>;
   medicationsArray: UseFieldArrayReturn<T>;
 }
 
 export const MedicationsSection = <T extends FieldValues>({
   register,
-  control,
   errors,
   medicationsArray,
 }: MedicationsSectionProps<T>) => {
@@ -54,7 +46,7 @@ export const MedicationsSection = <T extends FieldValues>({
         {medicationFields.map((field, index) => (
           <div key={field.id} className="p-3 rounded-lg border">
             <div className="w-full flex gap-4 items-center">
-              <div className="w-full grid md:grid-cols-2 gap-4">
+              <div className="w-full grid gap-4">
                 <Input
                   label="Medication Name"
                   register={register(
@@ -82,24 +74,7 @@ export const MedicationsSection = <T extends FieldValues>({
                     errors.medications?.[index]?.usedToTreat?.message as string
                   }
                 />
-                <Input
-                  label="Prescriber"
-                  register={register(
-                    `medications.${index}.prescriber` as Path<T>
-                  )}
-                  error={
-                    // @ts-expect-error - TODO: fix this
-                    errors.medications?.[index]?.prescriber?.message as string
-                  }
-                />
               </div>
-            </div>
-            <div className="w-full mt-4">
-              <DatePickerField
-                control={control}
-                label="Refill Due"
-                name={`medications.${index}.refillDue` as Path<T>}
-              />
             </div>
             {medicationFields.length > 1 && (
               <div className="flex justify-end mt-3">

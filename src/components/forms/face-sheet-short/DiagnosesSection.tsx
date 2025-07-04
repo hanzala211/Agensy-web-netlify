@@ -1,24 +1,24 @@
-import React from "react";
 import type {
   UseFormRegister,
   FieldErrors,
   UseFieldArrayReturn,
+  FieldValues,
+  Path,
 } from "react-hook-form";
-import type { FaceSheetShortFormData } from "@agensy/types";
-import { Input, Card } from "@agensy/components";
+import { Input, Card, TertiaryButton } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 
-interface DiagnosesSectionProps {
-  register: UseFormRegister<FaceSheetShortFormData>;
-  errors: FieldErrors<FaceSheetShortFormData>;
-  diagnosesArray: UseFieldArrayReturn<FaceSheetShortFormData, "diagnoses">;
+interface DiagnosesSectionProps<T extends FieldValues> {
+  register: UseFormRegister<T>;
+  errors: FieldErrors<T>;
+  diagnosesArray: UseFieldArrayReturn<T>;
 }
 
-export const DiagnosesSection: React.FC<DiagnosesSectionProps> = ({
+export const DiagnosesSection = <T extends FieldValues>({
   register,
   errors,
   diagnosesArray,
-}) => {
+}: DiagnosesSectionProps<T>) => {
   const {
     fields: diagnosisFields,
     append: appendDiagnosis,
@@ -29,7 +29,12 @@ export const DiagnosesSection: React.FC<DiagnosesSectionProps> = ({
     <Card
       title="Diagnoses"
       buttonText={<ICONS.plus size={16} />}
-      onButtonClick={() => appendDiagnosis({ diagnosis: "" })}
+      onButtonClick={() =>
+        appendDiagnosis({
+          // @ts-expect-error - TODO: fix this
+          diagnosis: "",
+        })
+      }
       ariaLabel="Add Diagnosis"
       showButton={true}
     >
@@ -39,18 +44,21 @@ export const DiagnosesSection: React.FC<DiagnosesSectionProps> = ({
             <div className="w-full flex gap-4 items-center">
               <div className="w-full">
                 <Input
-                  register={register(`diagnoses.${index}.diagnosis`)}
-                  error={errors.diagnoses?.[index]?.diagnosis?.message}
+                  register={register(`diagnoses.${index}.diagnosis` as Path<T>)}
+                  error={
+                    // @ts-expect-error - TODO: fix this
+                    errors.diagnoses?.[index]?.diagnosis?.message as string
+                  }
                 />
               </div>
               {diagnosisFields.length > 1 && (
-                <button
+                <TertiaryButton
                   type="button"
                   onClick={() => removeDiagnosis(index)}
-                  className="text-red-600 hover:text-red-800 p-1"
+                  className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
                 >
-                  <ICONS.delete size={16} />
-                </button>
+                  <ICONS.delete />
+                </TertiaryButton>
               )}
             </div>
           </div>

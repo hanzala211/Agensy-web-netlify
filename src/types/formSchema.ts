@@ -603,48 +603,249 @@ export const faceSheetShortFormSchema = z.object({
   dpoaPhone: z.string().optional(),
 
   // Dynamic Arrays - all in one schema
-  providers: z.array(
-    z.object({
-      providerName: z.string().optional(),
-      specialty: z.string().optional(),
-      address: z.string().optional(),
-      phone: z.string().optional(),
-      fax: z.string().optional(),
-      lastVisit: z.string().optional(),
-      nextVisit: z.string().optional(),
-      id: z.string().optional().nullish().nullable(),
-      providerType: z.string().optional(),
-    })
-  ),
+  providers: z
+    .array(
+      z.object({
+        providerName: z.string().optional(),
+        specialty: z.string().optional(),
+        address: z.string().optional(),
+        phone: z.string().optional(),
+        fax: z.string().optional(),
+        lastVisit: z.string().optional(),
+        nextVisit: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+        providerType: z.string().optional(),
+      })
+    )
+    .optional(),
 
-  medications: z.array(
-    z.object({
-      medicationName: z.string().optional(),
-      dose: z.string().optional(),
-      usedToTreat: z.string().optional(),
-      prescriber: z.string().optional(),
-      refillDue: z.string().optional(),
-      id: z.string().optional().nullable().nullish(),
-    })
-  ),
+  medications: z
+    .array(
+      z.object({
+        medicationName: z.string().optional(),
+        dose: z.string().optional(),
+        usedToTreat: z.string().optional(),
+        prescriber: z.string().optional(),
+        refillDue: z.string().optional(),
+        id: z.string().optional().nullable().nullish(),
+      })
+    )
+    .optional(),
 
-  diagnoses: z.array(
-    z.object({
-      diagnosis: z.string().optional(),
-    })
-  ),
+  diagnoses: z
+    .array(
+      z.object({
+        diagnosis: z.string().optional(),
+      })
+    )
+    .optional(),
 
-  allergies: z.array(
-    z.object({
-      allergen: z.string().optional(),
-    })
-  ),
+  allergies: z
+    .array(
+      z.object({
+        allergen: z.string().optional(),
+      })
+    )
+    .optional(),
 
-  surgicalHistory: z.array(
-    z.object({
-      surgicalHistory: z.string().optional(),
-    })
-  ),
+  surgicalHistory: z
+    .array(
+      z.object({
+        surgicalHistory: z.string().optional(),
+      })
+    )
+    .optional(),
 });
 
 export type FaceSheetShortFormData = z.infer<typeof faceSheetShortFormSchema>;
+
+export const faceSheetLongFormSchema = z.object({
+  // Personal Information
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  address: z.string().min(1, "Address is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  ssn: z.string().min(1, "SSN is required"),
+
+  // Additional Personal Information
+  gender: z.string().min(1, "Gender is required"),
+  race: z.string().min(1, "Race is required"),
+  language: z.string().min(1, "Language is required"),
+  maritalStatus: z.string().min(1, "Marital status is required"),
+  livingSituation: z.string().min(1, "Living situation is required"),
+  dateOfLastCarePlan: z.string().min(1, "Date of last care plan is required"),
+
+  // Emergency Contact
+  emergencyContactFirstName: z.string().min(1, "First name is required"),
+  emergencyContactLastName: z.string().min(1, "Last name is required"),
+  emergencyContactPhone: z.string().min(1, "Phone number is required"),
+  emergencyContactRelationship: z.string().min(1, "Relationship is required"),
+  emergencyContactEmail: z.string().email().min(1, "Email is required"),
+  emergencyContactAddress: z.string().min(1, "Address is required"),
+
+  // Medical Settings
+  codeStatus: z.string().min(1, "Code status is required"),
+  advanceDirective: z.string().min(1, "Advance directive is required"),
+
+  // Hospital Preference
+  hospitalPreference: z.string().optional(),
+  hospitalAddress: z.string().optional(),
+  hospitalPhoneNumber: z.string().optional(),
+
+  // Insurance
+  insurance: z.string().optional(),
+  groupNumber: z.string().optional(),
+  idNumber: z.string().optional(),
+  medicare: z.string().optional(),
+
+  // Pharmacy
+  pharmacyName: z.string().optional(),
+  pharmacyAddress: z.string().optional(),
+  pharmacyPhone: z.string().optional(),
+  pharmacyFax: z.string().optional(),
+
+  // MPOA/DPOA
+  mpoaName: z.string().optional(),
+  mpoaAddress: z.string().optional(),
+  mpoaPhone: z.string().optional(),
+  dpoaName: z.string().optional(),
+  dpoaAddress: z.string().optional(),
+  dpoaPhone: z.string().optional(),
+
+  // Caregiver Agency
+  caregiverAgency: z.string().min(1, "Caregiver agency is required"),
+  caregiverAddress: z.string().min(1, "Caregiver address is required"),
+  caregiverPhone: z.string().min(1, "Caregiver phone is required"),
+  caregiverPointOfContact: z
+    .string()
+    .min(1, "Caregiver point of contact is required"),
+  caregiverSchedule: z.string().min(1, "Caregiver schedule is required"),
+  caregiverDuties: z.string().min(1, "Caregiver duties is required"),
+  importantInformationForCaregivers: z
+    .string()
+    .min(1, "Important information for caregivers is required"),
+
+  // Home Health Agency
+  homeHealthAgency: z.string().min(1, "Home health agency is required"),
+  homeHealthAddress: z.string().min(1, "Home health address is required"),
+  homeHealthPhone: z.string().min(1, "Home health phone is required"),
+  homeHealthFax: z.string().min(1, "Home health fax is required"),
+  homeHealthSchedule: z.string().min(1, "Home health schedule is required"),
+  homeHealthPrescribingDoctor: z
+    .string()
+    .min(1, "Home health prescribing doctor is required"),
+  homeHealthStartDate: z.string().min(1, "Home health start date is required"),
+  homeHealthDischargeDate: z
+    .string()
+    .min(1, "Home health discharge date is required"),
+
+  // Mental Status
+  mentalStatus: z.string().optional(),
+  cognitiveScreeningDate: z.string().optional(),
+  cognitiveScreeningScore: z.string().optional(),
+  cognitiveScreeningScoreOutOf: z.string().optional(),
+  notesAndConcerns: z.string().optional(),
+
+  // Dynamic Arrays
+  providers: z
+    .array(
+      z.object({
+        providerName: z.string().optional(),
+        specialty: z.string().optional(),
+        address: z.string().optional(),
+        phone: z.string().optional(),
+        fax: z.string().optional(),
+        lastVisit: z.string().optional(),
+        nextVisit: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+        providerType: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  medications: z
+    .array(
+      z.object({
+        medicationName: z.string().optional(),
+        dose: z.string().optional(),
+        usedToTreat: z.string().optional(),
+        id: z.string().optional().nullable().nullish(),
+      })
+    )
+    .optional(),
+
+  diagnoses: z
+    .array(
+      z.object({
+        diagnosis: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  allergies: z
+    .array(
+      z.object({
+        allergen: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  surgicalHistory: z
+    .array(
+      z.object({
+        surgicalHistory: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  // Medical Conditions
+  medicalConditions: z
+    .array(
+      z.object({
+        condition: z.string().optional(),
+        onsetDate: z.string().optional(),
+        notes: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+      })
+    )
+    .optional(),
+
+  // Vaccinations
+  vaccinations: z
+    .array(
+      z.object({
+        vaccineName: z.string().optional(),
+        date: z.string().optional(),
+        nextVaccine: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+      })
+    )
+    .optional(),
+
+  // Bloodwork
+  bloodwork: z
+    .array(
+      z.object({
+        test: z.string().optional(),
+        date: z.string().optional(),
+        results: z.string().optional(),
+        orderedBy: z.string().optional(),
+        repeat: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+      })
+    )
+    .optional(),
+
+  // Dietary Restrictions
+  dietaryRestrictions: z
+    .array(
+      z.object({
+        dietaryRestrictions: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+      })
+    )
+    .optional(),
+});
+
+export type FaceSheetLongFormData = z.infer<typeof faceSheetLongFormSchema>;

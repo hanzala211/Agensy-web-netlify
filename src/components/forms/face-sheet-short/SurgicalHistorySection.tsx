@@ -1,29 +1,26 @@
-import React from "react";
 import type {
   UseFormRegister,
   FieldErrors,
   UseFieldArrayReturn,
   Control,
+  FieldValues,
+  Path,
 } from "react-hook-form";
-import type { FaceSheetShortFormData } from "@agensy/types";
-import { Input, Card } from "@agensy/components";
+import { Input, Card, TertiaryButton } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 
-interface SurgicalHistorySectionProps {
-  register: UseFormRegister<FaceSheetShortFormData>;
-  control: Control<FaceSheetShortFormData>;
-  errors: FieldErrors<FaceSheetShortFormData>;
-  surgicalHistoryArray: UseFieldArrayReturn<
-    FaceSheetShortFormData,
-    "surgicalHistory"
-  >;
+interface SurgicalHistorySectionProps<T extends FieldValues> {
+  register: UseFormRegister<T>;
+  control: Control<T>;
+  errors: FieldErrors<T>;
+  surgicalHistoryArray: UseFieldArrayReturn<T>;
 }
 
-export const SurgicalHistorySection: React.FC<SurgicalHistorySectionProps> = ({
+export const SurgicalHistorySection = <T extends FieldValues>({
   register,
   errors,
   surgicalHistoryArray,
-}) => {
+}: SurgicalHistorySectionProps<T>) => {
   const {
     fields: surgicalHistoryFields,
     append: appendSurgicalHistory,
@@ -36,6 +33,7 @@ export const SurgicalHistorySection: React.FC<SurgicalHistorySectionProps> = ({
       buttonText={<ICONS.plus size={16} />}
       onButtonClick={() =>
         appendSurgicalHistory({
+          // @ts-expect-error - TODO: fix this
           surgicalHistory: "",
         })
       }
@@ -49,22 +47,22 @@ export const SurgicalHistorySection: React.FC<SurgicalHistorySectionProps> = ({
               <div className="w-full">
                 <Input
                   register={register(
-                    `surgicalHistory.${index}.surgicalHistory`
+                    `surgicalHistory.${index}.surgicalHistory` as Path<T>
                   )}
                   error={
+                    // @ts-expect-error - TODO: fix this
                     errors.surgicalHistory?.[index]?.surgicalHistory?.message
                   }
                 />
               </div>
               {surgicalHistoryFields.length > 1 && (
-                <button
+                <TertiaryButton
                   type="button"
                   onClick={() => removeSurgicalHistory(index)}
-                  className="text-red-600 hover:text-red-800 p-1"
-                  aria-label="Remove surgical history"
+                  className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
                 >
-                  <ICONS.delete size={16} />
-                </button>
+                  <ICONS.delete />
+                </TertiaryButton>
               )}
             </div>
           </div>

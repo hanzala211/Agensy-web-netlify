@@ -1,24 +1,24 @@
-import React from "react";
 import type {
   UseFormRegister,
   FieldErrors,
   UseFieldArrayReturn,
+  FieldValues,
+  Path,
 } from "react-hook-form";
-import type { FaceSheetShortFormData } from "@agensy/types";
-import { Input, Card } from "@agensy/components";
+import { Input, Card, TertiaryButton } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 
-interface AllergiesSectionProps {
-  register: UseFormRegister<FaceSheetShortFormData>;
-  errors: FieldErrors<FaceSheetShortFormData>;
-  allergiesArray: UseFieldArrayReturn<FaceSheetShortFormData, "allergies">;
+interface AllergiesSectionProps<T extends FieldValues> {
+  register: UseFormRegister<T>;
+  errors: FieldErrors<T>;
+  allergiesArray: UseFieldArrayReturn<T>;
 }
 
-export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
+export const AllergiesSection = <T extends FieldValues>({
   register,
   errors,
   allergiesArray,
-}) => {
+}: AllergiesSectionProps<T>) => {
   const {
     fields: allergyFields,
     append: appendAllergy,
@@ -31,6 +31,7 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
       buttonText={<ICONS.plus size={16} />}
       onButtonClick={() =>
         appendAllergy({
+          // @ts-expect-error - TODO: fix this
           allergen: "",
         })
       }
@@ -43,18 +44,21 @@ export const AllergiesSection: React.FC<AllergiesSectionProps> = ({
             <div className="w-full flex gap-4 items-center">
               <div className="w-full">
                 <Input
-                  register={register(`allergies.${index}.allergen`)}
-                  error={errors.allergies?.[index]?.allergen?.message}
+                  register={register(`allergies.${index}.allergen` as Path<T>)}
+                  error={
+                    // @ts-expect-error - TODO: fix this
+                    errors.allergies?.[index]?.allergen?.message as string
+                  }
                 />
               </div>
               {allergyFields.length > 1 && (
-                <button
+                <TertiaryButton
                   type="button"
                   onClick={() => removeAllergy(index)}
-                  className="text-red-600 hover:text-red-800 p-1"
+                  className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
                 >
-                  <ICONS.delete size={16} />
-                </button>
+                  <ICONS.delete />
+                </TertiaryButton>
               )}
             </div>
           </div>

@@ -36,6 +36,45 @@ import {
 } from "@agensy/constants";
 import { toast } from "@agensy/utils";
 
+const defaultValues = {
+  firstName: "",
+  lastName: "",
+  address: "",
+  phoneNumber: "",
+  dateOfBirth: "",
+  ssn: "",
+  codeStatus: "",
+  hospitalPreference: "",
+  hospitalAddress: "",
+  hospitalPhoneNumber: "",
+  insurance: "",
+  groupNumber: "",
+  idNumber: "",
+  medicare: "",
+  pharmacyName: "",
+  pharmacyAddress: "",
+  pharmacyPhone: "",
+  pharmacyFax: "",
+  emergencyContactFirstName: "",
+  emergencyContactLastName: "",
+  emergencyContactPhone: "",
+  emergencyContactRelationship: "",
+  emergencyContactAddress: "",
+  advanceDirective: "",
+  dpoaName: "",
+  mpoaName: "",
+  mpoaAddress: "",
+  mpoaPhone: "",
+  dpoaAddress: "",
+  dpoaPhone: "",
+  providers: [],
+  medications: [],
+  diagnoses: [],
+  allergies: [],
+  surgicalHistory: [],
+  emergencyContactEmail: "",
+};
+
 export const FaceSheetShortForm: React.FC = () => {
   const { clientId } = useParams();
   const {
@@ -52,31 +91,7 @@ export const FaceSheetShortForm: React.FC = () => {
     reset,
   } = useForm<FaceSheetShortFormData>({
     resolver: zodResolver(faceSheetShortFormSchema),
-    defaultValues: {
-      providers: [
-        {
-          providerName: "",
-          specialty: "",
-          address: "",
-          phone: "",
-          fax: "",
-          lastVisit: "",
-          nextVisit: "",
-        },
-      ],
-      medications: [
-        {
-          medicationName: "",
-          dose: "",
-          usedToTreat: "",
-          prescriber: "",
-          refillDue: "",
-        },
-      ],
-      diagnoses: [{ diagnosis: "" }],
-      allergies: [{ allergen: "" }],
-      surgicalHistory: [{ surgicalHistory: "" }],
-    },
+    defaultValues,
   });
 
   const providersArray = useFieldArray({
@@ -201,7 +216,7 @@ export const FaceSheetShortForm: React.FC = () => {
           ADVANCE_DIRECTIVE_OPTIONS.find(
             (advanceDirective) =>
               advanceDirective.value ===
-              faceSheetShortForm.short_form.advance_directives
+              faceSheetShortForm.client_info.advance_directive
           )?.value || "",
         dpoaName: faceSheetShortForm.short_form.dpoa || "",
         mpoaName: faceSheetShortForm.short_form.mpoa || "",
@@ -226,8 +241,7 @@ export const FaceSheetShortForm: React.FC = () => {
   }, [faceSheetShortForm]);
 
   const onSubmit = (data: FaceSheetShortFormData) => {
-    console.log("Face Sheet Data:", data);
-    const medications = data.medications.map((item) => {
+    const medications = data.medications?.map((item) => {
       const medication = {
         refill_due: item.refillDue,
         purpose: item.usedToTreat,
@@ -243,7 +257,7 @@ export const FaceSheetShortForm: React.FC = () => {
         return medication;
       }
     });
-    const providers = data.providers.map((item) => {
+    const providers = data.providers?.map((item) => {
       const provider = {
         provider_type: item?.providerType,
         provider_name: item.providerName,
@@ -278,17 +292,18 @@ export const FaceSheetShortForm: React.FC = () => {
         pharmacy_phone: data.pharmacyPhone,
         pharmacy_fax: data.pharmacyFax,
         code_status: data.codeStatus,
+        advance_directive: data.advanceDirective,
       },
 
       medical_info: {
-        allergies: data.allergies
-          .map((allergen) => allergen.allergen)
+        allergies: data?.allergies
+          ?.map((allergen) => allergen.allergen)
           .join(", "),
-        diagnoses: data.diagnoses
-          .map((diagnosis) => diagnosis.diagnosis)
+        diagnoses: data?.diagnoses
+          ?.map((diagnosis) => diagnosis.diagnosis)
           .join(", "),
-        surgical_history: data.surgicalHistory
-          .map((surgicalHistory) => surgicalHistory.surgicalHistory)
+        surgical_history: data?.surgicalHistory
+          ?.map((surgicalHistory) => surgicalHistory.surgicalHistory)
           .join(", "),
       },
 
@@ -303,7 +318,6 @@ export const FaceSheetShortForm: React.FC = () => {
       medications,
       healthcare_providers: providers,
       short_form: {
-        advance_directives: data.advanceDirective,
         insurance: data.insurance,
         medicare: data.medicare,
         group_number: data.groupNumber,
@@ -323,61 +337,7 @@ export const FaceSheetShortForm: React.FC = () => {
   };
 
   const handleReset = () => {
-    reset({
-      firstName: "",
-      lastName: "",
-      address: "",
-      phoneNumber: "",
-      dateOfBirth: "",
-      ssn: "",
-      codeStatus: "",
-      hospitalPreference: "",
-      hospitalAddress: "",
-      hospitalPhoneNumber: "",
-      insurance: "",
-      groupNumber: "",
-      idNumber: "",
-      medicare: "",
-      pharmacyName: "",
-      pharmacyAddress: "",
-      pharmacyPhone: "",
-      pharmacyFax: "",
-      emergencyContactFirstName: "",
-      emergencyContactLastName: "",
-      emergencyContactPhone: "",
-      emergencyContactRelationship: "",
-      emergencyContactAddress: "",
-      advanceDirective: "",
-      dpoaName: "",
-      mpoaName: "",
-      mpoaAddress: "",
-      mpoaPhone: "",
-      dpoaAddress: "",
-      dpoaPhone: "",
-      providers: [
-        {
-          providerName: "",
-          specialty: "",
-          address: "",
-          phone: "",
-          fax: "",
-          lastVisit: "",
-          nextVisit: "",
-        },
-      ],
-      medications: [
-        {
-          medicationName: "",
-          dose: "",
-          usedToTreat: "",
-          prescriber: "",
-          refillDue: "",
-        },
-      ],
-      diagnoses: [{ diagnosis: "" }],
-      allergies: [{ allergen: "" }],
-      surgicalHistory: [{ surgicalHistory: "" }],
-    });
+    reset(defaultValues);
   };
 
   return isFaceSheetLoading ? (

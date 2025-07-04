@@ -1,40 +1,46 @@
-import React from "react";
-import type { Control, UseFormRegister, FieldErrors } from "react-hook-form";
-import type { FaceSheetShortFormData } from "@agensy/types";
+import type {
+  Control,
+  UseFormRegister,
+  FieldErrors,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 import { Input, Card, PhoneNumberInput, Select } from "@agensy/components";
 import { RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
 
-interface EmergencyContactSectionProps {
-  register: UseFormRegister<FaceSheetShortFormData>;
-  control: Control<FaceSheetShortFormData>;
-  errors: FieldErrors<FaceSheetShortFormData>;
+interface EmergencyContactSectionProps<T extends FieldValues> {
+  register: UseFormRegister<T>;
+  control: Control<T>;
+  errors: FieldErrors<T>;
 }
 
-export const EmergencyContactSection: React.FC<
-  EmergencyContactSectionProps
-> = ({ register, control, errors }) => {
+export const EmergencyContactSection = <T extends FieldValues>({
+  register,
+  control,
+  errors,
+}: EmergencyContactSectionProps<T>) => {
   return (
     <Card title="Emergency Contact">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <Input
           label="First Name"
-          register={register("emergencyContactFirstName")}
-          error={errors.emergencyContactFirstName?.message}
+          register={register("emergencyContactFirstName" as Path<T>)}
+          error={errors.emergencyContactFirstName?.message as string}
         />
         <Input
           label="Last Name"
-          register={register("emergencyContactLastName")}
-          error={errors.emergencyContactLastName?.message}
+          register={register("emergencyContactLastName" as Path<T>)}
+          error={errors.emergencyContactLastName?.message as string}
         />
         <PhoneNumberInput
           label="Phone"
           control={control}
-          name="emergencyContactPhone"
+          name={"emergencyContactPhone" as Path<T>}
         />
 
         <Select
           control={control}
-          name="emergencyContactRelationship"
+          name={"emergencyContactRelationship" as Path<T>}
           data={RELATIONSHIP_TO_CLIENT}
           label="Relationship"
           labelOption="Relationship"
@@ -42,13 +48,13 @@ export const EmergencyContactSection: React.FC<
         <Input
           label="Email"
           type="email"
-          register={register("emergencyContactEmail")}
-          error={errors.emergencyContactEmail?.message}
+          register={register("emergencyContactEmail" as Path<T>)}
+          error={errors.emergencyContactEmail?.message as string}
         />
         <Input
           label="Address"
-          register={register("emergencyContactAddress")}
-          error={errors.emergencyContactAddress?.message}
+          register={register("emergencyContactAddress" as Path<T>)}
+          error={errors.emergencyContactAddress?.message as string}
         />
       </div>
     </Card>

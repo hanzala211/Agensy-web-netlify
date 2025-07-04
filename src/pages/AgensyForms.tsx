@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FaceSheetShortForm, FolderExplorer } from "@agensy/components";
+import {
+  FaceSheetShortForm,
+  FolderExplorer,
+  FaceSheetLongForm,
+} from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@agensy/constants";
@@ -245,7 +249,7 @@ const fileMap: Record<string, FolderData> = {
     description: "Instructions form for start of care procedures",
     content: <div>Instructions Form content</div>,
   },
-  
+
   // Assessment files
   "comprehensive-care-plan-assessment": {
     id: "comprehensive-care-plan-assessment",
@@ -256,7 +260,8 @@ const fileMap: Record<string, FolderData> = {
   "care-recipient-questionnaire": {
     id: "care-recipient-questionnaire",
     name: "Care Recipient Questionnaire",
-    description: "Questionnaire for care recipients to assess needs and preferences",
+    description:
+      "Questionnaire for care recipients to assess needs and preferences",
     content: <div>Care Recipient Questionnaire content</div>,
   },
   "initial-assessment": {
@@ -265,13 +270,13 @@ const fileMap: Record<string, FolderData> = {
     description: "Initial assessment form for new care recipients",
     content: <div>Initial Assessment content</div>,
   },
-  
+
   // Medical files (existing and new)
   "face-sheet-long": {
     id: "face-sheet-long",
     name: "Face Sheet Long",
     description: "Comprehensive patient face sheet with detailed information",
-    content: <div>Face Sheet long content</div>,
+    content: <FaceSheetLongForm />,
   },
   "face-sheet-short": {
     id: "face-sheet-short",
@@ -303,7 +308,7 @@ const fileMap: Record<string, FolderData> = {
     description: "Guidelines for when and how to use medical forms",
     content: <div>Instructions on when/how to use content</div>,
   },
-  
+
   // Long Term Care Planning files
   "poa-documents": {
     id: "poa-documents",
@@ -329,7 +334,7 @@ const fileMap: Record<string, FolderData> = {
     description: "Insurance and identification information tracking",
     content: <div>Insurance & ID Information content</div>,
   },
-  
+
   // Caregiver files
   "caregiver-information": {
     id: "caregiver-information",
@@ -343,7 +348,7 @@ const fileMap: Record<string, FolderData> = {
     description: "Guidelines for caregiver communication and expectations",
     content: <div>Caregiver communication and expectations content</div>,
   },
-  
+
   // Care Plans files
   "care-plan-checklists-examples": {
     id: "care-plan-checklists-examples",
@@ -357,7 +362,7 @@ const fileMap: Record<string, FolderData> = {
     description: "Guidelines for when to activate care plans",
     content: <div>Instructions on when to call care plans content</div>,
   },
-  
+
   // Checklists files
   "move-in-checklist": {
     id: "move-in-checklist",

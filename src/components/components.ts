@@ -95,3 +95,4 @@ export * from "./messages/AddThreadModal";
 export * from "./forms/FolderExplorer";
 export * from "./forms/FileContentDisplay";
 export * from "./forms/face-sheet-short/FaceSheetShortForm";
+export * from "./forms/face-sheet-long/FaceSheetLongForm";

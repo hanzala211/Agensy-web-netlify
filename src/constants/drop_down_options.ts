@@ -169,3 +169,33 @@ export const SEVERITY_OPTIONS = [
   { label: "Severe", value: "severe" },
   { label: "Life-threatening", value: "life_threatening" },
 ];
+
+export const RACE_OPTIONS = [
+  { label: "American Indian or Alaska Native", value: "american_indian_alaska_native" },
+  { label: "Asian", value: "asian" },
+  { label: "Black or African American", value: "black_african_american" },
+  { label: "Hispanic or Latino", value: "hispanic_latino" },
+  { label: "Native Hawaiian or Other Pacific Islander", value: "native_hawaiian_pacific_islander" },
+  { label: "White", value: "white" },
+  { label: "Other", value: "other" },
+  { label: "Prefer not to say", value: "prefer_not_to_say" },
+];
+
+export const LANGUAGE_OPTIONS = [
+  { label: "English", value: "english" },
+  { label: "Spanish", value: "spanish" },
+  { label: "French", value: "french" },
+  { label: "German", value: "german" },
+  { label: "Italian", value: "italian" },
+  { label: "Portuguese", value: "portuguese" },
+  { label: "Russian", value: "russian" },
+  { label: "Chinese (Mandarin)", value: "chinese_mandarin" },
+  { label: "Chinese (Cantonese)", value: "chinese_cantonese" },
+  { label: "Japanese", value: "japanese" },
+  { label: "Korean", value: "korean" },
+  { label: "Arabic", value: "arabic" },
+  { label: "Hindi", value: "hindi" },
+  { label: "Vietnamese", value: "vietnamese" },
+  { label: "Tagalog", value: "tagalog" },
+  { label: "Other", value: "other" },
+];

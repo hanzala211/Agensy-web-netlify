@@ -216,3 +216,22 @@ export interface BillingHistory extends BaseSchema {
   latest_invoice: string;
 }
 
+export interface Bloodwork extends BaseSchema {
+  name: string;
+  date: string;
+  results: string;
+  ordered_by: string;
+  repeat: string;
+}
+
+export interface Vaccine extends BaseSchema {
+  name: string;
+  date: string;
+  next_vaccine: string;
+}
+
+export interface MedicalCondition extends BaseSchema {
+  condition: string;
+  onset_date: string;
+  notes: string;
+}

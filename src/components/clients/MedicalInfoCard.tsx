@@ -14,14 +14,14 @@ export const MedicalInfoCard: React.FC = () => {
           {selectedClient?.medical?.diagnoses && (
             <ItemList
               label="Diagnosis"
-              items={selectedClient.medical.diagnoses.split(", ")}
+              items={selectedClient.medical.diagnoses.split(", ").slice(0, 4)}
             />
           )}
 
           {selectedClient?.medical?.allergies && (
             <ItemList
               label="Allergies:"
-              items={selectedClient?.medical?.allergies.split(", ")}
+              items={selectedClient?.medical?.allergies.split(", ").slice(0, 4)}
             />
           )}
           {selectedClient?.code_status && (

@@ -1,6 +1,10 @@
-import React from "react";
-import type { Control, UseFormRegister, FieldErrors } from "react-hook-form";
-import type { FaceSheetShortFormData } from "@agensy/types";
+import type {
+  Control,
+  UseFormRegister,
+  FieldErrors,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 import {
   Input,
   Card,
@@ -8,47 +12,49 @@ import {
   PhoneNumberInput,
 } from "@agensy/components";
 
-interface PersonalInformationSectionProps {
-  register: UseFormRegister<FaceSheetShortFormData>;
-  control: Control<FaceSheetShortFormData>;
-  errors: FieldErrors<FaceSheetShortFormData>;
+interface PersonalInformationSectionProps<T extends FieldValues> {
+  register: UseFormRegister<T>;
+  control: Control<T>;
+  errors: FieldErrors<T>;
 }
 
-export const PersonalInformationSection: React.FC<
-  PersonalInformationSectionProps
-> = ({ register, control, errors }) => {
+export const PersonalInformationSection = <T extends FieldValues>({
+  register,
+  control,
+  errors,
+}: PersonalInformationSectionProps<T>) => {
   return (
     <Card title="Personal Information">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <Input
           label="First Name"
-          register={register("firstName")}
-          error={errors.firstName?.message}
+          register={register("firstName" as Path<T>)}
+          error={errors.firstName?.message as string}
         />
         <Input
           label="Last Name"
-          register={register("lastName")}
-          error={errors.lastName?.message}
+          register={register("lastName" as Path<T>)}
+          error={errors.lastName?.message as string}
         />
         <PhoneNumberInput
           label="Phone Number"
           control={control}
-          name="phoneNumber"
+          name={"phoneNumber" as Path<T>}
         />
         <DatePickerField
           control={control}
-          name="dateOfBirth"
+          name={"dateOfBirth" as Path<T>}
           label="Date of Birth"
         />
         <Input
           label="SSN"
-          register={register("ssn")}
-          error={errors.ssn?.message}
+          register={register("ssn" as Path<T>)}
+          error={errors.ssn?.message as string}
         />
         <Input
           label="Address"
-          register={register("address")}
-          error={errors.address?.message}
+          register={register("address" as Path<T>)}
+          error={errors.address?.message as string}
         />
       </div>
     </Card>
