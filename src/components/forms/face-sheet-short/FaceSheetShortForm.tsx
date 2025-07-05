@@ -35,6 +35,8 @@ import {
   CODE_STATUS_OPTIONS,
 } from "@agensy/constants";
 import { toast } from "@agensy/utils";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import FaceSheetShortFormPDF from "./FaceSheetShortFormPDF";
 
 const defaultValues = {
   firstName: "",
@@ -89,6 +91,7 @@ export const FaceSheetShortForm: React.FC = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    getValues,
   } = useForm<FaceSheetShortFormData>({
     resolver: zodResolver(faceSheetShortFormSchema),
     defaultValues,
@@ -431,18 +434,39 @@ export const FaceSheetShortForm: React.FC = () => {
         />
 
         {/* Form Actions */}
-        <div className="flex justify-end gap-4 pt-8 border-t bg-white p-6 rounded-lg">
-          <SecondaryButton type="button" onClick={handleReset}>
-            Reset Form
-          </SecondaryButton>
-          <PrimaryButton
-            isLoading={postFaceSheetShortFormMutation.isPending}
-            disabled={postFaceSheetShortFormMutation.isPending}
-            type="submit"
-            className="!w-fit"
-          >
-            Save Face Sheet
-          </PrimaryButton>
+        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+            <PDFDownloadLink
+              document={<FaceSheetShortFormPDF data={getValues()} />}
+              fileName="FaceSheetShort.pdf"
+            >
+              {({ loading }) => (
+                <PrimaryButton
+                  isLoading={loading}
+                  disabled={loading}
+                  type="button"
+                  className="sm:!w-fit w-full md:text-base text-sm"
+                >
+                  Download PDF
+                </PrimaryButton>
+              )}
+            </PDFDownloadLink>
+            <SecondaryButton
+              type="button"
+              className="md:!text-base !text-sm min-h-[48px] shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              onClick={handleReset}
+            >
+              Reset Form
+            </SecondaryButton>
+            <PrimaryButton
+              isLoading={postFaceSheetShortFormMutation.isPending}
+              disabled={postFaceSheetShortFormMutation.isPending}
+              type="submit"
+              className="sm:!w-fit w-full md:text-base text-sm"
+            >
+              Save Face Sheet
+            </PrimaryButton>
+          </div>
         </div>
       </form>
     </div>
