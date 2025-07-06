@@ -7,7 +7,7 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@agensy/assets": ["public/assets/*"],
+			"@agensy/assets": ["./src/assets"],
 			"@agensy/components": ["./src/components/components.ts"],
 			"@agensy/constants": ["./src/constants/constants.ts"],
 			"@agensy/pages": ["./src/pages/pages.ts"],

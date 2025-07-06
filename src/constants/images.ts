@@ -1,3 +1,3 @@
 export const IMAGES = {
-  logo: "/vite.svg"
-}
+  logo: "/vite.svg",
+};

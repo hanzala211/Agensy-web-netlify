@@ -1,11 +1,20 @@
 import React from "react";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+} from "@react-pdf/renderer";
 import type { FaceSheetShortFormData } from "@agensy/types";
 import {
   ADVANCE_DIRECTIVE_OPTIONS,
   CODE_STATUS_OPTIONS,
   RELATIONSHIP_TO_CLIENT,
 } from "@agensy/constants";
+import { DateUtils } from "@agensy/utils";
+import logo from "@agensy/assets/logo.png";
 
 const BORDER = "#1f3d7a";
 const BORDER_LITE = "#c5d2f2";
@@ -18,14 +27,21 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     lineHeight: 1.3,
   },
-
+  formTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 14,
+    marginTop: 5,
+    color: BORDER,
+  },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
     marginBottom: 5,
   },
-  headerLogo: { width: 72, height: 72, objectFit: "contain" },
+  headerLogo: { width: 130, objectFit: "contain" },
   headerDateBox: {
     borderWidth: 1,
     borderColor: BORDER,
@@ -130,6 +146,14 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
 }) => (
   <Document title="Agensy Face Sheet - Short Form">
     <Page size="A4" style={styles.page}>
+      <Text style={styles.formTitle}>Agensy Face Sheet - Short Form</Text>
+      <View style={styles.headerRow}>
+        <Image src={logo} style={styles.headerLogo} />
+        <Text style={styles.headerDateBox}>
+          Date: {DateUtils.formatDateToRequiredFormat(new Date().toISOString())}
+        </Text>
+      </View>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Patient Information</Text>
         <Field label="Name">

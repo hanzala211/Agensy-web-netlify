@@ -1,5 +1,12 @@
 import React from "react";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+} from "@react-pdf/renderer";
 import type { FaceSheetLongFormData } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
 import {
@@ -12,6 +19,7 @@ import {
   MARITAL_STATUS_OPTIONS,
   LIVING_SITUATION_OPTIONS,
 } from "@agensy/constants";
+import logo from "@agensy/assets/logo.png";
 
 const BORDER = "#1f3d7a";
 const BORDER_LITE = "#c5d2f2";
@@ -24,14 +32,20 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     lineHeight: 1.3,
   },
-
+  formTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+    color: BORDER,
+  },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
     marginBottom: 5,
   },
-  headerLogo: { width: 72, objectFit: "contain" },
+  headerLogo: { width: 130, objectFit: "contain" },
   headerDateBox: {
     borderWidth: 1,
     borderColor: BORDER,
@@ -136,9 +150,11 @@ const FaceSheetLongFormPDF: React.FC<{ data: FaceSheetLongFormData }> = ({
 }) => (
   <Document title="Agensy Face Sheet">
     <Page size="A4" style={styles.page}>
+      <Text style={styles.formTitle}>Agensy Face Sheet - Long Form</Text>
       <View style={styles.headerRow}>
+        <Image src={logo} style={styles.headerLogo} />
         <Text style={styles.headerDateBox}>
-          Date: {data.dateOfLastCarePlan}
+          Date: {DateUtils.formatDateToRequiredFormat(new Date().toISOString())}
         </Text>
       </View>
 
