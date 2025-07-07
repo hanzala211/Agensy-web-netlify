@@ -1,7 +1,20 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { ICONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
-import type { FolderData, FolderItem } from "@agensy/types";
+import type {
+  FaceSheetLongFormData,
+  FaceSheetShortFormData,
+  FolderData,
+  FolderItem,
+  HealthHistoryFormData,
+} from "@agensy/types";
+import { TertiaryButton } from "@agensy/components";
+import { useClientContext } from "@agensy/context";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { useParams } from "react-router-dom";
+import FaceSheetLongFormPDF from "./face-sheet-long/FaceSheetLongFormPDF";
+import FaceSheetShortFormPDF from "./face-sheet-short/FaceSheetShortFormPDF";
+import HealthHistoryFormPDF from "./health-history-form/HealthHistoryFormPDF";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -26,6 +39,8 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   onPathClick,
   fileContent,
 }) => {
+  const { setOpenedFileData, openedFileData } = useClientContext();
+  const params = useParams();
   const isShowingFileContent = useMemo(
     () => selectedItem && fileContent,
     [selectedItem, fileContent]
@@ -46,10 +61,36 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   const handleBackButtonClick = () => {
     if (isShowingFileContent) {
       onFileClose?.();
+      setOpenedFileData(null);
     } else {
       onBackClick?.();
     }
   };
+
+  const getPDFDocument = useCallback(() => {
+    switch (params.formSlug) {
+      case "face-sheet-long":
+        return (
+          <FaceSheetLongFormPDF
+            data={openedFileData as unknown as FaceSheetLongFormData}
+          />
+        );
+      case "face-sheet-short":
+        return (
+          <FaceSheetShortFormPDF
+            data={openedFileData as unknown as FaceSheetShortFormData}
+          />
+        );
+      case "health-history-form-medical":
+        return (
+          <HealthHistoryFormPDF
+            data={openedFileData as unknown as HealthHistoryFormData}
+          />
+        );
+      default:
+        return <></>;
+    }
+  }, [params.formSlug, openedFileData]);
 
   const renderGridItem = (item: FolderItem) => {
     const isSelected = selectedItem === item.id;
@@ -93,7 +134,11 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
     <div className="!p-0 overflow-hidden border-2 border-gray-200 rounded-lg">
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div
+            className={`flex items-center gap-3 ${
+              isShowingFileContent ? "w-full" : "w-fit"
+            }`}
+          >
             {showBackButton && (
               <button
                 onClick={handleBackButtonClick}
@@ -102,19 +147,36 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                 <ICONS.leftArrow size={18} className="text-gray-600" />
               </button>
             )}
-            <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+            <h3 className={`font-semibold text-gray-800 w-full`}>
               {isShowingFileContent ? (
-                <React.Fragment>
-                  <ICONS.fileAlt className="text-gray-600" />
-                  {fileContent?.name}
-                </React.Fragment>
+                <div className="flex items-center justify-between w-full gap-2">
+                  <div className="flex items-center gap-2">
+                    <ICONS.fileAlt className="text-gray-600" />
+                    {fileContent?.name}
+                  </div>
+                  {openedFileData && (
+                    <PDFDownloadLink
+                      document={getPDFDocument()}
+                      fileName={`${fileContent?.name}.pdf`}
+                    >
+                      <TertiaryButton
+                        aria_label="Download PDF"
+                        className="hover:bg-green-50 shadow-none hover:text-green-500 hover:border-green-300 bg-transparent"
+                      >
+                        <span className="flex items-center gap-2">
+                          <ICONS.download />
+                        </span>
+                      </TertiaryButton>
+                    </PDFDownloadLink>
+                  )}
+                </div>
               ) : (
-                <React.Fragment>
+                <div className="flex items-center gap-2">
                   <ICONS.folder className="text-blue-600" />
                   {currentPath.length > 0
                     ? currentPath[currentPath.length - 1]
                     : "Agensy Forms"}
-                </React.Fragment>
+                </div>
               )}
             </h3>
           </div>

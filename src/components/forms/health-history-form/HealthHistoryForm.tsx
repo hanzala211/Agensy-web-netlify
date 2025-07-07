@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   PrimaryButton,
-  SecondaryButton,
   Card,
   Input,
   TextArea,
@@ -16,6 +15,7 @@ import {
   healthHistoryFormSchema,
   type ClientMedications,
   type HealthHistoryFormData,
+  type OpenedFileData,
 } from "@agensy/types";
 
 import { toast } from "@agensy/utils";
@@ -26,8 +26,7 @@ import {
   useGetHealthHistoryForm,
   usePostHealthHistoryFormMutation,
 } from "@agensy/api";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import HealthHistoryFormPDF from "./HealthHistoryFormPDF";
+import { useClientContext } from "@agensy/context";
 
 const defaultValues: HealthHistoryFormData = {
   diagnoses: [
@@ -76,6 +75,7 @@ const defaultValues: HealthHistoryFormData = {
 
 export const HealthHistoryForm: React.FC = () => {
   const { clientId } = useParams();
+  const { setOpenedFileData } = useClientContext();
   const {
     data: healthHistoryForm,
     isFetching: isFetchingHealthHistoryForm,
@@ -89,7 +89,6 @@ export const HealthHistoryForm: React.FC = () => {
     formState: { errors },
     reset,
     getValues,
-    watch,
   } = useForm<HealthHistoryFormData>({
     resolver: zodResolver(healthHistoryFormSchema),
     defaultValues,
@@ -98,16 +97,6 @@ export const HealthHistoryForm: React.FC = () => {
   useEffect(() => {
     refetch();
   }, []);
-
-  const formValues = watch();
-
-  const pdfData = useMemo(() => {
-    try {
-      return getValues();
-    } catch {
-      return defaultValues;
-    }
-  }, [formValues, getValues]);
 
   useEffect(() => {
     if (postHealthHistoryMutation.status === "success") {
@@ -119,6 +108,16 @@ export const HealthHistoryForm: React.FC = () => {
       toast.error("Error Occured", String(postHealthHistoryMutation.error));
     }
   }, [postHealthHistoryMutation.status]);
+
+  const formValues = useWatch({ control });
+
+  useEffect(() => {
+    if (formValues && Object.keys(formValues).length > 0) {
+      setOpenedFileData(formValues as unknown as OpenedFileData);
+    } else {
+      setOpenedFileData(getValues() as unknown as OpenedFileData);
+    }
+  }, [formValues]);
 
   const medicationsStartedArray = useFieldArray({
     control,
@@ -208,10 +207,6 @@ export const HealthHistoryForm: React.FC = () => {
     });
   };
 
-  const handleReset = () => {
-    reset(defaultValues);
-  };
-
   useEffect(() => {
     if (healthHistoryForm) {
       reset({
@@ -282,6 +277,7 @@ export const HealthHistoryForm: React.FC = () => {
             id: medication.id || "",
           })),
       });
+      setOpenedFileData(getValues() as unknown as OpenedFileData);
     }
   }, [healthHistoryForm]);
 
@@ -578,28 +574,6 @@ export const HealthHistoryForm: React.FC = () => {
         {/* Form Actions */}
         <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PDFDownloadLink
-              document={<HealthHistoryFormPDF data={pdfData} />}
-              fileName="HealthHistoryForm.pdf"
-            >
-              {({ loading }) => (
-                <PrimaryButton
-                  isLoading={loading && !postHealthHistoryMutation.isPending}
-                  disabled={loading && !postHealthHistoryMutation.isPending}
-                  type="button"
-                  className="sm:!w-fit w-full md:text-base text-sm"
-                >
-                  Download PDF
-                </PrimaryButton>
-              )}
-            </PDFDownloadLink>
-            <SecondaryButton
-              type="button"
-              className="md:!text-base !text-sm min-h-[48px] shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-              onClick={handleReset}
-            >
-              Reset Form
-            </SecondaryButton>
             <PrimaryButton
               isLoading={postHealthHistoryMutation.isPending}
               disabled={postHealthHistoryMutation.isPending}

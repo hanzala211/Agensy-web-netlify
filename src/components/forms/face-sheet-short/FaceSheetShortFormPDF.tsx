@@ -141,7 +141,7 @@ const TableRow = ({
   </View>
 );
 
-const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
+const FaceSheetShortFormPDF: React.FC<{ data?: FaceSheetShortFormData }> = ({
   data,
 }) => (
   <Document title="Agensy Face Sheet - Short Form">
@@ -157,43 +157,43 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Patient Information</Text>
         <Field label="Name">
-          {data.firstName} {data.lastName}
+          {data?.firstName} {data?.lastName}
         </Field>
-        <Field label="Date of Birth">{data.dateOfBirth}</Field>
-        <Field label="Phone Number">{data.phoneNumber}</Field>
-        <Field label="Address">{data.address}</Field>
-        <Field label="SSN">{data.ssn}</Field>
+        <Field label="Date of Birth">{data?.dateOfBirth}</Field>
+        <Field label="Phone Number">{data?.phoneNumber}</Field>
+        <Field label="Address">{data?.address}</Field>
+        <Field label="SSN">{data?.ssn}</Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Emergency Contact</Text>
         <Field label="Name">
-          {data.emergencyContactFirstName} {data.emergencyContactLastName}
+          {data?.emergencyContactFirstName} {data?.emergencyContactLastName}
         </Field>
         <Field label="Relationship">
           {
             RELATIONSHIP_TO_CLIENT.find(
-              (item) => item.value === data.emergencyContactRelationship
+              (item) => item.value === data?.emergencyContactRelationship
             )?.label
           }
         </Field>
-        <Field label="Phone">{data.emergencyContactPhone}</Field>
-        <Field label="Email">{data.emergencyContactEmail}</Field>
-        <Field label="Address">{data.emergencyContactAddress}</Field>
+        <Field label="Phone">{data?.emergencyContactPhone}</Field>
+        <Field label="Email">{data?.emergencyContactEmail}</Field>
+        <Field label="Address">{data?.emergencyContactAddress}</Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Medical Settings</Text>
         <Field label="Code Status">
           {
-            CODE_STATUS_OPTIONS.find((item) => item.value === data.codeStatus)
+            CODE_STATUS_OPTIONS.find((item) => item.value === data?.codeStatus)
               ?.label
           }
         </Field>
         <Field label="Advance Directive">
           {
             ADVANCE_DIRECTIVE_OPTIONS.find(
-              (item) => item.value === data.advanceDirective
+              (item) => item.value === data?.advanceDirective
             )?.label
           }
         </Field>
@@ -201,38 +201,38 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Hospital Preference</Text>
-        <Field label="Hospital Preference">{data.hospitalPreference}</Field>
-        <Field label="Hospital Address">{data.hospitalAddress}</Field>
-        <Field label="Hospital Phone">{data.hospitalPhoneNumber}</Field>
+        <Field label="Hospital Preference">{data?.hospitalPreference}</Field>
+        <Field label="Hospital Address">{data?.hospitalAddress}</Field>
+        <Field label="Hospital Phone">{data?.hospitalPhoneNumber}</Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Insurance Information</Text>
-        <Field label="Insurance">{data.insurance}</Field>
-        <Field label="Group Number">{data.groupNumber}</Field>
-        <Field label="ID Number">{data.idNumber}</Field>
-        <Field label="Medicare">{data.medicare}</Field>
+        <Field label="Insurance">{data?.insurance}</Field>
+        <Field label="Group Number">{data?.groupNumber}</Field>
+        <Field label="ID Number">{data?.idNumber}</Field>
+        <Field label="Medicare">{data?.medicare}</Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Pharmacy Information</Text>
-        <Field label="Pharmacy Name">{data.pharmacyName}</Field>
-        <Field label="Pharmacy Address">{data.pharmacyAddress}</Field>
-        <Field label="Pharmacy Phone">{data.pharmacyPhone}</Field>
-        <Field label="Pharmacy Fax">{data.pharmacyFax}</Field>
+        <Field label="Pharmacy Name">{data?.pharmacyName}</Field>
+        <Field label="Pharmacy Address">{data?.pharmacyAddress}</Field>
+        <Field label="Pharmacy Phone">{data?.pharmacyPhone}</Field>
+        <Field label="Pharmacy Fax">{data?.pharmacyFax}</Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>MPOA</Text>
-        <Field label="MPOA Name">{data.mpoaName}</Field>
-        <Field label="MPOA Phone">{data.mpoaPhone}</Field>
-        <Field label="MPOA Address">{data.mpoaAddress}</Field>
+        <Field label="MPOA Name">{data?.mpoaName}</Field>
+        <Field label="MPOA Phone">{data?.mpoaPhone}</Field>
+        <Field label="MPOA Address">{data?.mpoaAddress}</Field>
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>DPOA</Text>
-        <Field label="DPOA Name">{data.dpoaName}</Field>
-        <Field label="DPOA Phone">{data.dpoaPhone}</Field>
-        <Field label="DPOA Address">{data.dpoaAddress}</Field>
+        <Field label="DPOA Name">{data?.dpoaName}</Field>
+        <Field label="DPOA Phone">{data?.dpoaPhone}</Field>
+        <Field label="DPOA Address">{data?.dpoaAddress}</Field>
       </View>
 
       <View style={styles.section}>
@@ -245,7 +245,7 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
             "Last / Next Visit",
           ]}
         />
-        {(data.providers ?? [])
+        {(data?.providers ?? [])
           .filter((p) => p && p.providerName)
           .map((p, i, arr) => (
             <TableRow
@@ -272,7 +272,7 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
             "Refill Due",
           ]}
         />
-        {(data.medications ?? [])
+        {(data?.medications ?? [])
           .filter((m) => m && m.medicationName)
           .map((m, i, arr) => (
             <TableRow
@@ -292,7 +292,7 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Diagnoses</Text>
         <Field label="Diagnoses">
-          {data.diagnoses
+          {data?.diagnoses
             ?.filter((d) => d && d.diagnosis)
             ?.map((d) => d.diagnosis)
             .join(", ") ?? ""}
@@ -302,7 +302,7 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Allergies</Text>
         <Field label="Allergies">
-          {data.allergies
+          {data?.allergies
             ?.filter((a) => a && a.allergen)
             ?.map((a) => a.allergen)
             .join(", ") ?? ""}
@@ -312,7 +312,7 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Surgical History</Text>
         <Field label="Surgical History">
-          {data.surgicalHistory
+          {data?.surgicalHistory
             ?.filter((s) => s && s.surgicalHistory)
             ?.map((s) => s.surgicalHistory)
             .join(", ") ?? ""}

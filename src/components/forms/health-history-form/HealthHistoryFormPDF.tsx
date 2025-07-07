@@ -110,112 +110,121 @@ const Field = ({
   </View>
 );
 
-const HealthHistoryFormPDF: React.FC<{ data: HealthHistoryFormData }> = ({
+const HealthHistoryFormPDF: React.FC<{ data?: HealthHistoryFormData }> = ({
   data,
-}) => (
-  <Document title="Agensy Health History Form">
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.formTitle}>Agensy Health History Form</Text>
-      <View style={styles.headerRow}>
-        <Image src={logo} style={styles.headerLogo} />
-        <Text style={styles.headerDateBox}>
-          Date: {DateUtils.formatDateToRequiredFormat(new Date().toISOString())}
-        </Text>
-      </View>
+}) => {
+  return (
+    <Document title="Agensy Health History Form">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>Agensy Health History Form</Text>
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <Text style={styles.headerDateBox}>
+            Date:{" "}
+            {DateUtils.formatDateToRequiredFormat(new Date().toISOString())}
+          </Text>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Diagnoses</Text>
-        <Field label="Diagnoses">
-          {data.diagnoses?.map((d) => d.diagnosis).join(", ")}
-        </Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Diagnoses</Text>
+          <Field label="Diagnoses">
+            {data?.diagnoses?.map((d) => d.diagnosis).join(", ")}
+          </Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Description of Health Concern</Text>
-        <Field label="Description of Health Concern">
-          {data.descriptionOfHealthConcern}
-        </Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Description of Health Concern</Text>
+          <Field label="Description of Health Concern">
+            {data?.descriptionOfHealthConcern}
+          </Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Onset of Symptoms</Text>
-        <Field label="Onset of Symptoms">{data.onsetOfSymptoms}</Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Onset of Symptoms</Text>
+          <Field label="Onset of Symptoms">{data?.onsetOfSymptoms}</Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Frequency of Symptoms</Text>
-        <Field label="Frequency of Symptoms">{data.frequencyOfSymptoms}</Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Frequency of Symptoms</Text>
+          <Field label="Frequency of Symptoms">
+            {data?.frequencyOfSymptoms}
+          </Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Severity of Symptoms</Text>
-        <Field label="Severity of Symptoms">{data.severityOfSymptoms}</Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Severity of Symptoms</Text>
+          <Field label="Severity of Symptoms">{data?.severityOfSymptoms}</Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Hospitalization</Text>
-        <Field label="Admitting Diagnosis">{data.admittingDiagnosis}</Field>
-        <Field label="Hospitalization Treatment">
-          {data.hospitalizationTreatment}
-        </Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Hospitalization</Text>
+          <Field label="Admitting Diagnosis">{data?.admittingDiagnosis}</Field>
+          <Field label="Hospitalization Treatment">
+            {data?.hospitalizationTreatment}
+          </Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Specialty Provider</Text>
-        <Field label="Provider Name">{data.providerName}</Field>
-        <Field label="Provider Address">{data.providerAddress}</Field>
-        <Field label="Provider Phone">{data.providerPhone}</Field>
-        <Field label="Provider Notes">{data.providerNotes}</Field>
-        <Field label="Provider Follow Up">{data.providerFollowUp}</Field>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Medication Started</Text>
-        <Field label="Medication Name">
-          {data.medicationsStarted?.map((m) => m.medicationName).join(", ")}
-        </Field>
-        <Field label="Dosage">
-          {data.medicationsStarted?.map((m) => m.dosage).join(", ")}
-        </Field>
-        <Field label="Prescribing Doctor">
-          {data.medicationsStarted?.map((m) => m.prescribingDoctor).join(", ")}
-        </Field>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Medication Ended</Text>
-        <Field label="Medication Name">
-          {data.medicationsEnded?.map((m) => m.medicationName).join(", ")}
-        </Field>
-        <Field label="Dosage">
-          {data.medicationsEnded?.map((m) => m.dosage).join(", ")}
-        </Field>
-        <Field label="Prescribing Doctor">
-          {data.medicationsEnded?.map((m) => m.prescribingDoctor).join(", ")}
-        </Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Specialty Provider</Text>
+          <Field label="Provider Name">{data?.providerName}</Field>
+          <Field label="Provider Address">{data?.providerAddress}</Field>
+          <Field label="Provider Phone">{data?.providerPhone}</Field>
+          <Field label="Provider Notes">{data?.providerNotes}</Field>
+          <Field label="Provider Follow Up">{data?.providerFollowUp}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Medication Started</Text>
+          <Field label="Medication Name">
+            {data?.medicationsStarted?.map((m) => m.medicationName).join(", ")}
+          </Field>
+          <Field label="Dosage">
+            {data?.medicationsStarted?.map((m) => m.dosage).join(", ")}
+          </Field>
+          <Field label="Prescribing Doctor">
+            {data?.medicationsStarted
+              ?.map((m) => m.prescribingDoctor)
+              .join(", ")}
+          </Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Medication Ended</Text>
+          <Field label="Medication Name">
+            {data?.medicationsEnded?.map((m) => m.medicationName).join(", ")}
+          </Field>
+          <Field label="Dosage">
+            {data?.medicationsEnded?.map((m) => m.dosage).join(", ")}
+          </Field>
+          <Field label="Prescribing Doctor">
+            {data?.medicationsEnded?.map((m) => m.prescribingDoctor).join(", ")}
+          </Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Home Health Agency</Text>
-        <Field label="Home Health Name">{data.homeHealthName}</Field>
-        <Field label="Home Health Phone">{data.homeHealthPhone}</Field>
-        <Field label="Home Health Address">{data.homeHealthAddress}</Field>
-        <Field label="Home Health Fax">{data.homeHealthFax}</Field>
-        <Field label="Home Health Service Received">
-          {data.homeHealthServiceReceived}
-        </Field>
-        <Field label="Home Health Start Date">{data.homeHealthStartDate}</Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Home Health Agency</Text>
+          <Field label="Home Health Name">{data?.homeHealthName}</Field>
+          <Field label="Home Health Phone">{data?.homeHealthPhone}</Field>
+          <Field label="Home Health Address">{data?.homeHealthAddress}</Field>
+          <Field label="Home Health Fax">{data?.homeHealthFax}</Field>
+          <Field label="Home Health Service Received">
+            {data?.homeHealthServiceReceived}
+          </Field>
+          <Field label="Home Health Start Date">
+            {data?.homeHealthStartDate}
+          </Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>What Worked</Text>
-        <Field label="What Worked">{data.whatWorked}</Field>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>What Worked</Text>
+          <Field label="What Worked">{data?.whatWorked}</Field>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Health History Notes</Text>
-        <Field label="Health History Notes">{data.healthHistoryNotes}</Field>
-      </View>
-    </Page>
-  </Document>
-);
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Health History Notes</Text>
+          <Field label="Health History Notes">{data?.healthHistoryNotes}</Field>
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 export default HealthHistoryFormPDF;

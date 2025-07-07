@@ -9,6 +9,7 @@ import type {
   HealthcareProvider,
   IUser,
   Note,
+  OpenedFileData,
 } from "@agensy/types";
 import { toast } from "@agensy/utils";
 import { createContext, useContext, useState } from "react";
@@ -19,6 +20,9 @@ const ClientContext = createContext<ClientContextType | undefined>(undefined);
 export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
   const { userData } = useAuthContext();
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [openedFileData, setOpenedFileData] = useState<OpenedFileData | null>(
+    null
+  );
 
   const addClientContact = (contact: ClientContact) => {
     setSelectedClient((prev) => {
@@ -251,6 +255,8 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
         addClientAccess,
         deleteClientAccess,
         updateClientAccess,
+        openedFileData,
+        setOpenedFileData,
       }}
     >
       {children}

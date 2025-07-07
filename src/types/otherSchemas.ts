@@ -20,3 +20,8 @@ export interface FolderData {
   description?: string;
   content: React.ReactNode;
 }
+
+export type OpenedFileData = Record<
+  string,
+  string | string[] | Record<string, string | number>
+>;

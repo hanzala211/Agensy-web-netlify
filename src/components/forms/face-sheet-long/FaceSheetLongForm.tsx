@@ -1,11 +1,7 @@
-import React, { useEffect, useMemo } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  CommonLoader,
-  PrimaryButton,
-  SecondaryButton,
-} from "@agensy/components";
+import { CommonLoader, PrimaryButton } from "@agensy/components";
 import {
   faceSheetLongFormSchema,
   type ClientMedications,
@@ -14,6 +10,7 @@ import {
   type Bloodwork,
   type Vaccine,
   type MedicalCondition,
+  type OpenedFileData,
 } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
@@ -51,8 +48,7 @@ import {
   RELATIONSHIP_TO_CLIENT,
   RACE_OPTIONS,
 } from "@agensy/constants";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import FaceSheetLongFormPDF from "./FaceSheetLongFormPDF";
+import { useClientContext } from "@agensy/context";
 
 const defaultValues = {
   firstName: "",
@@ -124,6 +120,7 @@ const defaultValues = {
 };
 
 export const FaceSheetLongForm: React.FC = () => {
+  const { setOpenedFileData } = useClientContext();
   const { clientId } = useParams();
   const postFaceSheetLongFormMutation = usePostFaceSheetLongFormMutation();
   const {
@@ -139,21 +136,10 @@ export const FaceSheetLongForm: React.FC = () => {
     getValues,
     formState: { errors },
     reset,
-    watch,
   } = useForm<FaceSheetLongFormData>({
     resolver: zodResolver(faceSheetLongFormSchema),
     defaultValues,
   });
-
-  const formValues = watch();
-
-  const pdfData = useMemo(() => {
-    try {
-      return getValues();
-    } catch {
-      return defaultValues;
-    }
-  }, [formValues, getValues]);
 
   useEffect(() => {
     refetch();
@@ -169,6 +155,16 @@ export const FaceSheetLongForm: React.FC = () => {
       toast.error("Error Occured", String(postFaceSheetLongFormMutation.error));
     }
   }, [postFaceSheetLongFormMutation.status]);
+
+  const formValues = useWatch({ control });
+
+  useEffect(() => {
+    if (formValues && Object.keys(formValues).length > 0) {
+      setOpenedFileData(formValues as unknown as OpenedFileData);
+    } else {
+      setOpenedFileData(getValues() as unknown as OpenedFileData);
+    }
+  }, [formValues]);
 
   const providersArray = useFieldArray({
     control,
@@ -402,6 +398,7 @@ export const FaceSheetLongForm: React.FC = () => {
       dietaryRestrictionsArray.replace(formData.dietaryRestrictions);
       medicalConditionsArray.replace(formData.medicalConditions);
     }
+    setOpenedFileData(getValues() as unknown as OpenedFileData);
   }, [faceSheetLongData]);
 
   const onSubmit = (data: FaceSheetLongFormData) => {
@@ -592,10 +589,6 @@ export const FaceSheetLongForm: React.FC = () => {
     });
   };
 
-  const handleReset = () => {
-    reset(defaultValues);
-  };
-
   return isFaceSheetLoading ? (
     <div className="flex justify-center items-center h-screen">
       <CommonLoader />
@@ -721,30 +714,6 @@ export const FaceSheetLongForm: React.FC = () => {
         {/* Form Actions */}
         <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PDFDownloadLink
-              document={<FaceSheetLongFormPDF data={pdfData} />}
-              fileName="FaceSheetLong.pdf"
-            >
-              {({ loading }) => (
-                <PrimaryButton
-                  isLoading={
-                    loading && !postFaceSheetLongFormMutation.isPending
-                  }
-                  disabled={loading && !postFaceSheetLongFormMutation.isPending}
-                  type="button"
-                  className="sm:!w-fit w-full md:text-base text-sm"
-                >
-                  Download PDF
-                </PrimaryButton>
-              )}
-            </PDFDownloadLink>
-            <SecondaryButton
-              type="button"
-              className="md:!text-base !text-sm min-h-[48px] shadow-sm hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-              onClick={handleReset}
-            >
-              Reset Form
-            </SecondaryButton>
             <PrimaryButton
               isLoading={postFaceSheetLongFormMutation.isPending}
               disabled={postFaceSheetLongFormMutation.isPending}

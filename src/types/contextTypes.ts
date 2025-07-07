@@ -12,6 +12,7 @@ import type {
   Note,
   Thread,
 } from "./schemas";
+import type { OpenedFileData } from "./otherSchemas";
 
 export interface AuthContextType {
   userData: IUser | null;
@@ -56,6 +57,10 @@ export interface ClientContextType {
   addClientAccess: (access: AccessInfo) => void;
   deleteClientAccess: (userId: string) => void;
   updateClientAccess: (userId: string, data: AccessInfo) => void;
+  openedFileData: OpenedFileData | null;
+  setOpenedFileData: React.Dispatch<
+    React.SetStateAction<OpenedFileData | null>
+  >;
 }
 
 export interface DocumentContextType {
