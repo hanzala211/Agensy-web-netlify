@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -139,10 +139,21 @@ export const FaceSheetLongForm: React.FC = () => {
     getValues,
     formState: { errors },
     reset,
+    watch,
   } = useForm<FaceSheetLongFormData>({
     resolver: zodResolver(faceSheetLongFormSchema),
     defaultValues,
   });
+
+  const formValues = watch();
+
+  const pdfData = useMemo(() => {
+    try {
+      return getValues();
+    } catch {
+      return defaultValues;
+    }
+  }, [formValues, getValues]);
 
   useEffect(() => {
     refetch();
@@ -711,13 +722,15 @@ export const FaceSheetLongForm: React.FC = () => {
         <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
             <PDFDownloadLink
-              document={<FaceSheetLongFormPDF data={getValues()} />}
+              document={<FaceSheetLongFormPDF data={pdfData} />}
               fileName="FaceSheetLong.pdf"
             >
               {({ loading }) => (
                 <PrimaryButton
-                  isLoading={loading}
-                  disabled={loading}
+                  isLoading={
+                    loading && !postFaceSheetLongFormMutation.isPending
+                  }
+                  disabled={loading && !postFaceSheetLongFormMutation.isPending}
                   type="button"
                   className="sm:!w-fit w-full md:text-base text-sm"
                 >

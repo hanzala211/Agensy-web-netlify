@@ -8,7 +8,7 @@ export const AuthLayout: React.FC = () => {
 
   if (userData) return <Navigate to={`/`} />;
 
-  return (
+  return (  
     <React.Fragment>
       <div className="min-h-screen w-full flex flex-col md:flex-row">
         <div className="hidden md:flex md:w-1/2 bg-primaryColor items-center justify-center p-8">

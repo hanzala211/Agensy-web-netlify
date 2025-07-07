@@ -238,35 +238,47 @@ const FaceSheetLongFormPDF: React.FC<{ data: FaceSheetLongFormData }> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Health History</Text>
         <Field label="Diagnoses">
-          {data.diagnoses?.map((d) => d.diagnosis).join(", ")}
+          {data.diagnoses
+            ?.filter((d) => d && d.diagnosis)
+            ?.map((d) => d.diagnosis)
+            .join(", ") ?? ""}
         </Field>
         <Field label="Allergies">
-          {data.allergies?.map((a) => a.allergen).join(", ")}
+          {data.allergies
+            ?.filter((a) => a && a.allergen)
+            ?.map((a) => a.allergen)
+            .join(", ") ?? ""}
         </Field>
         <Field label="Dietary Restrictions">
           {data.dietaryRestrictions
+            ?.filter((r) => r && r.dietaryRestrictions)
             ?.map((r) => r.dietaryRestrictions)
-            .join(", ")}
+            .join(", ") ?? ""}
         </Field>
         <Field label="Surgical History">
-          {data.surgicalHistory?.map((s) => s.surgicalHistory).join(", ")}
+          {data.surgicalHistory
+            ?.filter((s) => s && s.surgicalHistory)
+            ?.map((s) => s.surgicalHistory)
+            .join(", ") ?? ""}
         </Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Medical Conditions</Text>
         <TableHeader columns={["Condition", "Onset Date", "Notes"]} />
-        {(data.medicalConditions ?? []).map((m, i, arr) => (
-          <TableRow
-            key={i}
-            cells={[
-              m.condition,
-              DateUtils.formatDateToRequiredFormat(m.onsetDate ?? ""),
-              m.notes,
-            ]}
-            last={i === arr.length - 1}
-          />
-        ))}
+        {(data.medicalConditions ?? [])
+          .filter((m) => m && m.condition)
+          .map((m, i, arr) => (
+            <TableRow
+              key={i}
+              cells={[
+                m.condition ?? "",
+                DateUtils.formatDateToRequiredFormat(m.onsetDate ?? ""),
+                m.notes ?? "",
+              ]}
+              last={i === arr.length - 1}
+            />
+          ))}
       </View>
 
       <View style={styles.section}>
@@ -279,18 +291,20 @@ const FaceSheetLongFormPDF: React.FC<{ data: FaceSheetLongFormData }> = ({
             "Last / Next visit",
           ]}
         />
-        {(data.providers ?? []).map((p, i, arr) => (
-          <TableRow
-            key={i}
-            cells={[
-              p.providerName,
-              p.specialty,
-              `${p.phone} ${p.fax ? "/" : ""} ${p.fax}`,
-              `${p.lastVisit} / ${p.nextVisit}`,
-            ]}
-            last={i === arr.length - 1}
-          />
-        ))}
+        {(data.providers ?? [])
+          .filter((p) => p && p.providerName)
+          .map((p, i, arr) => (
+            <TableRow
+              key={i}
+              cells={[
+                p.providerName ?? "",
+                p.specialty ?? "",
+                `${p.phone ?? ""} ${p.fax ? "/" : ""} ${p.fax ?? ""}`,
+                `${p.lastVisit ?? ""} / ${p.nextVisit ?? ""}`,
+              ]}
+              last={i === arr.length - 1}
+            />
+          ))}
       </View>
 
       <View style={styles.section}>
@@ -308,13 +322,15 @@ const FaceSheetLongFormPDF: React.FC<{ data: FaceSheetLongFormData }> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Vaccinations</Text>
         <TableHeader columns={["Vaccination", "Date", "Next Vaccine"]} />
-        {(data.vaccinations ?? []).map((v, i, arr) => (
-          <TableRow
-            key={i}
-            cells={[v.vaccineName, v.date, v.nextVaccine]}
-            last={i === arr.length - 1}
-          />
-        ))}
+        {(data.vaccinations ?? [])
+          .filter((v) => v && v.vaccineName)
+          .map((v, i, arr) => (
+            <TableRow
+              key={i}
+              cells={[v.vaccineName ?? "", v.date ?? "", v.nextVaccine ?? ""]}
+              last={i === arr.length - 1}
+            />
+          ))}
       </View>
 
       <View style={styles.section}>
@@ -370,13 +386,20 @@ const FaceSheetLongFormPDF: React.FC<{ data: FaceSheetLongFormData }> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Bloodwork</Text>
         <TableHeader columns={["Date", "Results", "Ordered By", "Repeat"]} />
-        {(data.bloodwork ?? []).map((b, i, arr) => (
-          <TableRow
-            key={i}
-            cells={[b.date, b.results, b.orderedBy, b.repeat]}
-            last={i === arr.length - 1}
-          />
-        ))}
+        {(data.bloodwork ?? [])
+          .filter((b) => b && b.test)
+          .map((b, i, arr) => (
+            <TableRow
+              key={i}
+              cells={[
+                b.date ?? "",
+                b.results ?? "",
+                b.orderedBy ?? "",
+                b.repeat ?? "",
+              ]}
+              last={i === arr.length - 1}
+            />
+          ))}
       </View>
     </Page>
   </Document>

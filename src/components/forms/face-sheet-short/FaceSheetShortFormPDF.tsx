@@ -245,18 +245,20 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
             "Last / Next Visit",
           ]}
         />
-        {(data.providers ?? []).map((p, i, arr) => (
-          <TableRow
-            key={i}
-            cells={[
-              p.providerName,
-              p.specialty,
-              `${p.phone || ""} ${p.fax ? "/" : ""} ${p.fax || ""}`,
-              `${p.lastVisit || ""} / ${p.nextVisit || ""}`,
-            ]}
-            last={i === arr.length - 1}
-          />
-        ))}
+        {(data.providers ?? [])
+          .filter((p) => p && p.providerName)
+          .map((p, i, arr) => (
+            <TableRow
+              key={i}
+              cells={[
+                p.providerName ?? "",
+                p.specialty ?? "",
+                `${p.phone || ""} ${p.fax ? "/" : ""} ${p.fax || ""}`,
+                `${p.lastVisit || ""} / ${p.nextVisit || ""}`,
+              ]}
+              last={i === arr.length - 1}
+            />
+          ))}
       </View>
 
       <View style={styles.section}>
@@ -270,39 +272,50 @@ const FaceSheetShortFormPDF: React.FC<{ data: FaceSheetShortFormData }> = ({
             "Refill Due",
           ]}
         />
-        {(data.medications ?? []).map((m, i, arr) => (
-          <TableRow
-            key={i}
-            cells={[
-              m.medicationName,
-              m.dose,
-              m.usedToTreat,
-              m.prescriber,
-              m.refillDue,
-            ]}
-            last={i === arr.length - 1}
-          />
-        ))}
+        {(data.medications ?? [])
+          .filter((m) => m && m.medicationName)
+          .map((m, i, arr) => (
+            <TableRow
+              key={i}
+              cells={[
+                m.medicationName ?? "",
+                m.dose ?? "",
+                m.usedToTreat ?? "",
+                m.prescriber ?? "",
+                m.refillDue ?? "",
+              ]}
+              last={i === arr.length - 1}
+            />
+          ))}
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Diagnoses</Text>
         <Field label="Diagnoses">
-          {data.diagnoses?.map((d) => d.diagnosis).join(", ")}
+          {data.diagnoses
+            ?.filter((d) => d && d.diagnosis)
+            ?.map((d) => d.diagnosis)
+            .join(", ") ?? ""}
         </Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Allergies</Text>
         <Field label="Allergies">
-          {data.allergies?.map((a) => a.allergen).join(", ")}
+          {data.allergies
+            ?.filter((a) => a && a.allergen)
+            ?.map((a) => a.allergen)
+            .join(", ") ?? ""}
         </Field>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Surgical History</Text>
         <Field label="Surgical History">
-          {data.surgicalHistory?.map((s) => s.surgicalHistory).join(", ")}
+          {data.surgicalHistory
+            ?.filter((s) => s && s.surgicalHistory)
+            ?.map((s) => s.surgicalHistory)
+            .join(", ") ?? ""}
         </Field>
       </View>
     </Page>

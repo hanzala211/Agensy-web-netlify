@@ -3,6 +3,7 @@ import {
   FaceSheetShortForm,
   FolderExplorer,
   FaceSheetLongForm,
+  HealthHistoryForm,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -288,7 +289,7 @@ const fileMap: Record<string, FolderData> = {
     id: "health-history-form-medical",
     name: "Health History Form",
     description: "Medical health history documentation form",
-    content: <div>Health History Form content</div>,
+    content: <HealthHistoryForm />,
   },
   "bank-roi-forms": {
     id: "bank-roi-forms",

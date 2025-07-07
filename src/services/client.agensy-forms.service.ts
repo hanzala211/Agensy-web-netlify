@@ -67,3 +67,37 @@ export const postFaceSheetLongForm = async (
     throw error;
   }
 };
+
+export const getHealthHistoryForm = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/health-history`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getHealthHistoryForm] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postHealthHistoryForm = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/health-history`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postHealthHistoryForm] error: ${error}`
+    );
+    throw error;
+  }
+};

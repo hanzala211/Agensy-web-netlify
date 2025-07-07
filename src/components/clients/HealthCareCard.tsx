@@ -38,13 +38,13 @@ export const HealthCareCard: React.FC = () => {
     return selectedClient?.healthcareProviders?.find(
       (item) =>
         item.provider_type
-          .split(" ")
-          .join("")
+          ?.split(" ")
+          ?.join("")
           .toLowerCase()
           .includes("primary") ||
         item.provider_type
-          .split(" ")
-          .join("")
+          ?.split(" ")
+          ?.join("")
           .toLowerCase()
           .includes("physician")
     );

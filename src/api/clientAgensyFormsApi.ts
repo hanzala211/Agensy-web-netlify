@@ -30,3 +30,19 @@ export const usePostFaceSheetLongFormMutation = () => {
       ClientAgensyFormsService.postFaceSheetLongForm(clientId, data),
   });
 };
+
+export const useGetHealthHistoryForm = (clientId: string) => {
+  return useQuery({
+    queryKey: ["health-history-form", clientId],
+    queryFn: () => ClientAgensyFormsService.getHealthHistoryForm(clientId),
+    enabled: false,
+  });
+};
+
+
+export const usePostHealthHistoryFormMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postHealthHistoryForm(clientId, data),
+  });
+}

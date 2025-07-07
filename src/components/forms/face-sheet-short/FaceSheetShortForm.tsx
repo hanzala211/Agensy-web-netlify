@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -92,10 +92,21 @@ export const FaceSheetShortForm: React.FC = () => {
     formState: { errors },
     reset,
     getValues,
+    watch,
   } = useForm<FaceSheetShortFormData>({
     resolver: zodResolver(faceSheetShortFormSchema),
     defaultValues,
   });
+
+  const formValues = watch();
+
+  const pdfData = useMemo(() => {
+    try {
+      return getValues();
+    } catch {
+      return defaultValues;
+    }
+  }, [formValues, getValues]);
 
   const providersArray = useFieldArray({
     control,
@@ -437,13 +448,17 @@ export const FaceSheetShortForm: React.FC = () => {
         <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
             <PDFDownloadLink
-              document={<FaceSheetShortFormPDF data={getValues()} />}
+              document={<FaceSheetShortFormPDF data={pdfData} />}
               fileName="FaceSheetShort.pdf"
             >
               {({ loading }) => (
                 <PrimaryButton
-                  isLoading={loading}
-                  disabled={loading}
+                  isLoading={
+                    loading && !postFaceSheetShortFormMutation.isPending
+                  }
+                  disabled={
+                    loading && !postFaceSheetShortFormMutation.isPending
+                  }
                   type="button"
                   className="sm:!w-fit w-full md:text-base text-sm"
                 >
