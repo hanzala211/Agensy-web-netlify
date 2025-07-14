@@ -31,7 +31,7 @@ import {
   RELATIONSHIP_TO_CLIENT,
   CODE_STATUS_OPTIONS,
 } from "@agensy/constants";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useClientContext } from "@agensy/context";
 
 const defaultValues = {
@@ -282,11 +282,13 @@ export const FaceSheetShortForm: React.FC = () => {
   const onSubmit = (data: FaceSheetShortFormData) => {
     const medications = data.medications?.map((item) => {
       const medication = {
-        refill_due: item.refillDue ? DateUtils.changetoISO(item.refillDue) : "",
-        purpose: item.usedToTreat,
-        medication_name: item.medicationName,
-        dosage: item.dose,
-        prescribing_doctor: item.prescriber,
+        refill_due: item.refillDue
+          ? DateUtils.changetoISO(item.refillDue)
+          : null,
+        purpose: item.usedToTreat ? item.usedToTreat : null,
+        medication_name: item.medicationName ? item.medicationName : null,
+        dosage: item.dose ? item.dose : null,
+        prescribing_doctor: item.prescriber ? item.prescriber : null,
         id: item?.id,
       };
       if (item.id) {
@@ -345,20 +347,18 @@ export const FaceSheetShortForm: React.FC = () => {
       },
 
       medical_info: {
-        allergies:
-          data.allergies && data.allergies.length > 0
-            ? data.allergies?.map((allergen) => allergen.allergen).join(", ")
-            : null,
-        diagnoses:
-          data.diagnoses && data.diagnoses.length > 0
-            ? data.diagnoses?.map((diagnosis) => diagnosis.diagnosis).join(", ")
-            : null,
-        surgical_history:
-          data.surgicalHistory && data.surgicalHistory.length > 0
-            ? data.surgicalHistory
-                ?.map((surgicalHistory) => surgicalHistory.surgicalHistory)
-                .join(", ")
-            : null,
+        allergies: StringUtils.filterAndJoinWithCommas(
+          data.allergies,
+          (allergies) => allergies.allergen || ""
+        ),
+        diagnoses: StringUtils.filterAndJoinWithCommas(
+          data.diagnoses,
+          (diagnosis) => diagnosis.diagnosis || ""
+        ),
+        surgical_history: StringUtils.filterAndJoinWithCommas(
+          data.surgicalHistory,
+          (surgicalHistory) => surgicalHistory.surgicalHistory || ""
+        ),
       },
 
       emergency_contact: {

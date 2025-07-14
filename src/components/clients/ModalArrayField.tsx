@@ -29,7 +29,7 @@ export const ModalArrayField: React.FC<ModalArrayFieldProps> = ({
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700">{label}</label>
-      {items.map((_, index) => (
+      {items?.map((_, index) => (
         <div key={index} className="flex gap-2">
           <div className="flex-1">
             <Input
@@ -37,7 +37,7 @@ export const ModalArrayField: React.FC<ModalArrayFieldProps> = ({
               error={errors[field]?.[index]?.message}
             />
           </div>
-          {items.length > 1 && (
+          {items?.length > 1 && (
             <TertiaryButton
               type="button"
               onClick={() => removeArrayItem(field, index)}

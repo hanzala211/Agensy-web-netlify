@@ -78,9 +78,9 @@ export const AddClientMedicalHistory: React.FC<
         surgical_history: editData?.surgical_history?.split(", "),
         cognitive_status: editData?.cognitive_status,
         last_cognitive_screening: editData?.last_cognitive_screening,
-        cognitive_score: parseInt(editData.cognitive_score.split("/")[0]),
-        total_score: parseInt(editData.cognitive_score.split("/")[1]),
-        notes: editData.notes,
+        cognitive_score: parseInt(editData?.cognitive_score?.split("/")[0]),
+        total_score: parseInt(editData?.cognitive_score?.split("/")[1]),
+        notes: editData?.notes,
       });
     }
   }, [editData, reset, isOpen]);

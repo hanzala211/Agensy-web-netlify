@@ -55,7 +55,11 @@ export const ClientProfile: React.FC = () => {
         )}
         rightLabel="Primary Contact"
         rightValue={
-          (selectedClient?.contacts && selectedClient.contacts.length > 0
+          (selectedClient?.contacts &&
+          selectedClient.contacts.length > 0 &&
+          selectedClient?.contacts.some(
+            (item) => item.contact_type === "primary"
+          )
             ? `${
                 selectedClient.contacts.find(
                   (item) => item.contact_type === "primary"

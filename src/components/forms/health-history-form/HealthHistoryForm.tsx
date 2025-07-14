@@ -18,7 +18,7 @@ import {
   type OpenedFileData,
 } from "@agensy/types";
 
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { ICONS } from "@agensy/constants";
 import { DiagnosesSection } from "../face-sheet-short/DiagnosesSection";
 import { useParams } from "react-router-dom";
@@ -176,9 +176,10 @@ export const HealthHistoryForm: React.FC = () => {
     const postData = {
       medical_info: {
         diagnoses:
-          data.diagnoses && data.diagnoses.length > 0
-            ? data.diagnoses?.map((diagnosis) => diagnosis.diagnosis).join(", ")
-            : null,
+        StringUtils.filterAndJoinWithCommas(
+          data.diagnoses,
+          (diagnoses) => diagnoses.diagnosis || ""
+        ),
       },
       medications: [...(medicationsStarted || []), ...(medicationsEnded || [])],
       healthcare_providers: {

@@ -213,3 +213,26 @@ export const COGNITIVE_STATUS = [
   { label: "Mild Cognitive Impairment", value: "Mild Cognitive Impairment" },
   { label: "Other", value: "Other" },
 ];
+
+export const SPECIALTIES = [
+  { label: "Family Medicine", value: "Family Medicine" },
+  { label: "Internal Medicine", value: "Internal Medicine" },
+  { label: "Pediatrics", value: "Pediatrics" },
+  { label: "Cardiology", value: "Cardiology" },
+  { label: "Endocrinology", value: "Endocrinology" },
+  { label: "Gastroenterology", value: "Gastroenterology" },
+  { label: "Neurology", value: "Neurology" },
+  { label: "Orthopedic Surgery", value: "Orthopedic Surgery" },
+  { label: "Obstetrics", value: "Obstetrics" },
+  { label: "Gynecology", value: "Gynecology" },
+  { label: "Psychiatry", value: "Psychiatry" },
+  { label: "Dermatology", value: "Dermatology" },
+  { label: "Ophthalmology", value: "Ophthalmology" },
+  { label: "Emergency Medicine", value: "Emergency Medicine" },
+  { label: "Pulmonology", value: "Pulmonology" },
+  { label: "Oncology", value: "Oncology" },
+  { label: "Urology", value: "Urology" },
+  { label: "Radiology", value: "Radiology" },
+  { label: "Physical Therapy", value: "Physical Therapy" },
+  { label: "Other", value: "Other" },
+];

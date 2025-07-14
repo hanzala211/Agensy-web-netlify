@@ -13,7 +13,7 @@ import {
   type OpenedFileData,
 } from "@agensy/types";
 import { useParams } from "react-router-dom";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { PersonalInformationSection } from "../face-sheet-short/PersonalInformationSection";
 import { EmergencyContactSection } from "../face-sheet-short/EmergencyContactSection";
 import { MedicalSettingsSection } from "../face-sheet-short/MedicalSettingsSection";
@@ -152,7 +152,10 @@ export const FaceSheetLongForm: React.FC = () => {
         "Your client's medical information has been saved and is now up to date."
       );
     } else if (postFaceSheetLongFormMutation.status === "error") {
-      toast.error("Error Occurred", String(postFaceSheetLongFormMutation.error));
+      toast.error(
+        "Error Occurred",
+        String(postFaceSheetLongFormMutation.error)
+      );
     }
   }, [postFaceSheetLongFormMutation.status]);
 
@@ -450,9 +453,9 @@ export const FaceSheetLongForm: React.FC = () => {
   const onSubmit = (data: FaceSheetLongFormData) => {
     const medications = data.medications?.map((item) => {
       const medication = {
-        purpose: item.usedToTreat,
-        medication_name: item.medicationName,
-        dosage: item.dose,
+        purpose: item.usedToTreat ? item.usedToTreat : null,
+        medication_name: item.medicationName ? item.medicationName : null,
+        dosage: item.dose ? item.dose : null,
         id: item?.id,
       };
       if (item.id) {
@@ -521,7 +524,9 @@ export const FaceSheetLongForm: React.FC = () => {
     const medicalConditions = data.medicalConditions?.map((item) => {
       const medicalCondition = {
         condition: item.condition ? item.condition : null,
-        onset_date: item.onsetDate ? DateUtils.changeMonthYearToISO(item.onsetDate) : null,
+        onset_date: item.onsetDate
+          ? DateUtils.changeMonthYearToISO(item.onsetDate)
+          : null,
         notes: item.notes ? item.notes : null,
         id: item.id,
       };
@@ -581,28 +586,22 @@ export const FaceSheetLongForm: React.FC = () => {
       },
 
       medical_info: {
-        allergies:
-          data.allergies && data.allergies.length > 0
-            ? data.allergies?.map((allergen) => allergen.allergen).join(", ")
-            : null,
-        diagnoses:
-          data.diagnoses && data.diagnoses.length > 0
-            ? data.diagnoses?.map((diagnosis) => diagnosis.diagnosis).join(", ")
-            : null,
-        surgical_history:
-          data.surgicalHistory && data.surgicalHistory.length > 0
-            ? data.surgicalHistory
-                ?.map((surgicalHistory) => surgicalHistory.surgicalHistory)
-                .join(", ")
-            : null,
-        dietary_restrictions:
-          data.dietaryRestrictions && data.dietaryRestrictions.length > 0
-            ? data.dietaryRestrictions
-                ?.map(
-                  (dietaryRestriction) => dietaryRestriction.dietaryRestrictions
-                )
-                .join(", ")
-            : null,
+        allergies: StringUtils.filterAndJoinWithCommas(
+          data.allergies,
+          (allergies) => allergies.allergen || ""
+        ),
+        diagnoses: StringUtils.filterAndJoinWithCommas(
+          data.diagnoses,
+          (diagnoses) => diagnoses.diagnosis || ""
+        ),
+        surgical_history: StringUtils.filterAndJoinWithCommas(
+          data.surgicalHistory,
+          (surgicalHistory) => surgicalHistory.surgicalHistory || ""
+        ),
+        dietary_restrictions: StringUtils.filterAndJoinWithCommas(
+          data.dietaryRestrictions,
+          (dietaryRestrictions) => dietaryRestrictions.dietaryRestrictions || ""
+        ),
         cognitive_status: data.mentalStatus ? data.mentalStatus : null,
         last_cognitive_screening: data.cognitiveScreeningDate
           ? DateUtils.changetoISO(data.cognitiveScreeningDate)

@@ -12,8 +12,10 @@ import {
   Modal,
   PhoneNumberInput,
   PrimaryButton,
+  Select,
   TextArea,
 } from "@agensy/components";
+import { SPECIALTIES } from "@agensy/constants";
 
 interface AddClientHealthProviderModalProps {
   isOpen: boolean;
@@ -133,10 +135,12 @@ export const AddClientHealthProviderModal: React.FC<
           error={errors.provider_name?.message}
         />
 
-        <Input
+        <Select
           label="Specialty"
-          register={register("specialty")}
-          error={errors.specialty?.message}
+          control={control}
+          data={SPECIALTIES}
+          name="specialty"
+          labelOption="Select Specialty"
         />
 
         <Input

@@ -91,17 +91,21 @@ export const MedicalHistoryCard: React.FC = () => {
         {selectedClient?.medical ? (
           <div className="grid lg:grid-cols-2 gap-5 items-start">
             <div className="grid gap-4">
-              <ItemList
-                label="Diagnosis:"
-                items={selectedClient?.medical?.diagnoses.split(", ")}
-              />
+              {selectedClient?.medical?.diagnoses && (
+                <ItemList
+                  label="Diagnosis:"
+                  items={selectedClient?.medical?.diagnoses.split(", ")}
+                />
+              )}
 
-              <ItemList
-                label="Dietary Restrictions:"
-                items={selectedClient?.medical?.dietary_restrictions.split(
-                  ", "
-                )}
-              />
+              {selectedClient?.medical?.dietary_restrictions && (
+                <ItemList
+                  label="Dietary Restrictions:"
+                  items={selectedClient?.medical?.dietary_restrictions?.split(
+                    ", "
+                  )}
+                />
+              )}
 
               <InfoItem label="Cognitive Status:">
                 <p>{selectedClient?.medical.cognitive_status}</p>
@@ -109,33 +113,37 @@ export const MedicalHistoryCard: React.FC = () => {
 
               <InfoItem label="Cognitive Score:">
                 <p>
-                  {selectedClient.medical.cognitive_score.split("/")[0]} out of{" "}
-                  {selectedClient.medical.cognitive_score.split("/")[1]}
+                  {selectedClient.medical.cognitive_score?.split("/")[0]} out of{" "}
+                  {selectedClient.medical.cognitive_score?.split("/")[1]}
                 </p>
               </InfoItem>
             </div>
             <div className="grid gap-4">
-              <ItemList
-                label="Allergies:"
-                items={selectedClient?.medical?.allergies.split(", ")}
-              />
+              {selectedClient?.medical?.allergies && (
+                <ItemList
+                  label="Allergies:"
+                  items={selectedClient?.medical?.allergies?.split(", ")}
+                />
+              )}
 
-              <ItemList
-                label="Surgical History:"
-                items={selectedClient?.medical?.surgical_history.split(", ")}
-              />
+              {selectedClient?.medical?.surgical_history && (
+                <ItemList
+                  label="Surgical History:"
+                  items={selectedClient?.medical?.surgical_history?.split(", ")}
+                />
+              )}
 
               <InfoItem label="Last Screening:">
                 <p>
                   {DateUtils.formatDateToRequiredFormat(
-                    selectedClient?.medical.last_cognitive_screening
+                    selectedClient?.medical?.last_cognitive_screening
                   )}
                 </p>
               </InfoItem>
 
-              {selectedClient?.medical.notes && (
+              {selectedClient?.medical?.notes && (
                 <InfoItem label="Note:">
-                  <p>{selectedClient.medical.notes}</p>
+                  <p>{selectedClient.medical?.notes}</p>
                 </InfoItem>
               )}
             </div>

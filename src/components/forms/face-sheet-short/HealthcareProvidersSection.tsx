@@ -12,8 +12,9 @@ import {
   DatePickerField,
   PhoneNumberInput,
   TertiaryButton,
+  Select,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { ICONS, SPECIALTIES } from "@agensy/constants";
 
 interface HealthcareProvidersSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
@@ -69,14 +70,13 @@ export const HealthcareProvidersSection = <T extends FieldValues>({
                       ?.message as string
                   }
                 />
-                <Input
+
+                <Select
                   label="Specialty"
-                  register={register(`providers.${index}.specialty` as Path<T>)}
-                  error={
-                    // @ts-expect-error - TODO: fix this
-                    (errors.providers as FieldErrors<T>)?.[index]?.specialty
-                      ?.message as string
-                  }
+                  control={control}
+                  data={SPECIALTIES}
+                  name={`providers.${index}.specialty` as Path<T>}
+                  labelOption="Select Specialty"
                 />
                 <Input
                   label="Address"
