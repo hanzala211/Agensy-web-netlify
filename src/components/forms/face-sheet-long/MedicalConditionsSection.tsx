@@ -6,7 +6,13 @@ import type {
   UseFieldArrayReturn,
 } from "react-hook-form";
 import type { FaceSheetLongFormData } from "@agensy/types";
-import { Input, Card, DatePickerField, TextArea, TertiaryButton } from "@agensy/components";
+import {
+  Input,
+  Card,
+  DatePickerField,
+  TextArea,
+  TertiaryButton,
+} from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 
 interface MedicalConditionsSectionProps {
@@ -55,6 +61,7 @@ export const MedicalConditionsSection: React.FC<
                 control={control}
                 name={`medicalConditions.${index}.onsetDate`}
                 label="Onset Date"
+                monthYearOnly={true}
               />
             </div>
             <div className="mt-4">

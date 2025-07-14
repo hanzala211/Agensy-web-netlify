@@ -46,7 +46,7 @@ export const ContactInfoCard: React.FC = () => {
       addClientContact(addContactMutation.data);
       toast.success("Contact Added Successfully");
     } else if (addContactMutation.status === "error") {
-      toast.error("Failed to Add Contact", addContactMutation.error.message);
+      toast.error("Failed to Add Contact", String(addContactMutation.error));
     }
   }, [addContactMutation.status]);
 
@@ -58,7 +58,7 @@ export const ContactInfoCard: React.FC = () => {
     } else if (updateContactMutation.status === "error") {
       toast.error(
         "Failed to Update Contact",
-        updateContactMutation.error.message
+        String(updateContactMutation.error)
       );
     }
   }, [updateContactMutation.status]);
@@ -70,7 +70,7 @@ export const ContactInfoCard: React.FC = () => {
     } else if (deleteContactMutation.status === "error") {
       toast.error(
         "Failed to Delete Contact",
-        deleteContactMutation.error.message
+        String(deleteContactMutation.error)
       );
     }
   }, [deleteContactMutation.status]);

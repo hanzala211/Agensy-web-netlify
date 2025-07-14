@@ -35,18 +35,19 @@ export const HealthCareCard: React.FC = () => {
   }, [updateClientHealthcareMutation.isSuccess]);
 
   const selectedHealthCareProvider = useMemo(() => {
-    return selectedClient?.healthcareProviders?.find(
-      (item) =>
-        item.provider_type
-          ?.split(" ")
-          ?.join("")
-          .toLowerCase()
-          .includes("primary") ||
-        item.provider_type
-          ?.split(" ")
-          ?.join("")
-          .toLowerCase()
-          .includes("physician")
+    return selectedClient?.healthcareProviders?.find((item) =>
+      item?.provider_type
+        ? item?.provider_type
+            .split(" ")
+            .join("")
+            .toLowerCase()
+            .includes("primary") ||
+          item?.provider_type
+            .split(" ")
+            .join("")
+            .toLowerCase()
+            .includes("physician")
+        : null
     );
   }, [selectedClient]);
 

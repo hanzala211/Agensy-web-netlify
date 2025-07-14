@@ -52,10 +52,10 @@ export const HomeHealthAgencySection: React.FC<
             register={register("homeHealthPrescribingDoctor")}
             error={errors.homeHealthPrescribingDoctor?.message}
           />
-          <DatePickerField
-            label="Schedule"
-            control={control}
-            name="homeHealthSchedule"
+          <Input
+            label="Healthcare Schedule"
+            register={register("homeHealthSchedule")}
+            error={errors.homeHealthSchedule?.message}
           />
         </div>
 

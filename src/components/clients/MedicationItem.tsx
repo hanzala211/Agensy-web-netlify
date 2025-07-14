@@ -5,6 +5,7 @@ import {
 } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import type { ClientMedications } from "@agensy/types";
+import { DateUtils } from "@agensy/utils";
 import React, { useState } from "react";
 
 interface MedicationItemProps {
@@ -37,14 +38,14 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
               <ICONS.medicine size={20} />
             </span>
             <div className="md:text-xl text-sm font-semibold text-gray-800 break-words line-clamp-4">
-              {medication.medication_name}
+              {medication?.medication_name}
             </div>
             <div className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-medium text-xs md:text-sm">
-              {medication.dosage}
+              {medication?.dosage}
             </div>
             {medication.purpose && (
               <div className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-medium text-xs md:text-sm">
-                {medication.purpose}
+                {medication?.purpose}
               </div>
             )}
           </div>
@@ -52,35 +53,50 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
           <div className="mt-3 pl-1 flex flex-wrap items-center gap-2 md:text-sm text-xs text-gray-600">
             <div className="flex items-center gap-1">
               <ICONS.clockCircle size={14} className="text-gray-400" />
-              <span>{medication.frequency}</span>
+              <span>{medication?.frequency}</span>
             </div>
             <span className="text-gray-300">•</span>
             <div className="flex items-center gap-1">
               <ICONS.doctor size={14} className="text-gray-400" />
-              <span>Prescribed By: {medication.prescribing_doctor}</span>
+              <span>Prescribed By: {medication?.prescribing_doctor}</span>
             </div>
           </div>
 
-          {(medication.start_date ||
-            medication.end_date ||
-            medication.refill_due) && (
+          {(medication?.start_date ||
+            medication?.end_date ||
+            medication?.refill_due) && (
             <div className="mt-2 pl-1 flex flex-wrap items-center gap-3 md:text-sm text-xs text-gray-600">
               {medication?.start_date && (
                 <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md">
                   <ICONS.calendar size={14} className="text-blue-400" />
-                  <span>Start: {medication.start_date}</span>
+                  <span>
+                    Start:{" "}
+                    {DateUtils.formatDateToRequiredFormat(
+                      medication?.start_date as string
+                    )}
+                  </span>
                 </div>
               )}
               {medication?.end_date && (
                 <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md">
                   <ICONS.calendar size={14} className="text-red-400" />
-                  <span>End: {medication.end_date}</span>
+                  <span>
+                    End:{" "}
+                    {DateUtils.formatDateToRequiredFormat(
+                      medication?.end_date as string
+                    )}
+                  </span>
                 </div>
               )}
               {medication?.refill_due && (
                 <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md">
                   <ICONS.calendar size={14} className="text-orange-400" />
-                  <span>Refill: {medication.refill_due}</span>
+                  <span>
+                    Refill:{" "}
+                    {DateUtils.formatDateToRequiredFormat(
+                      medication?.refill_due as string
+                    )}
+                  </span>
                 </div>
               )}
             </div>

@@ -35,6 +35,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
     color: BORDER,
   },
+  headerDateBoxContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: 5,
+    gap: 5,
+  },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -141,185 +147,187 @@ const TableRow = ({
   </View>
 );
 
-const FaceSheetShortFormPDF: React.FC<{ data?: FaceSheetShortFormData }> = ({
-  data,
-}) => (
-  <Document title="Agensy Face Sheet - Short Form">
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.formTitle}>Agensy Face Sheet - Short Form</Text>
-      <View style={styles.headerRow}>
-        <Image src={logo} style={styles.headerLogo} />
-        <Text style={styles.headerDateBox}>
-          Date: {DateUtils.formatDateToRequiredFormat(new Date().toISOString())}
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Patient Information</Text>
-        <Field label="Name">
-          {data?.firstName} {data?.lastName}
-        </Field>
-        <Field label="Date of Birth">{data?.dateOfBirth}</Field>
-        <Field label="Phone Number">{data?.phoneNumber}</Field>
-        <Field label="Address">{data?.address}</Field>
-        <Field label="SSN">{data?.ssn}</Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Emergency Contact</Text>
-        <Field label="Name">
-          {data?.emergencyContactFirstName} {data?.emergencyContactLastName}
-        </Field>
-        <Field label="Relationship">
-          {
-            RELATIONSHIP_TO_CLIENT.find(
-              (item) => item.value === data?.emergencyContactRelationship
-            )?.label
-          }
-        </Field>
-        <Field label="Phone">{data?.emergencyContactPhone}</Field>
-        <Field label="Email">{data?.emergencyContactEmail}</Field>
-        <Field label="Address">{data?.emergencyContactAddress}</Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Medical Settings</Text>
-        <Field label="Code Status">
-          {
-            CODE_STATUS_OPTIONS.find((item) => item.value === data?.codeStatus)
-              ?.label
-          }
-        </Field>
-        <Field label="Advance Directive">
-          {
-            ADVANCE_DIRECTIVE_OPTIONS.find(
-              (item) => item.value === data?.advanceDirective
-            )?.label
-          }
-        </Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Hospital Preference</Text>
-        <Field label="Hospital Preference">{data?.hospitalPreference}</Field>
-        <Field label="Hospital Address">{data?.hospitalAddress}</Field>
-        <Field label="Hospital Phone">{data?.hospitalPhoneNumber}</Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Insurance Information</Text>
-        <Field label="Insurance">{data?.insurance}</Field>
-        <Field label="Group Number">{data?.groupNumber}</Field>
-        <Field label="ID Number">{data?.idNumber}</Field>
-        <Field label="Medicare">{data?.medicare}</Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Pharmacy Information</Text>
-        <Field label="Pharmacy Name">{data?.pharmacyName}</Field>
-        <Field label="Pharmacy Address">{data?.pharmacyAddress}</Field>
-        <Field label="Pharmacy Phone">{data?.pharmacyPhone}</Field>
-        <Field label="Pharmacy Fax">{data?.pharmacyFax}</Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>MPOA</Text>
-        <Field label="MPOA Name">{data?.mpoaName}</Field>
-        <Field label="MPOA Phone">{data?.mpoaPhone}</Field>
-        <Field label="MPOA Address">{data?.mpoaAddress}</Field>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>DPOA</Text>
-        <Field label="DPOA Name">{data?.dpoaName}</Field>
-        <Field label="DPOA Phone">{data?.dpoaPhone}</Field>
-        <Field label="DPOA Address">{data?.dpoaAddress}</Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Healthcare Providers</Text>
-        <TableHeader
-          columns={[
-            "Provider Name",
-            "Specialty",
-            "Phone / Fax",
-            "Last / Next Visit",
-          ]}
-        />
-        {(data?.providers ?? [])
-          .filter((p) => p && p.providerName)
-          .map((p, i, arr) => (
-            <TableRow
-              key={i}
-              cells={[
-                p.providerName ?? "",
-                p.specialty ?? "",
-                `${p.phone || ""} ${p.fax ? "/" : ""} ${p.fax || ""}`,
-                `${p.lastVisit || ""} / ${p.nextVisit || ""}`,
-              ]}
-              last={i === arr.length - 1}
-            />
-          ))}
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Medications</Text>
-        <TableHeader
-          columns={[
-            "Medication",
-            "Dose",
-            "Used to Treat",
-            "Prescriber",
-            "Refill Due",
-          ]}
-        />
-        {(data?.medications ?? [])
-          .filter((m) => m && m.medicationName)
-          .map((m, i, arr) => (
-            <TableRow
-              key={i}
-              cells={[
-                m.medicationName ?? "",
-                m.dose ?? "",
-                m.usedToTreat ?? "",
-                m.prescriber ?? "",
-                m.refillDue ?? "",
-              ]}
-              last={i === arr.length - 1}
-            />
-          ))}
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Diagnoses</Text>
-        <Field label="Diagnoses">
-          {data?.diagnoses
-            ?.filter((d) => d && d.diagnosis)
-            ?.map((d) => d.diagnosis)
-            .join(", ") ?? ""}
-        </Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Allergies</Text>
-        <Field label="Allergies">
-          {data?.allergies
-            ?.filter((a) => a && a.allergen)
-            ?.map((a) => a.allergen)
-            .join(", ") ?? ""}
-        </Field>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Surgical History</Text>
-        <Field label="Surgical History">
-          {data?.surgicalHistory
-            ?.filter((s) => s && s.surgicalHistory)
-            ?.map((s) => s.surgicalHistory)
-            .join(", ") ?? ""}
-        </Field>
-      </View>
-    </Page>
-  </Document>
-);
+const FaceSheetShortFormPDF: React.FC<{
+  data?: FaceSheetShortFormData & { last_update: { updatedAt: string } };
+}> = ({ data }) => {
+  return (
+    <Document title="Agensy Face Sheet - Short Form">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>Agensy Face Sheet - Short Form</Text>
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <View style={styles.headerDateBoxContainer}>
+            <Text style={styles.headerDateBox}>
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
+              )}`}
+            </Text>
+            {data?.last_update?.updatedAt && (
+              <Text style={[styles.headerDateBox, { marginTop: 5 }]}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Patient Information</Text>
+          <Field label="Name">
+            {data?.firstName} {data?.lastName}
+          </Field>
+          <Field label="Date of Birth">{data?.dateOfBirth}</Field>
+          <Field label="Phone Number">{data?.phoneNumber}</Field>
+          <Field label="Address">{data?.address}</Field>
+          <Field label="SSN">{data?.ssn}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Emergency Contact</Text>
+          <Field label="Name">
+            {data?.emergencyContactFirstName} {data?.emergencyContactLastName}
+          </Field>
+          <Field label="Relationship">
+            {
+              RELATIONSHIP_TO_CLIENT.find(
+                (item) => item.value === data?.emergencyContactRelationship
+              )?.label
+            }
+          </Field>
+          <Field label="Phone">{data?.emergencyContactPhone}</Field>
+          <Field label="Email">{data?.emergencyContactEmail}</Field>
+          <Field label="Address">{data?.emergencyContactAddress}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Medical Settings</Text>
+          <Field label="Code Status">
+            {
+              CODE_STATUS_OPTIONS.find(
+                (item) => item.value === data?.codeStatus
+              )?.label
+            }
+          </Field>
+          <Field label="Advance Directive">
+            {
+              ADVANCE_DIRECTIVE_OPTIONS.find(
+                (item) => item.value === data?.advanceDirective
+              )?.label
+            }
+          </Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Hospital Preference</Text>
+          <Field label="Hospital Preference">{data?.hospitalPreference}</Field>
+          <Field label="Hospital Address">{data?.hospitalAddress}</Field>
+          <Field label="Hospital Phone">{data?.hospitalPhoneNumber}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Insurance Information</Text>
+          <Field label="Insurance">{data?.insurance}</Field>
+          <Field label="Group Number">{data?.groupNumber}</Field>
+          <Field label="ID Number">{data?.idNumber}</Field>
+          <Field label="Medicare">{data?.medicare}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Pharmacy Information</Text>
+          <Field label="Pharmacy Name">{data?.pharmacyName}</Field>
+          <Field label="Pharmacy Address">{data?.pharmacyAddress}</Field>
+          <Field label="Pharmacy Phone">{data?.pharmacyPhone}</Field>
+          <Field label="Pharmacy Fax">{data?.pharmacyFax}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>MPOA</Text>
+          <Field label="MPOA Name">{data?.mpoaName}</Field>
+          <Field label="MPOA Phone">{data?.mpoaPhone}</Field>
+          <Field label="MPOA Address">{data?.mpoaAddress}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>DPOA</Text>
+          <Field label="DPOA Name">{data?.dpoaName}</Field>
+          <Field label="DPOA Phone">{data?.dpoaPhone}</Field>
+          <Field label="DPOA Address">{data?.dpoaAddress}</Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Healthcare Providers</Text>
+          <TableHeader
+            columns={[
+              "Provider Name",
+              "Specialty",
+              "Phone / Fax",
+              "Last / Next Visit",
+            ]}
+          />
+          {(data?.providers ?? [])
+            .filter((p) => p && p.providerName)
+            .map((p, i, arr) => (
+              <TableRow
+                key={i}
+                cells={[
+                  p.providerName ?? "",
+                  p.specialty ?? "",
+                  `${p.phone || ""} ${p.fax ? "/" : ""} ${p.fax || ""}`,
+                  `${p.lastVisit || ""} / ${p.nextVisit || ""}`,
+                ]}
+                last={i === arr.length - 1}
+              />
+            ))}
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Medications</Text>
+          <TableHeader
+            columns={[
+              "Medication",
+              "Dose",
+              "Used to Treat",
+              "Prescriber",
+              "Refill Due",
+            ]}
+          />
+          {(data?.medications ?? [])
+            .filter((m) => m && m.medicationName)
+            .map((m, i, arr) => (
+              <TableRow
+                key={i}
+                cells={[
+                  m.medicationName ?? "",
+                  m.dose ?? "",
+                  m.usedToTreat ?? "",
+                  m.prescriber ?? "",
+                  m.refillDue ?? "",
+                ]}
+                last={i === arr.length - 1}
+              />
+            ))}
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Diagnoses</Text>
+          <Field label="Diagnoses">
+            {data?.diagnoses
+              ?.filter((d) => d && d.diagnosis)
+              ?.map((d) => d.diagnosis)
+              .join(", ") ?? ""}
+          </Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Allergies</Text>
+          <Field label="Allergies">
+            {data?.allergies
+              ?.filter((a) => a && a.allergen)
+              ?.map((a) => a.allergen)
+              .join(", ") ?? ""}
+          </Field>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Surgical History</Text>
+          <Field label="Surgical History">
+            {data?.surgicalHistory
+              ?.filter((s) => s && s.surgicalHistory)
+              ?.map((s) => s.surgicalHistory)
+              .join(", ") ?? ""}
+          </Field>
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 export default FaceSheetShortFormPDF;

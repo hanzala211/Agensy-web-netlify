@@ -145,17 +145,28 @@ const TableRow = ({
   </View>
 );
 
-const FaceSheetLongFormPDF: React.FC<{ data: FaceSheetLongFormData }> = ({
-  data,
-}) => (
+const FaceSheetLongFormPDF: React.FC<{
+  data: FaceSheetLongFormData & { last_update: { updatedAt?: string } };
+}> = ({ data }) => (
   <Document title="Agensy Face Sheet">
     <Page size="A4" style={styles.page}>
       <Text style={styles.formTitle}>Agensy Face Sheet - Long Form</Text>
       <View style={styles.headerRow}>
         <Image src={logo} style={styles.headerLogo} />
-        <Text style={styles.headerDateBox}>
-          Date: {DateUtils.formatDateToRequiredFormat(new Date().toISOString())}
-        </Text>
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.headerDateBox}>
+            {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+              new Date().toISOString()
+            )}`}
+          </Text>
+          {data?.last_update.updatedAt && (
+            <Text style={[styles.headerDateBox, { marginTop: 5 }]}>
+              {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                data.last_update.updatedAt
+              )}`}
+            </Text>
+          )}
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -273,7 +284,7 @@ const FaceSheetLongFormPDF: React.FC<{ data: FaceSheetLongFormData }> = ({
               key={i}
               cells={[
                 m.condition ?? "",
-                DateUtils.formatDateToRequiredFormat(m.onsetDate ?? ""),
+                m.onsetDate && m.onsetDate.trim() !== "" ? DateUtils.formatDateToRequiredFormat(m.onsetDate) : "",
                 m.notes ?? "",
               ]}
               last={i === arr.length - 1}

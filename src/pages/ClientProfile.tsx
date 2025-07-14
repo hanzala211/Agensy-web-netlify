@@ -7,6 +7,7 @@ import {
 } from "@agensy/components";
 import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
+import { DateUtils } from "@agensy/utils";
 import React, { useEffect } from "react";
 import { useNavigate, Outlet, useParams, useLocation } from "react-router-dom";
 
@@ -49,7 +50,9 @@ export const ClientProfile: React.FC = () => {
 
       <PersonalInfoBar
         leftLabel="DOB"
-        leftValue={selectedClient?.date_of_birth as string}
+        leftValue={DateUtils.formatDateToRequiredFormat(
+          selectedClient?.date_of_birth as string
+        )}
         rightLabel="Primary Contact"
         rightValue={
           (selectedClient?.contacts && selectedClient.contacts.length > 0

@@ -13,6 +13,7 @@ import {
   PrimaryButton,
   ClientProviderInfoStep,
 } from "@agensy/components";
+import { DateUtils } from "@agensy/utils";
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -104,7 +105,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
     const postData = {
       first_name: data.firstName,
       last_name: data.lastName,
-      date_of_birth: data.dateOfBirth,
+      date_of_birth: DateUtils.changetoISO(data.dateOfBirth),
       gender: data.gender,
       marital_status: data.maritalStatus,
       address: data.address,

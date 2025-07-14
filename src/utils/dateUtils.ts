@@ -34,9 +34,12 @@ export const formatRelativeTime = (isoDate: string): string => {
   }
 };
 
-export const formatDateToRequiredFormat = (isoDateString: string): string => {
+export const formatDateToRequiredFormat = (
+  isoDateString: string,
+  format?: string
+): string => {
   const date = dayjs(isoDateString);
-  return date.format(DATE_FOMRAT);
+  return date.format(format || DATE_FOMRAT);
 };
 
 export const formatDateTime = (isoDateString: string): string => {
@@ -59,5 +62,35 @@ export const formatSimpleDate = (isoDate: string): string => {
     return "Yesterday";
   } else {
     return date.format(DATE_FOMRAT);
+  }
+};
+
+export const changetoISO = (date: string) => {
+  return dayjs(date).toISOString();
+};
+
+export const changeMonthYearToISO = (date: string) => {
+  if (!date || date.trim() === '') {
+    return null;
+  }
+  
+  if (date.includes('/') && date.split('/').length === 2) {
+    const [month, year] = date.split('/');
+    
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+    
+    if (isNaN(monthNum) || isNaN(yearNum) || monthNum < 1 || monthNum > 12) {
+      return null;
+    }
+    
+    return dayjs(`${year}-${month.padStart(2, '0')}-01`).toISOString();
+  }
+  
+  try {
+    return dayjs(date).toISOString();
+  } catch {
+    console.warn('Invalid date format:', date);
+    return null;
   }
 };

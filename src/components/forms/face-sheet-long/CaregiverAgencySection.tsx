@@ -1,13 +1,7 @@
 import React from "react";
 import type { Control, UseFormRegister, FieldErrors } from "react-hook-form";
 import type { FaceSheetLongFormData } from "@agensy/types";
-import {
-  Input,
-  Card,
-  PhoneNumberInput,
-  TextArea,
-  DatePickerField,
-} from "@agensy/components";
+import { Input, Card, PhoneNumberInput, TextArea } from "@agensy/components";
 
 interface CaregiverAgencySectionProps {
   register: UseFormRegister<FaceSheetLongFormData>;
@@ -50,10 +44,11 @@ export const CaregiverAgencySection: React.FC<CaregiverAgencySectionProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <DatePickerField
-            name="caregiverSchedule"
+          <Input
             label="Caregiver Schedule"
-            control={control}
+            name="caregiverSchedule"
+            register={register("caregiverSchedule")}
+            error={errors.caregiverSchedule?.message}
           />
           <Input
             label="Caregiver Duties"

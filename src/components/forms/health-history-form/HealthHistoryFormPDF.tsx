@@ -110,19 +110,29 @@ const Field = ({
   </View>
 );
 
-const HealthHistoryFormPDF: React.FC<{ data?: HealthHistoryFormData }> = ({
-  data,
-}) => {
+const HealthHistoryFormPDF: React.FC<{
+  data?: HealthHistoryFormData & { last_update: { updatedAt: string } };
+}> = ({ data }) => {
   return (
     <Document title="Agensy Health History Form">
       <Page size="A4" style={styles.page}>
         <Text style={styles.formTitle}>Agensy Health History Form</Text>
         <View style={styles.headerRow}>
           <Image src={logo} style={styles.headerLogo} />
-          <Text style={styles.headerDateBox}>
-            Date:{" "}
-            {DateUtils.formatDateToRequiredFormat(new Date().toISOString())}
-          </Text>
+          <View style={{ flexDirection: "column" }}>
+            <Text style={styles.headerDateBox}>
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
+              )}`}
+            </Text>
+            {data?.last_update?.updatedAt && (
+              <Text style={[styles.headerDateBox, { marginTop: 5 }]}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
         </View>
 
         <View style={styles.section}>

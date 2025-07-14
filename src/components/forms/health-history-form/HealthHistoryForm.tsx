@@ -18,7 +18,7 @@ import {
   type OpenedFileData,
 } from "@agensy/types";
 
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import { ICONS } from "@agensy/constants";
 import { DiagnosesSection } from "../face-sheet-short/DiagnosesSection";
 import { useParams } from "react-router-dom";
@@ -105,7 +105,7 @@ export const HealthHistoryForm: React.FC = () => {
         "The health history information has been saved successfully."
       );
     } else if (postHealthHistoryMutation.status === "error") {
-      toast.error("Error Occured", String(postHealthHistoryMutation.error));
+      toast.error("Error Occurred", String(postHealthHistoryMutation.error));
     }
   }, [postHealthHistoryMutation.status]);
 
@@ -113,9 +113,15 @@ export const HealthHistoryForm: React.FC = () => {
 
   useEffect(() => {
     if (formValues && Object.keys(formValues).length > 0) {
-      setOpenedFileData(formValues as unknown as OpenedFileData);
+      setOpenedFileData({
+        ...formValues,
+        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt },
+      } as unknown as OpenedFileData);
     } else {
-      setOpenedFileData(getValues() as unknown as OpenedFileData);
+      setOpenedFileData({
+        ...getValues(),
+        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt },
+      } as unknown as OpenedFileData);
     }
   }, [formValues]);
 
@@ -135,12 +141,13 @@ export const HealthHistoryForm: React.FC = () => {
   });
 
   const onSubmit = (data: HealthHistoryFormData) => {
-    console.log("Health History Form Data:", data);
     const medicationsStarted = data.medicationsStarted?.map((item) => {
       const medication = {
-        medication_name: item.medicationName,
-        dosage: item.dosage,
-        prescribing_doctor: item.prescribingDoctor,
+        medication_name: item.medicationName ? item.medicationName : null,
+        dosage: item.dosage ? item.dosage : null,
+        prescribing_doctor: item.prescribingDoctor
+          ? item.prescribingDoctor
+          : null,
         id: item?.id,
       };
       if (item.id) {
@@ -152,9 +159,11 @@ export const HealthHistoryForm: React.FC = () => {
     });
     const medicationsEnded = data.medicationsEnded?.map((item) => {
       const medication = {
-        medication_name: item.medicationName,
-        dosage: item.dosage,
-        prescribing_doctor: item.prescribingDoctor,
+        medication_name: item.medicationName ? item.medicationName : null,
+        dosage: item.dosage ? item.dosage : null,
+        prescribing_doctor: item.prescribingDoctor
+          ? item.prescribingDoctor
+          : null,
         id: item?.id,
       };
       if (item.id) {
@@ -166,39 +175,60 @@ export const HealthHistoryForm: React.FC = () => {
     });
     const postData = {
       medical_info: {
-        diagnoses: data.diagnoses
-          ?.map((diagnosis) => diagnosis.diagnosis)
-          .join(","),
+        diagnoses:
+          data.diagnoses && data.diagnoses.length > 0
+            ? data.diagnoses?.map((diagnosis) => diagnosis.diagnosis).join(", ")
+            : null,
       },
       medications: [...(medicationsStarted || []), ...(medicationsEnded || [])],
       healthcare_providers: {
-        provider_name: data.providerName,
-        address: data.providerAddress,
-        phone: data.providerPhone,
-        notes: data.providerNotes,
-        follow_up: data.providerFollowUp,
+        provider_name: data.providerName ? data.providerName : null,
+        address: data.providerAddress ? data.providerAddress : null,
+        phone: data.providerPhone ? data.providerPhone : null,
+        notes: data.providerNotes ? data.providerNotes : null,
+        follow_up: data.providerFollowUp
+          ? DateUtils.changetoISO(data.providerFollowUp)
+          : null,
       },
       home_health_agency: {
-        name: data.homeHealthName,
-        phone: data.homeHealthPhone,
-        address: data.homeHealthAddress,
-        fax: data.homeHealthFax,
-        service_received: data.homeHealthServiceReceived,
-        start_date: data.homeHealthStartDate,
-        discharge_date: data.homeHealthDischargeDate,
+        name: data.homeHealthName ? data.homeHealthName : null,
+        phone: data.homeHealthPhone ? data.homeHealthPhone : null,
+        address: data.homeHealthAddress ? data.homeHealthAddress : null,
+        fax: data.homeHealthFax ? data.homeHealthFax : null,
+        service_received: data.homeHealthServiceReceived
+          ? data.homeHealthServiceReceived
+          : null,
+        start_date: data.homeHealthStartDate
+          ? DateUtils.changetoISO(data.homeHealthStartDate)
+          : null,
+        discharge_date: data.homeHealthDischargeDate
+          ? DateUtils.changetoISO(data.homeHealthDischargeDate)
+          : null,
       },
       hospitalization: {
-        admitting_diagnosis: data.admittingDiagnosis,
-        treatment: data.hospitalizationTreatment,
+        admitting_diagnosis: data.admittingDiagnosis
+          ? data.admittingDiagnosis
+          : null,
+        treatment: data.hospitalizationTreatment
+          ? data.hospitalizationTreatment
+          : null,
       },
       health_history: {
-        what_worked: data.whatWorked,
-        date: data.healthHistoryDate,
-        notes: data.healthHistoryNotes,
-        description_of_health_concern: data.descriptionOfHealthConcern,
-        onset_of_symptoms: data.onsetOfSymptoms,
-        frequency_of_symptoms: data.frequencyOfSymptoms,
-        severity_of_symptoms: data.severityOfSymptoms,
+        what_worked: data.whatWorked ? data.whatWorked : null,
+        date: data.healthHistoryDate
+          ? DateUtils.changetoISO(data.healthHistoryDate)
+          : null,
+        notes: data.healthHistoryNotes ? data.healthHistoryNotes : null,
+        description_of_health_concern: data.descriptionOfHealthConcern
+          ? data.descriptionOfHealthConcern
+          : null,
+        onset_of_symptoms: data.onsetOfSymptoms ? data.onsetOfSymptoms : null,
+        frequency_of_symptoms: data.frequencyOfSymptoms
+          ? data.frequencyOfSymptoms
+          : null,
+        severity_of_symptoms: data.severityOfSymptoms
+          ? data.severityOfSymptoms
+          : null,
       },
     };
     postHealthHistoryMutation.mutate({
@@ -210,74 +240,104 @@ export const HealthHistoryForm: React.FC = () => {
   useEffect(() => {
     if (healthHistoryForm) {
       reset({
-        healthHistoryDate: healthHistoryForm.health_history.date || "",
-        healthHistoryNotes: healthHistoryForm.health_history.notes || "",
+        healthHistoryDate: healthHistoryForm?.health_history?.date
+          ? DateUtils.formatDateToRequiredFormat(
+              healthHistoryForm?.health_history?.date
+            )
+          : "",
+        healthHistoryNotes: healthHistoryForm?.health_history?.notes || "",
         frequencyOfSymptoms:
-          healthHistoryForm.health_history.frequency_of_symptoms || "",
+          healthHistoryForm?.health_history?.frequency_of_symptoms || "",
         severityOfSymptoms:
-          healthHistoryForm.health_history.severity_of_symptoms || "",
-        whatWorked: healthHistoryForm.health_history.what_worked || "",
+          healthHistoryForm?.health_history?.severity_of_symptoms || "",
+        whatWorked: healthHistoryForm?.health_history?.what_worked || "",
         onsetOfSymptoms:
-          healthHistoryForm.health_history.onset_of_symptoms || "",
+          healthHistoryForm?.health_history?.onset_of_symptoms || "",
         descriptionOfHealthConcern:
-          healthHistoryForm.health_history.description_of_health_concern || "",
+          healthHistoryForm?.health_history?.description_of_health_concern ||
+          "",
         providerName:
-          healthHistoryForm.healthcare_providers.provider_name || "",
-        providerAddress: healthHistoryForm.healthcare_providers.address || "",
-        providerPhone: healthHistoryForm.healthcare_providers.phone || "",
-        providerFollowUp:
-          healthHistoryForm.healthcare_providers.follow_up || "",
-        providerNotes: healthHistoryForm.healthcare_providers.notes || "",
-        homeHealthName: healthHistoryForm.home_health_agency.name || "",
-        homeHealthPhone: healthHistoryForm.home_health_agency.phone || "",
-        homeHealthFax: healthHistoryForm.home_health_agency.fax || "",
-        homeHealthAddress: healthHistoryForm.home_health_agency.address || "",
-        homeHealthDischargeDate:
-          healthHistoryForm.home_health_agency.discharge_date || "",
+          healthHistoryForm?.healthcare_providers?.provider_name || "",
+        providerAddress: healthHistoryForm?.healthcare_providers?.address || "",
+        providerPhone: healthHistoryForm?.healthcare_providers?.phone || "",
+        providerFollowUp: healthHistoryForm?.healthcare_providers?.follow_up
+          ? DateUtils.formatDateToRequiredFormat(
+              healthHistoryForm?.healthcare_providers?.follow_up
+            )
+          : "",
+        providerNotes: healthHistoryForm?.healthcare_providers?.notes || "",
+        homeHealthName: healthHistoryForm?.home_health_agency?.name || "",
+        homeHealthPhone: healthHistoryForm?.home_health_agency?.phone || "",
+        homeHealthFax: healthHistoryForm?.home_health_agency?.fax || "",
+        homeHealthAddress: healthHistoryForm?.home_health_agency?.address || "",
+        homeHealthDischargeDate: healthHistoryForm?.home_health_agency
+          ?.discharge_date
+          ? DateUtils.formatDateToRequiredFormat(
+              healthHistoryForm?.home_health_agency?.discharge_date
+            )
+          : "",
         homeHealthServiceReceived:
-          healthHistoryForm.home_health_agency.service_received || "",
-        homeHealthStartDate:
-          healthHistoryForm.home_health_agency.start_date || "",
+          healthHistoryForm?.home_health_agency?.service_received || "",
+        homeHealthStartDate: healthHistoryForm?.home_health_agency?.start_date
+          ? DateUtils.formatDateToRequiredFormat(
+              healthHistoryForm?.home_health_agency?.start_date
+            )
+          : "",
         admittingDiagnosis:
-          healthHistoryForm.hospitalization.admitting_diagnosis || "",
+          healthHistoryForm?.hospitalization?.admitting_diagnosis || "",
         hospitalizationTreatment:
-          healthHistoryForm.hospitalization.treatment || "",
-        diagnoses: healthHistoryForm?.medical_info?.diagnoses
-          .split(",")
-          .map((diagnosis: string) => ({
-            diagnosis: diagnosis || "",
-          })),
-        medicationsStarted: healthHistoryForm?.medications
-          ?.filter(
-            (medication: ClientMedications) =>
-              medication.start_date &&
-              new Date(medication.start_date) <= new Date() &&
-              (!medication.end_date ||
-                new Date(medication.end_date) >= new Date())
-          )
-          .map((medication: ClientMedications) => ({
-            medicationName: medication.medication_name || "",
-            dosage: medication.dosage || "",
-            prescribingDoctor: medication.prescribing_doctor || "",
-            startDate: medication.start_date || "",
-            endDate: medication.end_date,
-            id: medication.id,
-          })),
-        medicationsEnded: healthHistoryForm?.medications
-          ?.filter(
-            (medication: ClientMedications) =>
-              medication.end_date && new Date(medication.end_date) < new Date()
-          )
-          .map((medication: ClientMedications) => ({
-            medicationName: medication.medication_name || "",
-            dosage: medication.dosage || "",
-            prescribingDoctor: medication.prescribing_doctor || "",
-            startDate: medication.start_date || "",
-            endDate: medication.end_date || "",
-            id: medication.id || "",
-          })),
+          healthHistoryForm?.hospitalization?.treatment || "",
+        diagnoses:
+          healthHistoryForm?.medical_info?.diagnoses
+            ?.split(",")
+            ?.map((diagnosis: string) => ({
+              diagnosis: diagnosis || "",
+            })) || [],
+        medicationsStarted:
+          healthHistoryForm?.medications
+            ?.filter(
+              (medication: ClientMedications) =>
+                medication.start_date &&
+                new Date(medication.start_date) <= new Date() &&
+                (!medication.end_date ||
+                  new Date(medication.end_date) >= new Date())
+            )
+            ?.map((medication: ClientMedications) => ({
+              medicationName: medication.medication_name || "",
+              dosage: medication.dosage || "",
+              prescribingDoctor: medication.prescribing_doctor || "",
+              startDate: medication.start_date
+                ? DateUtils.formatDateToRequiredFormat(medication.start_date)
+                : "",
+              endDate: medication.end_date
+                ? DateUtils.formatDateToRequiredFormat(medication.end_date)
+                : "",
+              id: medication.id,
+            })) || [],
+        medicationsEnded:
+          healthHistoryForm?.medications
+            ?.filter(
+              (medication: ClientMedications) =>
+                medication.end_date &&
+                new Date(medication.end_date) < new Date()
+            )
+            ?.map((medication: ClientMedications) => ({
+              medicationName: medication.medication_name || "",
+              dosage: medication.dosage || "",
+              prescribingDoctor: medication.prescribing_doctor || "",
+              startDate: medication.start_date
+                ? DateUtils.formatDateToRequiredFormat(medication.start_date)
+                : "",
+              endDate: medication.end_date
+                ? DateUtils.formatDateToRequiredFormat(medication.end_date)
+                : "",
+              id: medication.id || "",
+            })) || [],
       });
-      setOpenedFileData(getValues() as unknown as OpenedFileData);
+      setOpenedFileData({
+        ...getValues(),
+        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt },
+      } as unknown as OpenedFileData);
     }
   }, [healthHistoryForm]);
 

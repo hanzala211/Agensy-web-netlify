@@ -8,6 +8,7 @@ import {
   DatePickerField,
   TextArea,
   ModalArrayField,
+  Select,
 } from "@agensy/components";
 import {
   medicalHistorySchema,
@@ -15,6 +16,7 @@ import {
   type MedicalHistoryArrayField,
   type MedicalHistoryFormData,
 } from "@agensy/types";
+import { COGNITIVE_STATUS } from "@agensy/constants";
 
 interface AddClientMedicalHistoryProps {
   isOpen: boolean;
@@ -159,11 +161,12 @@ export const AddClientMedicalHistory: React.FC<
           addArrayItem={addArrayItem}
           field="surgical_history"
         />
-
-        <Input
+        <Select
           label="Cognitive Status"
-          register={register("cognitive_status")}
-          error={errors.cognitive_status?.message}
+          control={control}
+          labelOption="Select Cognitive Status"
+          name="cognitive_status"
+          data={COGNITIVE_STATUS as { label: string; value: string }[]}
         />
 
         <DatePickerField
@@ -178,6 +181,7 @@ export const AddClientMedicalHistory: React.FC<
             label="Cognitive Score"
             register={register("cognitive_score", { valueAsNumber: true })}
             error={errors.cognitive_score?.message}
+            placeholder="e.g., 26 (from MMSE or SLUMS)"
           />
 
           <Input
@@ -185,6 +189,7 @@ export const AddClientMedicalHistory: React.FC<
             type="number"
             register={register("total_score", { valueAsNumber: true })}
             error={errors.total_score?.message}
+            placeholder="e.g., 30 (MMSE) or 30 (SLUMS)"
           />
         </div>
 
@@ -193,6 +198,7 @@ export const AddClientMedicalHistory: React.FC<
           register={register("notes")}
           error={errors.notes?.message}
           rows={4}
+          placeholder="Please specify assessment type (MMSE or SLUMS) and any additional observations..."
         />
 
         <input type="submit" ref={inputRef} className="hidden" />

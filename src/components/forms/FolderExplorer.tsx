@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { ICONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type {
@@ -41,6 +41,16 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
 }) => {
   const { setOpenedFileData, openedFileData } = useClientContext();
   const params = useParams();
+
+  useEffect(() => {
+    return () => {
+      setOpenedFileData(null);
+    };
+  }, [params.clientId, params.formSlug, setOpenedFileData]);
+
+  useEffect(() => {
+    setOpenedFileData(null);
+  }, [params.formSlug, setOpenedFileData]);
   const isShowingFileContent = useMemo(
     () => selectedItem && fileContent,
     [selectedItem, fileContent]
@@ -67,28 +77,75 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
     }
   };
 
-  const getPDFDocument = useCallback(() => {
-    switch (params.formSlug) {
-      case "face-sheet-long":
-        return (
-          <FaceSheetLongFormPDF
-            data={openedFileData as unknown as FaceSheetLongFormData}
-          />
-        );
-      case "face-sheet-short":
-        return (
-          <FaceSheetShortFormPDF
-            data={openedFileData as unknown as FaceSheetShortFormData}
-          />
-        );
-      case "health-history-form-medical":
-        return (
-          <HealthHistoryFormPDF
-            data={openedFileData as unknown as HealthHistoryFormData}
-          />
-        );
-      default:
-        return <></>;
+  const pdfDocument = useMemo(() => {
+    if (!openedFileData || typeof openedFileData !== "object") {
+      return null;
+    }
+
+    try {
+      const hasValidData =
+        openedFileData &&
+        typeof openedFileData === "object" &&
+        Object.keys(openedFileData).length > 0;
+
+      if (!hasValidData) {
+        return null;
+      }
+
+      if (!params.formSlug) {
+        console.warn("No form slug provided for PDF generation");
+        return null;
+      }
+
+      switch (params.formSlug) {
+        case "face-sheet-long":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <FaceSheetLongFormPDF
+                data={
+                  openedFileData as unknown as FaceSheetLongFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "face-sheet-short":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <FaceSheetShortFormPDF
+                data={
+                  openedFileData as unknown as FaceSheetShortFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "health-history-form-medical":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <HealthHistoryFormPDF
+                data={
+                  openedFileData as unknown as HealthHistoryFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        default:
+          console.warn(`Unknown form type: ${params.formSlug}`);
+          return null;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error creating PDF document:", error);
+      return null;
     }
   }, [params.formSlug, openedFileData]);
 
@@ -154,21 +211,24 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                     <ICONS.fileAlt className="text-gray-600" />
                     {fileContent?.name}
                   </div>
-                  {openedFileData && (
-                    <PDFDownloadLink
-                      document={getPDFDocument()}
-                      fileName={`${fileContent?.name}.pdf`}
-                    >
-                      <TertiaryButton
-                        aria_label="Download PDF"
-                        className="hover:bg-green-50 shadow-none hover:text-green-500 hover:border-green-300 bg-transparent"
+                  {openedFileData &&
+                    pdfDocument &&
+                    typeof openedFileData === "object" &&
+                    Object.keys(openedFileData).length > 0 && (
+                      <PDFDownloadLink
+                        document={pdfDocument}
+                        fileName={`${fileContent?.name}.pdf`}
                       >
-                        <span className="flex items-center gap-2">
-                          <ICONS.download />
-                        </span>
-                      </TertiaryButton>
-                    </PDFDownloadLink>
-                  )}
+                        <TertiaryButton
+                          aria_label="Download PDF"
+                          className="hover:bg-green-50 shadow-none hover:text-green-500 hover:border-green-300 bg-transparent"
+                        >
+                          <span className="flex items-center gap-2">
+                            <ICONS.download />
+                          </span>
+                        </TertiaryButton>
+                      </PDFDownloadLink>
+                    )}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">

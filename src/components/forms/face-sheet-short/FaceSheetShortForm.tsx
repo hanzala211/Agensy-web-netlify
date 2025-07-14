@@ -31,7 +31,7 @@ import {
   RELATIONSHIP_TO_CLIENT,
   CODE_STATUS_OPTIONS,
 } from "@agensy/constants";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import { useClientContext } from "@agensy/context";
 
 const defaultValues = {
@@ -131,7 +131,7 @@ export const FaceSheetShortForm: React.FC = () => {
       );
     } else if (postFaceSheetShortFormMutation.status === "error") {
       toast.error(
-        "Error Occured",
+        "Error Occurred",
         String(postFaceSheetShortFormMutation.error)
       );
     }
@@ -141,103 +141,128 @@ export const FaceSheetShortForm: React.FC = () => {
 
   useEffect(() => {
     if (formValues && Object.keys(formValues).length > 0) {
-      setOpenedFileData(formValues as unknown as OpenedFileData);
+      setOpenedFileData({
+        ...formValues,
+        last_update: { updatedAt: faceSheetShortForm?.last_update?.updatedAt },
+      } as unknown as OpenedFileData);
     } else {
-      setOpenedFileData(getValues() as unknown as OpenedFileData);
+      setOpenedFileData({
+        ...getValues(),
+        last_update: { updatedAt: faceSheetShortForm?.last_update?.updatedAt },
+      } as unknown as OpenedFileData);
     }
   }, [formValues]);
 
   useEffect(() => {
     if (faceSheetShortForm) {
       const formData = {
-        firstName: faceSheetShortForm.client_info.first_name || "",
-        lastName: faceSheetShortForm.client_info.last_name || "",
-        address: faceSheetShortForm.client_info.address || "",
-        phoneNumber: faceSheetShortForm.client_info.phone || "",
-        dateOfBirth: faceSheetShortForm.client_info.date_of_birth || "",
+        firstName: faceSheetShortForm?.client_info?.first_name || "",
+        lastName: faceSheetShortForm?.client_info?.last_name || "",
+        address: faceSheetShortForm?.client_info?.address || "",
+        phoneNumber: faceSheetShortForm?.client_info?.phone || "",
+        dateOfBirth: faceSheetShortForm?.client_info?.date_of_birth
+          ? DateUtils.formatDateToRequiredFormat(
+              faceSheetShortForm?.client_info?.date_of_birth
+            )
+          : "",
         codeStatus:
           CODE_STATUS_OPTIONS.find(
             (codeStatus) =>
-              codeStatus.value === faceSheetShortForm.client_info.code_status
+              codeStatus.value === faceSheetShortForm?.client_info?.code_status
           )?.value || "",
-        ssn: faceSheetShortForm.client_info.ssn || "",
+        ssn: faceSheetShortForm?.client_info?.ssn || "",
         hospitalPreference:
-          faceSheetShortForm.client_info.preferred_hospital || "",
-        hospitalAddress: faceSheetShortForm.client_info.hospital_address || "",
+          faceSheetShortForm?.client_info?.preferred_hospital || "",
+        hospitalAddress:
+          faceSheetShortForm?.client_info?.hospital_address || "",
         hospitalPhoneNumber:
-          faceSheetShortForm.client_info.hospital_phone || "",
-        pharmacyAddress: faceSheetShortForm.client_info.pharmacy_address || "",
-        pharmacyName: faceSheetShortForm.client_info.pharmacy_name || "",
-        pharmacyPhone: faceSheetShortForm.client_info.pharmacy_phone || "",
-        pharmacyFax: faceSheetShortForm.client_info.pharmacy_fax || "",
+          faceSheetShortForm?.client_info?.hospital_phone || "",
+        pharmacyAddress:
+          faceSheetShortForm?.client_info?.pharmacy_address || "",
+        pharmacyName: faceSheetShortForm?.client_info?.pharmacy_name || "",
+        pharmacyPhone: faceSheetShortForm?.client_info?.pharmacy_phone || "",
+        pharmacyFax: faceSheetShortForm?.client_info?.pharmacy_fax || "",
         emergencyContactAddress:
-          faceSheetShortForm.emergency_contact.address || "",
-        emergencyContactEmail: faceSheetShortForm.emergency_contact.email || "",
-        emergencyContactPhone: faceSheetShortForm.emergency_contact.phone || "",
+          faceSheetShortForm?.emergency_contact?.address || "",
+        emergencyContactEmail:
+          faceSheetShortForm?.emergency_contact?.email || "",
+        emergencyContactPhone:
+          faceSheetShortForm?.emergency_contact?.phone || "",
         emergencyContactFirstName:
-          faceSheetShortForm.emergency_contact.first_name || "",
+          faceSheetShortForm?.emergency_contact?.first_name || "",
         emergencyContactLastName:
-          faceSheetShortForm.emergency_contact.last_name || "",
+          faceSheetShortForm?.emergency_contact?.last_name || "",
         emergencyContactRelationship:
           RELATIONSHIP_TO_CLIENT.find(
             (relationship) =>
               relationship.value ===
-              faceSheetShortForm.emergency_contact.relationship
+              faceSheetShortForm?.emergency_contact?.relationship
           )?.value || "",
-        providers: faceSheetShortForm.healthcare_providers.map(
-          (provider: HealthcareProvider) => ({
-            providerName: provider.provider_name || "",
-            specialty: provider.specialty,
-            address: provider.address || "",
-            phone: provider.phone || "",
-            fax: provider.fax || "",
-            lastVisit: provider.last_visit || "",
-            nextVisit: provider.next_visit || "",
-            id: provider.id || "",
-            providerType: provider.provider_type,
-          })
-        ),
-        medications: faceSheetShortForm.medications.map(
-          (medication: ClientMedications) => ({
-            medicationName: medication.medication_name || "",
-            dose: medication.dosage || "",
-            usedToTreat: medication.purpose || "",
-            prescriber: medication.prescribing_doctor || "",
-            refillDue: medication.refill_due || "",
-            id: medication.id || "",
-          })
-        ),
-        diagnoses: faceSheetShortForm.medical_info.diagnoses
-          .split(", ")
-          .map((diagnosis: string) => ({
-            diagnosis: diagnosis || "",
-          })),
-        allergies: faceSheetShortForm.medical_info.allergies
-          .split(", ")
-          .map((allergen: string) => ({
-            allergen: allergen || "",
-          })),
-        surgicalHistory: faceSheetShortForm.medical_info.surgical_history
-          .split(", ")
-          .map((surgicalHistory: string) => ({
-            surgicalHistory: surgicalHistory || "",
-          })),
+        providers:
+          faceSheetShortForm?.healthcare_providers?.map(
+            (provider: HealthcareProvider) => ({
+              providerName: provider.provider_name || "",
+              specialty: provider.specialty,
+              address: provider.address || "",
+              phone: provider.phone || "",
+              fax: provider.fax || "",
+              lastVisit: provider.last_visit
+                ? DateUtils.formatDateToRequiredFormat(provider.last_visit)
+                : "",
+              nextVisit: provider.next_visit
+                ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
+                : "",
+              id: provider.id || "",
+              providerType: provider.provider_type,
+            })
+          ) || [],
+        medications:
+          faceSheetShortForm?.medications?.map(
+            (medication: ClientMedications) => ({
+              medicationName: medication.medication_name || "",
+              dose: medication.dosage || "",
+              usedToTreat: medication.purpose || "",
+              prescriber: medication.prescribing_doctor || "",
+              refillDue: medication?.refill_due
+                ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
+                : "",
+              id: medication.id || "",
+            })
+          ) || [],
+        diagnoses:
+          faceSheetShortForm?.medical_info?.diagnoses
+            ?.split(", ")
+            ?.map((diagnosis: string) => ({
+              diagnosis: diagnosis || "",
+            })) || [],
+        allergies:
+          faceSheetShortForm?.medical_info?.allergies
+            ?.split(", ")
+            ?.map((allergen: string) => ({
+              allergen: allergen || "",
+            })) || [],
+        surgicalHistory:
+          faceSheetShortForm?.medical_info?.surgical_history
+            ?.split(", ")
+            ?.map((surgicalHistory: string) => ({
+              surgicalHistory: surgicalHistory || "",
+            })) || [],
         advanceDirective:
           ADVANCE_DIRECTIVE_OPTIONS.find(
             (advanceDirective) =>
               advanceDirective.value ===
-              faceSheetShortForm.client_info.advance_directive
+              faceSheetShortForm?.client_info?.advance_directive
           )?.value || "",
-        dpoaName: faceSheetShortForm.short_form.dpoa || "",
-        mpoaName: faceSheetShortForm.short_form.mpoa || "",
-        mpoaAddress: faceSheetShortForm.short_form.mpoa_address || "",
-        mpoaPhone: faceSheetShortForm.short_form.mpoa_phone || "",
-        dpoaAddress: faceSheetShortForm.short_form.dpoa_address || "",
-        dpoaPhone: faceSheetShortForm.short_form.dpoa_phone || "",
-        insurance: faceSheetShortForm.short_form.insurance || "",
-        groupNumber: faceSheetShortForm.short_form.group_number || "",
-        idNumber: faceSheetShortForm.short_form.id_number || "",
-        medicare: faceSheetShortForm.short_form.medicare || "",
+        dpoaName: faceSheetShortForm?.short_form?.dpoa || "",
+        mpoaName: faceSheetShortForm?.short_form?.mpoa || "",
+        mpoaAddress: faceSheetShortForm?.short_form?.mpoa_address || "",
+        mpoaPhone: faceSheetShortForm?.short_form?.mpoa_phone || "",
+        dpoaAddress: faceSheetShortForm?.short_form?.dpoa_address || "",
+        dpoaPhone: faceSheetShortForm?.short_form?.dpoa_phone || "",
+        insurance: faceSheetShortForm?.short_form?.insurance || "",
+        groupNumber: faceSheetShortForm?.short_form?.group_number || "",
+        idNumber: faceSheetShortForm?.short_form?.id_number || "",
+        medicare: faceSheetShortForm?.short_form?.medicare || "",
       };
 
       reset(formData);
@@ -248,13 +273,16 @@ export const FaceSheetShortForm: React.FC = () => {
       allergiesArray.replace(formData.allergies);
       surgicalHistoryArray.replace(formData.surgicalHistory);
     }
-    setOpenedFileData(getValues() as unknown as OpenedFileData);
+    setOpenedFileData({
+      ...getValues(),
+      last_update: { updatedAt: faceSheetShortForm?.last_update?.updatedAt },
+    } as unknown as OpenedFileData);
   }, [faceSheetShortForm]);
 
   const onSubmit = (data: FaceSheetShortFormData) => {
     const medications = data.medications?.map((item) => {
       const medication = {
-        refill_due: item.refillDue,
+        refill_due: item.refillDue ? DateUtils.changetoISO(item.refillDue) : "",
         purpose: item.usedToTreat,
         medication_name: item.medicationName,
         dosage: item.dose,
@@ -270,13 +298,17 @@ export const FaceSheetShortForm: React.FC = () => {
     });
     const providers = data.providers?.map((item) => {
       const provider = {
-        provider_type: item?.providerType,
-        provider_name: item.providerName,
-        specialty: item.specialty,
-        address: item.address,
-        phone: item.phone,
-        last_visit: item.lastVisit,
-        next_visit: item.nextVisit,
+        provider_type: item.providerType,
+        provider_name: item.providerName ? item.providerName : null,
+        specialty: item.specialty ? item.specialty : null,
+        address: item.address ? item.address : null,
+        phone: item.phone ? item.phone : null,
+        last_visit: item.lastVisit
+          ? DateUtils.changetoISO(item.lastVisit)
+          : null,
+        next_visit: item.nextVisit
+          ? DateUtils.changetoISO(item.nextVisit)
+          : null,
         id: item.id,
       };
       if (item.id) {
@@ -292,30 +324,41 @@ export const FaceSheetShortForm: React.FC = () => {
         first_name: data.firstName,
         last_name: data.lastName,
         address: data.address,
-        ssn: data.ssn,
-        date_of_birth: data.dateOfBirth,
-        phone: data.phoneNumber,
-        preferred_hospital: data.hospitalPreference,
-        hospital_address: data.hospitalAddress,
-        hospital_phone: data.hospitalPhoneNumber,
-        pharmacy_name: data.pharmacyName,
-        pharmacy_address: data.pharmacyAddress,
-        pharmacy_phone: data.pharmacyPhone,
-        pharmacy_fax: data.pharmacyFax,
-        code_status: data.codeStatus,
-        advance_directive: data.advanceDirective,
+        ssn: data.ssn ? data.ssn : null,
+        date_of_birth: data.dateOfBirth
+          ? DateUtils.changetoISO(data.dateOfBirth)
+          : null,
+        phone: data.phoneNumber ? data.phoneNumber : null,
+        preferred_hospital: data.hospitalPreference
+          ? data.hospitalPreference
+          : null,
+        hospital_address: data.hospitalAddress ? data.hospitalAddress : null,
+        hospital_phone: data.hospitalPhoneNumber
+          ? data.hospitalPhoneNumber
+          : null,
+        pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
+        pharmacy_address: data.pharmacyAddress ? data.pharmacyAddress : null,
+        pharmacy_phone: data.pharmacyPhone ? data.pharmacyPhone : null,
+        pharmacy_fax: data.pharmacyFax ? data.pharmacyFax : null,
+        code_status: data.codeStatus ? data.codeStatus : null,
+        advance_directive: data.advanceDirective ? data.advanceDirective : null,
       },
 
       medical_info: {
-        allergies: data?.allergies
-          ?.map((allergen) => allergen.allergen)
-          .join(", "),
-        diagnoses: data?.diagnoses
-          ?.map((diagnosis) => diagnosis.diagnosis)
-          .join(", "),
-        surgical_history: data?.surgicalHistory
-          ?.map((surgicalHistory) => surgicalHistory.surgicalHistory)
-          .join(", "),
+        allergies:
+          data.allergies && data.allergies.length > 0
+            ? data.allergies?.map((allergen) => allergen.allergen).join(", ")
+            : null,
+        diagnoses:
+          data.diagnoses && data.diagnoses.length > 0
+            ? data.diagnoses?.map((diagnosis) => diagnosis.diagnosis).join(", ")
+            : null,
+        surgical_history:
+          data.surgicalHistory && data.surgicalHistory.length > 0
+            ? data.surgicalHistory
+                ?.map((surgicalHistory) => surgicalHistory.surgicalHistory)
+                .join(", ")
+            : null,
       },
 
       emergency_contact: {
@@ -329,16 +372,16 @@ export const FaceSheetShortForm: React.FC = () => {
       medications,
       healthcare_providers: providers,
       short_form: {
-        insurance: data.insurance,
-        medicare: data.medicare,
-        group_number: data.groupNumber,
-        id_number: data.idNumber,
-        mpoa: data.mpoaName,
-        mpoa_phone: data.mpoaPhone,
-        mpoa_address: data.mpoaAddress,
-        dpoa: data.dpoaName,
-        dpoa_phone: data.dpoaPhone,
-        dpoa_address: data.dpoaAddress,
+        insurance: data.insurance ? data.insurance : null,
+        medicare: data.medicare ? data.medicare : null,
+        group_number: data.groupNumber ? data.groupNumber : null,
+        id_number: data.idNumber ? data.idNumber : null,
+        mpoa: data.mpoaName ? data.mpoaName : null,
+        mpoa_phone: data.mpoaPhone ? data.mpoaPhone : null,
+        mpoa_address: data.mpoaAddress ? data.mpoaAddress : null,
+        dpoa: data.dpoaName ? data.dpoaName : null,
+        dpoa_phone: data.dpoaPhone ? data.dpoaPhone : null,
+        dpoa_address: data.dpoaAddress ? data.dpoaAddress : null,
       },
     };
     postFaceSheetShortFormMutation.mutate({

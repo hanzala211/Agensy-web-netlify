@@ -563,7 +563,7 @@ export const faceSheetShortFormSchema = z.object({
   address: z.string().min(1, "Address is required"),
   phoneNumber: z.string().min(1, "Phone number is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
-  ssn: z.string().min(1, "SSN is required"),
+  ssn: z.string().optional(),
 
   // Emergency Contact
   emergencyContactFirstName: z.string().min(1, "First name is required"),
@@ -574,8 +574,8 @@ export const faceSheetShortFormSchema = z.object({
   emergencyContactAddress: z.string().min(1, "Address is required"),
 
   // Medical Settings
-  codeStatus: z.string().min(1, "Code status is required"),
-  advanceDirective: z.string().min(1, "Advance directive is required"),
+  codeStatus: z.string().optional(),
+  advanceDirective: z.string().optional(),
 
   // Hospital Preference
   hospitalPreference: z.string().optional(),
@@ -667,15 +667,15 @@ export const faceSheetLongFormSchema = z
     address: z.string().min(1, "Address is required"),
     phoneNumber: z.string().min(1, "Phone number is required"),
     dateOfBirth: z.string().min(1, "Date of birth is required"),
-    ssn: z.string().min(1, "SSN is required"),
+    ssn: z.string().optional(),
 
     // Additional Personal Information
-    gender: z.string().min(1, "Gender is required"),
-    race: z.string().min(1, "Race is required"),
-    language: z.string().min(1, "Language is required"),
-    maritalStatus: z.string().min(1, "Marital status is required"),
-    livingSituation: z.string().min(1, "Living situation is required"),
-    dateOfLastCarePlan: z.string().min(1, "Date of last care plan is required"),
+    gender: z.string().optional(),
+    race: z.string().optional(),
+    language: z.string().optional(),
+    maritalStatus: z.string().optional(),
+    livingSituation: z.string().optional(),
+    dateOfLastCarePlan: z.string().optional(),
 
     // Emergency Contact
     emergencyContactFirstName: z.string().min(1, "First name is required"),
@@ -686,8 +686,8 @@ export const faceSheetLongFormSchema = z
     emergencyContactAddress: z.string().min(1, "Address is required"),
 
     // Medical Settings
-    codeStatus: z.string().min(1, "Code status is required"),
-    advanceDirective: z.string().min(1, "Advance directive is required"),
+    codeStatus: z.string().optional(),
+    advanceDirective: z.string().optional(),
 
     // Hospital Preference
     hospitalPreference: z.string().optional(),
@@ -715,36 +715,26 @@ export const faceSheetLongFormSchema = z
     dpoaPhone: z.string().optional(),
 
     // Caregiver Agency
-    caregiverAgency: z.string().min(1, "Caregiver agency is required"),
-    caregiverAddress: z.string().min(1, "Caregiver address is required"),
-    caregiverPhone: z.string().min(1, "Caregiver phone is required"),
-    caregiverPointOfContact: z
-      .string()
-      .min(1, "Caregiver point of contact is required"),
-    caregiverSchedule: z.string().min(1, "Caregiver schedule is required"),
-    caregiverDuties: z.string().min(1, "Caregiver duties is required"),
-    importantInformationForCaregivers: z
-      .string()
-      .min(1, "Important information for caregivers is required"),
+    caregiverAgency: z.string().optional(),
+    caregiverAddress: z.string().optional(),
+    caregiverPhone: z.string().optional(),
+    caregiverPointOfContact: z.string().optional(),
+    caregiverSchedule: z.string().optional(),
+    caregiverDuties: z.string().optional(),
+    importantInformationForCaregivers: z.string().optional(),
 
     // Home Health Agency
-    homeHealthAgency: z.string().min(1, "Home health agency is required"),
-    homeHealthAddress: z.string().min(1, "Home health address is required"),
-    homeHealthPhone: z.string().min(1, "Home health phone is required"),
-    homeHealthFax: z.string().min(1, "Home health fax is required"),
-    homeHealthSchedule: z.string().min(1, "Home health schedule is required"),
-    homeHealthPrescribingDoctor: z
-      .string()
-      .min(1, "Home health prescribing doctor is required"),
-    homeHealthStartDate: z
-      .string()
-      .min(1, "Home health start date is required"),
-    homeHealthDischargeDate: z
-      .string()
-      .min(1, "Home health discharge date is required"),
+    homeHealthAgency: z.string().optional(),
+    homeHealthAddress: z.string().optional(),
+    homeHealthPhone: z.string().optional(),
+    homeHealthFax: z.string().optional(),
+    homeHealthSchedule: z.string().optional(),
+    homeHealthPrescribingDoctor: z.string().optional(),
+    homeHealthStartDate: z.string().optional(),
+    homeHealthDischargeDate: z.string().optional(),
 
     // Mental Status
-    mentalStatus: z.string().optional(),
+    mentalStatus: z.string().min(1, "Mental status is required"),
     cognitiveScreeningDate: z.string().optional(),
     cognitiveScreeningScore: z.string().optional(),
     cognitiveScreeningScoreOutOf: z.string().optional(),
@@ -852,9 +842,15 @@ export const faceSheetLongFormSchema = z
   })
   .refine(
     (data) => {
-      const start = new Date(data.homeHealthStartDate);
-      const end = new Date(data.homeHealthDischargeDate);
-      return start <= end;
+      if (!data.homeHealthStartDate || !data.homeHealthDischargeDate)
+        return true;
+      const start = data.homeHealthStartDate
+        ? new Date(data.homeHealthStartDate)
+        : null;
+      const end = data.homeHealthDischargeDate
+        ? new Date(data.homeHealthDischargeDate)
+        : null;
+      return start && end && start <= end;
     },
     {
       message: "Home health discharge date cannot be before start date",
@@ -897,15 +893,9 @@ export const healthHistoryFormSchema = z.object({
   medicationsStarted: z
     .array(
       z.object({
-        medicationName: z
-          .string()
-          .min(1, "Medication name is required")
-          .transform(trimString),
-        dosage: z.string().min(1, "Dosage is required").transform(trimString),
-        prescribingDoctor: z
-          .string()
-          .min(1, "Prescribing doctor is required")
-          .transform(trimString),
+        medicationName: z.string().optional(),
+        dosage: z.string().optional(),
+        prescribingDoctor: z.string().optional(),
         id: z.string().optional().nullish().nullable(),
         startDate: z.string().optional().nullable().nullish(),
         endDate: z.string().optional().nullable().nullish(),
@@ -917,15 +907,9 @@ export const healthHistoryFormSchema = z.object({
   medicationsEnded: z
     .array(
       z.object({
-        medicationName: z
-          .string()
-          .min(1, "Medication name is required")
-          .transform(trimString),
-        dosage: z.string().min(1, "Dosage is required").transform(trimString),
-        prescribingDoctor: z
-          .string()
-          .min(1, "Prescribing doctor is required")
-          .transform(trimString),
+        medicationName: z.string().optional(),
+        dosage: z.string().optional(),
+        prescribingDoctor: z.string().optional(),
         id: z.string().optional().nullish().nullable(),
         startDate: z.string().optional().nullable().nullish(),
         endDate: z.string().optional().nullable().nullish(),
@@ -936,93 +920,93 @@ export const healthHistoryFormSchema = z.object({
   // Healthcare Providers
   providerName: z
     .string()
-    .min(1, "Provider name is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   providerAddress: z
     .string()
-    .min(1, "Provider address is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   providerPhone: z
     .string()
-    .min(1, "Provider phone is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   providerNotes: z
     .string()
-    .min(1, "Provider notes is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   providerFollowUp: z
     .string()
-    .min(1, "Provider follow up is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
 
   // Home Health Agency
   homeHealthName: z
     .string()
-    .min(1, "Home health name is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   homeHealthPhone: z
     .string()
-    .min(1, "Home health phone is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   homeHealthAddress: z
     .string()
-    .min(1, "Home health address is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   homeHealthFax: z
     .string()
-    .min(1, "Home health fax is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   homeHealthServiceReceived: z
     .string()
-    .min(1, "Home health service received is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   homeHealthStartDate: z
     .string()
-    .min(1, "Home health start date is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   homeHealthDischargeDate: z
     .string()
-    .min(1, "Home health discharge date is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
 
   // Hospitalization
   admittingDiagnosis: z
     .string()
-    .min(1, "Admitting diagnosis is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   hospitalizationTreatment: z
     .string()
-    .min(1, "Hospitalization treatment is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
 
   // Health History
   whatWorked: z
     .string()
-    .min(1, "What worked is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   healthHistoryDate: z
     .string()
-    .min(1, "Health history date is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   healthHistoryNotes: z
     .string()
-    .min(1, "Health history notes is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   descriptionOfHealthConcern: z
     .string()
-    .min(1, "Description of health concern is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   onsetOfSymptoms: z
     .string()
-    .min(1, "Onset of symptoms is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   frequencyOfSymptoms: z
     .string()
-    .min(1, "Frequency of symptoms is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
   severityOfSymptoms: z
     .string()
-    .min(1, "Severity of symptoms is required")
+    .optional()
     .transform((val) => (val ? trimString(val) : val)),
 });
 

@@ -1,1 +1,1 @@
-export const DATE_FOMRAT = "YYYY-MM-DD";
+export const DATE_FOMRAT = "MM/DD/YYYY";

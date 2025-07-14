@@ -13,7 +13,7 @@ import {
   type OpenedFileData,
 } from "@agensy/types";
 import { useParams } from "react-router-dom";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import { PersonalInformationSection } from "../face-sheet-short/PersonalInformationSection";
 import { EmergencyContactSection } from "../face-sheet-short/EmergencyContactSection";
 import { MedicalSettingsSection } from "../face-sheet-short/MedicalSettingsSection";
@@ -152,7 +152,7 @@ export const FaceSheetLongForm: React.FC = () => {
         "Your client's medical information has been saved and is now up to date."
       );
     } else if (postFaceSheetLongFormMutation.status === "error") {
-      toast.error("Error Occured", String(postFaceSheetLongFormMutation.error));
+      toast.error("Error Occurred", String(postFaceSheetLongFormMutation.error));
     }
   }, [postFaceSheetLongFormMutation.status]);
 
@@ -160,9 +160,15 @@ export const FaceSheetLongForm: React.FC = () => {
 
   useEffect(() => {
     if (formValues && Object.keys(formValues).length > 0) {
-      setOpenedFileData(formValues as unknown as OpenedFileData);
+      setOpenedFileData({
+        ...formValues,
+        last_update: { updatedAt: faceSheetLongData?.last_update?.updatedAt },
+      } as unknown as OpenedFileData);
     } else {
-      setOpenedFileData(getValues() as unknown as OpenedFileData);
+      setOpenedFileData({
+        ...getValues(),
+        last_update: { updatedAt: faceSheetLongData?.last_update?.updatedAt },
+      } as unknown as OpenedFileData);
     }
   }, [formValues]);
 
@@ -214,177 +220,214 @@ export const FaceSheetLongForm: React.FC = () => {
   useEffect(() => {
     if (faceSheetLongData) {
       const formData = {
-        firstName: faceSheetLongData.client_info.first_name || "",
-        lastName: faceSheetLongData.client_info.last_name || "",
-        address: faceSheetLongData.client_info.address || "",
-        phoneNumber: faceSheetLongData.client_info.phone || "",
-        dateOfBirth: faceSheetLongData.client_info.date_of_birth || "",
+        firstName: faceSheetLongData?.client_info?.first_name || "",
+        lastName: faceSheetLongData?.client_info?.last_name || "",
+        address: faceSheetLongData?.client_info?.address || "",
+        phoneNumber: faceSheetLongData?.client_info?.phone || "",
+        dateOfBirth: DateUtils.formatDateToRequiredFormat(
+          faceSheetLongData?.client_info?.date_of_birth || ""
+        ),
         gender:
           GENDER_OPTIONS.find(
-            (gender) => gender.value === faceSheetLongData.client_info.gender
+            (gender) => gender.value === faceSheetLongData?.client_info?.gender
           )?.value || "",
         race:
           RACE_OPTIONS.find(
-            (race) => race.value === faceSheetLongData.client_info.race
+            (race) => race.value === faceSheetLongData?.client_info?.race
           )?.value || "",
         language:
           LANGUAGE_OPTIONS.find(
             (language) =>
-              language.value === faceSheetLongData.client_info.language
+              language.value === faceSheetLongData?.client_info?.language
           )?.value || "",
         maritalStatus:
           MARITAL_STATUS_OPTIONS.find(
             (maritalStatus) =>
               maritalStatus.value ===
-              faceSheetLongData.client_info.marital_status
+              faceSheetLongData?.client_info?.marital_status
           )?.value || "",
         livingSituation:
           LIVING_SITUATION_OPTIONS.find(
             (livingSituation) =>
               livingSituation.value ===
-              faceSheetLongData.client_info.living_situation
+              faceSheetLongData?.client_info?.living_situation
           )?.value || "",
-        dateOfLastCarePlan:
-          faceSheetLongData.client_info.last_care_plan_date || "",
+        dateOfLastCarePlan: DateUtils.formatDateToRequiredFormat(
+          faceSheetLongData?.client_info?.last_care_plan_date || ""
+        ),
         codeStatus:
           CODE_STATUS_OPTIONS.find(
             (codeStatus) =>
-              codeStatus.value === faceSheetLongData.client_info.code_status
+              codeStatus.value === faceSheetLongData?.client_info?.code_status
           )?.value || "",
-        ssn: faceSheetLongData.client_info.ssn || "",
+        ssn: faceSheetLongData?.client_info?.ssn || "",
         hospitalPreference:
-          faceSheetLongData.client_info.preferred_hospital || "",
-        hospitalAddress: faceSheetLongData.client_info.hospital_address || "",
-        hospitalPhoneNumber: faceSheetLongData.client_info.hospital_phone || "",
-        pharmacyAddress: faceSheetLongData.client_info.pharmacy_address || "",
-        pharmacyName: faceSheetLongData.client_info.pharmacy_name || "",
-        pharmacyPhone: faceSheetLongData.client_info.pharmacy_phone || "",
-        pharmacyFax: faceSheetLongData.client_info.pharmacy_fax || "",
+          faceSheetLongData?.client_info?.preferred_hospital || "",
+        hospitalAddress: faceSheetLongData?.client_info?.hospital_address || "",
+        hospitalPhoneNumber:
+          faceSheetLongData?.client_info?.hospital_phone || "",
+        pharmacyAddress: faceSheetLongData?.client_info?.pharmacy_address || "",
+        pharmacyName: faceSheetLongData?.client_info?.pharmacy_name || "",
+        pharmacyPhone: faceSheetLongData?.client_info?.pharmacy_phone || "",
+        pharmacyFax: faceSheetLongData?.client_info?.pharmacy_fax || "",
         emergencyContactAddress:
-          faceSheetLongData.emergency_contact.address || "",
-        emergencyContactEmail: faceSheetLongData.emergency_contact.email || "",
-        emergencyContactPhone: faceSheetLongData.emergency_contact.phone || "",
+          faceSheetLongData?.emergency_contact?.address || "",
+        emergencyContactEmail:
+          faceSheetLongData?.emergency_contact?.email || "",
+        emergencyContactPhone:
+          faceSheetLongData?.emergency_contact?.phone || "",
         emergencyContactFirstName:
-          faceSheetLongData.emergency_contact.first_name || "",
+          faceSheetLongData?.emergency_contact?.first_name || "",
         emergencyContactLastName:
-          faceSheetLongData.emergency_contact.last_name || "",
+          faceSheetLongData?.emergency_contact?.last_name || "",
         emergencyContactRelationship:
           RELATIONSHIP_TO_CLIENT.find(
             (relationship) =>
               relationship.value ===
-              faceSheetLongData.emergency_contact.relationship
+              faceSheetLongData?.emergency_contact?.relationship
           )?.value || "",
-        providers: faceSheetLongData.healthcare_providers.map(
-          (provider: HealthcareProvider) => ({
-            providerName: provider.provider_name || "",
-            specialty: provider.specialty,
-            address: provider.address || "",
-            phone: provider.phone || "",
-            fax: provider.fax || "",
-            lastVisit: provider.last_visit || "",
-            nextVisit: provider.next_visit || "",
-            id: provider.id || "",
-            providerType: provider.provider_type,
-          })
-        ),
-        medications: faceSheetLongData.medications.map(
-          (medication: ClientMedications) => ({
-            medicationName: medication.medication_name || "",
-            dose: medication.dosage || "",
-            usedToTreat: medication.purpose || "",
-            prescriber: medication.prescribing_doctor || "",
-            refillDue: medication.refill_due || "",
-            id: medication.id || "",
-          })
-        ),
-        diagnoses: faceSheetLongData.medical_info.diagnoses
-          .split(", ")
-          .map((diagnosis: string) => ({
-            diagnosis: diagnosis || "",
-          })),
-        allergies: faceSheetLongData.medical_info.allergies
-          .split(", ")
-          .map((allergen: string) => ({
-            allergen: allergen || "",
-          })),
-        surgicalHistory: faceSheetLongData.medical_info.surgical_history
-          .split(", ")
-          .map((surgicalHistory: string) => ({
-            surgicalHistory: surgicalHistory || "",
-          })),
+        providers:
+          faceSheetLongData?.healthcare_providers?.map(
+            (provider: HealthcareProvider) => ({
+              providerName: provider.provider_name || "",
+              specialty: provider.specialty,
+              address: provider.address || "",
+              phone: provider.phone || "",
+              fax: provider.fax || "",
+              lastVisit: provider.last_visit
+                ? DateUtils.formatDateToRequiredFormat(provider.last_visit)
+                : "",
+              nextVisit: provider.next_visit
+                ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
+                : "",
+              id: provider.id || "",
+              providerType: provider.provider_type,
+            })
+          ) || [],
+        medications:
+          faceSheetLongData?.medications?.map(
+            (medication: ClientMedications) => ({
+              medicationName: medication.medication_name || "",
+              dose: medication.dosage || "",
+              usedToTreat: medication.purpose || "",
+              prescriber: medication.prescribing_doctor || "",
+              refillDue: medication.refill_due
+                ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
+                : "",
+              id: medication.id || "",
+            })
+          ) || [],
+        diagnoses:
+          faceSheetLongData?.medical_info?.diagnoses
+            ?.split(", ")
+            ?.map((diagnosis: string) => ({
+              diagnosis: diagnosis || "",
+            })) || [],
+        allergies:
+          faceSheetLongData?.medical_info?.allergies
+            ?.split(", ")
+            ?.map((allergen: string) => ({
+              allergen: allergen || "",
+            })) || [],
+        surgicalHistory:
+          faceSheetLongData?.medical_info?.surgical_history
+            ?.split(", ")
+            ?.map((surgicalHistory: string) => ({
+              surgicalHistory: surgicalHistory || "",
+            })) || [],
         advanceDirective:
           ADVANCE_DIRECTIVE_OPTIONS.find(
             (advanceDirective) =>
               advanceDirective.value ===
-              faceSheetLongData.client_info.advance_directive
+              faceSheetLongData?.client_info?.advance_directive
           )?.value || "",
-        dpoaName: faceSheetLongData.short_form.dpoa || "",
-        mpoaName: faceSheetLongData.short_form.mpoa || "",
-        mpoaAddress: faceSheetLongData.short_form.mpoa_address || "",
-        mpoaPhone: faceSheetLongData.short_form.mpoa_phone || "",
-        dpoaAddress: faceSheetLongData.short_form.dpoa_address || "",
-        dpoaPhone: faceSheetLongData.short_form.dpoa_phone || "",
-        insurance: faceSheetLongData.short_form.insurance || "",
-        groupNumber: faceSheetLongData.short_form.group_number || "",
-        idNumber: faceSheetLongData.short_form.id_number || "",
-        medicare: faceSheetLongData.short_form.medicare || "",
-        caregiverAgency: faceSheetLongData.caregiver_agency.name || "",
-        caregiverAddress: faceSheetLongData.caregiver_agency.address || "",
+        dpoaName: faceSheetLongData?.short_form?.dpoa || "",
+        mpoaName: faceSheetLongData?.short_form?.mpoa || "",
+        mpoaAddress: faceSheetLongData?.short_form?.mpoa_address || "",
+        mpoaPhone: faceSheetLongData?.short_form?.mpoa_phone || "",
+        dpoaAddress: faceSheetLongData?.short_form?.dpoa_address || "",
+        dpoaPhone: faceSheetLongData?.short_form?.dpoa_phone || "",
+        insurance: faceSheetLongData?.short_form?.insurance || "",
+        groupNumber: faceSheetLongData?.short_form?.group_number || "",
+        idNumber: faceSheetLongData?.short_form?.id_number || "",
+        medicare: faceSheetLongData?.short_form?.medicare || "",
+        caregiverAgency: faceSheetLongData?.caregiver_agency?.name || "",
+        caregiverAddress: faceSheetLongData?.caregiver_agency?.address || "",
         caregiverDuties:
-          faceSheetLongData.caregiver_agency.caregiver_duties || "",
-        caregiverPhone: faceSheetLongData.caregiver_agency.phone || "",
+          faceSheetLongData?.caregiver_agency?.caregiver_duties || "",
+        caregiverPhone: faceSheetLongData?.caregiver_agency?.phone || "",
         caregiverPointOfContact:
-          faceSheetLongData.caregiver_agency.point_of_contact || "",
+          faceSheetLongData?.caregiver_agency?.point_of_contact || "",
         caregiverSchedule:
-          faceSheetLongData.caregiver_agency.caregiver_schedule || "",
+          faceSheetLongData?.caregiver_agency?.caregiver_schedule || "",
         importantInformationForCaregivers:
-          faceSheetLongData.caregiver_agency.important_information || "",
-        homeHealthAgency: faceSheetLongData.home_health_agency.name || "",
-        homeHealthAddress: faceSheetLongData.home_health_agency.address || "",
+          faceSheetLongData?.caregiver_agency?.important_information || "",
+        homeHealthAgency: faceSheetLongData?.home_health_agency?.name || "",
+        homeHealthAddress: faceSheetLongData?.home_health_agency?.address || "",
         homeHealthStartDate:
-          faceSheetLongData.home_health_agency.start_date || "",
+          faceSheetLongData?.home_health_agency?.start_date || "",
         homeHealthDischargeDate:
-          faceSheetLongData.home_health_agency.discharge_date || "",
-        homeHealthFax: faceSheetLongData.home_health_agency.fax || "",
-        homeHealthPhone: faceSheetLongData.home_health_agency.phone || "",
-        homeHealthSchedule: faceSheetLongData.home_health_agency.schedule || "",
+          faceSheetLongData?.home_health_agency?.discharge_date || "",
+        homeHealthFax: faceSheetLongData?.home_health_agency?.fax || "",
+        homeHealthPhone: faceSheetLongData?.home_health_agency?.phone || "",
+        homeHealthSchedule:
+          faceSheetLongData?.home_health_agency?.schedule || "",
         homeHealthPrescribingDoctor:
-          faceSheetLongData.home_health_agency.prescribing_doctor || "",
-        bloodwork: faceSheetLongData.bloodwork.map((bloodwork: Bloodwork) => ({
-          test: bloodwork.name || "",
-          date: bloodwork.date || "",
-          results: bloodwork.results || "",
-          orderedBy: bloodwork.ordered_by || "",
-          repeat: bloodwork.repeat || "",
-          id: bloodwork.id || "",
-        })),
-        vaccinations: faceSheetLongData.vaccinations.map((item: Vaccine) => ({
-          vaccineName: item.name || "",
-          date: item.date || "",
-          nextVaccine: item.next_vaccine || "",
-          id: item.id || "",
-        })),
-        cognitiveScreeningDate:
-          faceSheetLongData.medical_info.last_cognitive_screening || "",
+          faceSheetLongData?.home_health_agency?.prescribing_doctor || "",
+        bloodwork:
+          faceSheetLongData?.bloodwork?.map((bloodwork: Bloodwork) => ({
+            test: bloodwork.name || "",
+            date: bloodwork.date
+              ? DateUtils.formatDateToRequiredFormat(bloodwork.date)
+              : "",
+            results: bloodwork.results || "",
+            orderedBy: bloodwork.ordered_by || "",
+            repeat: bloodwork.repeat || "",
+            id: bloodwork.id || "",
+          })) || [],
+        vaccinations:
+          faceSheetLongData?.vaccinations?.map((item: Vaccine) => ({
+            vaccineName: item.name || "",
+            date: item.date
+              ? DateUtils.formatDateToRequiredFormat(item.date)
+              : "",
+            nextVaccine: item.next_vaccine
+              ? DateUtils.formatDateToRequiredFormat(item.next_vaccine)
+              : "",
+            id: item.id || "",
+          })) || [],
+        cognitiveScreeningDate: faceSheetLongData?.medical_info
+          ?.last_cognitive_screening
+          ? DateUtils.formatDateToRequiredFormat(
+              faceSheetLongData?.medical_info?.last_cognitive_screening
+            )
+          : "",
         cognitiveScreeningScore:
-          faceSheetLongData.medical_info.cognitive_score.split("/")[0] || "",
+          faceSheetLongData?.medical_info?.cognitive_score?.split("/")[0] || "",
         cognitiveScreeningScoreOutOf:
-          faceSheetLongData.medical_info.cognitive_score.split("/")[1] || "",
-        notesAndConcerns: faceSheetLongData.medical_info.notes || "",
-        mentalStatus: faceSheetLongData.medical_info.cognitive_status || "",
-        dietaryRestrictions: faceSheetLongData.medical_info.dietary_restrictions
-          .split(", ")
-          .map((dietaryRestriction: string) => ({
-            dietaryRestrictions: dietaryRestriction || "",
-          })),
-        medicalConditions: faceSheetLongData.medical_conditions.map(
-          (medicalCondition: MedicalCondition) => ({
-            condition: medicalCondition.condition || "",
-            onsetDate: medicalCondition.onset_date || "",
-            notes: medicalCondition.notes || "",
-            id: medicalCondition.id || "",
-          })
-        ),
+          faceSheetLongData?.medical_info?.cognitive_score?.split("/")[1] || "",
+        notesAndConcerns: faceSheetLongData?.medical_info?.notes || "",
+        mentalStatus: faceSheetLongData?.medical_info?.cognitive_status || "",
+        dietaryRestrictions:
+          faceSheetLongData?.medical_info?.dietary_restrictions
+            ?.split(", ")
+            ?.map((dietaryRestriction: string) => ({
+              dietaryRestrictions: dietaryRestriction || "",
+            })) || [],
+        medicalConditions:
+          faceSheetLongData?.medical_conditions?.map(
+            (medicalCondition: MedicalCondition) => ({
+              condition: medicalCondition.condition || "",
+              onsetDate: medicalCondition.onset_date
+                ? DateUtils.formatDateToRequiredFormat(
+                    medicalCondition.onset_date,
+                    "MM/YYYY"
+                  )
+                : "",
+              notes: medicalCondition.notes || "",
+              id: medicalCondition.id || "",
+            })
+          ) || [],
       };
       reset(formData);
 
@@ -398,7 +441,10 @@ export const FaceSheetLongForm: React.FC = () => {
       dietaryRestrictionsArray.replace(formData.dietaryRestrictions);
       medicalConditionsArray.replace(formData.medicalConditions);
     }
-    setOpenedFileData(getValues() as unknown as OpenedFileData);
+    setOpenedFileData({
+      ...getValues(),
+      last_update: { updatedAt: faceSheetLongData?.last_update?.updatedAt },
+    } as unknown as OpenedFileData);
   }, [faceSheetLongData]);
 
   const onSubmit = (data: FaceSheetLongFormData) => {
@@ -419,12 +465,16 @@ export const FaceSheetLongForm: React.FC = () => {
     const providers = data.providers?.map((item) => {
       const provider = {
         provider_type: item?.providerType,
-        provider_name: item.providerName,
-        specialty: item.specialty,
-        address: item.address,
-        phone: item.phone,
-        last_visit: item.lastVisit,
-        next_visit: item.nextVisit,
+        provider_name: item.providerName ? item.providerName : null,
+        specialty: item.specialty ? item.specialty : null,
+        address: item.address ? item.address : null,
+        phone: item.phone ? item.phone : null,
+        last_visit: item.lastVisit
+          ? DateUtils.changetoISO(item.lastVisit)
+          : null,
+        next_visit: item.nextVisit
+          ? DateUtils.changetoISO(item.nextVisit)
+          : null,
         id: item.id,
       };
       if (item.id) {
@@ -437,11 +487,11 @@ export const FaceSheetLongForm: React.FC = () => {
     });
     const bloodwork = data.bloodwork?.map((item) => {
       const bloodwork = {
-        name: item.test,
-        date: item.date,
-        results: item.results,
-        ordered_by: item.orderedBy,
-        repeat: item.repeat,
+        name: item.test ? item.test : null,
+        date: item.date ? DateUtils.changetoISO(item.date) : null,
+        results: item.results ? item.results : null,
+        ordered_by: item.orderedBy ? item.orderedBy : null,
+        repeat: item.repeat ? item.repeat : null,
         id: item.id,
       };
       if (item.id) {
@@ -454,9 +504,11 @@ export const FaceSheetLongForm: React.FC = () => {
 
     const vaccinations = data.vaccinations?.map((item) => {
       const vaccination = {
-        name: item.vaccineName,
-        date: item.date,
-        next_vaccine: item.nextVaccine,
+        name: item.vaccineName ? item.vaccineName : null,
+        date: item.date ? DateUtils.changetoISO(item.date) : null,
+        next_vaccine: item.nextVaccine
+          ? DateUtils.changetoISO(item.nextVaccine)
+          : null,
         id: item.id,
       };
       if (item.id) {
@@ -468,9 +520,9 @@ export const FaceSheetLongForm: React.FC = () => {
     });
     const medicalConditions = data.medicalConditions?.map((item) => {
       const medicalCondition = {
-        condition: item.condition,
-        onset_date: item.onsetDate,
-        notes: item.notes,
+        condition: item.condition ? item.condition : null,
+        onset_date: item.onsetDate ? DateUtils.changeMonthYearToISO(item.onsetDate) : null,
+        notes: item.notes ? item.notes : null,
         id: item.id,
       };
       if (item.id) {
@@ -484,51 +536,82 @@ export const FaceSheetLongForm: React.FC = () => {
       client_info: {
         first_name: data.firstName,
         last_name: data.lastName,
-        address: data.address,
-        ssn: data.ssn,
-        date_of_birth: data.dateOfBirth,
-        phone: data.phoneNumber,
-        preferred_hospital: data.hospitalPreference,
-        hospital_address: data.hospitalAddress,
-        hospital_phone: data.hospitalPhoneNumber,
-        pharmacy_name: data.pharmacyName,
-        pharmacy_address: data.pharmacyAddress,
-        pharmacy_phone: data.pharmacyPhone,
-        pharmacy_fax: data.pharmacyFax,
-        code_status: data.codeStatus,
-        advance_directive: data.advanceDirective,
-        race: data.race,
-        last_care_plan_date: data.dateOfLastCarePlan,
-        gender: GENDER_OPTIONS.find((gender) => gender.value === data.gender)
-          ?.value,
-        marital_status: MARITAL_STATUS_OPTIONS.find(
-          (maritalStatus) => maritalStatus.value === data.maritalStatus
-        )?.value,
-        language: LANGUAGE_OPTIONS.find(
-          (language) => language.value === data.language
-        )?.value,
-        living_situation: LIVING_SITUATION_OPTIONS.find(
-          (livingSituation) => livingSituation.value === data.livingSituation
-        )?.value,
+        address: data.address ? data.address : null,
+        ssn: data.ssn ? data.ssn : null,
+        date_of_birth: data.dateOfBirth
+          ? DateUtils.changetoISO(data.dateOfBirth)
+          : null,
+        phone: data.phoneNumber ? data.phoneNumber : null,
+        preferred_hospital: data.hospitalPreference
+          ? data.hospitalPreference
+          : null,
+        hospital_address: data.hospitalAddress ? data.hospitalAddress : null,
+        hospital_phone: data.hospitalPhoneNumber
+          ? data.hospitalPhoneNumber
+          : null,
+        pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
+        pharmacy_address: data.pharmacyAddress ? data.pharmacyAddress : null,
+        pharmacy_phone: data.pharmacyPhone ? data.pharmacyPhone : null,
+        pharmacy_fax: data.pharmacyFax ? data.pharmacyFax : null,
+        code_status: data.codeStatus ? data.codeStatus : null,
+        advance_directive: data.advanceDirective ? data.advanceDirective : null,
+        race: data.race ? data.race : null,
+        last_care_plan_date: data.dateOfLastCarePlan
+          ? DateUtils.changetoISO(data.dateOfLastCarePlan)
+          : null,
+        gender: data.gender
+          ? GENDER_OPTIONS.find((gender) => gender.value === data.gender)?.value
+          : null,
+        marital_status: data.maritalStatus
+          ? MARITAL_STATUS_OPTIONS.find(
+              (maritalStatus) => maritalStatus.value === data.maritalStatus
+            )?.value
+          : null,
+        language: data.language
+          ? LANGUAGE_OPTIONS.find(
+              (language) => language.value === data.language
+            )?.value
+          : null,
+        living_situation: data.livingSituation
+          ? LIVING_SITUATION_OPTIONS.find(
+              (livingSituation) =>
+                livingSituation.value === data.livingSituation
+            )?.value
+          : null,
       },
 
       medical_info: {
-        allergies: data.allergies
-          ?.map((allergy) => allergy.allergen)
-          .join(", "),
-        diagnoses: data.diagnoses
-          ?.map((diagnosis) => diagnosis.diagnosis)
-          .join(", "),
-        surgical_history: data.surgicalHistory
-          ?.map((surgicalHistory) => surgicalHistory.surgicalHistory)
-          .join(", "),
-        dietary_restrictions: data.dietaryRestrictions
-          ?.map((dietaryRestriction) => dietaryRestriction.dietaryRestrictions)
-          .join(", "),
-        cognitive_status: data.mentalStatus,
-        last_cognitive_screening: data.cognitiveScreeningDate,
-        cognitive_score: `${data.cognitiveScreeningScore}/${data.cognitiveScreeningScoreOutOf}`,
-        notes: data.notesAndConcerns,
+        allergies:
+          data.allergies && data.allergies.length > 0
+            ? data.allergies?.map((allergen) => allergen.allergen).join(", ")
+            : null,
+        diagnoses:
+          data.diagnoses && data.diagnoses.length > 0
+            ? data.diagnoses?.map((diagnosis) => diagnosis.diagnosis).join(", ")
+            : null,
+        surgical_history:
+          data.surgicalHistory && data.surgicalHistory.length > 0
+            ? data.surgicalHistory
+                ?.map((surgicalHistory) => surgicalHistory.surgicalHistory)
+                .join(", ")
+            : null,
+        dietary_restrictions:
+          data.dietaryRestrictions && data.dietaryRestrictions.length > 0
+            ? data.dietaryRestrictions
+                ?.map(
+                  (dietaryRestriction) => dietaryRestriction.dietaryRestrictions
+                )
+                .join(", ")
+            : null,
+        cognitive_status: data.mentalStatus ? data.mentalStatus : null,
+        last_cognitive_screening: data.cognitiveScreeningDate
+          ? DateUtils.changetoISO(data.cognitiveScreeningDate)
+          : null,
+        cognitive_score:
+          data.cognitiveScreeningScore && data.cognitiveScreeningScoreOutOf
+            ? `${data.cognitiveScreeningScore}/${data.cognitiveScreeningScoreOutOf}`
+            : null,
+        notes: data.notesAndConcerns ? data.notesAndConcerns : null,
       },
 
       emergency_contact: {
@@ -547,39 +630,51 @@ export const FaceSheetLongForm: React.FC = () => {
       vaccinations: vaccinations,
 
       home_health_agency: {
-        name: data.homeHealthAgency,
-        phone: data.homeHealthPhone,
-        address: data.homeHealthAddress,
-        fax: data.homeHealthFax,
-        schedule: data.homeHealthSchedule,
-        prescribing_doctor: data.homeHealthPrescribingDoctor,
-        start_date: data.homeHealthStartDate,
-        discharge_date: data.homeHealthDischargeDate,
+        name: data.homeHealthAgency ? data.homeHealthAgency : null,
+        phone: data.homeHealthPhone ? data.homeHealthPhone : null,
+        address: data.homeHealthAddress ? data.homeHealthAddress : null,
+        fax: data.homeHealthFax ? data.homeHealthFax : null,
+        schedule: data.homeHealthSchedule ? data.homeHealthSchedule : null,
+        prescribing_doctor: data.homeHealthPrescribingDoctor
+          ? data.homeHealthPrescribingDoctor
+          : null,
+        start_date: data.homeHealthStartDate
+          ? DateUtils.changetoISO(data.homeHealthStartDate)
+          : null,
+        discharge_date: data.homeHealthDischargeDate
+          ? DateUtils.changetoISO(data.homeHealthDischargeDate)
+          : null,
       },
 
       bloodwork: bloodwork,
 
       caregiver_agency: {
-        name: data.caregiverAgency,
-        phone: data.caregiverPhone,
-        address: data.caregiverAddress,
-        point_of_contact: data.caregiverPointOfContact,
-        caregiver_schedule: data.caregiverSchedule,
-        caregiver_duties: data.caregiverDuties,
-        important_information: data.importantInformationForCaregivers,
+        name: data.caregiverAgency ? data.caregiverAgency : null,
+        phone: data.caregiverPhone ? data.caregiverPhone : null,
+        address: data.caregiverAddress ? data.caregiverAddress : null,
+        point_of_contact: data.caregiverPointOfContact
+          ? data.caregiverPointOfContact
+          : null,
+        caregiver_schedule: data.caregiverSchedule
+          ? data.caregiverSchedule
+          : null,
+        caregiver_duties: data.caregiverDuties ? data.caregiverDuties : null,
+        important_information: data.importantInformationForCaregivers
+          ? data.importantInformationForCaregivers
+          : null,
       },
 
       short_form: {
-        insurance: data.insurance,
-        medicare: data.medicare,
-        group_number: data.groupNumber,
-        id_number: data.idNumber,
-        mpoa: data.mpoaName,
-        mpoa_phone: data.mpoaPhone,
-        mpoa_address: data.mpoaAddress,
-        dpoa: data.dpoaName,
-        dpoa_phone: data.dpoaPhone,
-        dpoa_address: data.dpoaAddress,
+        insurance: data.insurance ? data.insurance : null,
+        medicare: data.medicare ? data.medicare : null,
+        group_number: data.groupNumber ? data.groupNumber : null,
+        id_number: data.idNumber ? data.idNumber : null,
+        mpoa: data.mpoaName ? data.mpoaName : null,
+        mpoa_phone: data.mpoaPhone ? data.mpoaPhone : null,
+        mpoa_address: data.mpoaAddress ? data.mpoaAddress : null,
+        dpoa: data.dpoaName ? data.dpoaName : null,
+        dpoa_phone: data.dpoaPhone ? data.dpoaPhone : null,
+        dpoa_address: data.dpoaAddress ? data.dpoaAddress : null,
       },
       medical_conditions: medicalConditions,
     };

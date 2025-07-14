@@ -69,6 +69,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+    console.log(file);
 
     if (!file) {
       return;
@@ -80,19 +81,66 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       return;
     }
 
-    if (file.type === "application/pdf" || file.type.startsWith("image/")) {
+    const isValidFile = () => {
+      if (file.type === "application/pdf" || file.type.startsWith("image/")) {
+        return true;
+      }
+
+      const fileName = file.name.toLowerCase();
+      const validExtensions = [
+        ".pdf",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".heic",
+        ".heif",
+      ];
+
+      return validExtensions.some((ext) => fileName.endsWith(ext));
+    };
+
+    if (isValidFile()) {
       setFile(file);
       setFileName(file.name);
       setValue("file", file);
     } else {
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.error("Please upload a valid file");
+      toast.error("Please upload a valid file (PDF or image format)");
     }
   };
 
   const handleFormSubmit = (data: DocumentFormData) => {
     if (onSubmit) {
-      onSubmit({ ...data, file: file as File });
+      let fileToSubmit = file as File;
+
+      if (file && !file.type) {
+        const fileName = file.name.toLowerCase();
+        let correctMimeType = "";
+
+        if (fileName.endsWith(".heic")) {
+          correctMimeType = "image/heic";
+        } else if (fileName.endsWith(".heif")) {
+          correctMimeType = "image/heif";
+        } else if (fileName.endsWith(".pdf")) {
+          correctMimeType = "application/pdf";
+        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+          correctMimeType = "image/jpeg";
+        } else if (fileName.endsWith(".png")) {
+          correctMimeType = "image/png";
+        } else if (fileName.endsWith(".gif")) {
+          correctMimeType = "image/gif";
+        }
+
+        if (correctMimeType) {
+          fileToSubmit = new File([file], file.name, {
+            type: correctMimeType,
+            lastModified: file.lastModified,
+          });
+        }
+      }
+
+      onSubmit({ ...data, file: fileToSubmit });
     }
   };
 
@@ -178,7 +226,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
           </SecondaryButton>
           <input
             type="file"
-            accept="application/pdf,image/*"
+            accept="application/pdf,image/*,.heic,.heif"
             onChange={handleFileChange}
             className="hidden"
             ref={fileInputRef}

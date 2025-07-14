@@ -171,11 +171,17 @@ export const SEVERITY_OPTIONS = [
 ];
 
 export const RACE_OPTIONS = [
-  { label: "American Indian or Alaska Native", value: "american_indian_alaska_native" },
+  {
+    label: "American Indian or Alaska Native",
+    value: "american_indian_alaska_native",
+  },
   { label: "Asian", value: "asian" },
   { label: "Black or African American", value: "black_african_american" },
   { label: "Hispanic or Latino", value: "hispanic_latino" },
-  { label: "Native Hawaiian or Other Pacific Islander", value: "native_hawaiian_pacific_islander" },
+  {
+    label: "Native Hawaiian or Other Pacific Islander",
+    value: "native_hawaiian_pacific_islander",
+  },
   { label: "White", value: "white" },
   { label: "Other", value: "other" },
   { label: "Prefer not to say", value: "prefer_not_to_say" },
@@ -198,4 +204,12 @@ export const LANGUAGE_OPTIONS = [
   { label: "Vietnamese", value: "vietnamese" },
   { label: "Tagalog", value: "tagalog" },
   { label: "Other", value: "other" },
+];
+
+export const COGNITIVE_STATUS = [
+  { label: "Alert", value: "Alert" },
+  { label: "Oriented", value: "Oriented" },
+  { label: "Dementia", value: "Dementia" },
+  { label: "Mild Cognitive Impairment", value: "Mild Cognitive Impairment" },
+  { label: "Other", value: "Other" },
 ];

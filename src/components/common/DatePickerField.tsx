@@ -21,6 +21,7 @@ interface DatePickerProps<T extends FieldValues> {
   color?: string;
   label?: string;
   showTime?: boolean;
+  monthYearOnly?: boolean;
 }
 
 export const DatePickerField = <T extends FieldValues>({
@@ -33,9 +34,17 @@ export const DatePickerField = <T extends FieldValues>({
   color,
   label,
   showTime = false,
+  monthYearOnly = false,
 }: DatePickerProps<T>) => {
   const [error, setError] = useState("");
-  const dateFormat = showTime ? `${DATE_FOMRAT} hh:mm A` : DATE_FOMRAT;
+  
+  const getDateFormat = () => {
+    if (monthYearOnly) return "MM/YYYY";
+    if (showTime) return `${DATE_FOMRAT} hh:mm A`;
+    return DATE_FOMRAT;
+  };
+  
+  const dateFormat = getDateFormat();
 
   return (
     <div className="space-y-2">
@@ -54,12 +63,13 @@ export const DatePickerField = <T extends FieldValues>({
                   placeholder={placeholder || dateFormat}
                   className={`${className} !text-darkGray !bg-lightGray p-2
                   border-[1px] border-mediumGray rounded-xl font-semibold  w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
-                  onChange={(_: unknown, dateString: string | string[]) => {
+                  onChange={(date: any, dateString: string | string[]) => {
                     field.onChange(dateString);
                   }}
                   showTime={showTime ? { format: "hh:mm A", use12Hours: true } : false}
+                  picker={monthYearOnly ? "month" : "date"}
                   suffixIcon={null}
-                  value={field.value ? dayjs(field.value) : undefined}
+                  value={field.value ? dayjs(field.value, dateFormat) : undefined}
                 />
               </React.Fragment>
             );
