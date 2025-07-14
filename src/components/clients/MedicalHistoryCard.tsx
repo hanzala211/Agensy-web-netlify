@@ -57,7 +57,9 @@ export const MedicalHistoryCard: React.FC = () => {
       surgical_history: data.surgical_history.join(", "),
       cognitive_status: data.cognitive_status,
       notes: data.notes as string,
-      last_cognitive_screening: data.last_cognitive_screening,
+      last_cognitive_screening: DateUtils.changetoISO(
+        data.last_cognitive_screening
+      ),
       cognitive_score: `${data.cognitive_score}/${data.total_score}`,
     };
     if (!selectedClient?.medical) {
@@ -111,12 +113,14 @@ export const MedicalHistoryCard: React.FC = () => {
                 <p>{selectedClient?.medical.cognitive_status}</p>
               </InfoItem>
 
-              <InfoItem label="Cognitive Score:">
-                <p>
-                  {selectedClient.medical.cognitive_score?.split("/")[0]} out of{" "}
-                  {selectedClient.medical.cognitive_score?.split("/")[1]}
-                </p>
-              </InfoItem>
+              {selectedClient?.medical?.cognitive_score && (
+                <InfoItem label="Cognitive Score:">
+                  <p>
+                    {selectedClient.medical.cognitive_score?.split("/")[0]} out
+                    of {selectedClient.medical.cognitive_score?.split("/")[1]}
+                  </p>
+                </InfoItem>
+              )}
             </div>
             <div className="grid gap-4">
               {selectedClient?.medical?.allergies && (

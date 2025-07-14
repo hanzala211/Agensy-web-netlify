@@ -64,7 +64,9 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
       reset({
         firstName: editClient.first_name,
         lastName: editClient.last_name,
-        dateOfBirth: editClient.date_of_birth,
+        dateOfBirth: DateUtils.formatDateToRequiredFormat(
+          editClient.date_of_birth
+        ),
         gender: editClient.gender as "male" | "female" | "other",
         maritalStatus: editClient.marital_status,
         address: editClient.address,

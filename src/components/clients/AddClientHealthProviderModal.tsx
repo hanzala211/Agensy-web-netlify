@@ -16,6 +16,7 @@ import {
   TextArea,
 } from "@agensy/components";
 import { SPECIALTIES } from "@agensy/constants";
+import { DateUtils } from "@agensy/utils";
 
 interface AddClientHealthProviderModalProps {
   isOpen: boolean;
@@ -65,12 +66,16 @@ export const AddClientHealthProviderModal: React.FC<
       reset({
         provider_name: editItem.provider_name,
         provider_type: editItem.provider_type,
-        last_visit: editItem.last_visit,
+        last_visit: editItem.last_visit
+          ? DateUtils.formatDateToRequiredFormat(editItem.last_visit)
+          : "",
         specialty: editItem.specialty,
         address: editItem.address,
         phone: editItem.phone,
         fax: editItem.fax,
-        next_visit: editItem.next_visit,
+        next_visit: editItem.next_visit
+          ? DateUtils.formatDateToRequiredFormat(editItem.next_visit)
+          : "",
         notes: editItem.notes,
       });
     }

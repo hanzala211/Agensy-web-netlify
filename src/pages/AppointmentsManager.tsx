@@ -11,7 +11,7 @@ import {
 import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
 import { useAppointmentsContext, useAuthContext } from "@agensy/context";
 import type { AppointmentFormData } from "@agensy/types";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import type React from "react";
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
@@ -57,8 +57,8 @@ export const AppointmentsManager: React.FC = () => {
     const postData = {
       title: data.title,
       appointment_type: data.appointment_type,
-      start_time: new Date(data.start_time).toISOString(),
-      end_time: new Date(data.end_time).toISOString(),
+      start_time: DateUtils.changetoISO(data.start_time),
+      end_time: DateUtils.changetoISO(data.end_time),
       notes: data.notes,
       location: data.location,
       healthcare_provider_id: data.healthcare_provider_id,

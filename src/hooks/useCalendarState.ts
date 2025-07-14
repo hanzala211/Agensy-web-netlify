@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Appointment, AppointmentFormData, ViewMode } from "@agensy/types";
-import { CalendarUtils, toast } from "@agensy/utils";
+import { CalendarUtils, DateUtils, toast } from "@agensy/utils";
 import { useDeleteClientAppointmentMutation } from "@agensy/api";
 import { useAppointmentsContext } from "@agensy/context";
 import { useEditClientAppointmentMutation } from "@agensy/api";
@@ -71,8 +71,8 @@ export const useCalendarState = (appointments: Appointment[]) => {
     const postData = {
       title: data.title,
       appointment_type: data.appointment_type,
-      start_time: new Date(data.start_time).toISOString(),
-      end_time: new Date(data.end_time).toISOString(),
+      start_time: DateUtils.changetoISO(data.start_time),
+      end_time: DateUtils.changetoISO(data.end_time),
       notes: data.notes,
       location: data.location,
       healthcare_provider_id: data.healthcare_provider_id,

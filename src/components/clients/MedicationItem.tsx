@@ -51,14 +51,23 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
           </div>
 
           <div className="mt-3 pl-1 flex flex-wrap items-center gap-2 md:text-sm text-xs text-gray-600">
-            <div className="flex items-center gap-1">
-              <ICONS.clockCircle size={14} className="text-gray-400" />
-              <span>{medication?.frequency}</span>
-            </div>
-            <span className="text-gray-300">•</span>
+            {medication?.frequency && (
+              <React.Fragment>
+                <div className="flex items-center gap-1">
+                  <ICONS.clockCircle size={14} className="text-gray-400" />
+                  <span>{medication?.frequency}</span>
+                </div>
+                <span className="text-gray-300">•</span>
+              </React.Fragment>
+            )}
             <div className="flex items-center gap-1">
               <ICONS.doctor size={14} className="text-gray-400" />
-              <span>Prescribed By: {medication?.prescribing_doctor}</span>
+              <span>
+                Prescribed By:{" "}
+                {medication.prescribing_doctor
+                  ? medication?.prescribing_doctor
+                  : "NONE"}
+              </span>
             </div>
           </div>
 

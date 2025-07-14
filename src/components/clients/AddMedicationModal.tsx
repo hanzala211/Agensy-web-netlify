@@ -12,6 +12,7 @@ import {
 import type { ClientMedications } from "@agensy/types";
 import { medicationSchema, type MedicationFormData } from "@agensy/types";
 import { MEDICATION_FREQUENCY_OPTIONS } from "@agensy/constants";
+import { DateUtils } from "@agensy/utils";
 
 interface AddMedicationModalProps {
   isOpen: boolean;
@@ -59,9 +60,17 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({
         frequency: editMedication.frequency || "",
         purpose: editMedication.purpose || "",
         prescribing_doctor: editMedication.prescribing_doctor || "",
-        start_date: editMedication.start_date || "",
-        end_date: editMedication.end_date || "",
-        refill_due: editMedication.refill_due || "",
+        start_date:
+          DateUtils.formatDateToRequiredFormat(
+            editMedication.start_date || ""
+          ) || "",
+        end_date:
+          DateUtils.formatDateToRequiredFormat(editMedication.end_date || "") ||
+          "",
+        refill_due:
+          DateUtils.formatDateToRequiredFormat(
+            editMedication.refill_due || ""
+          ) || "",
         notes: editMedication.notes as string,
       });
     }

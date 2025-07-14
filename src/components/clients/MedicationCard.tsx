@@ -11,7 +11,7 @@ import {
   useEditClientMedicationMutation,
 } from "@agensy/api";
 import { useAuthContext, useClientContext } from "@agensy/context";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 
 export const MedicationCard: React.FC = () => {
   const { userData } = useAuthContext();
@@ -75,9 +75,9 @@ export const MedicationCard: React.FC = () => {
       frequency: data.frequency,
       purpose: data.purpose,
       prescribing_doctor: data.prescribing_doctor,
-      start_date: data.start_date,
-      end_date: data.end_date,
-      refill_due: data.refill_due,
+      start_date: DateUtils.changetoISO(data.start_date),
+      end_date: DateUtils.changetoISO(data.end_date),
+      refill_due: DateUtils.changetoISO(data.refill_due),
       notes: data.notes,
     };
     if (selectedEditMedication) {

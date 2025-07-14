@@ -86,7 +86,7 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
               </div>
             )}
 
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-100">
+            <div className={`flex flex-wrap gap-x-4 gap-y-1 mt-3 pt-3 ${provider?.last_visit || provider?.next_visit ?  "border-t border-gray-100" : ""}`}>
               {provider?.last_visit && (
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-gray-500">Last Visit:</span>

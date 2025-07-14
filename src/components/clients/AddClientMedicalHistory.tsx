@@ -17,6 +17,7 @@ import {
   type MedicalHistoryFormData,
 } from "@agensy/types";
 import { COGNITIVE_STATUS } from "@agensy/constants";
+import { DateUtils } from "@agensy/utils";
 
 interface AddClientMedicalHistoryProps {
   isOpen: boolean;
@@ -77,7 +78,9 @@ export const AddClientMedicalHistory: React.FC<
         dietary_restrictions: editData?.dietary_restrictions?.split(", "),
         surgical_history: editData?.surgical_history?.split(", "),
         cognitive_status: editData?.cognitive_status,
-        last_cognitive_screening: editData?.last_cognitive_screening,
+        last_cognitive_screening: DateUtils.formatDateToRequiredFormat(
+          editData?.last_cognitive_screening
+        ),
         cognitive_score: parseInt(editData?.cognitive_score?.split("/")[0]),
         total_score: parseInt(editData?.cognitive_score?.split("/")[1]),
         notes: editData?.notes,

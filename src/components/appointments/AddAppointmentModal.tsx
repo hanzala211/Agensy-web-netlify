@@ -18,6 +18,7 @@ import type {
 } from "@agensy/types";
 import { APPOINTMENT_TYPES } from "@agensy/constants";
 import { useAuthContext } from "@agensy/context";
+import { DateUtils } from "@agensy/utils";
 
 interface AddAppointmentModalProps {
   isOpen: boolean;
@@ -87,8 +88,8 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         title: editData.title,
         appointment_type: editData.appointment_type,
         location: editData.location,
-        start_time: editData.start_time,
-        end_time: editData.end_time,
+        start_time: DateUtils.formatDateTime(editData.start_time),
+        end_time: DateUtils.formatDateTime(editData.end_time),
         notes: editData.notes,
         clientId: editData.client_id,
         healthcare_provider_id: editData.healthcare_provider_id,

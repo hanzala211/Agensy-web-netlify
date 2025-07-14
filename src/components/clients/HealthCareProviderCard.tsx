@@ -15,7 +15,7 @@ import type {
   ClientHealthProviderFormData,
   HealthcareProvider,
 } from "@agensy/types";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import React, { useEffect, useState } from "react";
 
 export const HealthCareProviderCard: React.FC = () => {
@@ -73,15 +73,26 @@ export const HealthCareProviderCard: React.FC = () => {
   }, [isHealthCareModalOpen]);
 
   const handleSubmitForm = (data: ClientHealthProviderFormData) => {
+    const postData = {
+      address: data.address,
+      fax: data.fax,
+      last_visit: DateUtils.changetoISO(data.last_visit),
+      next_visit: DateUtils.changetoISO(data.next_visit),
+      notes: data.notes,
+      phone: data.phone,
+      provider_name: data.provider_name,
+      provider_type: data.provider_type,
+      specialty: data.specialty,
+    };
     if (selectedEditHealthCareProvider) {
       updateHealthCareProviderMutation.mutate({
-        provider: data,
+        provider: postData,
         clientId: selectedClient?.id as string,
         providerId: selectedEditHealthCareProvider.id as string,
       });
     } else {
       addHealthCareProviderMutation.mutate({
-        provider: data,
+        provider: postData,
         clientId: selectedClient?.id as string,
       });
     }
