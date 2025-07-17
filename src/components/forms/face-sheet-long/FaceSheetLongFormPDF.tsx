@@ -284,7 +284,9 @@ const FaceSheetLongFormPDF: React.FC<{
               key={i}
               cells={[
                 m.condition ?? "",
-                m.onsetDate && m.onsetDate.trim() !== "" ? DateUtils.formatDateToRequiredFormat(m.onsetDate) : "",
+                m.onsetDate && m.onsetDate.trim() !== ""
+                  ? DateUtils.formatDateToRequiredFormat(m.onsetDate)
+                  : "",
                 m.notes ?? "",
               ]}
               last={i === arr.length - 1}
@@ -388,8 +390,7 @@ const FaceSheetLongFormPDF: React.FC<{
         <Text style={styles.sectionTitle}>Mental Status</Text>
         <Field label="Status">{data.mentalStatus}</Field>
         <Field label="Last Cognitive Screening">
-          {data.cognitiveScreeningScore}/{data.cognitiveScreeningScoreOutOf} on{" "}
-          {data.cognitiveScreeningDate}
+          {data.cognitiveScreeningScore} on {data.cognitiveScreeningDate}
         </Field>
         <Field label="Notes / Concerns">{data.notesAndConcerns}</Field>
       </View>
