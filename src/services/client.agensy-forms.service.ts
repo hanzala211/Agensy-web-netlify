@@ -101,3 +101,38 @@ export const postHealthHistoryForm = async (
     throw error;
   }
 };
+
+export const getChecklistsForms = async (param: string, clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/checklists/${param}`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getChecklistsForms] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postChecklistForms = async (
+  param: string,
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/checklists/${param}`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postChecklistForms] error: ${error}`
+    );
+    throw error;
+  }
+};

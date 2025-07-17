@@ -1,0 +1,414 @@
+import React from "react";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+  Svg,
+  Path,
+} from "@react-pdf/renderer";
+import type { ChecklistField } from "@agensy/types";
+import { DateUtils } from "@agensy/utils";
+import logo from "@agensy/assets/logo.png";
+
+const BORDER = "#1f3d7a";
+const BORDER_LITE = "#c5d2f2";
+const HEADER_BG = "#e6f0ff";
+
+const RightArrow = () => (
+  <Svg
+    width="8"
+    height="8"
+    viewBox="0 0 24 24"
+    style={{ marginRight: 4, marginTop: 1 }}
+  >
+    <Path d="M8 5v14l11-7z" fill={BORDER} />
+  </Svg>
+);
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 20,
+    fontSize: 9.5,
+    fontFamily: "Helvetica",
+    lineHeight: 1.3,
+  },
+  formTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 14,
+    marginTop: 5,
+    color: BORDER,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  headerLogo: { width: 130, objectFit: "contain" },
+  headerDateBox: {
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 4,
+    fontSize: 9,
+    minWidth: 110,
+    textAlign: "right",
+  },
+
+  section: {
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginBottom: 10,
+  },
+
+  sectionTitle: {
+    backgroundColor: HEADER_BG,
+    color: BORDER,
+    fontWeight: "bold",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+    fontSize: 12,
+  },
+
+  groupTitle: {
+    backgroundColor: "#f8fafc",
+    color: BORDER,
+    fontWeight: "bold",
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER_LITE,
+    fontSize: 10,
+  },
+
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LITE,
+  },
+
+  checkboxIcon: {
+    width: 8,
+    height: 8,
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginRight: 6,
+    marginTop: 1,
+    backgroundColor: "white",
+  },
+
+  checkboxChecked: {
+    backgroundColor: BORDER,
+  },
+
+  checkboxLabel: {
+    flex: 1,
+    fontSize: 9,
+    lineHeight: 1.2,
+  },
+
+  radioContainer: {
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LITE,
+  },
+
+  radioLabel: {
+    fontSize: 9,
+    fontWeight: "bold",
+    marginBottom: 3,
+  },
+
+  radioOption: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginLeft: 10,
+    marginBottom: 2,
+  },
+
+  radioIcon: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginRight: 6,
+    marginTop: 2,
+    backgroundColor: "white",
+  },
+
+  radioSelected: {
+    backgroundColor: BORDER,
+  },
+
+  radioOptionLabel: {
+    flex: 1,
+    fontSize: 8,
+    lineHeight: 1.2,
+  },
+
+  indentLevel1: {
+    marginLeft: 15,
+  },
+
+  indentLevel2: {
+    marginLeft: 30,
+  },
+
+  indentLevel3: {
+    marginLeft: 45,
+  },
+});
+
+interface ChecklistFormData {
+  [key: string]: boolean | string;
+}
+
+interface StartofCareChecklistPDFProps {
+  data?: ChecklistFormData & { last_update: { updatedAt: string } };
+  schema: ChecklistField[];
+}
+
+// Get nesting level based on parentId chain
+const getNestingLevel = (
+  fieldId: string | undefined,
+  schema: ChecklistField[]
+): number => {
+  if (!fieldId) return 0;
+
+  let level = 0;
+  let currentField = schema.find((f: ChecklistField) => f.id === fieldId);
+
+  while (currentField?.parentId) {
+    level++;
+    currentField = schema.find(
+      (f: ChecklistField) => f.id === currentField!.parentId
+    );
+  }
+
+  return level;
+};
+
+const getFieldsByParent = (
+  parentId: string | null,
+  schema: ChecklistField[]
+): ChecklistField[] => {
+  return schema.filter((field: ChecklistField) => field.parentId === parentId);
+};
+
+const getFieldsByHeading = (
+  headingId: string | undefined,
+  schema: ChecklistField[]
+): ChecklistField[] => {
+  if (!headingId) return [];
+  return schema.filter(
+    (field: ChecklistField) =>
+      field.headingId === headingId && field.type !== "heading"
+  );
+};
+
+const CheckboxField: React.FC<{
+  field: ChecklistField;
+  data?: ChecklistFormData;
+  schema: ChecklistField[];
+  nestingLevel: number;
+}> = ({ field, data, schema, nestingLevel }) => {
+  const isChecked = field.id ? Boolean(data?.[field.id]) : false;
+  const childFields = getFieldsByParent(field.id, schema);
+  const indentStyle =
+    nestingLevel === 1
+      ? styles.indentLevel1
+      : nestingLevel === 2
+      ? styles.indentLevel2
+      : nestingLevel >= 3
+      ? styles.indentLevel3
+      : {};
+
+  return (
+    <View>
+      <View style={[styles.checkboxContainer, indentStyle]}>
+        <View
+          style={[
+            styles.checkboxIcon,
+            ...(isChecked ? [styles.checkboxChecked] : []),
+          ]}
+        />
+        <Text style={styles.checkboxLabel}>{field.label}</Text>
+      </View>
+      {childFields.map((childField) => (
+        <FieldRenderer
+          key={childField.id}
+          field={childField}
+          data={data}
+          schema={schema}
+        />
+      ))}
+    </View>
+  );
+};
+
+const RadioField: React.FC<{
+  field: ChecklistField;
+  data?: ChecklistFormData;
+  nestingLevel: number;
+}> = ({ field, data, nestingLevel }) => {
+  const selectedValue = field.id ? data?.[field.id] : null;
+  const indentStyle =
+    nestingLevel === 1
+      ? styles.indentLevel1
+      : nestingLevel === 2
+      ? styles.indentLevel2
+      : nestingLevel >= 3
+      ? styles.indentLevel3
+      : {};
+
+  return (
+    <View style={[styles.radioContainer, indentStyle]}>
+      {field.label && <Text style={styles.radioLabel}>{field.label}</Text>}
+      {field.options?.map((option, index) => (
+        <View key={index} style={styles.radioOption}>
+          <View
+            style={[
+              styles.radioIcon,
+              ...(selectedValue === option ? [styles.radioSelected] : []),
+            ]}
+          />
+          <Text style={styles.radioOptionLabel}>{option}</Text>
+        </View>
+      ))}
+    </View>
+  );
+};
+
+const GroupField: React.FC<{
+  field: ChecklistField;
+  data?: ChecklistFormData;
+  schema: ChecklistField[];
+  nestingLevel: number;
+}> = ({ field, data, schema, nestingLevel }) => {
+  const childFields = getFieldsByParent(field.id, schema);
+  const indentStyle =
+    nestingLevel === 1
+      ? styles.indentLevel1
+      : nestingLevel === 2
+      ? styles.indentLevel2
+      : nestingLevel >= 3
+      ? styles.indentLevel3
+      : {};
+
+  return (
+    <View>
+      <View style={[styles.groupTitle, indentStyle]}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <RightArrow />
+          <Text>{field.label}</Text>
+        </View>
+      </View>
+      {childFields.map((childField) => (
+        <FieldRenderer
+          key={childField.id}
+          field={childField}
+          data={data}
+          schema={schema}
+        />
+      ))}
+    </View>
+  );
+};
+
+const FieldRenderer: React.FC<{
+  field: ChecklistField;
+  data?: ChecklistFormData;
+  schema: ChecklistField[];
+}> = ({ field, data, schema }) => {
+  const nestingLevel = getNestingLevel(field.id, schema);
+
+  if (field.type === "group") {
+    return (
+      <GroupField
+        field={field}
+        data={data}
+        schema={schema}
+        nestingLevel={nestingLevel}
+      />
+    );
+  }
+
+  if (field.type === "checkbox") {
+    return (
+      <CheckboxField
+        field={field}
+        data={data}
+        schema={schema}
+        nestingLevel={nestingLevel}
+      />
+    );
+  }
+
+  if (field.type === "radio") {
+    return <RadioField field={field} data={data} nestingLevel={nestingLevel} />;
+  }
+
+  return null;
+};
+
+export const StartofCareChecklistPDF: React.FC<
+  StartofCareChecklistPDFProps
+> = ({ data, schema }) => {
+  // Get all headings
+  const headings = schema.filter((field) => field.type === "heading");
+
+  return (
+    <Document title="Agensy Start of Care Checklist">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>Agensy Start of Care Checklist</Text>
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <View style={{ flexDirection: "column" }}>
+            <Text style={styles.headerDateBox}>
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
+              )}`}
+            </Text>
+            {data?.last_update?.updatedAt && (
+              <Text style={[styles.headerDateBox, { marginTop: 5 }]}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        {headings.map((heading) => {
+          const headingFields = getFieldsByHeading(heading.headingId, schema);
+          const rootFields = headingFields.filter((field) => !field.parentId);
+
+          return (
+            <View key={heading.id} style={styles.section}>
+              <Text style={styles.sectionTitle}>{heading.label}</Text>
+              {rootFields.map((field) => (
+                <FieldRenderer
+                  key={field.id}
+                  field={field}
+                  data={data}
+                  schema={schema}
+                />
+              ))}
+            </View>
+          );
+        })}
+      </Page>
+    </Document>
+  );
+};

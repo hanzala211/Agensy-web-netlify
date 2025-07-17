@@ -60,7 +60,7 @@ export const MedicalHistoryCard: React.FC = () => {
       last_cognitive_screening: DateUtils.changetoISO(
         data.last_cognitive_screening
       ),
-      cognitive_score: `${data.cognitive_score}/${data.total_score}`,
+      cognitive_score: data.cognitive_score,
     };
     if (!selectedClient?.medical) {
       addClientMedicalHistoryMutation.mutate({

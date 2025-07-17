@@ -17,6 +17,11 @@ interface SelectProps<T extends FieldValues> {
   className?: string;
   showButton?: boolean;
   buttonLabel?: string;
+  // New props for text input functionality
+  enableTextInput?: boolean;
+  textInputTriggerValue?: string;
+  textInputName?: Path<T>;
+  textInputPlaceholder?: string;
 }
 
 export const Select = <T extends FieldValues>({
@@ -32,8 +37,15 @@ export const Select = <T extends FieldValues>({
   className = "",
   showButton = false,
   buttonLabel = "Add New One",
+  // New props with defaults
+  enableTextInput = false,
+  textInputTriggerValue = "add-new-one",
+  textInputName,
+  textInputPlaceholder = "Enter custom value",
 }: SelectProps<T>) => {
   const [error, setError] = useState("");
+  const [selectedValue, setSelectedValue] = useState("");
+
   return (
     <div className="space-y-2">
       <div className="flex flex-col gap-2 relative w-full">
@@ -47,32 +59,74 @@ export const Select = <T extends FieldValues>({
           control={control}
           render={({ field, fieldState: { error } }) => {
             setError(error?.message || "");
+            setSelectedValue(field.value || "");
+
             return (
-              <div className="relative">
-                <select
-                  id={label}
-                  aria-label={aria_label}
-                  {...field}
-                  className={`${className} text-darkGray bg-lightGray placeholder:text-darkGray p-2
-              border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+              <div
+                className={`flex gap-2 ${
+                  enableTextInput &&
+                  selectedValue === textInputTriggerValue &&
+                  textInputName
+                    ? "w-full"
+                    : ""
+                }`}
+              >
+                <div
+                  className={`relative ${
+                    enableTextInput &&
+                    selectedValue === textInputTriggerValue &&
+                    textInputName
+                      ? "flex-1"
+                      : "w-full"
+                  }`}
                 >
-                  {labelOption && <option value="">{labelOption}</option>}
-                  {data.map((item, index) => (
-                    <option key={index} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                  {showButton && (
-                    <option value="add-new-one">{buttonLabel}</option>
+                  <select
+                    id={label}
+                    aria-label={aria_label}
+                    {...field}
+                    className={`${className} text-darkGray bg-lightGray placeholder:text-darkGray p-2
+                      border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+                  >
+                    {labelOption && <option value="">{labelOption}</option>}
+                    {data.map((item, index) => (
+                      <option key={index} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                    {showButton && (
+                      <option value="add-new-one">{buttonLabel}</option>
+                    )}
+                  </select>
+                  {Icon && (
+                    <Icon
+                      className="absolute top-1/2 -translate-y-1/2 left-3"
+                      size={size}
+                      color={color}
+                    />
                   )}
-                </select>
-                {Icon && (
-                  <Icon
-                    className="absolute top-1/2 -translate-y-1/2 left-3"
-                    size={size}
-                    color={color}
-                  />
-                )}
+                </div>
+
+                {/* Conditional text input */}
+                {enableTextInput &&
+                  selectedValue === textInputTriggerValue &&
+                  textInputName && (
+                    <div className="flex-1">
+                      <Controller
+                        name={textInputName}
+                        control={control}
+                        render={({ field: textField }) => (
+                          <input
+                            id={`${name}-text-input`}
+                            type="text"
+                            placeholder={textInputPlaceholder}
+                            {...textField}
+                            className={`${className} text-darkGray bg-lightGray placeholder:text-darkGray p-2
+                          border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+                          />
+                        )}
+                      />
+                    </div>
+                  )}
               </div>
             );
           }}

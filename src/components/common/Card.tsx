@@ -10,6 +10,7 @@ interface CardProps {
   className?: string;
   ariaLabel?: string;
   showButton?: boolean;
+  childrenClasses?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -20,6 +21,7 @@ export const Card: React.FC<CardProps> = ({
   className = "",
   ariaLabel,
   showButton = true,
+  childrenClasses = "",
 }) => {
   return (
     <div
@@ -44,7 +46,7 @@ export const Card: React.FC<CardProps> = ({
         </div>
       )}
 
-      <div className="md:p-6 p-4 flex-1">{children}</div>
+      <div className={`md:p-6 p-4 flex-1 ${childrenClasses}`}>{children}</div>
     </div>
   );
 };

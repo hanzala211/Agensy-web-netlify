@@ -15,6 +15,8 @@ import { useParams } from "react-router-dom";
 import FaceSheetLongFormPDF from "./face-sheet-long/FaceSheetLongFormPDF";
 import FaceSheetShortFormPDF from "./face-sheet-short/FaceSheetShortFormPDF";
 import HealthHistoryFormPDF from "./health-history-form/HealthHistoryFormPDF";
+import { StartofCareChecklistPDF } from "./start-of-care-checklist/StartofCareChecklistPDF";
+import { checklistSchema } from "@agensy/config";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -133,6 +135,22 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                     last_update: { updatedAt: string };
                   }
                 }
+              />
+            );
+          }
+          break;
+        case "start-of-care-checklist":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <StartofCareChecklistPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+                schema={checklistSchema}
               />
             );
           }

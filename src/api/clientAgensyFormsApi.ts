@@ -39,10 +39,31 @@ export const useGetHealthHistoryForm = (clientId: string) => {
   });
 };
 
-
 export const usePostHealthHistoryFormMutation = () => {
   return useMutation({
     mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
       ClientAgensyFormsService.postHealthHistoryForm(clientId, data),
   });
-}
+};
+
+export const useGetChecklistForms = (param: string, clientId: string) => {
+  return useQuery({
+    queryKey: ["checklist", param, clientId],
+    queryFn: () => ClientAgensyFormsService.getChecklistsForms(param, clientId),
+    enabled: true,
+  });
+};
+
+export const usePostChecklistFormsMutation = () => {
+  return useMutation({
+    mutationFn: ({
+      clientId,
+      param,
+      data,
+    }: {
+      clientId: string;
+      param: string;
+      data: unknown;
+    }) => ClientAgensyFormsService.postChecklistForms(param, clientId, data),
+  });
+};

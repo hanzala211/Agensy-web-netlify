@@ -4,11 +4,11 @@ import React, { useEffect, useRef } from "react";
 import {
   Modal,
   PrimaryButton,
-  Input,
   DatePickerField,
   TextArea,
   ModalArrayField,
   Select,
+  ScoringInput,
 } from "@agensy/components";
 import {
   medicalHistorySchema,
@@ -48,9 +48,9 @@ export const AddClientMedicalHistory: React.FC<
       surgical_history: [""],
       cognitive_status: "",
       last_cognitive_screening: "",
-      cognitive_score: 0,
-      total_score: 0,
+      cognitive_score: "",
       notes: "",
+      cognitive_status_text: "",
     },
   });
 
@@ -63,9 +63,9 @@ export const AddClientMedicalHistory: React.FC<
         surgical_history: [""],
         cognitive_status: "",
         last_cognitive_screening: "",
-        cognitive_score: 0,
-        total_score: 0,
+        cognitive_score: "",
         notes: "",
+        cognitive_status_text: "",
       });
     }
   }, [isOpen, reset, editData]);
@@ -77,12 +77,20 @@ export const AddClientMedicalHistory: React.FC<
         allergies: editData?.allergies?.split(", "),
         dietary_restrictions: editData?.dietary_restrictions?.split(", "),
         surgical_history: editData?.surgical_history?.split(", "),
-        cognitive_status: editData?.cognitive_status,
+        cognitive_status: COGNITIVE_STATUS.some(
+          (item) => item?.value === editData?.cognitive_status
+        )
+          ? editData?.cognitive_status
+          : "Other",
+        cognitive_status_text: COGNITIVE_STATUS.some(
+          (item) => item?.value === editData?.cognitive_status
+        )
+          ? ""
+          : editData?.cognitive_status,
         last_cognitive_screening: DateUtils.formatDateToRequiredFormat(
           editData?.last_cognitive_screening
         ),
-        cognitive_score: parseInt(editData?.cognitive_score?.split("/")[0]),
-        total_score: parseInt(editData?.cognitive_score?.split("/")[1]),
+        cognitive_score: editData?.cognitive_score || "",
         notes: editData?.notes,
       });
     }
@@ -170,6 +178,10 @@ export const AddClientMedicalHistory: React.FC<
           labelOption="Select Cognitive Status"
           name="cognitive_status"
           data={COGNITIVE_STATUS as { label: string; value: string }[]}
+          enableTextInput={true}
+          textInputTriggerValue="Other"
+          textInputName="cognitive_status_text"
+          textInputPlaceholder="Enter Cognitive Status"
         />
 
         <DatePickerField
@@ -178,23 +190,12 @@ export const AddClientMedicalHistory: React.FC<
           label="Last Cognitive Screening"
         />
 
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="number"
-            label="Cognitive Score"
-            register={register("cognitive_score", { valueAsNumber: true })}
-            error={errors.cognitive_score?.message}
-            placeholder="e.g., 26 (from MMSE or SLUMS)"
-          />
-
-          <Input
-            label="Total Score"
-            type="number"
-            register={register("total_score", { valueAsNumber: true })}
-            error={errors.total_score?.message}
-            placeholder="e.g., 30 (MMSE) or 30 (SLUMS)"
-          />
-        </div>
+        <ScoringInput
+          control={control}
+          name="cognitive_score"
+          label="Cognitive Score"
+          placeholder="e.g., 26/30 (from MMSE or SLUMS)"
+        />
 
         <TextArea
           label="Notes"

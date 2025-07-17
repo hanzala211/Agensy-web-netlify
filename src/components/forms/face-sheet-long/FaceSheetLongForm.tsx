@@ -47,6 +47,7 @@ import {
   LIVING_SITUATION_OPTIONS,
   RELATIONSHIP_TO_CLIENT,
   RACE_OPTIONS,
+  COGNITIVE_STATUS,
 } from "@agensy/constants";
 import { useClientContext } from "@agensy/context";
 
@@ -82,7 +83,6 @@ const defaultValues = {
   medications: [],
   cognitiveScreeningDate: "",
   cognitiveScreeningScore: "",
-  cognitiveScreeningScoreOutOf: "",
   notesAndConcerns: "",
   mentalStatus: "",
   dietaryRestrictions: [],
@@ -117,6 +117,7 @@ const defaultValues = {
   surgicalHistory: [],
   diagnoses: [],
   allergies: [],
+  mentalStatusText: "",
 };
 
 export const FaceSheetLongForm: React.FC = () => {
@@ -406,11 +407,20 @@ export const FaceSheetLongForm: React.FC = () => {
             )
           : "",
         cognitiveScreeningScore:
-          faceSheetLongData?.medical_info?.cognitive_score?.split("/")[0] || "",
-        cognitiveScreeningScoreOutOf:
-          faceSheetLongData?.medical_info?.cognitive_score?.split("/")[1] || "",
+          faceSheetLongData?.medical_info?.cognitive_score || "",
         notesAndConcerns: faceSheetLongData?.medical_info?.notes || "",
-        mentalStatus: faceSheetLongData?.medical_info?.cognitive_status || "",
+        mentalStatus: COGNITIVE_STATUS.some(
+          (item) =>
+            item.value === faceSheetLongData?.medical_info?.cognitive_status
+        )
+          ? faceSheetLongData?.medical_info?.cognitive_status
+          : "Other",
+        mentalStatusText: COGNITIVE_STATUS.some(
+          (item) =>
+            item.value === faceSheetLongData?.medical_info?.cognitive_status
+        )
+          ? ""
+          : faceSheetLongData?.medical_info?.cognitive_status,
         dietaryRestrictions:
           faceSheetLongData?.medical_info?.dietary_restrictions
             ?.split(", ")
@@ -602,14 +612,17 @@ export const FaceSheetLongForm: React.FC = () => {
           data.dietaryRestrictions,
           (dietaryRestrictions) => dietaryRestrictions.dietaryRestrictions || ""
         ),
-        cognitive_status: data.mentalStatus ? data.mentalStatus : null,
+        cognitive_status: data.mentalStatus
+          ? data.mentalStatus === "Other"
+            ? data.mentalStatusText
+            : data.mentalStatus
+          : null,
         last_cognitive_screening: data.cognitiveScreeningDate
           ? DateUtils.changetoISO(data.cognitiveScreeningDate)
           : null,
-        cognitive_score:
-          data.cognitiveScreeningScore && data.cognitiveScreeningScoreOutOf
-            ? `${data.cognitiveScreeningScore}/${data.cognitiveScreeningScoreOutOf}`
-            : null,
+        cognitive_score: data.cognitiveScreeningScore
+          ? data.cognitiveScreeningScore
+          : null,
         notes: data.notesAndConcerns ? data.notesAndConcerns : null,
       },
 

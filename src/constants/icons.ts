@@ -50,10 +50,15 @@ import {
 } from "react-icons/fa6";
 import { PiNotePencilBold } from "react-icons/pi";
 import { IoMdAddCircle } from "react-icons/io";
-import { IoChatbubbleOutline, IoCheckmarkOutline, IoHomeSharp, IoPersonAdd } from "react-icons/io5";
+import {
+  IoChatbubbleOutline,
+  IoCheckmarkOutline,
+  IoHomeSharp,
+  IoPersonAdd,
+} from "react-icons/io5";
 import { CiMedicalCross } from "react-icons/ci";
 import { GrDocumentText } from "react-icons/gr";
-import { BiDollar } from "react-icons/bi";
+import { BiDollar, BiSolidRightArrow } from "react-icons/bi";
 import { FaFolder, FaFolderOpen, FaFileAlt } from "react-icons/fa";
 
 export const ICONS = {
@@ -111,5 +116,6 @@ export const ICONS = {
   chat: IoChatbubbleOutline,
   folder: FaFolder,
   folderOpen: FaFolderOpen,
-  fileAlt: FaFileAlt
+  fileAlt: FaFileAlt,
+  rightSolid: BiSolidRightArrow,
 };

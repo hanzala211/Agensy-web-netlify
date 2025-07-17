@@ -4,6 +4,7 @@ import {
   FolderExplorer,
   FaceSheetLongForm,
   HealthHistoryForm,
+  StartofCareChecklist,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -230,7 +231,7 @@ const fileMap: Record<string, FolderData> = {
     id: "start-of-care-checklist",
     name: "Start of Care Checklist",
     description: "Comprehensive checklist for initiating care services",
-    content: <div>Start of Care Checklist content</div>,
+    content: <StartofCareChecklist />,
   },
   "health-history-form-soc": {
     id: "health-history-form-soc",

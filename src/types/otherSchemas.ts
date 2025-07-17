@@ -25,3 +25,15 @@ export type OpenedFileData = Record<
   string,
   string | string[] | Record<string, string | number>
 >;
+
+export interface ChecklistField {
+  id: string;
+  type: "heading" | "group" | "checkbox" | "radio";
+  label: string;
+  name?: string;
+  options?: string[];
+  parentId: string | null;
+  headingId?: string;
+}
+
+export type ChecklistFormData = Record<string, boolean | string | null>;

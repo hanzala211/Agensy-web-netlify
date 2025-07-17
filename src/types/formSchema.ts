@@ -379,12 +379,23 @@ export const medicalHistorySchema = z.object({
     .string()
     .min(1, "Cognitive status is required")
     .transform(trimString),
+  cognitive_status_text: z.string().optional(),
   last_cognitive_screening: z
     .string()
     .min(1, "Last cognitive screening date is required")
     .transform(trimString),
-  cognitive_score: z.number().min(1, "Cognitive score is required"),
-  total_score: z.number().min(1, "Total score is required"),
+  cognitive_score: z
+    .string()
+    .min(1, "Cognitive score is required")
+    .refine(
+      (val) => {
+        const pattern = /^\d{1,2}\/\d{1,2}$/;
+        return pattern.test(val);
+      },
+      {
+        message: "Score must be in format 'score/total' (e.g., '26/30')",
+      }
+    ),
   notes: z
     .string()
     .optional()
@@ -561,7 +572,7 @@ export const faceSheetShortFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   address: z.string().min(1, "Address is required"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
+  phoneNumber: z.string().optional(),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   ssn: z.string().optional(),
 
@@ -614,7 +625,7 @@ export const faceSheetShortFormSchema = z.object({
         lastVisit: z.string().optional(),
         nextVisit: z.string().optional(),
         id: z.string().optional().nullish().nullable(),
-        providerType: z.string().optional(),
+        providerType: z.string().optional().nullable(),
       })
     )
     .optional(),
@@ -665,7 +676,7 @@ export const faceSheetLongFormSchema = z
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     address: z.string().min(1, "Address is required"),
-    phoneNumber: z.string().min(1, "Phone number is required"),
+    phoneNumber: z.string().optional(),
     dateOfBirth: z.string().min(1, "Date of birth is required"),
     ssn: z.string().optional(),
 
@@ -735,9 +746,20 @@ export const faceSheetLongFormSchema = z
 
     // Mental Status
     mentalStatus: z.string().min(1, "Mental status is required"),
+    mentalStatusText: z.string().optional(),
     cognitiveScreeningDate: z.string().optional(),
-    cognitiveScreeningScore: z.string().optional(),
-    cognitiveScreeningScoreOutOf: z.string().optional(),
+    cognitiveScreeningScore: z
+      .string()
+      .min(1, "Cognitive score is required")
+      .refine(
+        (val) => {
+          const pattern = /^\d{1,2}\/\d{1,2}$/;
+          return pattern.test(val);
+        },
+        {
+          message: "Score must be in format 'score/total' (e.g., '26/30')",
+        }
+      ),
     notesAndConcerns: z.string().optional(),
 
     // Dynamic Arrays
@@ -752,7 +774,7 @@ export const faceSheetLongFormSchema = z
           lastVisit: z.string().optional(),
           nextVisit: z.string().optional(),
           id: z.string().optional().nullish().nullable(),
-          providerType: z.string().optional(),
+          providerType: z.string().optional().nullable(),
         })
       )
       .optional(),
@@ -855,24 +877,6 @@ export const faceSheetLongFormSchema = z
     {
       message: "Home health discharge date cannot be before start date",
       path: ["homeHealthDischargeDate"],
-    }
-  )
-  .refine(
-    (data) => {
-      const score = data.cognitiveScreeningScore;
-      const scoreOutOf = data.cognitiveScreeningScoreOutOf;
-      if (!score || !scoreOutOf) return true;
-      const scoreNumber = parseInt(score);
-      const scoreOutOfNumber = parseInt(scoreOutOf);
-      return (
-        scoreNumber <= scoreOutOfNumber &&
-        scoreNumber >= 0 &&
-        scoreOutOfNumber >= 0
-      );
-    },
-    {
-      message: "Cognitive screening score cannot be greater than total score",
-      path: ["cognitiveScreeningScore"],
     }
   );
 
