@@ -63,7 +63,10 @@ export const StartofCareChecklist = () => {
   }, [postStartCareChecklistMutation.status]);
 
   useEffect(() => {
-    setOpenedFileData({...formData, last_update: {updatedAt: startOfCareChecklist.updatedAt}} as unknown as OpenedFileData);
+    setOpenedFileData({
+      ...formData,
+      last_update: { updatedAt: startOfCareChecklist?.updatedAt },
+    } as unknown as OpenedFileData);
   }, [formData]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
