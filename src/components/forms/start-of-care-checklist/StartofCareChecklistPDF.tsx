@@ -168,6 +168,23 @@ const styles = StyleSheet.create({
   indentLevel3: {
     marginLeft: 45,
   },
+
+  linkContainer: {
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LITE,
+  },
+
+  linkText: {
+    fontSize: 9,
+    lineHeight: 1.3,
+  },
+
+  linkUrl: {
+    color: "#2563eb",
+    textDecoration: "underline",
+  },
 });
 
 interface ChecklistFormData {
@@ -326,6 +343,64 @@ const GroupField: React.FC<{
   );
 };
 
+const LinkField: React.FC<{
+  field: ChecklistField;
+  nestingLevel: number;
+}> = ({ field, nestingLevel }) => {
+  const indentStyle =
+    nestingLevel === 1
+      ? styles.indentLevel1
+      : nestingLevel === 2
+      ? styles.indentLevel2
+      : nestingLevel >= 3
+      ? styles.indentLevel3
+      : {};
+
+  // Extract URLs from text for PDF display
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const segments: Array<{ text: string; url?: string }> = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = urlRegex.exec(field.label)) !== null) {
+    // Add text before the URL
+    if (match.index > lastIndex) {
+      segments.push({ text: field.label.slice(lastIndex, match.index) });
+    }
+    
+    // Add the URL segment
+    segments.push({ text: match[1], url: match[1] });
+    
+    lastIndex = match.index + match[1].length;
+  }
+
+  // Add remaining text after the last URL
+  if (lastIndex < field.label.length) {
+    segments.push({ text: field.label.slice(lastIndex) });
+  }
+
+  return (
+    <View>
+      <View style={[styles.groupTitle, indentStyle]}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <RightArrow />
+          <Text style={styles.groupTitle}>
+            {segments.map((segment, index) => (
+              <Text key={index}>
+                {segment.url ? (
+                  <Text style={styles.linkUrl}>{segment.text}</Text>
+                ) : (
+                  segment.text
+                )}
+              </Text>
+            ))}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
 const FieldRenderer: React.FC<{
   field: ChecklistField;
   data?: ChecklistFormData;
@@ -359,13 +434,16 @@ const FieldRenderer: React.FC<{
     return <RadioField field={field} data={data} nestingLevel={nestingLevel} />;
   }
 
+  if (field.type === "link") {
+    return <LinkField field={field} nestingLevel={nestingLevel} />;
+  }
+
   return null;
 };
 
 export const StartofCareChecklistPDF: React.FC<
   StartofCareChecklistPDFProps
 > = ({ data, schema }) => {
-  // Get all headings
   const headings = schema.filter((field) => field.type === "heading");
 
   return (

@@ -28,12 +28,13 @@ export type OpenedFileData = Record<
 
 export interface ChecklistField {
   id: string;
-  type: "heading" | "group" | "checkbox" | "radio";
+  type: "heading" | "group" | "checkbox" | "radio" | "link";
   label: string;
   name?: string;
   options?: string[];
   parentId: string | null;
   headingId?: string;
+  parentOption?: string;
 }
 
 export type ChecklistFormData = Record<string, boolean | string | null>;

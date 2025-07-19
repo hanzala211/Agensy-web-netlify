@@ -136,3 +136,71 @@ export const postChecklistForms = async (
     throw error;
   }
 };
+
+export const getEssentialDocumentsForAging = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/essential-documents`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getEssentialDocumentsForAging] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postEssentialDocumentsForAging = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/essential-documents`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postEssentialDocumentsForAging] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getCareRecipientQuestionnaire = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/care-recipient-questionnaire`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getCareRecipientQuestionnaire] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postCareRecipientQuestionaire = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/care-recipient-questionnaire`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postCareRecipientQuestionaire] error: ${error}`
+    );
+    throw error;
+  }
+};

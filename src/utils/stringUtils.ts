@@ -20,3 +20,28 @@ export const filterAndJoinWithCommas = <T>(
       })()
     : null;
 };
+
+export const extractLinksFromText = (
+  text: string
+): Array<{ text: string; url?: string }> => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const segments: Array<{ text: string; url?: string }> = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = urlRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ text: text.slice(lastIndex, match.index) });
+    }
+
+    segments.push({ text: match[1], url: match[1] });
+
+    lastIndex = match.index + match[1].length;
+  }
+
+  if (lastIndex < text.length) {
+    segments.push({ text: text.slice(lastIndex) });
+  }
+
+  return segments;
+};

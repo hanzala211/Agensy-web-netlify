@@ -22,7 +22,7 @@ export const RadioInput: React.FC<RadioInputProps> = ({
         value={value}
         className={`${className} mr-1`}
       />
-      <span>{label}</span>
+      <span className="md:text-[16px] text-[13px]">{label}</span>
     </label>
   );
 };

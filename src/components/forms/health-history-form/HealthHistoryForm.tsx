@@ -130,6 +130,11 @@ export const HealthHistoryForm: React.FC = () => {
     name: "medicationsStarted",
   });
 
+  const medications = useFieldArray({
+    control,
+    name: "medications",
+  });
+
   const medicationsEndedArray = useFieldArray({
     control,
     name: "medicationsEnded",
@@ -149,6 +154,10 @@ export const HealthHistoryForm: React.FC = () => {
           ? item.prescribingDoctor
           : null,
         id: item?.id,
+        start_date: item.startDate
+          ? DateUtils.changetoISO(item.startDate)
+          : null,
+        end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
       };
       if (item.id) {
         return medication;
@@ -165,6 +174,31 @@ export const HealthHistoryForm: React.FC = () => {
           ? item.prescribingDoctor
           : null,
         id: item?.id,
+        start_date: item.startDate
+          ? DateUtils.changetoISO(item.startDate)
+          : null,
+        end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
+      };
+      if (item.id) {
+        return medication;
+      } else {
+        delete medication.id;
+        return medication;
+      }
+    });
+
+    const medications = data.medications?.map((item) => {
+      const medication = {
+        medication_name: item.medicationName ? item.medicationName : null,
+        dosage: item.dosage ? item.dosage : null,
+        prescribing_doctor: item.prescribingDoctor
+          ? item.prescribingDoctor
+          : null,
+        id: item?.id,
+        start_date: item.startDate
+          ? DateUtils.changetoISO(item.startDate)
+          : null,
+        end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
       };
       if (item.id) {
         return medication;
@@ -175,13 +209,16 @@ export const HealthHistoryForm: React.FC = () => {
     });
     const postData = {
       medical_info: {
-        diagnoses:
-        StringUtils.filterAndJoinWithCommas(
+        diagnoses: StringUtils.filterAndJoinWithCommas(
           data.diagnoses,
           (diagnoses) => diagnoses.diagnosis || ""
         ),
       },
-      medications: [...(medicationsStarted || []), ...(medicationsEnded || [])],
+      medications: [
+        ...(medicationsStarted || []),
+        ...(medicationsEnded || []),
+        ...(medications || []),
+      ],
       healthcare_providers: {
         provider_name: data.providerName ? data.providerName : null,
         address: data.providerAddress ? data.providerAddress : null,
@@ -206,14 +243,6 @@ export const HealthHistoryForm: React.FC = () => {
           ? DateUtils.changetoISO(data.homeHealthDischargeDate)
           : null,
       },
-      hospitalization: {
-        admitting_diagnosis: data.admittingDiagnosis
-          ? data.admittingDiagnosis
-          : null,
-        treatment: data.hospitalizationTreatment
-          ? data.hospitalizationTreatment
-          : null,
-      },
       health_history: {
         what_worked: data.whatWorked ? data.whatWorked : null,
         date: data.healthHistoryDate
@@ -229,6 +258,12 @@ export const HealthHistoryForm: React.FC = () => {
           : null,
         severity_of_symptoms: data.severityOfSymptoms
           ? data.severityOfSymptoms
+          : null,
+        admitting_diagnosis: data.admittingDiagnosis
+          ? data.admittingDiagnosis
+          : null,
+        treatment: data.hospitalizationTreatment
+          ? data.hospitalizationTreatment
           : null,
       },
     };
@@ -285,9 +320,9 @@ export const HealthHistoryForm: React.FC = () => {
             )
           : "",
         admittingDiagnosis:
-          healthHistoryForm?.hospitalization?.admitting_diagnosis || "",
+          healthHistoryForm?.health_history?.admitting_diagnosis || "",
         hospitalizationTreatment:
-          healthHistoryForm?.hospitalization?.treatment || "",
+          healthHistoryForm?.health_history?.treatment || "",
         diagnoses:
           healthHistoryForm?.medical_info?.diagnoses
             ?.split(",")
@@ -334,6 +369,22 @@ export const HealthHistoryForm: React.FC = () => {
                 : "",
               id: medication.id || "",
             })) || [],
+        medications: healthHistoryForm?.medications
+          ?.filter(
+            (item: ClientMedications) => !item.start_date && !item.end_date
+          )
+          ?.map((medication: ClientMedications) => ({
+            medicationName: medication.medication_name || "",
+            dosage: medication.dosage || "",
+            prescribingDoctor: medication.prescribing_doctor || "",
+            startDate: medication.start_date
+              ? DateUtils.formatDateToRequiredFormat(medication.start_date)
+              : "",
+            endDate: medication.end_date
+              ? DateUtils.formatDateToRequiredFormat(medication.end_date)
+              : "",
+            id: medication.id || "",
+          })),
       });
       setOpenedFileData({
         ...getValues(),
@@ -375,7 +426,7 @@ export const HealthHistoryForm: React.FC = () => {
             {medicationsStartedArray.fields.map((field, index) => (
               <div
                 key={field.id}
-                className="p-4 rounded-lg border border-gray-200"
+                className="p-4 rounded-lg border space-y-4 border-gray-200"
               >
                 <div className="grid md:grid-cols-3 gap-4">
                   <Input
@@ -402,6 +453,18 @@ export const HealthHistoryForm: React.FC = () => {
                       errors.medicationsStarted?.[index]?.prescribingDoctor
                         ?.message
                     }
+                  />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <DatePickerField
+                    control={control}
+                    name={`medicationsStarted.${index}.startDate`}
+                    label="Medication Start Date"
+                  />
+                  <DatePickerField
+                    control={control}
+                    name={`medicationsStarted.${index}.endDate`}
+                    label="Medication End Date"
                   />
                 </div>
                 {medicationsStartedArray.fields.length > 1 && (
@@ -439,7 +502,7 @@ export const HealthHistoryForm: React.FC = () => {
             {medicationsEndedArray.fields.map((field, index) => (
               <div
                 key={field.id}
-                className="p-4 rounded-lg border border-gray-200"
+                className="p-4 rounded-lg border space-y-4 border-gray-200"
               >
                 <div className="grid md:grid-cols-3 gap-4">
                   <Input
@@ -467,11 +530,92 @@ export const HealthHistoryForm: React.FC = () => {
                     }
                   />
                 </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <DatePickerField
+                    control={control}
+                    name={`medicationsEnded.${index}.startDate`}
+                    label="Medication Start Date"
+                  />
+                  <DatePickerField
+                    control={control}
+                    name={`medicationsEnded.${index}.endDate`}
+                    label="Medication End Date"
+                  />
+                </div>
                 {medicationsEndedArray.fields.length > 1 && (
                   <div className="flex justify-end mt-4">
                     <TertiaryButton
                       type="button"
                       onClick={() => medicationsEndedArray.remove(index)}
+                      className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
+                    >
+                      <ICONS.delete />
+                    </TertiaryButton>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card
+          title="Medications"
+          buttonText={<ICONS.plus size={16} />}
+          onButtonClick={() =>
+            medications.append({
+              medicationName: "",
+              dosage: "",
+              prescribingDoctor: "",
+              id: "",
+            })
+          }
+          ariaLabel="Add Medication"
+          showButton={true}
+        >
+          <div className="space-y-6">
+            {medications.fields.map((field, index) => (
+              <div
+                key={field.id}
+                className="p-4 rounded-lg border space-y-4 border-gray-200"
+              >
+                <div className="grid md:grid-cols-3 gap-4">
+                  <Input
+                    label="Medication Name"
+                    register={register(`medications.${index}.medicationName`)}
+                    error={errors.medications?.[index]?.medicationName?.message}
+                  />
+                  <Input
+                    label="Dosage"
+                    register={register(`medications.${index}.dosage`)}
+                    error={errors.medications?.[index]?.dosage?.message}
+                  />
+                  <Input
+                    label="Prescribing Doctor"
+                    register={register(
+                      `medications.${index}.prescribingDoctor`
+                    )}
+                    error={
+                      errors.medications?.[index]?.prescribingDoctor?.message
+                    }
+                  />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <DatePickerField
+                    control={control}
+                    name={`medications.${index}.startDate`}
+                    label="Medication Start Date"
+                  />
+                  <DatePickerField
+                    control={control}
+                    name={`medications.${index}.endDate`}
+                    label="Medication End Date"
+                  />
+                </div>
+                {medications.fields.length > 1 && (
+                  <div className="flex justify-end mt-4">
+                    <TertiaryButton
+                      type="button"
+                      onClick={() => medications.remove(index)}
                       className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
                     >
                       <ICONS.delete />

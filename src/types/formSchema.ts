@@ -380,6 +380,7 @@ export const medicalHistorySchema = z.object({
     .min(1, "Cognitive status is required")
     .transform(trimString),
   cognitive_status_text: z.string().optional(),
+  test_type: z.string().min(1, "Test type is required").transform(trimString),
   last_cognitive_screening: z
     .string()
     .min(1, "Last cognitive screening date is required")
@@ -748,6 +749,7 @@ export const faceSheetLongFormSchema = z
     mentalStatus: z.string().min(1, "Mental status is required"),
     mentalStatusText: z.string().optional(),
     cognitiveScreeningDate: z.string().optional(),
+    test_type: z.string().optional(),
     cognitiveScreeningScore: z
       .string()
       .min(1, "Cognitive score is required")
@@ -767,7 +769,7 @@ export const faceSheetLongFormSchema = z
       .array(
         z.object({
           providerName: z.string().optional(),
-          specialty: z.string().optional(),
+          specialty: z.string().optional().nullable().nullish(),
           address: z.string().optional(),
           phone: z.string().optional(),
           fax: z.string().optional(),
@@ -901,8 +903,8 @@ export const healthHistoryFormSchema = z.object({
         dosage: z.string().optional(),
         prescribingDoctor: z.string().optional(),
         id: z.string().optional().nullish().nullable(),
-        startDate: z.string().optional().nullable().nullish(),
-        endDate: z.string().optional().nullable().nullish(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
       })
     )
     .optional(),
@@ -915,8 +917,21 @@ export const healthHistoryFormSchema = z.object({
         dosage: z.string().optional(),
         prescribingDoctor: z.string().optional(),
         id: z.string().optional().nullish().nullable(),
-        startDate: z.string().optional().nullable().nullish(),
-        endDate: z.string().optional().nullable().nullish(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      })
+    )
+    .optional(),
+
+    medications: z
+    .array(
+      z.object({
+        medicationName: z.string().optional(),
+        dosage: z.string().optional(),
+        prescribingDoctor: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
       })
     )
     .optional(),
@@ -1015,3 +1030,631 @@ export const healthHistoryFormSchema = z.object({
 });
 
 export type HealthHistoryFormData = z.infer<typeof healthHistoryFormSchema>;
+
+// Schema for the Care Recipient Questionnaire
+export const careRecipientQuestionnaireSchema = z.object({
+  // Form Filler Information
+  formFillerName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  formFillerDate: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  fillingForOtherSpecify: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  fillingForOtherSpecifyText: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Care Recipient Personal Information
+  careRecipientFirstName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientLastName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientAddress: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientCity: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientState: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientZip: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientBirthdate: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientBirthplace: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientSSN: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientPhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientEmail: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientCulturalBackground: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientEducation: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientReligion: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientActiveReligionLocation: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientMaritalStatus: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientDateOfDivorceOrWidowhood: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  careRecipientLossImpactDescription: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Work and Retirement Information
+  occupationProfession: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  retirementDate: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  retirementAdjustment: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Insurance Information
+  medicareA: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  medicareB: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  medicareNumbers: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  medicareSupplementPlan: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  insuranceProvider: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  insurancePolicyNumber: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  insurancePhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  mentalHealthCoverage: z
+    .boolean()
+    .nullable()
+    .transform((val) => val || false),
+  hmo: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  hmoPolicyNumber: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  hmoPhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  longTermCareInsuranceName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  longTermCareInsurancePolicyNumber: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  longTermCareInsurancePhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Relatives Information
+  relatives: z
+    .array(
+      z.object({
+        name: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        address: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        homePhone: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        workPhone: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        relationship: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        email: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        id: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+      })
+    )
+    .nullable()
+    .transform((val) => val || []),
+
+  // Friends/Neighbors Information
+  friendsNeighbors: z
+    .array(
+      z.object({
+        name: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        address: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        helpDescription: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        relationship: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        phone: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        id: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+      })
+    )
+    .nullable()
+    .transform((val) => val || []),
+
+  // Professional Contacts Information
+  lawyerName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  lawyerPhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  lawyerId: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  powerOfAttorneyFinancesName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  powerOfAttorneyFinancesPhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  powerOfAttorneyFinancesId: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  powerOfAttorneyHealthcareName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  powerOfAttorneyHealthcarePhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  powerOfAttorneyHealthcareId: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  taxProfessionalName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  taxProfessionalPhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  taxProfessionalId: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  accountantName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  accountantPhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  accountantId: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  financialAdvisorName: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  financialAdvisorPhone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  financialAdvisorId: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  significantOther1Name: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  significantOther1Phone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  significantOther1Id: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  significantOther2Name: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  significantOther2Phone: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  significantOther2Id: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Support System & Emergency Contacts
+  supportSystemRating: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  supportSystemProblems: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  emergencyContacts: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // In-Home Help Services
+  houseCleaningAgency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  houseCleaningSatisfaction: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  houseCleaningFrequency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  homeAidAgency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  homeAidSatisfaction: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  homeAidFrequency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  homeHealthAgency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  homeHealthSatisfaction: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  homeHealthFrequency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  maintenanceAgency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  maintenanceSatisfaction: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  maintenanceFrequency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  otherHelpAgency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  otherHelpSatisfaction: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  otherHelpFrequency: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Living Environment
+  livingEnvironmentType: z
+    .array(z.string())
+    .nullable()
+    .transform((val) => val || []),
+  homeEnvironmentAdequacy: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Healthcare Providers
+  healthcareProviders: z
+    .array(
+      z.object({
+        providerName: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        phone: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        forWhatProblem: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        id: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+      })
+    )
+    .nullable()
+    .transform((val) => val || []),
+
+  // Medical Conditions
+  medicalConditions: z
+    .array(
+      z.object({
+        problem: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        treatment: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+        medications: z
+          .string()
+          .nullable()
+          .transform((val) => val || ""),
+      })
+    )
+    .nullable()
+    .transform((val) => val || []),
+
+  lastCheckupDate: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  allergies: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  recentHospitalization: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  hospitalDetails: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  supportSystemThoughts: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Problem Areas in Daily Living
+  problemAreasDailyLiving: z
+    .array(z.string())
+    .nullable()
+    .transform((val) => val || []),
+  problemAreasExplanation: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Problems/Risks
+  problemsRisks: z
+    .array(z.string())
+    .nullable()
+    .transform((val) => val || []),
+  nutritionConcerns: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  selfCareCapacitySummary: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Memory, Orientation and Judgment
+  memoryProblems: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  // Emotional Health
+  emotionalHealthNotes: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  personalityCoping: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  recentBehaviorChanges: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  recipientSharesConcerns: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  recipientSharesConcernsNotes: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  emotionalProblemsHistory: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  emotionalProblemsTreatment: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  emotionalProblemsNotes: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  recentLossesImpact: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  // Social Life
+  socialLifeNotes: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Other Pertinent Information
+  hospitalPreference: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  dnr: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  trust: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  lifecare: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  will: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  livingWill: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  funeralArrangements: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  cemeteryPlot: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  monthlyIncome: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  spouseIncome: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  savings: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  otherAssets: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  financialProblemsDescription: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+
+  // Summary Section
+  majorConcernsAndAssistance: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+  areasAcceptingHelp: z
+    .string()
+    .nullable()
+    .transform((val) => val || ""),
+});
+
+export type CareRecipientQuestionnaireData = z.infer<
+  typeof careRecipientQuestionnaireSchema
+>;

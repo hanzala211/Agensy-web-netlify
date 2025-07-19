@@ -16,7 +16,7 @@ import {
   type MedicalHistoryArrayField,
   type MedicalHistoryFormData,
 } from "@agensy/types";
-import { COGNITIVE_STATUS } from "@agensy/constants";
+import { COGNITIVE_STATUS, TEST_TYPES } from "@agensy/constants";
 import { DateUtils } from "@agensy/utils";
 
 interface AddClientMedicalHistoryProps {
@@ -92,6 +92,7 @@ export const AddClientMedicalHistory: React.FC<
         ),
         cognitive_score: editData?.cognitive_score || "",
         notes: editData?.notes,
+        test_type: editData.test_type,
       });
     }
   }, [editData, reset, isOpen]);
@@ -190,12 +191,21 @@ export const AddClientMedicalHistory: React.FC<
           label="Last Cognitive Screening"
         />
 
-        <ScoringInput
-          control={control}
-          name="cognitive_score"
-          label="Cognitive Score"
-          placeholder="e.g., 26/30 (from MMSE or SLUMS)"
-        />
+        <div className="grid md:grid-cols-2 gap-4">
+          <ScoringInput
+            control={control}
+            name="cognitive_score"
+            label="Cognitive Score"
+            placeholder="e.g., 26/30 (from MMSE or SLUMS)"
+          />
+          <Select
+            label="Test Type"
+            control={control}
+            labelOption="Select Test Type"
+            name="test_type"
+            data={TEST_TYPES as { label: string; value: string }[]}
+          />
+        </div>
 
         <TextArea
           label="Notes"

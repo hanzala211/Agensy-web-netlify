@@ -18,7 +18,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useClientContext } from "@agensy/context";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, toast, HEICUtils } from "@agensy/utils";
 import printJS from "print-js";
 import type { Document } from "@agensy/types";
 
@@ -41,6 +41,10 @@ export const DocumentPreview: React.FC = () => {
     refetch: loadGeneralDocument,
   } = useGetSingleGeneralDocumentQuery(params.documentId as string);
   const [document, setDocument] = useState<Document | null>(null);
+  const [convertedImageUrl, setConvertedImageUrl] = useState<string | null>(
+    null
+  );
+  const [isConvertingHeic, setIsConvertingHeic] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,15 +79,53 @@ export const DocumentPreview: React.FC = () => {
     return document?.file_type === "application/pdf";
   }, [document]);
 
+  const isHeic = useMemo(() => {
+    return document
+      ? HEICUtils.isHeicImage(document.file_type, document.file_name)
+      : false;
+  }, [document]);
+
+  useEffect(() => {
+    const convertHeicImage = async () => {
+      if (document && isHeic && document.file_url && !convertedImageUrl) {
+        setIsConvertingHeic(true);
+        try {
+          const convertedUrl = await HEICUtils.convertHeicToJpeg(
+            document.file_url
+          );
+          setConvertedImageUrl(convertedUrl);
+        } catch (error) {
+          console.error("Failed to convert HEIC image:", error);
+          toast.error("Failed to load HEIC image");
+        } finally {
+          setIsConvertingHeic(false);
+        }
+      }
+    };
+
+    convertHeicImage();
+  }, [document, isHeic, convertedImageUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (convertedImageUrl) {
+        URL.revokeObjectURL(convertedImageUrl);
+        setConvertedImageUrl(null);
+      }
+    };
+  }, [convertedImageUrl]);
+
   const handlePrint = useCallback(() => {
+    const printUrl =
+      isHeic && convertedImageUrl ? convertedImageUrl : document?.file_url;
     printJS({
-      printable: document?.file_url,
+      printable: printUrl,
       type: isPDF ? "pdf" : "image",
       onLoadingStart: () => {
         toast.info("Preparing document for printing...");
       },
     });
-  }, [document, isPDF]);
+  }, [document, isPDF, isHeic, convertedImageUrl]);
 
   if (isLoadingClientDocument || isLoadingGeneralDocument)
     return <DocumentPreviewSkeleton hasClientId={!!params.clientId} />;
@@ -167,7 +209,28 @@ export const DocumentPreview: React.FC = () => {
             </div>
           </div>
           <div className="border rounded-lg min-h-[320px] bg-gray-50 flex items-center justify-center overflow-hidden">
-            {isImage ? (
+            {isHeic && isConvertingHeic ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p className="text-gray-600">Converting HEIC image...</p>
+              </div>
+            ) : isHeic && convertedImageUrl ? (
+              <img
+                src={convertedImageUrl}
+                alt={document?.title}
+                className="max-h-[400px] w-auto mx-auto"
+              />
+            ) : isHeic ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <ICONS.document size={48} className="text-gray-400" />
+                <p className="text-gray-600">
+                  HEIC image format not supported in browser
+                </p>
+                <p className="text-sm text-gray-500">
+                  Please download the file to view it
+                </p>
+              </div>
+            ) : isImage ? (
               <img
                 src={document?.file_url}
                 alt={document?.title}

@@ -5,6 +5,8 @@ import {
   FaceSheetLongForm,
   HealthHistoryForm,
   StartofCareChecklist,
+  EssentialDocumentForAging,
+  CareRecipientQuestionaire,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,24 +24,6 @@ const rootFolders: FolderItem[] = [
         name: "Start of Care Checklist",
         type: "file",
         slug: "start-of-care-checklist",
-      },
-      {
-        id: "health-history-form-soc",
-        name: "Health History Form",
-        type: "file",
-        slug: "health-history-form-soc",
-      },
-      {
-        id: "face-sheets-form-soc",
-        name: "Face Sheets Form",
-        type: "file",
-        slug: "face-sheets-form-soc",
-      },
-      {
-        id: "instructions-form-soc",
-        name: "Instructions Form",
-        type: "file",
-        slug: "instructions-form-soc",
       },
     ],
   },
@@ -104,12 +88,6 @@ const rootFolders: FolderItem[] = [
         name: "Agensy Note Templates",
         type: "file",
         slug: "agensy-note-templates",
-      },
-      {
-        id: "instructions-when-how-to-use",
-        name: "Instructions on when/how to use",
-        type: "file",
-        slug: "instructions-when-how-to-use",
       },
     ],
   },
@@ -204,10 +182,10 @@ const rootFolders: FolderItem[] = [
         slug: "hospital-checklist",
       },
       {
-        id: "emergency-checklist",
-        name: "Emergency",
+        id: "essential-document-for-aging",
+        name: "Essential Document for Aging",
         type: "file",
-        slug: "emergency-checklist",
+        slug: "essential-document-for-aging",
       },
       {
         id: "next-steps-after-death",
@@ -233,24 +211,6 @@ const fileMap: Record<string, FolderData> = {
     description: "Comprehensive checklist for initiating care services",
     content: <StartofCareChecklist />,
   },
-  "health-history-form-soc": {
-    id: "health-history-form-soc",
-    name: "Health History Form",
-    description: "Detailed health history form for start of care",
-    content: <div>Health History Form content</div>,
-  },
-  "face-sheets-form-soc": {
-    id: "face-sheets-form-soc",
-    name: "Face Sheets Form",
-    description: "Face sheets form for start of care documentation",
-    content: <div>Face Sheets Form content</div>,
-  },
-  "instructions-form-soc": {
-    id: "instructions-form-soc",
-    name: "Instructions Form",
-    description: "Instructions form for start of care procedures",
-    content: <div>Instructions Form content</div>,
-  },
 
   // Assessment files
   "comprehensive-care-plan-assessment": {
@@ -264,7 +224,7 @@ const fileMap: Record<string, FolderData> = {
     name: "Care Recipient Questionnaire",
     description:
       "Questionnaire for care recipients to assess needs and preferences",
-    content: <div>Care Recipient Questionnaire content</div>,
+    content: <CareRecipientQuestionaire />,
   },
   "initial-assessment": {
     id: "initial-assessment",
@@ -303,12 +263,6 @@ const fileMap: Record<string, FolderData> = {
     name: "Agensy Note Templates",
     description: "Templates for standardized care notes",
     content: <div>Agensy Note Templates content</div>,
-  },
-  "instructions-when-how-to-use": {
-    id: "instructions-when-how-to-use",
-    name: "Instructions on when/how to use",
-    description: "Guidelines for when and how to use medical forms",
-    content: <div>Instructions on when/how to use content</div>,
   },
 
   // Long Term Care Planning files
@@ -378,11 +332,11 @@ const fileMap: Record<string, FolderData> = {
     description: "Checklist for hospital visits and procedures",
     content: <div>Hospital checklist content</div>,
   },
-  "emergency-checklist": {
-    id: "emergency-checklist",
-    name: "Emergency",
-    description: "Emergency response checklist",
-    content: <div>Emergency checklist content</div>,
+  "essential-document-for-aging": {
+    id: "essential-document-for-aging",
+    name: "Essential Document for Aging",
+    description: "Essential document for aging",
+    content: <EssentialDocumentForAging />,
   },
   "next-steps-after-death": {
     id: "next-steps-after-death",

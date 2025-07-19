@@ -408,6 +408,7 @@ export const FaceSheetLongForm: React.FC = () => {
           : "",
         cognitiveScreeningScore:
           faceSheetLongData?.medical_info?.cognitive_score || "",
+        test_type: faceSheetLongData?.medical_info?.test_type || "",
         notesAndConcerns: faceSheetLongData?.medical_info?.notes || "",
         mentalStatus: COGNITIVE_STATUS.some(
           (item) =>
@@ -624,6 +625,7 @@ export const FaceSheetLongForm: React.FC = () => {
           ? data.cognitiveScreeningScore
           : null,
         notes: data.notesAndConcerns ? data.notesAndConcerns : null,
+        test_type: data.test_type ? data.test_type : null,
       },
 
       emergency_contact: {

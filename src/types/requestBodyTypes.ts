@@ -47,6 +47,7 @@ export interface ClientMedicalHistoryRequestData {
   last_cognitive_screening: string;
   cognitive_score: string;
   notes: string;
+  test_type?: string;
 }
 
 export interface ClientHealthcareRequestData {

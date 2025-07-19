@@ -67,3 +67,35 @@ export const usePostChecklistFormsMutation = () => {
     }) => ClientAgensyFormsService.postChecklistForms(param, clientId, data),
   });
 };
+
+export const useGetEssentialDocumentsForAging = (clientId: string) => {
+  return useQuery({
+    queryKey: ["essential-documents-for-aging", clientId],
+    queryFn: () =>
+      ClientAgensyFormsService.getEssentialDocumentsForAging(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostEssentialDocumentsForAgingMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postEssentialDocumentsForAging(clientId, data),
+  });
+};
+
+export const useGetCareRecipientQuestionnaire = (clientId: string) => {
+  return useQuery({
+    queryKey: ["care-recipient-questionnaire", clientId],
+    queryFn: () =>
+      ClientAgensyFormsService.getCareRecipientQuestionnaire(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostCareRecipientQuestionaireMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postCareRecipientQuestionaire(clientId, data),
+  });
+};

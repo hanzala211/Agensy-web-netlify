@@ -236,3 +236,31 @@ export const SPECIALTIES = [
   { label: "Physical Therapy", value: "Physical Therapy" },
   { label: "Other", value: "Other" },
 ];
+
+export const TEST_TYPES = [
+  {
+    label: "MMSE",
+    value: "MMSE",
+  },
+  {
+    label: "Mini-Cog",
+    value: "Mini-Cog",
+  },
+  {
+    label: "MoCA",
+    value: "MoCA",
+  },
+
+  {
+    label: "SLUMS",
+    value: "SLUMS",
+  },
+];
+
+export const FILLING_FOR_OPTIONS = [
+  { label: "Self", value: "Self" },
+  { label: "Mother", value: "Mother" },
+  { label: "Father", value: "Father" },
+  { label: "Both", value: "Both" },
+  { label: "Other", value: "Other" },
+];

@@ -110,6 +110,7 @@ export interface ClientMedical extends BaseSchema {
   cognitive_score: string;
   notes: string;
   client_id: string;
+  test_type?: string;
 }
 
 export interface ClientDocumentCategory extends BaseSchema {

@@ -61,6 +61,7 @@ export const MedicalHistoryCard: React.FC = () => {
         data.last_cognitive_screening
       ),
       cognitive_score: data.cognitive_score,
+      test_type: data.test_type,
     };
     if (!selectedClient?.medical) {
       addClientMedicalHistoryMutation.mutate({
@@ -117,7 +118,9 @@ export const MedicalHistoryCard: React.FC = () => {
                 <InfoItem label="Cognitive Score:">
                   <p>
                     {selectedClient.medical.cognitive_score?.split("/")[0]} out
-                    of {selectedClient.medical.cognitive_score?.split("/")[1]}
+                    of {selectedClient.medical.cognitive_score?.split("/")[1]}{" "}
+                    {selectedClient?.medical?.test_type &&
+                      `in ${selectedClient?.medical?.test_type}`}
                   </p>
                 </InfoItem>
               )}

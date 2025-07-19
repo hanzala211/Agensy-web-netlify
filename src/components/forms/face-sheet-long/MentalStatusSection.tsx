@@ -8,7 +8,7 @@ import {
   Select,
   ScoringInput,
 } from "@agensy/components";
-import { COGNITIVE_STATUS } from "@agensy/constants";
+import { COGNITIVE_STATUS, TEST_TYPES } from "@agensy/constants";
 
 interface MentalStatusSectionProps {
   register: UseFormRegister<FaceSheetLongFormData>;
@@ -42,12 +42,21 @@ export const MentalStatusSection: React.FC<MentalStatusSectionProps> = ({
             name="cognitiveScreeningDate"
           />
         </div>
-        <ScoringInput
-          control={control}
-          name="cognitiveScreeningScore"
-          label="Cognitive Score"
-          placeholder="e.g., 26/30 (from MMSE or SLUMS)"
-        />
+        <div className="grid md:grid-cols-2 gap-4">
+          <ScoringInput
+            control={control}
+            name="cognitiveScreeningScore"
+            label="Cognitive Score"
+            placeholder="e.g., 26/30 (from MMSE or SLUMS)"
+          />
+           <Select
+            label="Test Type"
+            control={control}
+            labelOption="Select Test Type"
+            name="test_type"
+            data={TEST_TYPES as { label: string; value: string }[]}
+          />
+        </div>
 
         <TextArea
           label="Notes / Concerns"

@@ -17,6 +17,7 @@ import FaceSheetShortFormPDF from "./face-sheet-short/FaceSheetShortFormPDF";
 import HealthHistoryFormPDF from "./health-history-form/HealthHistoryFormPDF";
 import { StartofCareChecklistPDF } from "./start-of-care-checklist/StartofCareChecklistPDF";
 import { checklistSchema } from "@agensy/config";
+import EssentialDocumentsForAgingPDF from "./essential-documents-for-aging/EssentialDocumentsForAgingPDF";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -151,6 +152,26 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   }
                 }
                 schema={checklistSchema}
+              />
+            );
+          }
+          break;
+        case "essential-document-for-aging":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <EssentialDocumentsForAgingPDF
+                data={
+                  openedFileData as unknown as {
+                    essential_documents: {
+                      id: string;
+                      category: string;
+                      document_name: string;
+                      in_place: boolean;
+                      notes?: string | null;
+                    }[];
+                    last_update?: { updatedAt: string };
+                  }
+                }
               />
             );
           }

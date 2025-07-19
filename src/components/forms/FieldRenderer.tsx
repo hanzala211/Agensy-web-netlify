@@ -1,5 +1,6 @@
 import { ICONS } from "@agensy/constants";
 import type { ChecklistField } from "@agensy/types";
+import { StringUtils } from "@agensy/utils";
 
 interface FormData {
   [key: string]: boolean | string | null;
@@ -11,7 +12,6 @@ interface ChecklistFieldRendererProps {
   schema: ChecklistField[];
 }
 
-// Get nesting level based on parentId chain
 const getNestingLevel = (fieldId: string, schema: ChecklistField[]): number => {
   let level = 0;
   let currentField = schema.find((f: ChecklistField) => f.id === fieldId);
@@ -33,7 +33,6 @@ const getFieldsByParent = (
   return schema.filter((field: ChecklistField) => field.parentId === parentId);
 };
 
-// Get all descendant field IDs recursively
 const getAllDescendantFieldIds = (
   parentId: string,
   schema: ChecklistField[]
@@ -43,7 +42,6 @@ const getAllDescendantFieldIds = (
 
   directChildren.forEach((child) => {
     allDescendants.push(child.id);
-    // Recursively get descendants of this child
     allDescendants = [
       ...allDescendants,
       ...getAllDescendantFieldIds(child.id, schema),
@@ -53,23 +51,30 @@ const getAllDescendantFieldIds = (
   return allDescendants;
 };
 
-// Check if a field should be visible based on its parent checkbox state
 const isFieldVisible = (
   field: ChecklistField,
   formData: FormData,
   schema: ChecklistField[]
 ): boolean => {
-  if (!field.parentId) return true; // Root fields are always visible
+  if (!field.parentId) return true;
 
   const parent = schema.find((f) => f.id === field.parentId);
   if (!parent) return true;
 
-  // If parent is a checkbox and it's unchecked, hide this field
   if (parent.type === "checkbox" && !formData[parent.id]) {
     return false;
   }
 
-  // If parent is a group, check its parent recursively
+  if (parent.type === "radio") {
+    const selectedOption = formData[parent.id];
+
+    if (field.parentOption) {
+      return selectedOption === field.parentOption;
+    }
+
+    return selectedOption !== undefined && selectedOption !== null;
+  }
+
   if (parent.type === "group") {
     return isFieldVisible(parent, formData, schema);
   }
@@ -83,7 +88,6 @@ export const FieldRenderer = ({
   setFormData,
   schema,
 }: ChecklistFieldRendererProps) => {
-  // Check if this field should be visible
   if (!isFieldVisible(field, formData, schema)) {
     return null;
   }
@@ -94,24 +98,31 @@ export const FieldRenderer = ({
     marginBottom: "8px",
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (field.id) {
-      setFormData({ ...formData, [field.id]: e.target.value });
-    }
-  };
-
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (field.id) {
       const isChecked = e.target.checked;
       const newFormData = { ...formData, [field.id]: isChecked };
 
-      // If unchecking, remove all nested field values
       if (!isChecked) {
         const descendantIds = getAllDescendantFieldIds(field.id, schema);
         descendantIds.forEach((id) => {
           delete newFormData[id];
         });
       }
+
+      setFormData(newFormData);
+    }
+  };
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (field.id) {
+      const selectedValue = e.target.value;
+      const newFormData = { ...formData, [field.id]: selectedValue };
+
+      const descendantIds = getAllDescendantFieldIds(field.id, schema);
+      descendantIds.forEach((id) => {
+        delete newFormData[id];
+      });
 
       setFormData(newFormData);
     }
@@ -161,7 +172,6 @@ export const FieldRenderer = ({
           />
           <span className="text-[14px]">{field.label}</span>
         </label>
-        {/* Render child fields only if checkbox is checked */}
         {field.id &&
           formData[field.id] &&
           childFields.map((childField) => (
@@ -178,26 +188,76 @@ export const FieldRenderer = ({
   }
 
   if (field.type === "radio") {
+    const childFields = getFieldsByParent(field.id, schema);
+
     return (
       <div style={indentationStyle}>
         <div className="font-medium mb-[6px] text-[14px]">{field.label}</div>
         <div className="ml-1 sm:ml-2 md:ml-[10px]">
           {field.options?.map((option) => (
-            <label
-              key={option}
-              className="flex items-center cursor-pointer mb-[4px]"
-            >
-              <input
-                type="radio"
-                name={field.id}
-                value={option}
-                checked={field.id ? formData[field.id] === option : false}
-                onChange={handleChange}
-                className="mr-[8px]"
-              />
-              <span className="text-[13px]">{option}</span>
-            </label>
+            <div key={option}>
+              <label className="flex items-center cursor-pointer mb-[4px]">
+                <input
+                  type="radio"
+                  name={field.id}
+                  value={option}
+                  checked={field.id ? formData[field.id] === option : false}
+                  onChange={handleRadioChange}
+                  className="mr-[8px]"
+                />
+                <span className="text-[13px]">{option}</span>
+              </label>
+              {field.id &&
+                formData[field.id] === option &&
+                childFields
+                  .filter(
+                    (childField) =>
+                      !childField.parentOption ||
+                      childField.parentOption === option
+                  )
+                  .map((childField) => (
+                    <FieldRenderer
+                      key={childField.id}
+                      field={childField}
+                      formData={formData}
+                      setFormData={setFormData}
+                      schema={schema}
+                    />
+                  ))}
+            </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (field.type === "link") {
+    const segments = StringUtils.extractLinksFromText(field.label);
+    
+    return (
+      <div style={indentationStyle} className="px-2 sm:px-4 md:px-6">
+        <div
+          className={`font-semibold text-sm text-primaryColor pl-1 sm:pl-2 md:pl-[10px] mb-[10px] flex items-center gap-2`}
+        >
+          <ICONS.rightSolid className="w-4 h-4 flex-shrink-0" />
+          <div className="text-[14px] leading-relaxed">
+            {segments.map((segment: { text: string; url?: string }, index: number) => (
+              <span key={index}>
+                {segment.url ? (
+                  <a
+                    href={segment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline break-all"
+                  >
+                    {segment.text}
+                  </a>
+                ) : (
+                  segment.text
+                )}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     );

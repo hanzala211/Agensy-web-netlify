@@ -320,6 +320,18 @@ export const checklistSchema: ChecklistField[] = [
     parentId: "26.2.1",
     headingId: "25",
   },
+  // {
+  //   id: "26.2.1.1.1",
+  //   type: "radio",
+  //   options: [
+  //     "If the document is being notarized, you should count 6 signatures upon completion (2 of client, 2 of physician, and 2 of notary).",
+  //   ],
+  //   label: "",
+  //   parentId: "26.2.1.1",
+  //   parentOption:
+  //     "If the document is being notarized, you should count 6 signatures upon completion (2 of client, 2 of physician, and 2 of notary).",
+  //   headingId: "25",
+  // }, // for nested radio options inside radios has to provide parentOption so we can know under which radio option this field belongs to
   {
     id: "26.3",
     type: "checkbox",
