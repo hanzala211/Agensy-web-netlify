@@ -1090,12 +1090,12 @@ export const CareRecipientQuestionaire = () => {
           ? data.recentBehaviorChanges
           : null,
         recipient_shares_concerns: data.recipientSharesConcerns
-          ? data.recipientSharesConcerns
-          : null,
-        recipient_shares_concerns_notes: data.recipientSharesConcernsNotes
           ? data.recipientSharesConcerns === "true"
             ? true
             : false
+          : null,
+        recipient_shares_concerns_notes: data.recipientSharesConcernsNotes
+          ? data.recipientSharesConcernsNotes
           : null,
         emotional_problems_history: data.emotionalProblemsHistory
           ? data.emotionalProblemsHistory === "true"
