@@ -527,7 +527,7 @@ export const CareRecipientQuestionaire = () => {
         // Living Environment
         livingEnvironmentType:
           careRecipientQuestionnaire.questionnaire?.living_environment_type?.split(
-            ","
+            ", "
           ) || [],
         homeEnvironmentAdequacy:
           careRecipientQuestionnaire.questionnaire?.home_environment_adequacy ||
