@@ -68,7 +68,7 @@ const defaultValues = {
   insuranceProvider: "",
   insurancePolicyNumber: "",
   insurancePhone: "",
-  mentalHealthCoverage: false,
+  mentalHealthCoverage: "",
   hmo: "",
   hmoPolicyNumber: "",
   hmoPhone: "",
@@ -304,7 +304,12 @@ export const CareRecipientQuestionaire = () => {
           careRecipientQuestionnaire.insurance?.policy_number || "",
         insurancePhone: careRecipientQuestionnaire.insurance?.phone || "",
         mentalHealthCoverage:
-          careRecipientQuestionnaire.insurance?.mental_health_coverage || false,
+          careRecipientQuestionnaire.insurance?.mental_health_coverage !== null
+            ? careRecipientQuestionnaire.insurance?.mental_health_coverage ===
+              true
+              ? "true"
+              : "false"
+            : "",
         hmo: careRecipientQuestionnaire.insurance?.hmo || "",
         hmoPolicyNumber:
           careRecipientQuestionnaire.insurance?.hmo_policy_number || "",
@@ -948,7 +953,9 @@ export const CareRecipientQuestionaire = () => {
           : null,
         phone: data.insurancePhone ? data.insurancePhone : null,
         mental_health_coverage: data.mentalHealthCoverage
-          ? data.mentalHealthCoverage
+          ? data.mentalHealthCoverage === "true"
+            ? true
+            : false
           : null,
         hmo: data.hmo ? data.hmo : null,
         hmo_policy_number: data.hmoPolicyNumber ? data.hmoPolicyNumber : null,

@@ -923,7 +923,7 @@ export const healthHistoryFormSchema = z.object({
     )
     .optional(),
 
-    medications: z
+  medications: z
     .array(
       z.object({
         medicationName: z.string().optional(),
@@ -1169,9 +1169,9 @@ export const careRecipientQuestionnaireSchema = z.object({
     .nullable()
     .transform((val) => val || ""),
   mentalHealthCoverage: z
-    .boolean()
+    .string()
     .nullable()
-    .transform((val) => val || false),
+    .transform((val) => val || ""),
   hmo: z
     .string()
     .nullable()
