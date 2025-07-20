@@ -209,8 +209,6 @@ export const CareRecipientQuestionaire = () => {
     defaultValues: defaultValues,
   });
 
-  console.log(errors);
-
   useEffect(() => {
     if (careRecipientQuestionnaire) {
       reset({
@@ -717,12 +715,16 @@ export const CareRecipientQuestionaire = () => {
     if (formValues && Object.keys(formValues).length > 0) {
       setOpenedFileData({
         ...formValues,
-        last_update: { updatedAt: new Date().toISOString() },
+        last_update: {
+          updatedAt: careRecipientQuestionnaire?.last_update?.updatedAt || "",
+        },
       } as unknown as Record<string, string | string[] | Record<string, string | number>>);
     } else {
       setOpenedFileData({
         ...getValues(),
-        last_update: { updatedAt: new Date().toISOString() },
+        last_update: {
+          updatedAt: careRecipientQuestionnaire?.last_update?.updatedAt || "",
+        },
       } as unknown as Record<string, string | string[] | Record<string, string | number>>);
     }
   }, [formValues, setOpenedFileData, getValues]);

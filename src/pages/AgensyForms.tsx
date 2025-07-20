@@ -7,6 +7,10 @@ import {
   StartofCareChecklist,
   EssentialDocumentForAging,
   CareRecipientQuestionaire,
+  HospitalizationChecklist,
+  CarePlanChecklist,
+  MoveIn,
+  NextStepsAfterDeath,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -150,10 +154,10 @@ const rootFolders: FolderItem[] = [
     type: "folder",
     children: [
       {
-        id: "care-plan-checklists-examples",
-        name: "Care plan checklists and examples",
+        id: "care-plan-checklists",
+        name: "Care plan checklist",
         type: "file",
-        slug: "care-plan-checklists-examples",
+        slug: "care-plan-checklists",
       },
       {
         id: "when-to-call-care-plans",
@@ -177,7 +181,7 @@ const rootFolders: FolderItem[] = [
       },
       {
         id: "hospital-checklist",
-        name: "Hospital",
+        name: "Hospitalization Checklist",
         type: "file",
         slug: "hospital-checklist",
       },
@@ -306,11 +310,11 @@ const fileMap: Record<string, FolderData> = {
   },
 
   // Care Plans files
-  "care-plan-checklists-examples": {
-    id: "care-plan-checklists-examples",
-    name: "Care plan checklists and examples",
-    description: "Checklists and examples for care plan development",
-    content: <div>Care plan checklists and examples content</div>,
+  "care-plan-checklists": {
+    id: "care-plan-checklists",
+    name: "Care plan checklists",
+    description: "Checklists for care plan development",
+    content: <CarePlanChecklist />,
   },
   "when-to-call-care-plans": {
     id: "when-to-call-care-plans",
@@ -324,13 +328,13 @@ const fileMap: Record<string, FolderData> = {
     id: "move-in-checklist",
     name: "Move in",
     description: "Checklist for moving in new care recipients",
-    content: <div>Move in checklist content</div>,
+    content: <MoveIn />,
   },
   "hospital-checklist": {
     id: "hospital-checklist",
-    name: "Hospital",
-    description: "Checklist for hospital visits and procedures",
-    content: <div>Hospital checklist content</div>,
+    name: "Hospitalization Checklist",
+    description: "Checklist for hospitalization",
+    content: <HospitalizationChecklist />,
   },
   "essential-document-for-aging": {
     id: "essential-document-for-aging",
@@ -342,7 +346,7 @@ const fileMap: Record<string, FolderData> = {
     id: "next-steps-after-death",
     name: "Next Steps after Death",
     description: "Checklist for procedures following death",
-    content: <div>Next Steps after Death content</div>,
+    content: <NextStepsAfterDeath />,
   },
   "family-check-in": {
     id: "family-check-in",

@@ -2,6 +2,7 @@ import React, { useMemo, useEffect } from "react";
 import { ICONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type {
+  CareRecipientQuestionnaireData,
   FaceSheetLongFormData,
   FaceSheetShortFormData,
   FolderData,
@@ -18,6 +19,11 @@ import HealthHistoryFormPDF from "./health-history-form/HealthHistoryFormPDF";
 import { StartofCareChecklistPDF } from "./start-of-care-checklist/StartofCareChecklistPDF";
 import { checklistSchema } from "@agensy/config";
 import EssentialDocumentsForAgingPDF from "./essential-documents-for-aging/EssentialDocumentsForAgingPDF";
+import CareRecipientQuestionairePDF from "./care-recipient-questionaire/CareRecipientQuestionairePDF";
+import { HospitalizationChecklistPDF } from "./hospitalization-checklist/HospitalizationChecklistPDF";
+import { CarePlanChecklistPDF } from "./care-plan-checklist/CarePlanChecklistPDF";
+import { MoveInPDF } from "./move-in-checklist/MoveInPDF";
+import { NextStepsAfterDeathPDF } from "./next-steps-after-death-checklist/NextStepsAfterDeathPDF";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -170,6 +176,79 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                       notes?: string | null;
                     }[];
                     last_update?: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "care-recipient-questionnaire":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <CareRecipientQuestionairePDF
+                data={
+                  openedFileData as unknown as CareRecipientQuestionnaireData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "hospital-checklist":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <HospitalizationChecklistPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "care-plan-checklists":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <CarePlanChecklistPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "move-in-checklist":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <MoveInPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "next-steps-after-death":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <NextStepsAfterDeathPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
                   }
                 }
               />

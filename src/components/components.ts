@@ -116,3 +116,8 @@ export * from "./forms/care-recipient-questionaire/ProblemsRisksSection";
 export * from "./forms/care-recipient-questionaire/MemoryOrientationJudgmentSection";
 export * from "./forms/care-recipient-questionaire/EmotionalHealthSection";
 export * from "./forms/care-recipient-questionaire/SocialLifeSection";
+export * from "./forms/care-recipient-questionaire/CareRecipientQuestionairePDF";
+export * from "./forms/hospitalization-checklist/HospitalizationChecklist";
+export * from "./forms/care-plan-checklist/CarePlanChecklist";
+export * from "./forms/move-in-checklist/MoveIn";
+export * from "./forms/next-steps-after-death-checklist/NextStepsAfterDeath";

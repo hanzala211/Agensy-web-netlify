@@ -167,6 +167,29 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#666",
   },
+
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LITE,
+  },
+
+  checkboxIcon: {
+    width: 8,
+    height: 8,
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginRight: 6,
+    marginTop: 1,
+    backgroundColor: "white",
+  },
+
+  checkboxChecked: {
+    backgroundColor: BORDER,
+  },
 });
 
 interface AdvanceCareDocument {
@@ -266,9 +289,14 @@ const EssentialDocumentsForAgingPDF: React.FC<{
                   <Text style={styles.documentName}>
                     {document.document_name}
                   </Text>
-                  <Text style={styles.inPlace}>
-                    {document.in_place ? "✓ Yes" : "✗ No"}
-                  </Text>
+                  <View style={[styles.checkboxContainer]}>
+                    <View
+                      style={[
+                        styles.checkboxIcon,
+                        ...(document.in_place ? [styles.checkboxChecked] : []),
+                      ]}
+                    />
+                  </View>
                   <Text style={styles.notes}>{document.notes || " "}</Text>
                 </View>
               ))}

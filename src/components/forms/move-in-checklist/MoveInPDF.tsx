@@ -12,6 +12,7 @@ import {
 import type { ChecklistField } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
 import logo from "@agensy/assets/logo.png";
+import { moveInSchema } from "@agensy/config";
 
 const BORDER = "#1f3d7a";
 const BORDER_LITE = "#c5d2f2";
@@ -191,9 +192,9 @@ interface ChecklistFormData {
   [key: string]: boolean | string;
 }
 
-interface StartofCareChecklistPDFProps {
+interface MoveInPDFProps {
   data?: ChecklistFormData & { last_update: { updatedAt: string } };
-  schema: ChecklistField[];
+  schema?: ChecklistField[];
 }
 
 // Get nesting level based on parentId chain
@@ -379,10 +380,10 @@ const LinkField: React.FC<{
     if (match.index > lastIndex) {
       segments.push({ text: field.label.slice(lastIndex, match.index) });
     }
-
+    
     // Add the URL segment
     segments.push({ text: match[1], url: match[1] });
-
+    
     lastIndex = match.index + match[1].length;
   }
 
@@ -460,15 +461,15 @@ const FieldRenderer: React.FC<{
   return null;
 };
 
-export const StartofCareChecklistPDF: React.FC<
-  StartofCareChecklistPDFProps
-> = ({ data, schema }) => {
+export const MoveInPDF: React.FC<
+  MoveInPDFProps
+> = ({ data, schema = moveInSchema }) => {
   const headings = schema.filter((field) => field.type === "heading");
 
   return (
-    <Document title="Agensy Start of Care Checklist">
+    <Document title="Agensy Move In Checklist">
       <Page size="A4" style={styles.page}>
-        <Text style={styles.formTitle}>Agensy Start of Care Checklist</Text>
+        <Text style={styles.formTitle}>Agensy Move In Checklist</Text>
         <View style={styles.headerRow}>
           <Image src={logo} style={styles.headerLogo} />
           <View style={{ flexDirection: "column" }}>
