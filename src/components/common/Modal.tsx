@@ -49,7 +49,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         className={`relative z-[500] bg-white rounded-xl shadow-2xl w-full ${maxWidth} flex flex-col ${height}`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-basicWhite z-10 rounded-t-xl">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-basicWhite z-10 rounded-t-xl">
           <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
           <button
             onClick={onClose}

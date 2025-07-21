@@ -20,7 +20,7 @@ export const CarePlanChecklist = () => {
     data: startOfCareChecklist,
     isFetching: isLoadingChecklist,
     refetch,
-  } = useGetChecklistForms("care_plan_checklist", params.clientId!);
+  } = useGetChecklistForms("care_plan", params.clientId!);
   const [formData, setFormData] = useState<ChecklistFormData>(
     generateCarePlanChecklistDefaultValues()
   );
@@ -74,7 +74,7 @@ export const CarePlanChecklist = () => {
     console.log("Checklist data:", formData);
     postStartCareChecklistMutation.mutate({
       clientId: params.clientId!,
-      param: "care_plan_checklist",
+      param: "care_plan",
       data: {
         checklist_data: formData,
       },

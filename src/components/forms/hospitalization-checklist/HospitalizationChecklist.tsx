@@ -20,7 +20,7 @@ export const HospitalizationChecklist = () => {
     data: startOfCareChecklist,
     isFetching: isLoadingChecklist,
     refetch,
-  } = useGetChecklistForms("hostpitalization_checklist", params.clientId!);
+  } = useGetChecklistForms("hospitalization", params.clientId!);
   const [formData, setFormData] = useState<ChecklistFormData>(
     generateHospitalizationChecklistDefaultValues()
   );
@@ -73,7 +73,7 @@ export const HospitalizationChecklist = () => {
     e.preventDefault();
     postStartCareChecklistMutation.mutate({
       clientId: params.clientId!,
-      param: "hostpitalization_checklist",
+      param: "hospitalization",
       data: {
         checklist_data: formData,
       },
