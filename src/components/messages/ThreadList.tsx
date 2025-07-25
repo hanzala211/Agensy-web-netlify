@@ -141,7 +141,11 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                         <AntdTag
                           color={thread.type === "general" ? "blue" : "green"}
                         >
-                          {StringUtils.capitalizeFirstLetter(thread.type)}
+                          {StringUtils.capitalizeFirstLetter(
+                            thread.type === "general"
+                              ? "General"
+                              : "Care Recipient"
+                          )}
                         </AntdTag>
                       </div>
                     )}

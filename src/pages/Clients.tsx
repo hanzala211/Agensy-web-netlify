@@ -16,9 +16,7 @@ import {
   PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
-import type {
-  Client,
-} from "@agensy/types";
+import type { Client } from "@agensy/types";
 import { useNavigate } from "react-router-dom";
 import { useAddClientMutation } from "@agensy/api";
 import { toast } from "@agensy/utils";
@@ -93,15 +91,15 @@ export const Clients: React.FC = () => {
   return (
     <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
       <PageHeader
-        title="Clients"
-        buttonText="Add Client"
+        title="Care Recipients"
+        buttonText="Add Care Recipient"
         showButton={userPermissions.includes(APP_ACTIONS.AddClient)}
-        buttonAriaLabel="Add new client"
+        buttonAriaLabel="Add new care recipient"
         onButtonClick={() => setIsAddClientModalOpen(true)}
       />
 
       <SearchFilterBar
-        searchPlaceholder="Search clients..."
+        searchPlaceholder="Search care recipients..."
         searchValue={searchTerm}
         setSearchValue={setSearchTerm}
         filterBy={filterBy}

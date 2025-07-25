@@ -88,7 +88,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
           </div>
           {showClientName && (
             <div className="text-sm text-gray-500">
-              Client:{" "}
+              Care Recipient:{" "}
               <span className="font-semibold">
                 {doc?.client?.first_name} {doc?.client?.last_name}
               </span>
@@ -103,7 +103,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
                   doc.upload_type === "client" ? "green" : COLORS.temporaryBlue
                 }
               >
-                {doc.upload_type === "client" ? "Client" : "General"}
+                {doc.upload_type === "client" ? "Care Recipient" : "General"}
               </AntdTag>
             )}
           </div>

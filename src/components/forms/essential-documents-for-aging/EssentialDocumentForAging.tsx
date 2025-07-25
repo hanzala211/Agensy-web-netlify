@@ -326,7 +326,7 @@ export const EssentialDocumentForAging = () => {
                 disabled={postEssentialDocumentsForAgingMutation.isPending}
                 className="sm:!w-fit w-full md:text-base text-sm"
               >
-                Save Documents
+                Save Essential Document for Aging
               </PrimaryButton>
             </div>
           </Card>

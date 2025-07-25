@@ -503,7 +503,7 @@ export const FaceSheetShortForm: React.FC = () => {
               type="submit"
               className="sm:!w-fit w-full md:text-base text-sm"
             >
-              Save Face Sheet
+              Save Face Sheet Short Form
             </PrimaryButton>
           </div>
         </div>

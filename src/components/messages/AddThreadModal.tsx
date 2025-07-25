@@ -111,14 +111,16 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
             />
             <RadioInput
               register={register("type")}
-              label="Client"
+              label="Care Recipient"
               value="client"
             />
           </div>
         )}
         {watch("type") === "client" && showType && (
           <div>
-            <label className="text-neutralGray mb-2 block">Select Client</label>
+            <label className="text-neutralGray mb-2 block">
+              Select Care Recipient
+            </label>
             <Controller
               name="client_id"
               control={control}
@@ -128,7 +130,7 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
                   value={value || undefined}
                   onChange={onChange}
                   showSearch
-                  placeholder="Search to Select Client"
+                  placeholder="Search to Select Care Recipient"
                   optionFilterProp="value"
                   style={{ width: "100%" }}
                   filterOption={(

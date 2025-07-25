@@ -11,7 +11,7 @@ export const RELATIONSHIP_TO_CLIENT = [
 ];
 
 export const CLIENTS_FILTERS = [
-  { value: "all", label: "All Clients" },
+  { value: "all", label: "All Care Recipients" },
   { value: "active", label: "Active" },
   { value: "inactive", label: "Inactive" },
 ];

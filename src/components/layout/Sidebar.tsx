@@ -78,7 +78,7 @@ export const Sidebar: React.FC = () => {
             <SidebarItem
               link={`/${ROUTES.clients}`}
               icon={ICONS.users}
-              label="Clients"
+              label="Care Recipients"
             />
             <SidebarItem
               link={ROUTES.documents}

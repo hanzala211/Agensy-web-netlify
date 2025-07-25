@@ -122,7 +122,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
               <div className="flex items-center gap-2 text-gray-600">
                 <ICONS.user className="text-gray-400" size={14} />
                 <span>
-                  Client: {filterClient(appointment.client_id)?.first_name}{" "}
+                  Care Recipient:{" "}
+                  {filterClient(appointment.client_id)?.first_name}{" "}
                   {filterClient(appointment.client_id)?.last_name}
                 </span>
               </div>
