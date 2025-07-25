@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   PrimaryButton,
@@ -116,65 +116,6 @@ export const HealthHistoryForm: React.FC = () => {
       toast.error("Error Occurred", String(postHealthHistoryMutation.error));
     }
   }, [postHealthHistoryMutation.status]);
-
-  const formValues = useWatch({ control });
-
-  useEffect(() => {
-    if (formValues && Object.keys(formValues).length > 0) {
-      const sanitizedFormValues = {
-        ...formValues,
-        providers: Array.isArray(formValues.providers)
-          ? formValues.providers.filter(
-              (provider) => provider && typeof provider === "object"
-            )
-          : [],
-        diagnoses: Array.isArray(formValues.diagnoses)
-          ? formValues.diagnoses.filter(
-              (diagnosis) => diagnosis && typeof diagnosis === "object"
-            )
-          : [],
-        medicationsStarted: Array.isArray(formValues.medicationsStarted)
-          ? formValues.medicationsStarted.filter(
-              (med) => med && typeof med === "object"
-            )
-          : [],
-        medicationsEnded: Array.isArray(formValues.medicationsEnded)
-          ? formValues.medicationsEnded.filter(
-              (med) => med && typeof med === "object"
-            )
-          : [],
-        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt || "" },
-      };
-      setOpenedFileData(sanitizedFormValues as unknown as OpenedFileData);
-    } else {
-      const currentValues = getValues();
-      const sanitizedCurrentValues = {
-        ...currentValues,
-        providers: Array.isArray(currentValues.providers)
-          ? currentValues.providers.filter(
-              (provider) => provider && typeof provider === "object"
-            )
-          : [],
-        diagnoses: Array.isArray(currentValues.diagnoses)
-          ? currentValues.diagnoses.filter(
-              (diagnosis) => diagnosis && typeof diagnosis === "object"
-            )
-          : [],
-        medicationsStarted: Array.isArray(currentValues.medicationsStarted)
-          ? currentValues.medicationsStarted.filter(
-              (med) => med && typeof med === "object"
-            )
-          : [],
-        medicationsEnded: Array.isArray(currentValues.medicationsEnded)
-          ? currentValues.medicationsEnded.filter(
-              (med) => med && typeof med === "object"
-            )
-          : [],
-        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt || "" },
-      };
-      setOpenedFileData(sanitizedCurrentValues as unknown as OpenedFileData);
-    }
-  }, [formValues]);
 
   const medicationsStartedArray = useFieldArray({
     control,
@@ -401,7 +342,9 @@ export const HealthHistoryForm: React.FC = () => {
       });
       setOpenedFileData({
         ...getValues(),
-        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt || "" },
+        last_update: {
+          updatedAt: healthHistoryForm?.last_update?.updatedAt || "",
+        },
       } as unknown as OpenedFileData);
     }
   }, [healthHistoryForm]);

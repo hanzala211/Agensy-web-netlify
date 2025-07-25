@@ -140,6 +140,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           break;
         case "health-history-form-medical":
           if (openedFileData && typeof openedFileData === "object") {
+            console.log(openedFileData)
             return (
               <HealthHistoryFormPDF
                 data={

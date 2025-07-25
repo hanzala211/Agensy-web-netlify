@@ -57,13 +57,17 @@ export const ClientCard: React.FC<ClientCardProps> = ({
           <div className="mt-1 space-y-1 text-sm text-slateGrey">
             <p>
               DOB:{" "}
-              {DateUtils.formatDateToRequiredFormat(
-                client.date_of_birth as string
-              )}
+              {client.date_of_birth
+                ? DateUtils.formatDateToRequiredFormat(
+                    client.date_of_birth as string
+                  )
+                : "None"}
             </p>
             <p>
               Living:{" "}
-              {StringUtils.capitalizeFirstLetter(client.living_situation)}
+              {client.living_situation
+                ? StringUtils.capitalizeFirstLetter(client.living_situation)
+                : "None"}
             </p>
           </div>
         </div>

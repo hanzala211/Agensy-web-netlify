@@ -40,9 +40,11 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
             <div className="md:text-xl text-sm font-semibold text-gray-800 break-words line-clamp-4">
               {medication?.medication_name}
             </div>
-            <div className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-medium text-xs md:text-sm">
-              {medication?.dosage}
-            </div>
+            {medication.dosage && (
+              <div className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-medium text-xs md:text-sm">
+                {medication?.dosage}
+              </div>
+            )}
             {medication.purpose && (
               <div className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-medium text-xs md:text-sm">
                 {medication?.purpose}

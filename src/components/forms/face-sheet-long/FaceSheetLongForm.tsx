@@ -633,6 +633,8 @@ export const FaceSheetLongForm: React.FC = () => {
         cognitive_status: data.mentalStatus
           ? data.mentalStatus === "Other"
             ? data.mentalStatusText
+              ? data.mentalStatusText
+              : null
             : data.mentalStatus
           : null,
         last_cognitive_screening: data.cognitiveScreeningDate

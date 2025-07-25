@@ -315,3 +315,8 @@ body {
 .ant-select-arrow {
   margin-top: -2px !important;
 }
+
+input[type="checkbox"] {
+  width: 15px !important;
+  height: 15px !important;
+}

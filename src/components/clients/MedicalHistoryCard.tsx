@@ -74,7 +74,7 @@ export const MedicalHistoryCard: React.FC = () => {
           : null,
       cognitive_status: data.cognitive_status
         ? data.cognitive_status === "Other"
-          ? data.cognitive_status_text
+          ? data.cognitive_status_text ? data.cognitive_status_text : null
           : data.cognitive_status
         : null,
       notes: data.notes ? data.notes : null,
