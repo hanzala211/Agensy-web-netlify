@@ -1,10 +1,9 @@
 import { ClientService } from "@agensy/services";
-import type { ClientAddRequestData } from "@agensy/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useAddClientMutation = () => {
   return useMutation({
-    mutationFn: async (data: ClientAddRequestData) =>
+    mutationFn: async (data: unknown) =>
       await ClientService.addClient(data),
   });
 };

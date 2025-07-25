@@ -1,7 +1,6 @@
-import type { ClientAddRequestData } from "@agensy/types";
 import { sendRequest } from "@agensy/utils";
 
-export const addClient = async (data: ClientAddRequestData) => {
+export const addClient = async (data: unknown) => {
   try {
     const response = await sendRequest({
       method: "POST",

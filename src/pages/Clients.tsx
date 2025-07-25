@@ -16,7 +16,9 @@ import {
   PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
-import type { Client, ClientAddRequestData } from "@agensy/types";
+import type {
+  Client,
+} from "@agensy/types";
 import { useNavigate } from "react-router-dom";
 import { useAddClientMutation } from "@agensy/api";
 import { toast } from "@agensy/utils";
@@ -79,7 +81,7 @@ export const Clients: React.FC = () => {
     }
   };
 
-  const handleAddClient = (data: ClientAddRequestData) => {
+  const handleAddClient = (data: unknown) => {
     addClientMutation.mutate(data);
   };
 
