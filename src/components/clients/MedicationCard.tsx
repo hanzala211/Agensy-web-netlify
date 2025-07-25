@@ -71,14 +71,20 @@ export const MedicationCard: React.FC = () => {
   const handleMedicationChange = (data: MedicationFormData) => {
     const postData = {
       medication_name: data.medication_name,
-      dosage: data.dosage,
-      frequency: data.frequency,
-      purpose: data.purpose,
-      prescribing_doctor: data.prescribing_doctor,
-      start_date: DateUtils.changetoISO(data.start_date),
-      end_date: DateUtils.changetoISO(data.end_date),
-      refill_due: DateUtils.changetoISO(data.refill_due),
-      notes: data.notes,
+      dosage: data.dosage ? data.dosage : null,
+      frequency: data.frequency ? data.frequency : null,
+      purpose: data.purpose ? data.purpose : null,
+      prescribing_doctor: data.prescribing_doctor
+        ? data.prescribing_doctor
+        : null,
+      start_date: data.start_date
+        ? DateUtils.changetoISO(data.start_date)
+        : null,
+      end_date: data.end_date ? DateUtils.changetoISO(data.end_date) : null,
+      refill_due: data.refill_due
+        ? DateUtils.changetoISO(data.refill_due)
+        : null,
+      notes: data.notes ? data.notes : null,
     };
     if (selectedEditMedication) {
       editClientMedicationMutation.mutate({

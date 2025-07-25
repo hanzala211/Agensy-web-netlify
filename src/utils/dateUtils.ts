@@ -38,6 +38,9 @@ export const formatDateToRequiredFormat = (
   isoDateString: string,
   format?: string
 ): string => {
+  if (!isoDateString) {
+    return "";
+  }
   const date = dayjs(isoDateString);
   return date.format(format || DATE_FOMRAT);
 };
@@ -70,27 +73,27 @@ export const changetoISO = (date: string) => {
 };
 
 export const changeMonthYearToISO = (date: string) => {
-  if (!date || date.trim() === '') {
+  if (!date || date.trim() === "") {
     return null;
   }
-  
-  if (date.includes('/') && date.split('/').length === 2) {
-    const [month, year] = date.split('/');
-    
+
+  if (date.includes("/") && date.split("/").length === 2) {
+    const [month, year] = date.split("/");
+
     const monthNum = parseInt(month, 10);
     const yearNum = parseInt(year, 10);
-    
+
     if (isNaN(monthNum) || isNaN(yearNum) || monthNum < 1 || monthNum > 12) {
       return null;
     }
-    
-    return dayjs(`${year}-${month.padStart(2, '0')}-01`).toISOString();
+
+    return dayjs(`${year}-${month.padStart(2, "0")}-01`).toISOString();
   }
-  
+
   try {
     return dayjs(date).toISOString();
   } catch {
-    console.warn('Invalid date format:', date);
+    console.warn("Invalid date format:", date);
     return null;
   }
 };

@@ -1,8 +1,5 @@
 import { ClientService } from "@agensy/services";
-import type {
-  ClientAddRequestData,
-  ClientHealthcareRequestData,
-} from "@agensy/types";
+import type { ClientAddRequestData } from "@agensy/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useAddClientMutation = () => {
@@ -33,7 +30,7 @@ export const useGetSingleClientQuery = (id: string) => {
 
 export const useUpdateClientMutation = () => {
   return useMutation({
-    mutationFn: async (data: { id: string; data: ClientAddRequestData }) =>
+    mutationFn: async (data: { id: string; data: unknown }) =>
       await ClientService.updateClient(data),
   });
 };
@@ -47,9 +44,7 @@ export const useUpdateClientStatusMutation = () => {
 
 export const useUpdateClientHealthcareMutation = () => {
   return useMutation({
-    mutationFn: async (data: {
-      clientId: string;
-      data: ClientHealthcareRequestData;
-    }) => await ClientService.updateClientHealthcare(data.clientId, data.data),
+    mutationFn: async (data: { clientId: string; data: unknown }) =>
+      await ClientService.updateClientHealthcare(data.clientId, data.data),
   });
 };

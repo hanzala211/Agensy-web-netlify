@@ -22,7 +22,7 @@ export const Documents: React.FC = () => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("document_type", data.documentType);
-    formData.append("description", data.description);
+    formData.append("description", data.description ? data.description : "");
     formData.append("file", data.file);
     formData.append("category", data.documentType as string);
     addGeneralDocumentMutation.mutate(formData);

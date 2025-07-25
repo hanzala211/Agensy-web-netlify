@@ -99,3 +99,34 @@ export const usePostCareRecipientQuestionaireMutation = () => {
       ClientAgensyFormsService.postCareRecipientQuestionaire(clientId, data),
   });
 };
+
+export const useGetCaregiverInformation = (clientId: string) => {
+  return useQuery({
+    queryKey: ["care-giver-info", clientId],
+    queryFn: () =>
+      ClientAgensyFormsService.getClientCareGiverInformation(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostCaregiverInformationMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postClientCaregiverInformation(clientId, data),
+  });
+};
+
+export const useGetMedicalAppointmentTemplate = (clientId: string) => {
+  return useQuery({
+    queryKey: ["medical-appointment-template", clientId],
+    queryFn: () => ClientAgensyFormsService.getMedicalAppointmentTemplate(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostMedicalAppointmentTemplateMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postMedicalAppointmentTemplate(clientId, data),
+  });
+};

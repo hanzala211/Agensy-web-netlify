@@ -1,13 +1,9 @@
-import type { ClientHealthProviderFormData } from "@agensy/types";
-import { useMutation } from "@tanstack/react-query";
+  import { useMutation } from "@tanstack/react-query";
 import { ClientHealthCareService } from "@agensy/services";
 
 export const useAddHealthCareMutation = () => {
   return useMutation({
-    mutationFn: async (data: {
-      provider: ClientHealthProviderFormData;
-      clientId: string;
-    }) =>
+    mutationFn: async (data: { provider: unknown; clientId: string }) =>
       await ClientHealthCareService.addHealthCareProvider(
         data.provider,
         data.clientId
@@ -18,7 +14,7 @@ export const useAddHealthCareMutation = () => {
 export const useUpdateHealthCareMutation = () => {
   return useMutation({
     mutationFn: async (data: {
-      provider: ClientHealthProviderFormData;
+      provider: unknown;
       providerId: string;
       clientId: string;
     }) =>

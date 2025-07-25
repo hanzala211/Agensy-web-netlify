@@ -168,9 +168,17 @@ export const FieldRenderer = ({
             type="checkbox"
             checked={field.id ? Boolean(formData[field.id]) : false}
             onChange={handleCheckboxChange}
-            className="mr-[8px]"
+            className={`mr-[8px] w-3.5 h-3.5 flex-shrink-0 ${!field.parentId ? "ml-4" : ""}`}
           />
-          <span className="text-[14px]">{field.label}</span>
+          <span
+            className={`${
+              !field.parentId
+                ? "font-bold text-lg text-primaryColor ml-2"
+                : "text-[14px]"
+            }`}
+          >
+            {field.label}
+          </span>
         </label>
         {field.id &&
           formData[field.id] &&
@@ -233,7 +241,7 @@ export const FieldRenderer = ({
 
   if (field.type === "link") {
     const segments = StringUtils.extractLinksFromText(field.label);
-    
+
     return (
       <div style={indentationStyle} className="px-2 sm:px-4 md:px-6">
         <div
@@ -241,22 +249,24 @@ export const FieldRenderer = ({
         >
           <ICONS.rightSolid className="w-4 h-4 flex-shrink-0" />
           <div className="text-[14px] leading-relaxed">
-            {segments.map((segment: { text: string; url?: string }, index: number) => (
-              <span key={index}>
-                {segment.url ? (
-                  <a
-                    href={segment.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 underline break-all"
-                  >
-                    {segment.text}
-                  </a>
-                ) : (
-                  segment.text
-                )}
-              </span>
-            ))}
+            {segments.map(
+              (segment: { text: string; url?: string }, index: number) => (
+                <span key={index}>
+                  {segment.url ? (
+                    <a
+                      href={segment.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline break-all"
+                    >
+                      {segment.text}
+                    </a>
+                  ) : (
+                    segment.text
+                  )}
+                </span>
+              )
+            )}
           </div>
         </div>
       </div>

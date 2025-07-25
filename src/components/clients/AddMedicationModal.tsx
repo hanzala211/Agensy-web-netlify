@@ -55,22 +55,24 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({
   useEffect(() => {
     if (editMedication) {
       reset({
-        medication_name: editMedication.medication_name || "",
+        medication_name: editMedication.medication_name,
         dosage: editMedication.dosage || "",
         frequency: editMedication.frequency || "",
         purpose: editMedication.purpose || "",
         prescribing_doctor: editMedication.prescribing_doctor || "",
-        start_date:
-          DateUtils.formatDateToRequiredFormat(
-            editMedication.start_date || ""
-          ) || "",
-        end_date:
-          DateUtils.formatDateToRequiredFormat(editMedication.end_date || "") ||
-          "",
-        refill_due:
-          DateUtils.formatDateToRequiredFormat(
-            editMedication.refill_due || ""
-          ) || "",
+        start_date: editMedication.start_date
+          ? DateUtils.formatDateToRequiredFormat(
+              editMedication.start_date || ""
+            )
+          : "",
+        end_date: editMedication.end_date
+          ? DateUtils.formatDateToRequiredFormat(editMedication.end_date || "")
+          : "",
+        refill_due: editMedication.refill_due
+          ? DateUtils.formatDateToRequiredFormat(
+              editMedication.refill_due || ""
+            )
+          : "",
         notes: editMedication.notes as string,
       });
     }

@@ -1,7 +1,4 @@
-import type {
-  ClientAddRequestData,
-  ClientHealthcareRequestData,
-} from "@agensy/types";
+import type { ClientAddRequestData } from "@agensy/types";
 import { sendRequest } from "@agensy/utils";
 
 export const addClient = async (data: ClientAddRequestData) => {
@@ -47,10 +44,7 @@ export const getSingleClient = async (id: string) => {
   }
 };
 
-export const updateClient = async (data: {
-  id: string;
-  data: ClientAddRequestData;
-}) => {
+export const updateClient = async (data: { id: string; data: unknown }) => {
   try {
     const response = await sendRequest({
       method: "PUT",
@@ -80,7 +74,7 @@ export const updateClientStatus = async (id: string, status: boolean) => {
 
 export const updateClientHealthcare = async (
   clientId: string,
-  data: ClientHealthcareRequestData
+  data: unknown
 ) => {
   try {
     const response = await sendRequest({

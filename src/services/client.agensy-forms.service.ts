@@ -204,3 +204,71 @@ export const postCareRecipientQuestionaire = async (
     throw error;
   }
 };
+
+export const getClientCareGiverInformation = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/caregiver-information-sheet`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getClientCareGiverInformation] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postClientCaregiverInformation = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/caregiver-information-sheet`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postClientCaregiverInformation] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getMedicalAppointmentTemplate = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/medical-template`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getMedicalAppointmentTemplate] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postMedicalAppointmentTemplate = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/medical-template`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postMedicalAppointmentTemplate] error: ${error}`
+    );
+    throw error;
+  }
+};

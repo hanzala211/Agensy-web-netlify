@@ -50,6 +50,7 @@ import {
   COGNITIVE_STATUS,
 } from "@agensy/constants";
 import { useClientContext } from "@agensy/context";
+import { useQueryClient } from "@tanstack/react-query";
 
 const defaultValues = {
   firstName: "",
@@ -121,6 +122,8 @@ const defaultValues = {
 };
 
 export const FaceSheetLongForm: React.FC = () => {
+  const params = useParams();
+  const queryClient = useQueryClient();
   const { setOpenedFileData } = useClientContext();
   const { clientId } = useParams();
   const postFaceSheetLongFormMutation = usePostFaceSheetLongFormMutation();
@@ -152,6 +155,7 @@ export const FaceSheetLongForm: React.FC = () => {
         "Face Sheet Successfully Updated",
         "Your client's medical information has been saved and is now up to date."
       );
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
     } else if (postFaceSheetLongFormMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -294,7 +298,7 @@ export const FaceSheetLongForm: React.FC = () => {
           faceSheetLongData?.healthcare_providers?.map(
             (provider: HealthcareProvider) => ({
               providerName: provider.provider_name || "",
-              specialty: provider.specialty,
+              specialty: provider.specialty || "",
               address: provider.address || "",
               phone: provider.phone || "",
               fax: provider.fax || "",
@@ -305,7 +309,7 @@ export const FaceSheetLongForm: React.FC = () => {
                 ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
                 : "",
               id: provider.id || "",
-              providerType: provider.provider_type,
+              providerType: provider.provider_type || "",
             })
           ) || [],
         medications:
@@ -410,18 +414,28 @@ export const FaceSheetLongForm: React.FC = () => {
           faceSheetLongData?.medical_info?.cognitive_score || "",
         test_type: faceSheetLongData?.medical_info?.test_type || "",
         notesAndConcerns: faceSheetLongData?.medical_info?.notes || "",
-        mentalStatus: COGNITIVE_STATUS.some(
-          (item) =>
-            item.value === faceSheetLongData?.medical_info?.cognitive_status
-        )
-          ? faceSheetLongData?.medical_info?.cognitive_status
-          : "Other",
-        mentalStatusText: COGNITIVE_STATUS.some(
-          (item) =>
-            item.value === faceSheetLongData?.medical_info?.cognitive_status
-        )
-          ? ""
-          : faceSheetLongData?.medical_info?.cognitive_status,
+        mentalStatus:
+          faceSheetLongData?.medical_info?.cognitive_status &&
+          faceSheetLongData?.medical_info?.cognitive_status.length > 0
+            ? COGNITIVE_STATUS.some(
+                (item) =>
+                  item.value ===
+                  faceSheetLongData?.medical_info?.cognitive_status
+              )
+              ? faceSheetLongData?.medical_info?.cognitive_status
+              : "Other"
+            : "",
+        mentalStatusText:
+          faceSheetLongData?.medical_info?.cognitive_status &&
+          faceSheetLongData?.medical_info?.cognitive_status.length > 0 &&
+          COGNITIVE_STATUS.some(
+            (item) =>
+              item.value === faceSheetLongData?.medical_info?.cognitive_status
+          )
+            ? ""
+            : faceSheetLongData?.medical_info?.cognitive_status
+            ? faceSheetLongData?.medical_info?.cognitive_status
+            : "",
         dietaryRestrictions:
           faceSheetLongData?.medical_info?.dietary_restrictions
             ?.split(", ")
@@ -491,6 +505,9 @@ export const FaceSheetLongForm: React.FC = () => {
           : null,
         id: item.id,
       };
+      if (provider.provider_type?.length === 0) {
+        delete provider.provider_type;
+      }
       if (item.id) {
         return provider;
       } else {
@@ -629,12 +646,20 @@ export const FaceSheetLongForm: React.FC = () => {
       },
 
       emergency_contact: {
-        first_name: data.emergencyContactFirstName,
-        last_name: data.emergencyContactLastName,
-        email: data.emergencyContactEmail,
-        phone: data.emergencyContactPhone,
-        relationship: data.emergencyContactRelationship,
-        address: data.emergencyContactAddress,
+        first_name: data.emergencyContactFirstName
+          ? data.emergencyContactFirstName
+          : null,
+        last_name: data.emergencyContactLastName
+          ? data.emergencyContactLastName
+          : null,
+        email: data.emergencyContactEmail ? data.emergencyContactEmail : null,
+        phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
+        relationship: data.emergencyContactRelationship
+          ? data.emergencyContactRelationship
+          : null,
+        address: data.emergencyContactAddress
+          ? data.emergencyContactAddress
+          : null,
       },
 
       medications: medications,

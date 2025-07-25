@@ -1,12 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useRef } from "react";
-import {
-  clientSchema,
-  type Client,
-  type ClientAddRequestData,
-  type ClientFormData,
-} from "@agensy/types";
+import { clientSchema, type Client, type ClientFormData } from "@agensy/types";
 import {
   Modal,
   ClientPersonalInfoStep,
@@ -20,7 +15,7 @@ interface AddClientModalProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
   btnText: string;
-  onSubmit?: (data: ClientAddRequestData) => void;
+  onSubmit?: (data: ClientFormData) => void;
   isButtonLoading?: boolean;
   editClient?: Client | null;
 }
@@ -107,24 +102,28 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
     const postData = {
       first_name: data.firstName,
       last_name: data.lastName,
-      date_of_birth: DateUtils.changetoISO(data.dateOfBirth),
-      gender: data.gender,
-      marital_status: data.maritalStatus,
-      address: data.address,
-      city: data.city,
-      state: data.state,
-      zip: data.zipCode,
-      living_situation: data.livingSituation,
-      hospital_phone: data.hospital_phone,
-      hospital_address: data.hospital_address,
-      pharmacy_name: data.pharmacy_name,
-      pharmacy_phone: data.pharmacy_phone,
-      pharmacy_address: data.pharmacy_address,
-      pharmacy_fax: data.pharmacy_fax,
-      preferred_hospital: data.preferred_hospital,
+      date_of_birth: data.dateOfBirth
+        ? DateUtils.changetoISO(data.dateOfBirth)
+        : null,
+      gender: data.gender ? data.gender : null,
+      marital_status: data.maritalStatus ? data.maritalStatus : null,
+      address: data.address ? data.address : null,
+      city: data.city ? data.city : null,
+      state: data.state ? data.state : null,
+      zip: data.zipCode ? data.zipCode : null,
+      living_situation: data.livingSituation ? data.livingSituation : null,
+      hospital_phone: data.hospital_phone ? data.hospital_phone : null,
+      hospital_address: data.hospital_address ? data.hospital_address : null,
+      pharmacy_name: data.pharmacy_name ? data.pharmacy_name : null,
+      pharmacy_phone: data.pharmacy_phone ? data.pharmacy_phone : null,
+      pharmacy_address: data.pharmacy_address ? data.pharmacy_address : null,
+      pharmacy_fax: data.pharmacy_fax ? data.pharmacy_fax : null,
+      preferred_hospital: data.preferred_hospital
+        ? data.preferred_hospital
+        : null,
     };
     if (onSubmitProp) {
-      onSubmitProp(postData as ClientAddRequestData);
+      onSubmitProp(postData as unknown as ClientFormData);
     }
   };
 

@@ -8,6 +8,7 @@ import type {
   FolderData,
   FolderItem,
   HealthHistoryFormData,
+  MedicalAppointmentTemplateData,
 } from "@agensy/types";
 import { TertiaryButton } from "@agensy/components";
 import { useClientContext } from "@agensy/context";
@@ -24,6 +25,10 @@ import { HospitalizationChecklistPDF } from "./hospitalization-checklist/Hospita
 import { CarePlanChecklistPDF } from "./care-plan-checklist/CarePlanChecklistPDF";
 import { MoveInPDF } from "./move-in-checklist/MoveInPDF";
 import { NextStepsAfterDeathPDF } from "./next-steps-after-death-checklist/NextStepsAfterDeathPDF";
+import { MedicareCheatSheetPDF } from "./medicare-cheat-sheet/MedicareCheatSheetPDF";
+import { LongTermCareInsurancePolicyPDF } from "./long-term-care-insurance-policy/LongTermCareInsurancePolicyPDF";
+import { CaregiverInformationPDF } from "./caregiver-information/CaregiverInformationPDF";
+import MedicalAppointmentTemplatePDF from "./medical-appointment-template/MedicalAppointmentTemplatePDF";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -248,6 +253,64 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "medicare-cheat-sheet":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <MedicareCheatSheetPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "long-term-care-insurance-policy":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <LongTermCareInsurancePolicyPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "caregiver-information":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <CaregiverInformationPDF
+                data={
+                  openedFileData as unknown as {
+                    [key: string]: boolean | string;
+                  } & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "medical-appointment-template":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <MedicalAppointmentTemplatePDF
+                data={
+                  openedFileData as unknown as MedicalAppointmentTemplateData & {
                     last_update: { updatedAt: string };
                   }
                 }

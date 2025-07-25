@@ -1,8 +1,7 @@
-import type { ClientHealthProviderFormData } from "@agensy/types";
-import { sendRequest } from "@agensy/utils";
+  import { sendRequest } from "@agensy/utils";
 
 export const addHealthCareProvider = async (
-  data: ClientHealthProviderFormData,
+  data: unknown,
   clientId: string
 ) => {
   try {
@@ -21,7 +20,7 @@ export const addHealthCareProvider = async (
 };
 
 export const updateHealthCareProvider = async (
-  data: ClientHealthProviderFormData,
+  data: unknown,
   clientID: string,
   providerId: string
 ) => {

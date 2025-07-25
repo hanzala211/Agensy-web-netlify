@@ -30,6 +30,7 @@ import {
 } from "@agensy/api";
 import { DateUtils, toast } from "@agensy/utils";
 import { RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 const defaultValues = {
   formFillerName: "",
@@ -181,6 +182,8 @@ const defaultValues = {
 };
 
 export const CareRecipientQuestionaire = () => {
+  const params = useParams();
+  const queryClient = useQueryClient();
   const { setOpenedFileData } = useClientContext();
   const { clientId } = useParams();
   const {
@@ -551,21 +554,34 @@ export const CareRecipientQuestionaire = () => {
           [],
 
         // Medical Conditions
-        medicalConditions:
-          (careRecipientQuestionnaire.medical_conditions &&
-            careRecipientQuestionnaire?.medical_conditions?.length > 0 &&
-            careRecipientQuestionnaire?.medical_conditions?.map(
-              (condition: {
-                condition?: string;
-                treatment?: string;
-                medications?: string;
-              }) => ({
-                problem: condition.condition || "",
-                treatment: condition.treatment || "",
-                medications: condition.medications || "",
-              })
-            )) ||
-          [],
+        medicalConditions: careRecipientQuestionnaire.medical_conditions
+          ? (() => {
+              const condition = careRecipientQuestionnaire.medical_conditions;
+              const problems = condition.problem
+                ? condition.problem.split(", ")
+                : [];
+              const treatments = condition.treatment
+                ? condition.treatment.split(", ")
+                : [];
+              const medications = condition.medications
+                ? condition.medications.split(", ")
+                : [];
+
+              // Get the maximum length to handle different array sizes
+              const maxLength = Math.max(
+                problems.length,
+                treatments.length,
+                medications.length
+              );
+
+              // Create array of objects
+              return Array.from({ length: maxLength }, (_, index) => ({
+                problem: problems[index] || "",
+                treatment: treatments[index] || "",
+                medications: medications[index] || "",
+              }));
+            })()
+          : [],
 
         // Medical Info
         lastCheckupDate: careRecipientQuestionnaire.medical_info
@@ -660,7 +676,8 @@ export const CareRecipientQuestionaire = () => {
           careRecipientQuestionnaire.questionnaire?.social_life_notes || "",
 
         // Other Pertinent Information
-        hospitalPreference: "",
+        hospitalPreference:
+          careRecipientQuestionnaire?.client_info.preferred_hospital,
         dnr: careRecipientQuestionnaire.client_info?.dnr || "",
         trust: careRecipientQuestionnaire.client_info?.trust || "",
         lifecare: careRecipientQuestionnaire.client_info?.lifecare || "",
@@ -732,6 +749,7 @@ export const CareRecipientQuestionaire = () => {
   useEffect(() => {
     if (postCareRecipientQuestionaireMutation.status === "success") {
       toast.success("Care Recipient Questionaire Updated");
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
     } else if (postCareRecipientQuestionaireMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -890,6 +908,9 @@ export const CareRecipientQuestionaire = () => {
           : null,
         last_name: data.careRecipientLastName
           ? data.careRecipientLastName
+          : null,
+        preferred_hospital: data.hospitalPreference
+          ? data.hospitalPreference
           : null,
         address: data.careRecipientAddress ? data.careRecipientAddress : null,
         city: data.careRecipientCity ? data.careRecipientCity : null,

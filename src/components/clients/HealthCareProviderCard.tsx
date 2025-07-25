@@ -74,15 +74,19 @@ export const HealthCareProviderCard: React.FC = () => {
 
   const handleSubmitForm = (data: ClientHealthProviderFormData) => {
     const postData = {
-      address: data.address,
-      fax: data.fax,
-      last_visit: DateUtils.changetoISO(data.last_visit),
-      next_visit: DateUtils.changetoISO(data.next_visit),
-      notes: data.notes,
-      phone: data.phone,
-      provider_name: data.provider_name,
-      provider_type: data.provider_type,
-      specialty: data.specialty,
+      address: data.address ? data.address : null,
+      fax: data.fax ? data.fax : null,
+      last_visit: data.last_visit
+        ? DateUtils.changetoISO(data.last_visit)
+        : null,
+      next_visit: data.next_visit
+        ? DateUtils.changetoISO(data.next_visit)
+        : null,
+      notes: data.notes ? data.notes : null,
+      phone: data.phone ? data.phone : null,
+      provider_name: data.provider_name ? data.provider_name : null,
+      provider_type: data.provider_type ? data.provider_type : null,
+      specialty: data.specialty ? data.specialty : null,
     };
     if (selectedEditHealthCareProvider) {
       updateHealthCareProviderMutation.mutate({

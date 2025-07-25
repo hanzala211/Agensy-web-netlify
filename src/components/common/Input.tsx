@@ -35,7 +35,7 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <div className="space-y-2">
-        {label && !placeholder && <label htmlFor="email">{label}</label>}
+      {label && !placeholder && <label htmlFor={name}>{label}</label>}
       <div className="flex gap-2 flex-col relative w-full">
         <input
           {...register}

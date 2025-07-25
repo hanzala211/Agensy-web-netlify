@@ -11,10 +11,14 @@ import {
   CarePlanChecklist,
   MoveIn,
   NextStepsAfterDeath,
+  MedicareCheatSheet,
+  LongTermCareInsurancePolicy,
+  CaregiverInformation,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@agensy/constants";
+import { MedicalAppointmentTemplate } from "@agensy/components";
 
 const rootFolders: FolderItem[] = [
   {
@@ -82,16 +86,16 @@ const rootFolders: FolderItem[] = [
         slug: "health-history-form-medical",
       },
       {
-        id: "bank-roi-forms",
-        name: "Bank ROI Forms",
+        id: "medicare-cheat-sheet",
+        name: "Medicare Cheat Sheet",
         type: "file",
-        slug: "bank-roi-forms",
+        slug: "medicare-cheat-sheet",
       },
       {
-        id: "agensy-note-templates",
-        name: "Agensy Note Templates",
+        id: "medical-appointment-template",
+        name: "Medical Appointment Template",
         type: "file",
-        slug: "agensy-note-templates",
+        slug: "medical-appointment-template",
       },
     ],
   },
@@ -102,28 +106,10 @@ const rootFolders: FolderItem[] = [
     type: "folder",
     children: [
       {
-        id: "poa-documents",
-        name: "POA Documents, Living Will, Advance Directives, MPOA, DNR",
+        id: "long-term-care-insurance-policy",
+        name: "Long Term Care Insurance Policy",
         type: "file",
-        slug: "poa-documents",
-      },
-      {
-        id: "account-password-tracking",
-        name: "Account /password tracking",
-        type: "file",
-        slug: "account-password-tracking",
-      },
-      {
-        id: "professional-contacts",
-        name: "Professional contacts",
-        type: "file",
-        slug: "professional-contacts",
-      },
-      {
-        id: "insurance-id-information",
-        name: "Insurance & ID Information",
-        type: "file",
-        slug: "insurance-id-information",
+        slug: "long-term-care-insurance-policy",
       },
     ],
   },
@@ -139,12 +125,6 @@ const rootFolders: FolderItem[] = [
         type: "file",
         slug: "caregiver-information",
       },
-      {
-        id: "caregiver-communication-expectations",
-        name: "Instructions on caregiver communication and expectations",
-        type: "file",
-        slug: "caregiver-communication-expectations",
-      },
     ],
   },
   {
@@ -158,12 +138,6 @@ const rootFolders: FolderItem[] = [
         name: "Care plan checklist",
         type: "file",
         slug: "care-plan-checklists",
-      },
-      {
-        id: "when-to-call-care-plans",
-        name: "Instructions on when to call care plans",
-        type: "file",
-        slug: "when-to-call-care-plans",
       },
     ],
   },
@@ -196,12 +170,6 @@ const rootFolders: FolderItem[] = [
         name: "Next Steps after Death",
         type: "file",
         slug: "next-steps-after-death",
-      },
-      {
-        id: "family-check-in",
-        name: "Family check in",
-        type: "file",
-        slug: "family-check-in",
       },
     ],
   },
@@ -256,43 +224,25 @@ const fileMap: Record<string, FolderData> = {
     description: "Medical health history documentation form",
     content: <HealthHistoryForm />,
   },
-  "bank-roi-forms": {
-    id: "bank-roi-forms",
-    name: "Bank ROI Forms",
-    description: "Bank Release of Information forms",
-    content: <div>Bank ROI Forms content</div>,
+  "medicare-cheat-sheet": {
+    id: "medicare-cheat-sheet",
+    name: "Medicare Cheat Sheet",
+    description: "Medicare Cheat Sheet for medications guidance",
+    content: <MedicareCheatSheet />,
   },
-  "agensy-note-templates": {
-    id: "agensy-note-templates",
-    name: "Agensy Note Templates",
-    description: "Templates for standardized care notes",
-    content: <div>Agensy Note Templates content</div>,
+  "medical-appointment-template": {
+    id: "medical-appointment-template",
+    name: "Medical Appointment Template",
+    description: "Templates for standardized medical appointment notes",
+    content: <MedicalAppointmentTemplate />,
   },
 
   // Long Term Care Planning files
-  "poa-documents": {
-    id: "poa-documents",
-    name: "POA Documents, Living Will, Advance Directives, MPOA, DNR",
-    description: "Power of Attorney and advance directive documents",
-    content: <div>POA Documents content</div>,
-  },
-  "account-password-tracking": {
-    id: "account-password-tracking",
-    name: "Account /password tracking",
-    description: "Secure tracking of accounts and passwords",
-    content: <div>Account/password tracking content</div>,
-  },
-  "professional-contacts": {
-    id: "professional-contacts",
-    name: "Professional contacts",
-    description: "Directory of professional contacts and services",
-    content: <div>Professional contacts content</div>,
-  },
-  "insurance-id-information": {
-    id: "insurance-id-information",
-    name: "Insurance & ID Information",
-    description: "Insurance and identification information tracking",
-    content: <div>Insurance & ID Information content</div>,
+  "long-term-care-insurance-policy": {
+    id: "long-term-care-insurance-policy",
+    name: "Long Term Care Insurance Policy",
+    description: "Long Term Care Insurance Policy",
+    content: <LongTermCareInsurancePolicy />,
   },
 
   // Caregiver files
@@ -300,15 +250,8 @@ const fileMap: Record<string, FolderData> = {
     id: "caregiver-information",
     name: "Caregiver Information",
     description: "Information and documentation for caregivers",
-    content: <div>Caregiver Information content</div>,
+    content: <CaregiverInformation />,
   },
-  "caregiver-communication-expectations": {
-    id: "caregiver-communication-expectations",
-    name: "Instructions on caregiver communication and expectations",
-    description: "Guidelines for caregiver communication and expectations",
-    content: <div>Caregiver communication and expectations content</div>,
-  },
-
   // Care Plans files
   "care-plan-checklists": {
     id: "care-plan-checklists",
@@ -316,13 +259,6 @@ const fileMap: Record<string, FolderData> = {
     description: "Checklists for care plan development",
     content: <CarePlanChecklist />,
   },
-  "when-to-call-care-plans": {
-    id: "when-to-call-care-plans",
-    name: "Instructions on when to call care plans",
-    description: "Guidelines for when to activate care plans",
-    content: <div>Instructions on when to call care plans content</div>,
-  },
-
   // Checklists files
   "move-in-checklist": {
     id: "move-in-checklist",
@@ -347,12 +283,6 @@ const fileMap: Record<string, FolderData> = {
     name: "Next Steps after Death",
     description: "Checklist for procedures following death",
     content: <NextStepsAfterDeath />,
-  },
-  "family-check-in": {
-    id: "family-check-in",
-    name: "Family check in",
-    description: "Family check-in procedures and forms",
-    content: <div>Family check in content</div>,
   },
 };
 

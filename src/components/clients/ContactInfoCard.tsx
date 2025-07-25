@@ -146,8 +146,10 @@ export const ContactInfoCard: React.FC = () => {
                 >
                   <div>
                     <p>
-                      {item.first_name} {item.last_name} (
-                      {StringUtils.capitalizeFirstLetter(item.relationship)})
+                      {item.first_name} {item.last_name}{" "}
+                      {item.relationship && "("}
+                      {StringUtils.capitalizeFirstLetter(item.relationship)}
+                      {item.relationship && ")"}
                     </p>
                     <p>{item.phone}</p>
                   </div>

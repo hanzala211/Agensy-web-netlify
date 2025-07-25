@@ -66,169 +66,45 @@ export const verificationSchema = z.object({
 export type VerificationFormData = z.infer<typeof verificationSchema>;
 
 export const hospitalSchema = z.object({
-  preferred_hospital: z
-    .string()
-    .min(1, { message: "Preferred Hospital Name is required" })
-    .transform(trimString),
-  hospital_address: z
-    .string()
-    .min(1, { message: "Hospital address is required" })
-    .transform(trimString),
-  hospital_phone: z
-    .string()
-    .min(1, { message: "Hospital phone is required" })
-    .transform(trimString),
-  pharmacy_name: z
-    .string()
-    .min(1, { message: "Pharmacy name is required" })
-    .transform(trimString),
-  pharmacy_address: z
-    .string()
-    .min(1, { message: "Pharmacy address is required" })
-    .transform(trimString),
-  pharmacy_phone: z
-    .string()
-    .min(1, { message: "Pharmacy phone is required" })
-    .transform(trimString),
-  pharmacy_fax: z
-    .string()
-    .min(1, { message: "Pharmacy fax is required" })
-    .transform(trimString),
+  preferred_hospital: z.string().optional(),
+  hospital_address: z.string().optional(),
+  hospital_phone: z.string().optional(),
+  pharmacy_name: z.string().optional(),
+  pharmacy_address: z.string().optional(),
+  pharmacy_phone: z.string().optional(),
+  pharmacy_fax: z.string().optional(),
 });
 
 export type HospitalFormData = z.infer<typeof hospitalSchema>;
 
-export const clientSchema = z
-  .object({
-    firstName: z
-      .string()
-      .min(2, { message: "First name is required" })
-      .max(12, "First name must be less than 12 characters")
-      .transform(trimString),
-    lastName: z
-      .string()
-      .min(2, { message: "Last name is required" })
-      .max(12, "Last name must be less than 12 characters")
-      .transform(trimString),
-    dateOfBirth: z
-      .string()
-      .min(1, { message: "Date of birth is required" })
-      .transform(trimString),
-    gender: z.enum(["male", "female", "other"]),
-    maritalStatus: z
-      .string()
-      .min(1, { message: "Marital status is required" })
-      .transform(trimString),
-    address: z
-      .string()
-      .min(5, { message: "Address is required" })
-      .transform(trimString),
-    city: z
-      .string()
-      .min(2, { message: "City is required" })
-      .transform(trimString),
-    state: z
-      .string()
-      .min(2, { message: "State is required" })
-      .transform(trimString),
-    zipCode: z
-      .string()
-      .min(5, { message: "Valid ZIP code is required" })
-      .transform(trimString),
-    livingSituation: z
-      .string()
-      .min(1, { message: "Living situation is required" })
-      .transform(trimString),
-    pharmacy_name: z
-      .string()
-      .min(1, { message: "Pharmacy name is required" })
-      .optional()
-      .transform((val) => (val ? trimString(val) : val)),
-    pharmacy_address: z
-      .string()
-      .min(1, { message: "Pharmacy address is required" })
-      .optional()
-      .transform((val) => (val ? trimString(val) : val)),
-    pharmacy_phone: z
-      .string()
-      .min(1, { message: "Pharmacy phone is required" })
-      .optional()
-      .transform((val) => (val ? trimString(val) : val)),
-    pharmacy_fax: z
-      .string()
-      .min(1, { message: "Pharmacy fax is required" })
-      .optional()
-      .transform((val) => (val ? trimString(val) : val)),
-    preferred_hospital: z
-      .string()
-      .min(1, { message: "Preferred Hospital Name is required" })
-      .optional()
-      .transform((val) => (val ? trimString(val) : val)),
-    hospital_address: z
-      .string()
-      .min(1, { message: "Hospital address is required" })
-      .optional()
-      .transform((val) => (val ? trimString(val) : val)),
-    hospital_phone: z
-      .string()
-      .min(1, { message: "Hospital phone is required" })
-      .optional()
-      .transform((val) => (val ? trimString(val) : val)),
-    isEdit: z.boolean().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (!data.isEdit) {
-      if (!data.pharmacy_name) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Pharmacy name is required",
-          path: ["pharmacy_name"],
-        });
-      }
-      if (!data.pharmacy_address) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Pharmacy address is required",
-          path: ["pharmacy_address"],
-        });
-      }
-      if (!data.pharmacy_phone) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Pharmacy phone is required",
-          path: ["pharmacy_phone"],
-        });
-      }
-      if (!data.pharmacy_fax) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Pharmacy fax is required",
-          path: ["pharmacy_fax"],
-        });
-      }
-      if (!data.preferred_hospital) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Preferred Hospital Name is required",
-          path: ["preferred_hospital"],
-        });
-      }
-      if (!data.hospital_address) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Hospital address is required",
-          path: ["hospital_address"],
-        });
-      }
-      if (!data.hospital_phone) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Hospital phone is required",
-          path: ["hospital_phone"],
-        });
-      }
-    }
-  });
+export const clientSchema = z.object({
+  firstName: z
+    .string()
+    .min(2, { message: "First name is required" })
+    .max(12, "First name must be less than 12 characters")
+    .transform(trimString),
+  lastName: z
+    .string()
+    .min(2, { message: "Last name is required" })
+    .max(12, "Last name must be less than 12 characters")
+    .transform(trimString),
+  dateOfBirth: z.string().optional(),
+  gender: z.enum(["male", "female", "other"]),
+  maritalStatus: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipCode: z.string().optional(),
+  livingSituation: z.string().optional(),
+  pharmacy_name: z.string().optional(),
+  pharmacy_address: z.string().optional(),
+  pharmacy_phone: z.string().optional(),
+  pharmacy_fax: z.string().optional(),
+  preferred_hospital: z.string().optional(),
+  hospital_address: z.string().optional(),
+  hospital_phone: z.string().optional(),
+  isEdit: z.boolean().optional(),
+});
 
 export type ClientFormData = z.infer<typeof clientSchema>;
 
@@ -261,51 +137,51 @@ export const medicationSchema = z
       .min(1, { message: "Medication name is required" })
       .max(35, { message: "Medication name must be less than 35 characters" })
       .transform(trimString),
-    dosage: z
-      .string()
-      .min(3, { message: "Dosage is required (min 3 characters)" })
-      .transform(trimString),
-    frequency: z
-      .string()
-      .min(1, { message: "Frequency is required" })
-      .transform(trimString),
+    dosage: z.string().optional(),
+    frequency: z.string().optional(),
     purpose: z
       .string()
       .min(3, { message: "Purpose is required (min 3 characters)" })
       .transform(trimString),
-    prescribing_doctor: z
-      .string()
-      .min(1, { message: "Prescribing doctor is required" })
-      .transform(trimString),
-    start_date: z
-      .string()
-      .min(1, { message: "Start date is required" })
-      .transform(trimString),
-    end_date: z
-      .string()
-      .min(1, { message: "End date is required" })
-      .transform(trimString),
-    refill_due: z
-      .string()
-      .min(1, { message: "Refill due is required" })
-      .transform(trimString),
+    prescribing_doctor: z.string().optional(),
+    start_date: z.string().optional(),
+    end_date: z.string().optional(),
+    refill_due: z.string().optional(),
     notes: z
       .string()
       .optional()
       .transform((val) => (val ? trimString(val) : val)),
   })
-  .refine((data) => new Date(data.start_date) <= new Date(data.end_date), {
-    message: "End date cannot be before start date",
-    path: ["end_date"],
-  })
-  .refine((data) => new Date(data.start_date) <= new Date(data.refill_due), {
-    message: "Refill due date cannot be before Start date",
-    path: ["refill_due"],
-  })
-  .refine((data) => new Date(data.refill_due) <= new Date(data.end_date), {
-    message: "Refill due date cannot be after end date",
-    path: ["refill_due"],
-  });
+  .refine(
+    (data) => {
+      if (!data.start_date || !data.end_date) return true;
+      return new Date(data.start_date) <= new Date(data.end_date);
+    },
+    {
+      message: "End date cannot be before start date",
+      path: ["end_date"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.start_date || !data.refill_due) return true;
+      return new Date(data.start_date) <= new Date(data.refill_due);
+    },
+    {
+      message: "Refill due date cannot be before Start date",
+      path: ["refill_due"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.refill_due || !data.end_date) return true;
+      return new Date(data.refill_due) <= new Date(data.end_date);
+    },
+    {
+      message: "Refill due date cannot be after end date",
+      path: ["refill_due"],
+    }
+  );
 
 export type MedicationFormData = z.infer<typeof medicationSchema>;
 
@@ -320,17 +196,11 @@ export const clientHealthProviderSchema = z
       .min(1, "Provider name is required")
       .transform(trimString),
     specialty: z.string().min(1, "Specialty is required").transform(trimString),
-    address: z.string().min(1, "Address is required").transform(trimString),
-    phone: z.string().min(1, "Phone number is required").transform(trimString),
-    fax: z.string().min(1, "Fax is required").transform(trimString),
-    last_visit: z
-      .string()
-      .min(1, "Last visit is required")
-      .transform(trimString),
-    next_visit: z
-      .string()
-      .min(1, "Next visit is required")
-      .transform(trimString),
+    address: z.string().optional(),
+    phone: z.string().optional(),
+    fax: z.string().optional(),
+    last_visit: z.string().optional(),
+    next_visit: z.string().optional(),
     notes: z
       .string()
       .optional()
@@ -338,6 +208,7 @@ export const clientHealthProviderSchema = z
   })
   .refine(
     (data) => {
+      if (!data.last_visit || !data.next_visit) return true;
       const last = new Date(data.last_visit);
       const next = new Date(data.next_visit);
       return last <= next;
@@ -353,43 +224,20 @@ export type ClientHealthProviderFormData = z.infer<
 >;
 
 export const medicalHistorySchema = z.object({
-  diagnoses: z
-    .array(z.string().min(1, "Diagnosis cannot be empty").transform(trimString))
-    .min(1, "At least one diagnosis is required"),
-  allergies: z
-    .array(z.string().min(1, "Allergy cannot be empty").transform(trimString))
-    .min(1, "At least one allergy is required"),
-  dietary_restrictions: z
-    .array(
-      z
-        .string()
-        .min(1, "Dietary restriction cannot be empty")
-        .transform(trimString)
-    )
-    .min(1, "At least one dietary restriction is required"),
-  surgical_history: z
-    .array(
-      z
-        .string()
-        .min(1, "Surgical history cannot be empty")
-        .transform(trimString)
-    )
-    .min(1, "At least one surgical history is required"),
-  cognitive_status: z
-    .string()
-    .min(1, "Cognitive status is required")
-    .transform(trimString),
+  diagnoses: z.array(z.string().optional()).optional(),
+  allergies: z.array(z.string().optional()).optional(),
+  dietary_restrictions: z.array(z.string().optional()).optional(),
+  surgical_history: z.array(z.string().optional()).optional(),
+  cognitive_status: z.string().optional(),
   cognitive_status_text: z.string().optional(),
-  test_type: z.string().min(1, "Test type is required").transform(trimString),
-  last_cognitive_screening: z
-    .string()
-    .min(1, "Last cognitive screening date is required")
-    .transform(trimString),
+  test_type: z.string().optional(),
+  last_cognitive_screening: z.string().optional(),
   cognitive_score: z
     .string()
-    .min(1, "Cognitive score is required")
+    .optional()
     .refine(
       (val) => {
+        if (!val) return true;
         const pattern = /^\d{1,2}\/\d{1,2}$/;
         return pattern.test(val);
       },
@@ -397,10 +245,7 @@ export const medicalHistorySchema = z.object({
         message: "Score must be in format 'score/total' (e.g., '26/30')",
       }
     ),
-  notes: z
-    .string()
-    .optional()
-    .transform((val) => (val ? trimString(val) : val)),
+  notes: z.string().optional(),
 });
 
 export type MedicalHistoryFormData = z.infer<typeof medicalHistorySchema>;
@@ -408,10 +253,7 @@ export type MedicalHistoryFormData = z.infer<typeof medicalHistorySchema>;
 export const documentSchema = z.object({
   documentType: z.string().min(1, "Category is required").transform(trimString),
   title: z.string().min(1, "Title is required").transform(trimString),
-  description: z
-    .string()
-    .min(1, "Description is required")
-    .transform(trimString),
+  description: z.string().optional(),
   file: z.instanceof(File, { message: "File is required" }),
 });
 
@@ -572,18 +414,18 @@ export const faceSheetShortFormSchema = z.object({
   // Personal Information
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  address: z.string().min(1, "Address is required"),
+  address: z.string().optional(),
   phoneNumber: z.string().optional(),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  dateOfBirth: z.string().optional(),
   ssn: z.string().optional(),
 
   // Emergency Contact
-  emergencyContactFirstName: z.string().min(1, "First name is required"),
-  emergencyContactLastName: z.string().min(1, "Last name is required"),
-  emergencyContactPhone: z.string().min(1, "Phone number is required"),
-  emergencyContactRelationship: z.string().min(1, "Relationship is required"),
-  emergencyContactEmail: z.string().email().min(1, "Email is required"),
-  emergencyContactAddress: z.string().min(1, "Address is required"),
+  emergencyContactFirstName: z.string().optional(),
+  emergencyContactLastName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  emergencyContactRelationship: z.string().optional(),
+  emergencyContactEmail: z.string().optional(),
+  emergencyContactAddress: z.string().optional(),
 
   // Medical Settings
   codeStatus: z.string().optional(),
@@ -676,9 +518,9 @@ export const faceSheetLongFormSchema = z
     // Personal Information
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    address: z.string().min(1, "Address is required"),
+    address: z.string().optional(),
     phoneNumber: z.string().optional(),
-    dateOfBirth: z.string().min(1, "Date of birth is required"),
+    dateOfBirth: z.string().optional(),
     ssn: z.string().optional(),
 
     // Additional Personal Information
@@ -690,12 +532,12 @@ export const faceSheetLongFormSchema = z
     dateOfLastCarePlan: z.string().optional(),
 
     // Emergency Contact
-    emergencyContactFirstName: z.string().min(1, "First name is required"),
-    emergencyContactLastName: z.string().min(1, "Last name is required"),
-    emergencyContactPhone: z.string().min(1, "Phone number is required"),
-    emergencyContactRelationship: z.string().min(1, "Relationship is required"),
-    emergencyContactEmail: z.string().email().min(1, "Email is required"),
-    emergencyContactAddress: z.string().min(1, "Address is required"),
+    emergencyContactFirstName: z.string().optional(),
+    emergencyContactLastName: z.string().optional(),
+    emergencyContactPhone: z.string().optional(),
+    emergencyContactRelationship: z.string().optional(),
+    emergencyContactEmail: z.string().optional(),
+    emergencyContactAddress: z.string().optional(),
 
     // Medical Settings
     codeStatus: z.string().optional(),
@@ -746,15 +588,16 @@ export const faceSheetLongFormSchema = z
     homeHealthDischargeDate: z.string().optional(),
 
     // Mental Status
-    mentalStatus: z.string().min(1, "Mental status is required"),
+    mentalStatus: z.string().optional(),
     mentalStatusText: z.string().optional(),
     cognitiveScreeningDate: z.string().optional(),
     test_type: z.string().optional(),
     cognitiveScreeningScore: z
       .string()
-      .min(1, "Cognitive score is required")
+      .optional()
       .refine(
         (val) => {
+          if (!val) return true;
           const pattern = /^\d{1,2}\/\d{1,2}$/;
           return pattern.test(val);
         },
@@ -937,26 +780,32 @@ export const healthHistoryFormSchema = z.object({
     .optional(),
 
   // Healthcare Providers
-  providerName: z
-    .string()
-    .optional()
-    .transform((val) => (val ? trimString(val) : val)),
-  providerAddress: z
-    .string()
-    .optional()
-    .transform((val) => (val ? trimString(val) : val)),
-  providerPhone: z
-    .string()
-    .optional()
-    .transform((val) => (val ? trimString(val) : val)),
-  providerNotes: z
-    .string()
-    .optional()
-    .transform((val) => (val ? trimString(val) : val)),
-  providerFollowUp: z
-    .string()
-    .optional()
-    .transform((val) => (val ? trimString(val) : val)),
+  providers: z
+    .array(
+      z.object({
+        providerName: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        providerAddress: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        providerPhone: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        providerNotes: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        providerFollowUp: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+      })
+    )
+    .optional(),
 
   // Home Health Agency
   homeHealthName: z
@@ -1037,164 +886,201 @@ export const careRecipientQuestionnaireSchema = z.object({
   formFillerName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   formFillerDate: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   fillingForOtherSpecify: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   fillingForOtherSpecifyText: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Care Recipient Personal Information
   careRecipientFirstName: z
     .string()
-    .nullable()
+    .min(1, "First name is required")
     .transform((val) => val || ""),
   careRecipientLastName: z
     .string()
-    .nullable()
+    .min(1, "Last name is required")
     .transform((val) => val || ""),
   careRecipientAddress: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientCity: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientState: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientZip: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientBirthdate: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientBirthplace: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientSSN: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientPhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientEmail: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientCulturalBackground: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientEducation: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientReligion: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientActiveReligionLocation: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientMaritalStatus: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientDateOfDivorceOrWidowhood: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   careRecipientLossImpactDescription: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Work and Retirement Information
   occupationProfession: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   retirementDate: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   retirementAdjustment: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Insurance Information
   medicareA: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   medicareB: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   medicareNumbers: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   medicareSupplementPlan: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   insuranceProvider: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   insurancePolicyNumber: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   insurancePhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   mentalHealthCoverage: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   hmo: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   hmoPolicyNumber: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   hmoPhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   longTermCareInsuranceName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   longTermCareInsurancePolicyNumber: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   longTermCareInsurancePhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Relatives Information
@@ -1204,30 +1090,37 @@ export const careRecipientQuestionnaireSchema = z.object({
         name: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         address: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         homePhone: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         workPhone: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         relationship: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         email: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         id: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
       })
     )
@@ -1241,26 +1134,32 @@ export const careRecipientQuestionnaireSchema = z.object({
         name: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         address: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         helpDescription: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         relationship: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         phone: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         id: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
       })
     )
@@ -1271,173 +1170,221 @@ export const careRecipientQuestionnaireSchema = z.object({
   lawyerName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   lawyerPhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   lawyerId: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   powerOfAttorneyFinancesName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   powerOfAttorneyFinancesPhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   powerOfAttorneyFinancesId: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   powerOfAttorneyHealthcareName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   powerOfAttorneyHealthcarePhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   powerOfAttorneyHealthcareId: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   taxProfessionalName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   taxProfessionalPhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   taxProfessionalId: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   accountantName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   accountantPhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   accountantId: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   financialAdvisorName: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   financialAdvisorPhone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   financialAdvisorId: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   significantOther1Name: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   significantOther1Phone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   significantOther1Id: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   significantOther2Name: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   significantOther2Phone: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   significantOther2Id: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Support System & Emergency Contacts
   supportSystemRating: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   supportSystemProblems: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   emergencyContacts: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // In-Home Help Services
   houseCleaningAgency: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   houseCleaningSatisfaction: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   houseCleaningFrequency: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   homeAidAgency: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   homeAidSatisfaction: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   homeAidFrequency: z
     .string()
+    .optional()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   homeHealthAgency: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   homeHealthSatisfaction: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   homeHealthFrequency: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   maintenanceAgency: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   maintenanceSatisfaction: z
     .string()
     .nullable()
+    .optional()
+    .optional()
     .transform((val) => val || ""),
   maintenanceFrequency: z
     .string()
     .nullable()
+    .optional()
+    .optional()
     .transform((val) => val || ""),
   otherHelpAgency: z
     .string()
     .nullable()
+    .optional()
+    .optional()
     .transform((val) => val || ""),
   otherHelpSatisfaction: z
     .string()
     .nullable()
+    .optional()
+    .optional()
     .transform((val) => val || ""),
   otherHelpFrequency: z
     .string()
+    .optional()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
 
@@ -1445,10 +1392,12 @@ export const careRecipientQuestionnaireSchema = z.object({
   livingEnvironmentType: z
     .array(z.string())
     .nullable()
+    .optional()
     .transform((val) => val || []),
   homeEnvironmentAdequacy: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Healthcare Providers
@@ -1458,18 +1407,22 @@ export const careRecipientQuestionnaireSchema = z.object({
         providerName: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         phone: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         forWhatProblem: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         id: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
       })
     )
@@ -1483,14 +1436,17 @@ export const careRecipientQuestionnaireSchema = z.object({
         problem: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         treatment: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
         medications: z
           .string()
           .nullable()
+          .optional()
           .transform((val) => val || ""),
       })
     )
@@ -1500,57 +1456,69 @@ export const careRecipientQuestionnaireSchema = z.object({
   lastCheckupDate: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   allergies: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   recentHospitalization: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   hospitalDetails: z
     .string()
+    .optional()
     .nullable()
     .transform((val) => val || ""),
   supportSystemThoughts: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Problem Areas in Daily Living
   problemAreasDailyLiving: z
     .array(z.string())
     .nullable()
+    .optional()
     .transform((val) => val || []),
   problemAreasExplanation: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Problems/Risks
   problemsRisks: z
     .array(z.string())
     .nullable()
+    .optional()
     .transform((val) => val || []),
   nutritionConcerns: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   selfCareCapacitySummary: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Memory, Orientation and Judgment
   memoryProblems: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   // Emotional Health
   emotionalHealthNotes: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   personalityCoping: z
     .string()
@@ -1559,102 +1527,406 @@ export const careRecipientQuestionnaireSchema = z.object({
   recentBehaviorChanges: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   recipientSharesConcerns: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   recipientSharesConcernsNotes: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   emotionalProblemsHistory: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   emotionalProblemsTreatment: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   emotionalProblemsNotes: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   recentLossesImpact: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   // Social Life
   socialLifeNotes: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Other Pertinent Information
   hospitalPreference: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   dnr: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   trust: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   lifecare: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   will: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   livingWill: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   funeralArrangements: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   cemeteryPlot: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   monthlyIncome: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   spouseIncome: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   savings: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   otherAssets: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   financialProblemsDescription: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 
   // Summary Section
   majorConcernsAndAssistance: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
   areasAcceptingHelp: z
     .string()
     .nullable()
+    .optional()
     .transform((val) => val || ""),
 });
 
+// Caregiver Information Form Schema
+export const caregiverInformationFormSchema = z.object({
+  name: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  nickname_preferred_name: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  // Schedule fields
+  wake_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  sleep_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  breakfast_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  lunch_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  snacks_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  activity_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  nap_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  dinner_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  medication_time: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(val), {
+      message: "Invalid time format. Use HH:MM (00:00-23:59)",
+    })
+    .transform((val) => (val ? trimString(val) : val)),
+  likes: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  dislikes: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  redirection_techniques: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  triggers: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  helpful_information: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  documentation: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+});
+
+export type CaregiverInformationFormData = z.infer<
+  typeof caregiverInformationFormSchema
+>;
+
 export type CareRecipientQuestionnaireData = z.infer<
   typeof careRecipientQuestionnaireSchema
+>;
+
+// Medical Appointment Template Schema
+export const medicalAppointmentTemplateSchema = z.object({
+  firstName: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  lastName: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+
+  dateOfBirth: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  date: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  height: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  weight: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  blood_pressure: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  temperature: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  heart_rate: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  additional_vitals: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  reason_for_visit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  top_3_concerns: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  tests_labs_imaging: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  visit_notes: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  diagnoses: z
+    .array(
+      z.object({
+        diagnosis: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+      })
+    )
+    .optional(),
+  allergies: z
+    .array(
+      z.object({
+        allergen: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+      })
+    )
+    .optional(),
+  surgical_history: z
+    .array(
+      z.object({
+        surgicalHistory: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+      })
+    )
+    .optional(),
+  medications: z
+    .array(
+      z.object({
+        medication_name: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        dosage: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        frequency: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        notes: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        prescribing_doctor: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        start_date: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        end_date: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        id: z.string().nullable().nullish().optional(),
+      })
+    )
+    .optional(),
+  healthcareProviders: z
+    .array(
+      z.object({
+        provider_name: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        address: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        phone: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        notes: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        follow_up: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        specialty: z
+          .string()
+          .optional()
+          .transform((val) => (val ? trimString(val) : val)),
+        id: z.string().nullable().nullish().optional(),
+      })
+    )
+    .optional(),
+  recommendations: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  referrals: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  follow_up: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+  report_given_to: z
+    .string()
+    .optional()
+    .transform((val) => (val ? trimString(val) : val)),
+});
+
+export type MedicalAppointmentTemplateData = z.infer<
+  typeof medicalAppointmentTemplateSchema
 >;

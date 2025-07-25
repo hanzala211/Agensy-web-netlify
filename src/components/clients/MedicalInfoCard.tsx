@@ -9,7 +9,9 @@ export const MedicalInfoCard: React.FC = () => {
   const { selectedClient } = useClientContext();
   return (
     <Card title="Medical Information">
-      {selectedClient?.medical ? (
+      {selectedClient?.medical?.diagnoses ||
+      selectedClient?.medical?.allergies ||
+      selectedClient?.code_status ? (
         <div className="flex flex-col gap-6">
           {selectedClient?.medical?.diagnoses && (
             <ItemList

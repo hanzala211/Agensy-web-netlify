@@ -12,10 +12,7 @@ import {
   useAddClientMedicalHistoryMutation,
   useUpdateClientMedicalHistoryMutation,
 } from "@agensy/api";
-import type {
-  ClientMedicalHistoryRequestData,
-  MedicalHistoryFormData,
-} from "@agensy/types";
+import type { MedicalHistoryFormData } from "@agensy/types";
 import ItemList from "./ItemList";
 
 export const MedicalHistoryCard: React.FC = () => {
@@ -50,18 +47,42 @@ export const MedicalHistoryCard: React.FC = () => {
   }, [updateClientMedicalHistoryMutation.status]);
 
   const handleSubmit = (data: MedicalHistoryFormData) => {
-    const postData: ClientMedicalHistoryRequestData = {
-      diagnoses: data.diagnoses.join(", "),
-      allergies: data.allergies.join(", "),
-      dietary_restrictions: data.dietary_restrictions.join(", "),
-      surgical_history: data.surgical_history.join(", "),
-      cognitive_status: data.cognitive_status,
-      notes: data.notes as string,
-      last_cognitive_screening: DateUtils.changetoISO(
-        data.last_cognitive_screening
-      ),
-      cognitive_score: data.cognitive_score,
-      test_type: data.test_type,
+    const postData: unknown = {
+      diagnoses:
+        data.diagnoses && data.diagnoses?.length > 0
+          ? data.diagnoses.join(", ").length > 0
+            ? data.diagnoses.join(", ")
+            : null
+          : null,
+      allergies:
+        data.allergies && data.allergies?.length > 0
+          ? data.allergies.join(", ").length > 0
+            ? data.allergies.join(", ")
+            : null
+          : null,
+      dietary_restrictions:
+        data.dietary_restrictions && data.dietary_restrictions.length > 0
+          ? data.dietary_restrictions.join(", ").length > 0
+            ? data.dietary_restrictions.join(", ")
+            : null
+          : null,
+      surgical_history:
+        data.surgical_history && data.surgical_history.length > 0
+          ? data.surgical_history.join(", ").length > 0
+            ? data.surgical_history.join(", ")
+            : null
+          : null,
+      cognitive_status: data.cognitive_status
+        ? data.cognitive_status === "Other"
+          ? data.cognitive_status_text
+          : data.cognitive_status
+        : null,
+      notes: data.notes ? data.notes : null,
+      last_cognitive_screening: data.last_cognitive_screening
+        ? DateUtils.changetoISO(data.last_cognitive_screening)
+        : null,
+      cognitive_score: data.cognitive_score ? data.cognitive_score : null,
+      test_type: data.test_type ? data.test_type : null,
     };
     if (!selectedClient?.medical) {
       addClientMedicalHistoryMutation.mutate({
@@ -91,7 +112,14 @@ export const MedicalHistoryCard: React.FC = () => {
         }
         showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
       >
-        {selectedClient?.medical ? (
+        {selectedClient?.medical?.diagnoses ||
+        selectedClient?.medical?.allergies ||
+        selectedClient?.medical?.dietary_restrictions ||
+        selectedClient?.medical?.cognitive_status ||
+        selectedClient?.medical?.cognitive_score ||
+        selectedClient?.medical?.surgical_history ||
+        selectedClient?.medical?.last_cognitive_screening ||
+        selectedClient?.medical?.notes ? (
           <div className="grid lg:grid-cols-2 gap-5 items-start">
             <div className="grid gap-4">
               {selectedClient?.medical?.diagnoses && (
@@ -110,9 +138,11 @@ export const MedicalHistoryCard: React.FC = () => {
                 />
               )}
 
-              <InfoItem label="Cognitive Status:">
-                <p>{selectedClient?.medical.cognitive_status}</p>
-              </InfoItem>
+              {selectedClient?.medical.cognitive_status && (
+                <InfoItem label="Cognitive Status:">
+                  <p>{selectedClient?.medical.cognitive_status}</p>
+                </InfoItem>
+              )}
 
               {selectedClient?.medical?.cognitive_score && (
                 <InfoItem label="Cognitive Score:">
@@ -140,13 +170,15 @@ export const MedicalHistoryCard: React.FC = () => {
                 />
               )}
 
-              <InfoItem label="Last Screening:">
-                <p>
-                  {DateUtils.formatDateToRequiredFormat(
-                    selectedClient?.medical?.last_cognitive_screening
-                  )}
-                </p>
-              </InfoItem>
+              {selectedClient?.medical?.last_cognitive_screening && (
+                <InfoItem label="Last Screening:">
+                  <p>
+                    {DateUtils.formatDateToRequiredFormat(
+                      selectedClient?.medical?.last_cognitive_screening
+                    )}
+                  </p>
+                </InfoItem>
+              )}
 
               {selectedClient?.medical?.notes && (
                 <InfoItem label="Note:">

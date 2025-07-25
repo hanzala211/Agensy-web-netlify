@@ -2,8 +2,8 @@ import { useUpdateClientMutation } from "@agensy/api";
 import { AddClientModal, Card, InfoItem } from "@agensy/components";
 import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
-import type { ClientAddRequestData } from "@agensy/types";
-import { StringUtils, toast } from "@agensy/utils";
+import type { ClientFormData } from "@agensy/types";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 
@@ -31,11 +31,26 @@ export const PersonalInfoCard: React.FC = () => {
     }
   }, [updateClientMutation.status]);
 
-  const handleUpdateClient = (data: ClientAddRequestData) =>
+  const handleUpdateClient = (data: ClientFormData) => {
+    const postData = {
+      first_name: data.firstName,
+      last_name: data.lastName,
+      date_of_birth: data.dateOfBirth
+        ? DateUtils.changetoISO(data.dateOfBirth)
+        : null,
+      gender: data.gender ? data.gender : null,
+      marital_status: data.maritalStatus ? data.maritalStatus : null,
+      address: data.address ? data.address : null,
+      city: data.city ? data.city : null,
+      state: data.state ? data.state : null,
+      zip: data.zipCode ? data.zipCode : null,
+      living_situation: data.livingSituation ? data.livingSituation : null,
+    };
     updateClientMutation.mutate({
       id: selectedClient?.id?.toString() as string,
-      data,
+      data: postData,
     });
+  };
 
   return (
     <React.Fragment>
@@ -47,21 +62,24 @@ export const PersonalInfoCard: React.FC = () => {
         showButton={userPermissions.includes(APP_ACTIONS.EditClientBasicInfo)}
       >
         <div className="space-y-6">
-          <InfoItem label="Address:">
-            <p>{selectedClient?.address}</p>
-            <p>
-              {selectedClient?.city}, {selectedClient?.state}{" "}
-              {selectedClient?.zip}
-            </p>
-          </InfoItem>
-
-          <InfoItem label="Living Situation:">
-            {selectedClient?.living_situation
-              ? StringUtils.capitalizeFirstLetter(
-                  selectedClient.living_situation
-                )
-              : ""}
-          </InfoItem>
+          {selectedClient?.address && (
+            <InfoItem label="Address:">
+              <p>{selectedClient?.address}</p>
+              <p>
+                {selectedClient?.city} {selectedClient?.city && ","}{" "}
+                {selectedClient?.state} {selectedClient?.zip}
+              </p>
+            </InfoItem>
+          )}
+          {selectedClient?.living_situation && (
+            <InfoItem label="Living Situation:">
+              {selectedClient?.living_situation
+                ? StringUtils.capitalizeFirstLetter(
+                    selectedClient.living_situation
+                  )
+                : ""}
+            </InfoItem>
+          )}
 
           <InfoItem label="Gender:">
             {selectedClient?.gender
@@ -69,11 +87,15 @@ export const PersonalInfoCard: React.FC = () => {
               : ""}
           </InfoItem>
 
-          <InfoItem label="Marital Status:">
-            {selectedClient?.marital_status
-              ? StringUtils.capitalizeFirstLetter(selectedClient.marital_status)
-              : ""}
-          </InfoItem>
+          {selectedClient?.marital_status && (
+            <InfoItem label="Marital Status:">
+              {selectedClient?.marital_status
+                ? StringUtils.capitalizeFirstLetter(
+                    selectedClient.marital_status
+                  )
+                : ""}
+            </InfoItem>
+          )}
         </div>
       </Card>
       <AddClientModal

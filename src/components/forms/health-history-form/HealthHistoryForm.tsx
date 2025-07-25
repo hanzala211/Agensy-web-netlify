@@ -14,6 +14,7 @@ import {
 import {
   healthHistoryFormSchema,
   type ClientMedications,
+  type HealthcareProvider,
   type HealthHistoryFormData,
   type OpenedFileData,
 } from "@agensy/types";
@@ -27,6 +28,7 @@ import {
   usePostHealthHistoryFormMutation,
 } from "@agensy/api";
 import { useClientContext } from "@agensy/context";
+import { useQueryClient } from "@tanstack/react-query";
 
 const defaultValues: HealthHistoryFormData = {
   diagnoses: [
@@ -50,11 +52,15 @@ const defaultValues: HealthHistoryFormData = {
       id: "",
     },
   ],
-  providerName: "",
-  providerAddress: "",
-  providerPhone: "",
-  providerNotes: "",
-  providerFollowUp: "",
+  providers: [
+    {
+      providerName: "",
+      providerAddress: "",
+      providerPhone: "",
+      providerNotes: "",
+      providerFollowUp: "",
+    },
+  ],
   homeHealthName: "",
   homeHealthPhone: "",
   homeHealthAddress: "",
@@ -74,6 +80,7 @@ const defaultValues: HealthHistoryFormData = {
 };
 
 export const HealthHistoryForm: React.FC = () => {
+  const queryClient = useQueryClient();
   const { clientId } = useParams();
   const { setOpenedFileData } = useClientContext();
   const {
@@ -104,6 +111,7 @@ export const HealthHistoryForm: React.FC = () => {
         "Health History Successfully Saved",
         "The health history information has been saved successfully."
       );
+      queryClient.invalidateQueries({ queryKey: ["client", clientId] });
     } else if (postHealthHistoryMutation.status === "error") {
       toast.error("Error Occurred", String(postHealthHistoryMutation.error));
     }
@@ -113,15 +121,58 @@ export const HealthHistoryForm: React.FC = () => {
 
   useEffect(() => {
     if (formValues && Object.keys(formValues).length > 0) {
-      setOpenedFileData({
+      const sanitizedFormValues = {
         ...formValues,
-        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt },
-      } as unknown as OpenedFileData);
+        providers: Array.isArray(formValues.providers)
+          ? formValues.providers.filter(
+              (provider) => provider && typeof provider === "object"
+            )
+          : [],
+        diagnoses: Array.isArray(formValues.diagnoses)
+          ? formValues.diagnoses.filter(
+              (diagnosis) => diagnosis && typeof diagnosis === "object"
+            )
+          : [],
+        medicationsStarted: Array.isArray(formValues.medicationsStarted)
+          ? formValues.medicationsStarted.filter(
+              (med) => med && typeof med === "object"
+            )
+          : [],
+        medicationsEnded: Array.isArray(formValues.medicationsEnded)
+          ? formValues.medicationsEnded.filter(
+              (med) => med && typeof med === "object"
+            )
+          : [],
+        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt || "" },
+      };
+      setOpenedFileData(sanitizedFormValues as unknown as OpenedFileData);
     } else {
-      setOpenedFileData({
-        ...getValues(),
-        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt },
-      } as unknown as OpenedFileData);
+      const currentValues = getValues();
+      const sanitizedCurrentValues = {
+        ...currentValues,
+        providers: Array.isArray(currentValues.providers)
+          ? currentValues.providers.filter(
+              (provider) => provider && typeof provider === "object"
+            )
+          : [],
+        diagnoses: Array.isArray(currentValues.diagnoses)
+          ? currentValues.diagnoses.filter(
+              (diagnosis) => diagnosis && typeof diagnosis === "object"
+            )
+          : [],
+        medicationsStarted: Array.isArray(currentValues.medicationsStarted)
+          ? currentValues.medicationsStarted.filter(
+              (med) => med && typeof med === "object"
+            )
+          : [],
+        medicationsEnded: Array.isArray(currentValues.medicationsEnded)
+          ? currentValues.medicationsEnded.filter(
+              (med) => med && typeof med === "object"
+            )
+          : [],
+        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt || "" },
+      };
+      setOpenedFileData(sanitizedCurrentValues as unknown as OpenedFileData);
     }
   }, [formValues]);
 
@@ -129,12 +180,6 @@ export const HealthHistoryForm: React.FC = () => {
     control,
     name: "medicationsStarted",
   });
-
-  const medications = useFieldArray({
-    control,
-    name: "medications",
-  });
-
   const medicationsEndedArray = useFieldArray({
     control,
     name: "medicationsEnded",
@@ -143,6 +188,11 @@ export const HealthHistoryForm: React.FC = () => {
   const diagnosesArray = useFieldArray({
     control,
     name: "diagnoses",
+  });
+
+  const providersArray = useFieldArray({
+    control,
+    name: "providers",
   });
 
   const onSubmit = (data: HealthHistoryFormData) => {
@@ -186,27 +236,6 @@ export const HealthHistoryForm: React.FC = () => {
         return medication;
       }
     });
-
-    const medications = data.medications?.map((item) => {
-      const medication = {
-        medication_name: item.medicationName ? item.medicationName : null,
-        dosage: item.dosage ? item.dosage : null,
-        prescribing_doctor: item.prescribingDoctor
-          ? item.prescribingDoctor
-          : null,
-        id: item?.id,
-        start_date: item.startDate
-          ? DateUtils.changetoISO(item.startDate)
-          : null,
-        end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
-      };
-      if (item.id) {
-        return medication;
-      } else {
-        delete medication.id;
-        return medication;
-      }
-    });
     const postData = {
       medical_info: {
         diagnoses: StringUtils.filterAndJoinWithCommas(
@@ -214,20 +243,17 @@ export const HealthHistoryForm: React.FC = () => {
           (diagnoses) => diagnoses.diagnosis || ""
         ),
       },
-      medications: [
-        ...(medicationsStarted || []),
-        ...(medicationsEnded || []),
-        ...(medications || []),
-      ],
-      healthcare_providers: {
-        provider_name: data.providerName ? data.providerName : null,
-        address: data.providerAddress ? data.providerAddress : null,
-        phone: data.providerPhone ? data.providerPhone : null,
-        notes: data.providerNotes ? data.providerNotes : null,
-        follow_up: data.providerFollowUp
-          ? DateUtils.changetoISO(data.providerFollowUp)
-          : null,
-      },
+      medications: [...(medicationsStarted || []), ...(medicationsEnded || [])],
+      healthcare_providers:
+        data.providers?.map((provider) => ({
+          provider_name: provider.providerName ? provider.providerName : null,
+          address: provider.providerAddress ? provider.providerAddress : null,
+          phone: provider.providerPhone ? provider.providerPhone : null,
+          notes: provider.providerNotes ? provider.providerNotes : null,
+          follow_up: provider.providerFollowUp
+            ? DateUtils.changetoISO(provider.providerFollowUp)
+            : null,
+        })) || [],
       home_health_agency: {
         name: data.homeHealthName ? data.homeHealthName : null,
         phone: data.homeHealthPhone ? data.homeHealthPhone : null,
@@ -292,16 +318,18 @@ export const HealthHistoryForm: React.FC = () => {
         descriptionOfHealthConcern:
           healthHistoryForm?.health_history?.description_of_health_concern ||
           "",
-        providerName:
-          healthHistoryForm?.healthcare_providers?.provider_name || "",
-        providerAddress: healthHistoryForm?.healthcare_providers?.address || "",
-        providerPhone: healthHistoryForm?.healthcare_providers?.phone || "",
-        providerFollowUp: healthHistoryForm?.healthcare_providers?.follow_up
-          ? DateUtils.formatDateToRequiredFormat(
-              healthHistoryForm?.healthcare_providers?.follow_up
-            )
-          : "",
-        providerNotes: healthHistoryForm?.healthcare_providers?.notes || "",
+        providers:
+          healthHistoryForm?.healthcare_providers.map(
+            (provider: HealthcareProvider) => ({
+              providerName: provider.provider_name || "",
+              providerAddress: provider.address || "",
+              providerPhone: provider.phone || "",
+              providerFollowUp: provider.follow_up
+                ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
+                : "",
+              providerNotes: provider.notes || "",
+            })
+          ) || [],
         homeHealthName: healthHistoryForm?.home_health_agency?.name || "",
         homeHealthPhone: healthHistoryForm?.home_health_agency?.phone || "",
         homeHealthFax: healthHistoryForm?.home_health_agency?.fax || "",
@@ -333,10 +361,11 @@ export const HealthHistoryForm: React.FC = () => {
           healthHistoryForm?.medications
             ?.filter(
               (medication: ClientMedications) =>
-                medication.start_date &&
-                new Date(medication.start_date) <= new Date() &&
-                (!medication.end_date ||
-                  new Date(medication.end_date) >= new Date())
+                (medication.start_date &&
+                  new Date(medication.start_date) <= new Date() &&
+                  (!medication.end_date ||
+                    new Date(medication.end_date) >= new Date())) ||
+                (!medication.start_date && !medication.end_date)
             )
             ?.map((medication: ClientMedications) => ({
               medicationName: medication.medication_name || "",
@@ -369,26 +398,10 @@ export const HealthHistoryForm: React.FC = () => {
                 : "",
               id: medication.id || "",
             })) || [],
-        medications: healthHistoryForm?.medications
-          ?.filter(
-            (item: ClientMedications) => !item.start_date && !item.end_date
-          )
-          ?.map((medication: ClientMedications) => ({
-            medicationName: medication.medication_name || "",
-            dosage: medication.dosage || "",
-            prescribingDoctor: medication.prescribing_doctor || "",
-            startDate: medication.start_date
-              ? DateUtils.formatDateToRequiredFormat(medication.start_date)
-              : "",
-            endDate: medication.end_date
-              ? DateUtils.formatDateToRequiredFormat(medication.end_date)
-              : "",
-            id: medication.id || "",
-          })),
       });
       setOpenedFileData({
         ...getValues(),
-        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt },
+        last_update: { updatedAt: healthHistoryForm?.last_update?.updatedAt || "" },
       } as unknown as OpenedFileData);
     }
   }, [healthHistoryForm]);
@@ -557,65 +570,63 @@ export const HealthHistoryForm: React.FC = () => {
             ))}
           </div>
         </Card>
-
+        {/* Healthcare Provider Section */}
         <Card
-          title="Medications"
+          title="Healthcare Providers"
           buttonText={<ICONS.plus size={16} />}
           onButtonClick={() =>
-            medications.append({
-              medicationName: "",
-              dosage: "",
-              prescribingDoctor: "",
-              id: "",
+            providersArray.append({
+              providerName: "",
+              providerAddress: "",
+              providerPhone: "",
+              providerNotes: "",
+              providerFollowUp: "",
             })
           }
-          ariaLabel="Add Medication"
+          ariaLabel="Add Healthcare Provider"
           showButton={true}
         >
           <div className="space-y-6">
-            {medications.fields.map((field, index) => (
+            {providersArray.fields.map((field, index) => (
               <div
                 key={field.id}
                 className="p-4 rounded-lg border space-y-4 border-gray-200"
               >
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
                   <Input
-                    label="Medication Name"
-                    register={register(`medications.${index}.medicationName`)}
-                    error={errors.medications?.[index]?.medicationName?.message}
+                    label="Provider Name"
+                    register={register(`providers.${index}.providerName`)}
+                    error={errors.providers?.[index]?.providerName?.message}
                   />
-                  <Input
-                    label="Dosage"
-                    register={register(`medications.${index}.dosage`)}
-                    error={errors.medications?.[index]?.dosage?.message}
-                  />
-                  <Input
-                    label="Prescribing Doctor"
-                    register={register(
-                      `medications.${index}.prescribingDoctor`
-                    )}
-                    error={
-                      errors.medications?.[index]?.prescribingDoctor?.message
-                    }
+                  <PhoneNumberInput
+                    label="Phone"
+                    control={control}
+                    name={`providers.${index}.providerPhone`}
                   />
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <DatePickerField
-                    control={control}
-                    name={`medications.${index}.startDate`}
-                    label="Medication Start Date"
+                  <Input
+                    label="Address"
+                    register={register(`providers.${index}.providerAddress`)}
+                    error={errors.providers?.[index]?.providerAddress?.message}
                   />
                   <DatePickerField
                     control={control}
-                    name={`medications.${index}.endDate`}
-                    label="Medication End Date"
+                    name={`providers.${index}.providerFollowUp`}
+                    label="Follow-up Schedule"
                   />
                 </div>
-                {medications.fields.length > 1 && (
+                <TextArea
+                  label="Notes"
+                  register={register(`providers.${index}.providerNotes`)}
+                  error={errors.providers?.[index]?.providerNotes?.message}
+                  rows={3}
+                />
+                {providersArray.fields.length > 1 && (
                   <div className="flex justify-end mt-4">
                     <TertiaryButton
                       type="button"
-                      onClick={() => medications.remove(index)}
+                      onClick={() => providersArray.remove(index)}
                       className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
                     >
                       <ICONS.delete />
@@ -624,42 +635,6 @@ export const HealthHistoryForm: React.FC = () => {
                 )}
               </div>
             ))}
-          </div>
-        </Card>
-
-        {/* Healthcare Provider Section */}
-        <Card title="Healthcare Provider">
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <Input
-                label="Provider Name"
-                register={register("providerName")}
-                error={errors.providerName?.message}
-              />
-              <PhoneNumberInput
-                label="Phone"
-                control={control}
-                name="providerPhone"
-              />
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              <Input
-                label="Address"
-                register={register("providerAddress")}
-                error={errors.providerAddress?.message}
-              />
-              <DatePickerField
-                control={control}
-                name="providerFollowUp"
-                label="Follow-up Schedule"
-              />
-            </div>
-            <TextArea
-              label="Notes"
-              register={register("providerNotes")}
-              error={errors.providerNotes?.message}
-              rows={3}
-            />
           </div>
         </Card>
 

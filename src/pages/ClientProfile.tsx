@@ -50,9 +50,13 @@ export const ClientProfile: React.FC = () => {
 
       <PersonalInfoBar
         leftLabel="DOB"
-        leftValue={DateUtils.formatDateToRequiredFormat(
-          selectedClient?.date_of_birth as string
-        )}
+        leftValue={
+          selectedClient?.date_of_birth
+            ? DateUtils.formatDateToRequiredFormat(
+                selectedClient?.date_of_birth as string
+              )
+            : "N/A"
+        }
         rightLabel="Primary Contact"
         rightValue={
           (selectedClient?.contacts &&

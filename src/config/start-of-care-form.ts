@@ -10,7 +10,7 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "1",
-    type: "group",
+    type: "checkbox",
     label: "Service Agreement",
     parentId: null,
     headingId: "0",
@@ -58,7 +58,7 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "3",
-    type: "group",
+    type: "checkbox",
     label: "Care Recipient Questionnaire Completed",
     name: "care-recipient-questionnaire",
     parentId: null,
@@ -88,28 +88,28 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "6",
-    type: "group",
+    type: "checkbox",
     label: "Does it include supplements and vitamins.",
     parentId: null,
     headingId: "5",
   },
   {
     id: "7",
-    type: "group",
+    type: "checkbox",
     label: "Take a picture of the medication list the client uses",
     parentId: null,
     headingId: "5",
   },
   {
     id: "8",
-    type: "group",
+    type: "checkbox",
     label: "Take pictures of pill bottles with dosage and provider names.",
     parentId: null,
     headingId: "5",
   },
   {
     id: "9",
-    type: "group",
+    type: "checkbox",
     label:
       "Ask to see pill box, medication box, system being used to track medication administration.",
     parentId: null,
@@ -124,7 +124,7 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "11",
-    type: "group",
+    type: "checkbox",
     label:
       "Take pictures *front and back* of the following: Medicare (red, white & blue) card, Supplemental insurance cards, Vision & Dental, Prescription cards, pacemaker card.",
     parentId: null,
@@ -139,14 +139,14 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "12",
-    type: "group",
+    type: "checkbox",
     label: "Take picture of ID card.",
     parentId: null,
     headingId: "11",
   },
   {
     id: "13",
-    type: "group",
+    type: "checkbox",
     label: "Make note of when license or ID card expires",
     parentId: null,
     headingId: "11",
@@ -160,14 +160,14 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "15",
-    type: "group",
+    type: "checkbox",
     label: "Medical Power of Attorney (MPOA)",
     parentId: null,
     headingId: "14",
   },
   {
     id: "16",
-    type: "group",
+    type: "checkbox",
     label: "Statutory Durable Power of Attorney (POA, FPOA, DPOA)",
     parentId: null,
     headingId: "14",
@@ -223,14 +223,14 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "19",
-    type: "group",
+    type: "checkbox",
     label: "Review Release of Information to ensure completion.",
     parentId: null,
     headingId: "18",
   },
   {
     id: "20",
-    type: "group",
+    type: "checkbox",
     label:
       "Request last two visit notes; History and Physical (H&P); and Signed medication list.",
     parentId: null,
@@ -245,7 +245,7 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "22",
-    type: "group",
+    type: "checkbox",
     label: "Request policy for review.",
     parentId: null,
     headingId: "21",
@@ -268,7 +268,7 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "24",
-    type: "group",
+    type: "checkbox",
     label: "Does LTC policy have case management / care coordination benefits?",
     parentId: null,
     headingId: "21",
@@ -349,14 +349,14 @@ export const checklistSchema: ChecklistField[] = [
   },
   {
     id: "28",
-    type: "group",
+    type: "checkbox",
     label: "Who is primary point of contact?",
     parentId: null,
     headingId: "27",
   },
   {
     id: "29",
-    type: "group",
+    type: "checkbox",
     label: "Who should provider share updates and information with?",
     parentId: null,
     headingId: "27",
@@ -366,7 +366,7 @@ export const checklistSchema: ChecklistField[] = [
     label: "Who should provider not share information with?",
     parentId: null,
     headingId: "27",
-    type: "group",
+    type: "checkbox",
   },
   {
     id: "31",
@@ -393,21 +393,21 @@ export const checklistSchema: ChecklistField[] = [
   {
     id: "33",
     label: "Arrange transportation for care recipient.",
-    type: "group",
+    type: "checkbox",
     headingId: "31",
     parentId: null,
   },
   {
     id: "34",
     label: "Confirm medical records have been sent to provider",
-    type: "group",
+    type: "checkbox",
     headingId: "31",
     parentId: null,
   },
   {
     id: "35",
     label: "Confirm medication list is accurate prior to appointment.",
-    type: "group",
+    type: "checkbox",
     headingId: "31",
     parentId: null,
   },

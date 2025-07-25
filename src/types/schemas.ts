@@ -98,6 +98,7 @@ export interface HealthcareProvider extends BaseSchema {
   last_visit?: string;
   next_visit?: string;
   notes?: string;
+  follow_up?: string; 
 }
 
 export interface ClientMedical extends BaseSchema {

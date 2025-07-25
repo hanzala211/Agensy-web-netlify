@@ -73,26 +73,35 @@ export const AddClientMedicalHistory: React.FC<
   useEffect(() => {
     if (editData) {
       reset({
-        diagnoses: editData?.diagnoses?.split(", "),
-        allergies: editData?.allergies?.split(", "),
-        dietary_restrictions: editData?.dietary_restrictions?.split(", "),
-        surgical_history: editData?.surgical_history?.split(", "),
-        cognitive_status: COGNITIVE_STATUS.some(
-          (item) => item?.value === editData?.cognitive_status
-        )
-          ? editData?.cognitive_status
-          : "Other",
+        diagnoses: editData?.diagnoses ? editData?.diagnoses?.split(", ") : [],
+        allergies: editData?.allergies ? editData?.allergies?.split(", ") : [],
+        dietary_restrictions: editData?.dietary_restrictions
+          ? editData?.dietary_restrictions?.split(", ")
+          : [],
+        surgical_history: editData?.surgical_history
+          ? editData?.surgical_history?.split(", ")
+          : [],
+        cognitive_status:
+          editData?.cognitive_status && editData?.cognitive_status.length > 0
+            ? COGNITIVE_STATUS.some(
+                (item) => item?.value === editData?.cognitive_status
+              )
+              ? editData?.cognitive_status
+              : "Other"
+            : "",
         cognitive_status_text: COGNITIVE_STATUS.some(
           (item) => item?.value === editData?.cognitive_status
         )
           ? ""
-          : editData?.cognitive_status,
+          : editData?.cognitive_status
+          ? editData?.cognitive_status
+          : "",
         last_cognitive_screening: DateUtils.formatDateToRequiredFormat(
           editData?.last_cognitive_screening
         ),
         cognitive_score: editData?.cognitive_score || "",
-        notes: editData?.notes,
-        test_type: editData.test_type,
+        notes: editData?.notes || "",
+        test_type: editData.test_type || "",
       });
     }
   }, [editData, reset, isOpen]);
@@ -107,12 +116,12 @@ export const AddClientMedicalHistory: React.FC<
   };
 
   const addArrayItem = (field: MedicalHistoryArrayField) => {
-    const currentValue = watch(field);
+    const currentValue = watch(field) || [];
     setValue(field, [...currentValue, ""]);
   };
 
   const removeArrayItem = (field: MedicalHistoryArrayField, index: number) => {
-    const currentValue = watch(field);
+    const currentValue = watch(field) || [];
     setValue(
       field,
       currentValue.filter((_, i) => i !== index)
@@ -139,7 +148,7 @@ export const AddClientMedicalHistory: React.FC<
       <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
         <ModalArrayField
           label="Diagnosis"
-          items={watch("diagnoses")}
+          items={watch("diagnoses") as string[]}
           register={register}
           errors={errors}
           removeArrayItem={removeArrayItem}
@@ -148,7 +157,7 @@ export const AddClientMedicalHistory: React.FC<
         />
         <ModalArrayField
           label="Allergies"
-          items={watch("allergies")}
+          items={watch("allergies") as string[]}
           register={register}
           errors={errors}
           removeArrayItem={removeArrayItem}
@@ -157,7 +166,7 @@ export const AddClientMedicalHistory: React.FC<
         />
         <ModalArrayField
           label="Dietary Restrictions"
-          items={watch("dietary_restrictions")}
+          items={watch("dietary_restrictions") as string[]}
           register={register}
           errors={errors}
           removeArrayItem={removeArrayItem}
@@ -166,7 +175,7 @@ export const AddClientMedicalHistory: React.FC<
         />
         <ModalArrayField
           label="Surgical History"
-          items={watch("surgical_history")}
+          items={watch("surgical_history") as string[]}
           register={register}
           errors={errors}
           removeArrayItem={removeArrayItem}

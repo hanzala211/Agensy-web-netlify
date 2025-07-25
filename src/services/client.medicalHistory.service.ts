@@ -1,9 +1,8 @@
-import type { ClientMedicalHistoryRequestData } from "@agensy/types";
 import { sendRequest } from "@agensy/utils";
 
 export const addMedicalHistory = async (
   clientId: string,
-  data: ClientMedicalHistoryRequestData
+  data: unknown
 ) => {
   try {
     const response = await sendRequest({
@@ -22,7 +21,7 @@ export const addMedicalHistory = async (
 
 export const updateMedicalHistory = async (
   clientId: string,
-  data: ClientMedicalHistoryRequestData
+  data: unknown
 ) => {
   try {
     const response = await sendRequest({

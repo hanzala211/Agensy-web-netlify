@@ -138,7 +138,7 @@ const HealthHistoryFormPDF: React.FC<{
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Diagnoses</Text>
           <Field label="Diagnoses">
-            {data?.diagnoses?.map((d) => d.diagnosis).join(", ")}
+            {(data?.diagnoses ?? []).filter(d => d?.diagnosis).map((d) => d.diagnosis).join(", ") || "None"}
           </Field>
         </View>
 
@@ -175,37 +175,51 @@ const HealthHistoryFormPDF: React.FC<{
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Specialty Provider</Text>
-          <Field label="Provider Name">{data?.providerName}</Field>
-          <Field label="Provider Address">{data?.providerAddress}</Field>
-          <Field label="Provider Phone">{data?.providerPhone}</Field>
-          <Field label="Provider Notes">{data?.providerNotes}</Field>
-          <Field label="Provider Follow Up">{data?.providerFollowUp}</Field>
+          <Text style={styles.sectionTitle}>Healthcare Providers</Text>
+          {(data?.providers ?? []).filter(provider => 
+            provider && (provider.providerName || provider.providerAddress || provider.providerPhone || provider.providerNotes || provider.providerFollowUp)
+          ).map((provider, index) => (
+            <View key={index} style={styles.fieldRow}>
+              <Text style={styles.label}>Provider {index + 1}</Text>
+              <Text style={styles.value}>
+                {provider.providerName && `Name: ${provider.providerName}`}
+                {provider.providerAddress && `\nAddress: ${provider.providerAddress}`}
+                {provider.providerPhone && `\nPhone: ${provider.providerPhone}`}
+                {provider.providerNotes && `\nNotes: ${provider.providerNotes}`}
+                {provider.providerFollowUp && `\nFollow Up: ${provider.providerFollowUp}`}
+              </Text>
+            </View>
+          ))}
+          {(data?.providers ?? []).filter(provider => 
+            provider && (provider.providerName || provider.providerAddress || provider.providerPhone || provider.providerNotes || provider.providerFollowUp)
+          ).length === 0 && (
+            <Field label="Providers">None</Field>
+          )}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Medication Started</Text>
           <Field label="Medication Name">
-            {data?.medicationsStarted?.map((m) => m.medicationName).join(", ")}
+            {(data?.medicationsStarted ?? []).map((m) => m.medicationName).join(", ")}
           </Field>
           <Field label="Dosage">
-            {data?.medicationsStarted?.map((m) => m.dosage).join(", ")}
+            {(data?.medicationsStarted ?? []).map((m) => m.dosage).join(", ")}
           </Field>
           <Field label="Prescribing Doctor">
-            {data?.medicationsStarted
-              ?.map((m) => m.prescribingDoctor)
+            {(data?.medicationsStarted ?? [])
+              .map((m) => m.prescribingDoctor)
               .join(", ")}
           </Field>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Medication Ended</Text>
           <Field label="Medication Name">
-            {data?.medicationsEnded?.map((m) => m.medicationName).join(", ")}
+            {(data?.medicationsEnded ?? []).map((m) => m.medicationName).join(", ")}
           </Field>
           <Field label="Dosage">
-            {data?.medicationsEnded?.map((m) => m.dosage).join(", ")}
+            {(data?.medicationsEnded ?? []).map((m) => m.dosage).join(", ")}
           </Field>
           <Field label="Prescribing Doctor">
-            {data?.medicationsEnded?.map((m) => m.prescribingDoctor).join(", ")}
+            {(data?.medicationsEnded ?? []).map((m) => m.prescribingDoctor).join(", ")}
           </Field>
         </View>
 

@@ -64,19 +64,19 @@ export const AddClientHealthProviderModal: React.FC<
   useEffect(() => {
     if (editItem) {
       reset({
-        provider_name: editItem.provider_name,
-        provider_type: editItem.provider_type,
+        provider_name: editItem.provider_name ? editItem.provider_name : "",
+        provider_type: editItem.provider_type ? editItem.provider_type : "",
         last_visit: editItem.last_visit
           ? DateUtils.formatDateToRequiredFormat(editItem.last_visit)
           : "",
-        specialty: editItem.specialty,
-        address: editItem.address,
-        phone: editItem.phone,
-        fax: editItem.fax,
+        specialty: editItem.specialty ? editItem.specialty : "",
+        address: editItem.address ? editItem.address : "",
+        phone: editItem.phone ? editItem.phone : "",
+        fax: editItem.fax ? editItem.fax : "",
         next_visit: editItem.next_visit
           ? DateUtils.formatDateToRequiredFormat(editItem.next_visit)
           : "",
-        notes: editItem.notes,
+        notes: editItem.notes ? editItem.notes : "",
       });
     }
   }, [editItem, isOpen]);

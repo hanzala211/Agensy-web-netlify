@@ -1,9 +1,8 @@
 import { sendRequest } from "@agensy/utils";
-import type { ClientMedicationAddRequestData } from "@agensy/types";
 
 export const addClientMedication = async (data: {
   client_id: string;
-  postData: ClientMedicationAddRequestData;
+  postData: unknown;
 }) => {
   try {
     const response = await sendRequest({
@@ -34,7 +33,7 @@ export const getClientMedications = async (clientId: string) => {
 export const editClientMedication = async (data: {
   medication_id: string;
   clientId: string;
-  postData: ClientMedicationAddRequestData;
+  postData: unknown;
 }) => {
   try {
     const response = await sendRequest({

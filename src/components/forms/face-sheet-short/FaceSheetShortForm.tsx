@@ -33,6 +33,7 @@ import {
 } from "@agensy/constants";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useClientContext } from "@agensy/context";
+import { useQueryClient } from "@tanstack/react-query";
 
 const defaultValues = {
   firstName: "",
@@ -75,6 +76,7 @@ const defaultValues = {
 
 export const FaceSheetShortForm: React.FC = () => {
   const { clientId } = useParams();
+  const queryClient = useQueryClient();
   const { setOpenedFileData } = useClientContext();
   const {
     data: faceSheetShortForm,
@@ -129,6 +131,7 @@ export const FaceSheetShortForm: React.FC = () => {
         "Face Sheet Successfully Updated",
         "Your client's medical information has been saved and is now up to date."
       );
+      queryClient.invalidateQueries({ queryKey: ["client", clientId] });
     } else if (postFaceSheetShortFormMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -202,7 +205,7 @@ export const FaceSheetShortForm: React.FC = () => {
           faceSheetShortForm?.healthcare_providers?.map(
             (provider: HealthcareProvider) => ({
               providerName: provider.provider_name || "",
-              specialty: provider.specialty,
+              specialty: provider.specialty || "",
               address: provider.address || "",
               phone: provider.phone || "",
               fax: provider.fax || "",
@@ -213,7 +216,7 @@ export const FaceSheetShortForm: React.FC = () => {
                 ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
                 : "",
               id: provider.id || "",
-              providerType: provider.provider_type,
+              providerType: provider.provider_type || "",
             })
           ) || [],
         medications:
@@ -313,6 +316,9 @@ export const FaceSheetShortForm: React.FC = () => {
           : null,
         id: item.id,
       };
+      if (provider.provider_type?.length === 0) {
+        delete provider.provider_type;
+      }
       if (item.id) {
         return provider;
       } else {
@@ -325,7 +331,7 @@ export const FaceSheetShortForm: React.FC = () => {
       client_info: {
         first_name: data.firstName,
         last_name: data.lastName,
-        address: data.address,
+        address: data.address ? data.address : null,
         ssn: data.ssn ? data.ssn : null,
         date_of_birth: data.dateOfBirth
           ? DateUtils.changetoISO(data.dateOfBirth)
@@ -362,12 +368,20 @@ export const FaceSheetShortForm: React.FC = () => {
       },
 
       emergency_contact: {
-        first_name: data.emergencyContactFirstName,
-        last_name: data.emergencyContactLastName,
-        email: data.emergencyContactEmail,
-        phone: data.emergencyContactPhone,
-        relationship: data.emergencyContactRelationship,
-        address: data.emergencyContactAddress,
+        first_name: data.emergencyContactFirstName
+          ? data.emergencyContactFirstName
+          : null,
+        last_name: data.emergencyContactLastName
+          ? data.emergencyContactLastName
+          : null,
+        email: data.emergencyContactEmail ? data.emergencyContactEmail : null,
+        phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
+        relationship: data.emergencyContactRelationship
+          ? data.emergencyContactRelationship
+          : null,
+        address: data.emergencyContactAddress
+          ? data.emergencyContactAddress
+          : null,
       },
       medications,
       healthcare_providers: providers,

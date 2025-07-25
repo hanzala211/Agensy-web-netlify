@@ -188,9 +188,9 @@ export const EssentialDocumentForAging = () => {
   useEffect(() => {
     if (essentialDocuments?.essential_documents) {
       setOpenedFileData({
-        essential_documents: essentialDocuments.essential_documents,
+        essential_documents: essentialDocuments?.essential_documents,
         last_update: {
-          updatedAt: essentialDocuments.last_update.updatedAt,
+          updatedAt: essentialDocuments?.last_update?.updatedAt,
         },
       });
     }

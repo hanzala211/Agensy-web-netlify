@@ -53,13 +53,15 @@ export const HealthCareCard: React.FC = () => {
 
   const handleSubmit = (data: HospitalFormData) => {
     const postData = {
-      preferred_hospital: data.preferred_hospital,
-      hospital_address: data.hospital_address,
-      hospital_phone: data.hospital_phone,
-      pharmacy_name: data.pharmacy_name,
-      pharmacy_address: data.pharmacy_address,
-      pharmacy_phone: data.pharmacy_phone,
-      pharmacy_fax: data.pharmacy_fax,
+      preferred_hospital: data.preferred_hospital
+        ? data.preferred_hospital
+        : null,
+      hospital_address: data.hospital_address ? data.hospital_address : null,
+      hospital_phone: data.hospital_phone ? data.hospital_phone : null,
+      pharmacy_name: data.pharmacy_name ? data.pharmacy_name : null,
+      pharmacy_address: data.pharmacy_address ? data.pharmacy_address : null,
+      pharmacy_phone: data.pharmacy_phone ? data.pharmacy_phone : null,
+      pharmacy_fax: data.pharmacy_fax ? data.pharmacy_fax : null,
     };
     updateClientHealthcareMutation.mutate({
       clientId: selectedClient?.id as string,
@@ -76,7 +78,9 @@ export const HealthCareCard: React.FC = () => {
         ariaLabel="Edit Healthcare Information"
         showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
       >
-        {selectedClient?.preferred_hospital ? (
+        {selectedClient?.preferred_hospital ||
+        selectedClient?.pharmacy_name ||
+        selectedHealthCareProvider ? (
           <div className="flex flex-col gap-6">
             {selectedHealthCareProvider && (
               <HealthcareItem
@@ -84,10 +88,10 @@ export const HealthCareCard: React.FC = () => {
                 icon={<ICONS.doctor size={22} />}
               >
                 <p className="font-medium">
-                  {selectedHealthCareProvider.provider_name}
+                  {selectedHealthCareProvider?.provider_name}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {selectedHealthCareProvider.phone}
+                  {selectedHealthCareProvider?.phone}
                 </p>
               </HealthcareItem>
             )}
