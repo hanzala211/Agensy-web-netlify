@@ -62,7 +62,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       <div className="flex 2xl:flex-row w-full 2xl:w-fit flex-col gap-2">
         <div className="w-full 2xl:w-48">
           <StatefulSelect
-            label="Client"
+            label="Care Recipient"
             name="client"
             value={clientFilter}
             onChange={(e) => setClientFilter(e.target.value)}

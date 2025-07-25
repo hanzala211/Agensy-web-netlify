@@ -81,7 +81,7 @@ export const AppointmentsList: React.FC = () => {
         filterLabel="Type"
         sortLabel="Sort by"
         showExtraFilter={true}
-        extraFilterLabel="Client"
+        extraFilterLabel="Care Recipient"
         extraFilterData={[
           { label: "All", value: "all" },
           ...(clients?.map((client: Client) => ({

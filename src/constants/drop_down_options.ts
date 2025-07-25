@@ -76,7 +76,7 @@ export const DOCUMENT_CATEGORY_OPTIONS = [
 
 export const DOCUMENT_UPLOAD_TYPE_OPTIONS = [
   { label: "All", value: "all" },
-  { label: "Client", value: "client" },
+  { label: "Care Recipient", value: "client" },
   { label: "General", value: "general" },
 ];
 
@@ -146,7 +146,7 @@ export const USER_ROLES = [
 ];
 
 export const MESSAGING_TYPES = [
-  { label: "Client", value: "client" },
+  { label: "Care Recipient", value: "client" },
   { label: "General", value: "general" },
 ];
 

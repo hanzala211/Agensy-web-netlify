@@ -145,14 +145,14 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         <Select
           control={control}
           name="clientId"
-          label="Client"
+          label="Care Recipient"
           data={
             clients?.map((client: Client) => ({
               label: `${client.first_name} ${client.last_name}`,
               value: client.id as string,
             })) || []
           }
-          labelOption="Select Client"
+          labelOption="Select Care Recipient"
         />
 
         <Select
