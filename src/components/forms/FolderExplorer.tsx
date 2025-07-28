@@ -3,11 +3,13 @@ import { ICONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type {
   CareRecipientQuestionnaireData,
+  ComprehensiveCarePlanFormData,
   FaceSheetLongFormData,
   FaceSheetShortFormData,
   FolderData,
   FolderItem,
   HealthHistoryFormData,
+  InitialCareAssessmentPlanFormData,
   MedicalAppointmentTemplateData,
 } from "@agensy/types";
 import { TertiaryButton } from "@agensy/components";
@@ -29,6 +31,8 @@ import { MedicareCheatSheetPDF } from "./medicare-cheat-sheet/MedicareCheatSheet
 import { LongTermCareInsurancePolicyPDF } from "./long-term-care-insurance-policy/LongTermCareInsurancePolicyPDF";
 import { CaregiverInformationPDF } from "./caregiver-information/CaregiverInformationPDF";
 import MedicalAppointmentTemplatePDF from "./medical-appointment-template/MedicalAppointmentTemplatePDF";
+import InitialCareAssessmentPlanPDF from "./initial-care-assessment/InitialCareAssessmentPlanPDF";
+import ComprehensiveCarePlanPDF from "./comprehensive-care-plan/ComprehensiveCarePlanPDF";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -140,7 +144,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           break;
         case "health-history-form-medical":
           if (openedFileData && typeof openedFileData === "object") {
-            console.log(openedFileData)
+            console.log(openedFileData);
             return (
               <HealthHistoryFormPDF
                 data={
@@ -194,6 +198,19 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               <CareRecipientQuestionairePDF
                 data={
                   openedFileData as unknown as CareRecipientQuestionnaireData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "initial-assessment":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <InitialCareAssessmentPlanPDF
+                data={
+                  openedFileData as unknown as InitialCareAssessmentPlanFormData & {
                     last_update: { updatedAt: string };
                   }
                 }
@@ -312,6 +329,19 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               <MedicalAppointmentTemplatePDF
                 data={
                   openedFileData as unknown as MedicalAppointmentTemplateData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "comprehensive-care-plan-assessment":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <ComprehensiveCarePlanPDF
+                data={
+                  openedFileData as unknown as ComprehensiveCarePlanFormData & {
                     last_update: { updatedAt: string };
                   }
                 }

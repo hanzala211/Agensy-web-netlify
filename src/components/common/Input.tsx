@@ -16,6 +16,7 @@ interface InputProps {
   error?: string;
   register?: UseFormRegisterReturn;
   isPassword?: boolean;
+  mainClassname?: string;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -30,11 +31,12 @@ export const Input: React.FC<InputProps> = ({
   error,
   register,
   isPassword = false,
+  mainClassname = "",
 }) => {
   const [selectedType, setSelectedType] = useState<string>(type);
 
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${mainClassname}`}>
       {label && !placeholder && <label htmlFor={name}>{label}</label>}
       <div className="flex gap-2 flex-col relative w-full">
         <input

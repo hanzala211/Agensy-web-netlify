@@ -46,7 +46,7 @@ export const Subscription: React.FC = () => {
           period="month"
           description="No features are available on Free."
           features={[
-            "Client Management Tools",
+            "Care Recipient Management Tools",
             "Document Handling",
             "Communication Features",
             "Care Planning",
@@ -62,7 +62,7 @@ export const Subscription: React.FC = () => {
           period="month"
           description="Subscribers receive access to a broad suite of features, including:"
           features={[
-            "Client Management Tools",
+            "Care Recipient Management Tools",
             "Document Handling",
             "Communication Features",
             "Care Planning",

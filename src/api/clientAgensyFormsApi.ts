@@ -119,7 +119,8 @@ export const usePostCaregiverInformationMutation = () => {
 export const useGetMedicalAppointmentTemplate = (clientId: string) => {
   return useQuery({
     queryKey: ["medical-appointment-template", clientId],
-    queryFn: () => ClientAgensyFormsService.getMedicalAppointmentTemplate(clientId),
+    queryFn: () =>
+      ClientAgensyFormsService.getMedicalAppointmentTemplate(clientId),
     enabled: false,
   });
 };
@@ -128,5 +129,36 @@ export const usePostMedicalAppointmentTemplateMutation = () => {
   return useMutation({
     mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
       ClientAgensyFormsService.postMedicalAppointmentTemplate(clientId, data),
+  });
+};
+
+export const usePostInitialCareAssessmentPlan = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postInitialCareAssessmentPlan(clientId, data),
+  });
+};
+
+export const useGetInitialCareAssessmentPlan = (clientId: string) => {
+  return useQuery({
+    queryKey: ["initial-care-assessment-plan", clientId],
+    queryFn: () =>
+      ClientAgensyFormsService.getInitialCareAssessmentPlan(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostComprehensiveCarePlanMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postComprehensiveCarePlan(clientId, data),
+  });
+};
+
+export const useGetComprehensiveCarePlan = (clientId: string) => {
+  return useQuery({
+    queryKey: ["comprehensive-care-plan", clientId],
+    queryFn: () => ClientAgensyFormsService.getComprehensiveCarePlan(clientId),
+    enabled: false,
   });
 };

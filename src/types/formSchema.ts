@@ -187,15 +187,12 @@ export type MedicationFormData = z.infer<typeof medicationSchema>;
 
 export const clientHealthProviderSchema = z
   .object({
-    provider_type: z
-      .string()
-      .min(1, "Provider type is required")
-      .transform(trimString),
+    provider_type: z.string().optional(),
     provider_name: z
       .string()
       .min(1, "Provider name is required")
       .transform(trimString),
-    specialty: z.string().min(1, "Specialty is required").transform(trimString),
+    specialty: z.string().optional(),
     address: z.string().optional(),
     phone: z.string().optional(),
     fax: z.string().optional(),
@@ -1929,4 +1926,612 @@ export const medicalAppointmentTemplateSchema = z.object({
 
 export type MedicalAppointmentTemplateData = z.infer<
   typeof medicalAppointmentTemplateSchema
+>;
+
+export const initialCareAssessmentPlanSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().optional(),
+  dateOfAssessment: z.string().optional(),
+  dateOfCarePlan: z.string().optional(),
+  personCompletingAssessment: z.string().optional(),
+  presentForAssessment: z.string().optional(),
+  goalsForAssessment: z.string().optional(),
+  focusedRecommendations: z
+    .array(
+      z.object({
+        id: z.string().optional().nullable().nullish(),
+        name: z.string(),
+        description: z.string(),
+        details: z.array(z.string()),
+      })
+    )
+    .optional(),
+  functionalAdls: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  functionalIadls: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  homeSafety: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  memoryAndRecommendations: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  geriatricDepression: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  nutritionalHealth: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  legalAndFinancial: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  caregiverSupport: z
+    .object({
+      summary: z.string().optional(),
+      categoryName: z.string().optional().nullable().nullish(),
+    })
+    .optional(),
+  nextStepCareRecipient: z.array(z.string()).optional(),
+  nextStepCarePartner: z.array(z.string()).optional(),
+});
+
+export type InitialCareAssessmentPlanFormData = z.infer<
+  typeof initialCareAssessmentPlanSchema
+>;
+
+export const comprehensiveCarePlanSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().optional(),
+  preferredHospital: z.string().optional(),
+  pharmacyName: z.string().optional(),
+  dateOfAssessment: z.string().optional(),
+  dateOfCarePlan: z.string().optional(),
+  personCompletingAssessment: z.string().optional(),
+  presentForAssessment: z.string().optional(),
+  goalsForAssessment: z.string().optional(),
+  focusedRecommendations: z
+    .array(
+      z.object({
+        id: z.string().optional().nullable().nullish(),
+        name: z.string().optional(),
+        description: z.string().optional(),
+        details: z.array(z.string()).optional(),
+      })
+    )
+    .optional(),
+  initialRequest: z.string().optional(),
+  careRecipientGoals: z.string().optional(),
+  demographicAndHistoricInformation: z.string().optional(),
+  medicalHistory: z.string().optional(),
+  medications: z
+    .array(
+      z.object({
+        id: z.string().optional().nullable().nullish(),
+        medicationName: z.string().optional(),
+        dosage: z.string().optional(),
+        frequency: z.string().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        indication: z.string().optional(),
+      })
+    )
+    .optional(),
+  allergies: z
+    .array(
+      z.object({
+        allergen: z.string().optional(),
+      })
+    )
+    .optional(),
+  healthcareProviders: z
+    .array(
+      z.object({
+        id: z.string().optional().nullable().nullish(),
+        providerName: z.string().optional(),
+        providerType: z.string().optional(),
+        specialty: z.string().optional(),
+        address: z.string().optional(),
+        phone: z.string().optional(),
+      })
+    )
+    .optional(),
+  functionalAdls: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      deficitsNoted: z.string().optional(),
+      detailedTable: z
+        .object({
+          katzIndex: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          bathing: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          dressing: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          toileting: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          transfers: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          continence: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          feeding: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+      additionalData: z.string().optional().nullable(),
+    })
+    .optional(),
+  functionalIadls: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      detailedTable: z
+        .object({
+          telephone: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          shopping: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          foodPreparation: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          housekeeping: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          laundry: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          transportation: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          medication: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+          finances: z
+            .object({
+              description: z.string().optional(),
+              score: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+      additionalData: z
+        .object({
+          identifiedProblem1: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem2: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem3: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem4: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  homeSafety: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      deficitsNoted: z.string().optional(),
+      detailedTable: z
+        .object({
+          arePathwaysClear: z.boolean().optional(),
+          areThereThrowRugs: z.boolean().optional(),
+          areStairsSafe: z.boolean().optional(),
+          isThereClutterOrHoarding: z.boolean().optional(),
+          isThereFireEscapeRoute: z.boolean().optional(),
+          areFloorsSlippery: z.boolean().optional(),
+          conditionOfFloorSurfaces: z.boolean().optional(),
+          conditionOfCarpeting: z.boolean().optional(),
+          areChairsSturdyAndStable: z.boolean().optional(),
+          electricityFullyFunctional: z.boolean().optional(),
+          adequateLighting: z.boolean().optional(),
+          exposedWiresOrCords: z.boolean().optional(),
+          conditionOfWiresAndPlugs: z.boolean().optional(),
+          smokeDetectorsPresent: z.boolean().optional(),
+          areThereSpaceHeaters: z.boolean().optional(),
+          careRecipientSmokes: z.boolean().optional(),
+          fireExtinguisherAccessible: z.boolean().optional(),
+          conditionOfAppliances: z.boolean().optional(),
+          kitchenSafetyHazards: z.boolean().optional(),
+          locksOnDoorsAndWindows: z.boolean().optional(),
+          emergencyNumbersPosted: z.boolean().optional(),
+          accessibleTelephones: z.boolean().optional(),
+          weaponsOrFirearmsPresent: z.boolean().optional(),
+          petsPresent: z.boolean().optional(),
+          unsanitaryConditionsPresent: z.boolean().optional(),
+          medicationsSafelyStored: z.boolean().optional(),
+          adequateAirConditioningOrHeat: z.boolean().optional(),
+          conditionOfTubOrShower: z.boolean().optional(),
+          conditionOfBed: z.boolean().optional(),
+          other: z.boolean().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  memoryAndReasoning: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      deficitsNoted: z.string().optional(),
+      detailedTable: z
+        .object({
+          identifiedProblem1: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem2: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem3: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem4: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  geriatricDepression: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      deficitsNoted: z.string().optional(),
+      detailedTable: z
+        .object({
+          identifiedProblem1: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem2: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem3: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem4: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem5: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  nutritionalHealth: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      deficitsNoted: z.string().optional(),
+      detailedTable: z
+        .object({
+          identifiedProblem1: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem2: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem3: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem4: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem5: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  legalAndFinancial: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      deficitsNoted: z.string().optional(),
+      detailedTable: z
+        .object({
+          identifiedProblem1: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem2: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem3: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem4: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem5: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem6: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem7: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem8: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem9: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem10: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  careGiverSupport: z
+    .object({
+      categoryName: z.string().optional(),
+      summary: z.string().optional(),
+      deficitsNoted: z.string().optional(),
+      detailedTable: z
+        .object({
+          identifiedProblem1: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem2: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem3: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+          identifiedProblem4: z
+            .object({
+              identifiedProblem: z.string().optional(),
+              interventionAction: z.string().optional(),
+              goal: z.string().optional(),
+              referralOptions: z.string().optional(),
+            })
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  nextStepCareRecipient: z.array(z.string()).optional(),
+  nextStepCarePartner: z.array(z.string()).optional(),
+});
+
+export type ComprehensiveCarePlanFormData = z.infer<
+  typeof comprehensiveCarePlanSchema
 >;

@@ -272,3 +272,72 @@ export const postMedicalAppointmentTemplate = async (
     throw error;
   }
 };
+
+export const postInitialCareAssessmentPlan = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/initial-care-plan-assessment`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postInitialCareAssessmentPlan] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getInitialCareAssessmentPlan = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/initial-care-plan-assessment`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getInitialCareAssessmentPlan] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postComprehensiveCarePlan = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/comprehensive-care-plan-assessment`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postComprehensiveCarePlan] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+
+export const getComprehensiveCarePlan = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/comprehensive-care-plan-assessment`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postComprehensiveCarePlan] error: ${error}`
+    );
+    throw error;
+  }
+}

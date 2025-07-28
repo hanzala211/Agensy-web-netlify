@@ -85,6 +85,7 @@ export interface ClientMedications extends BaseSchema {
   refill_due?: string;
   notes?: string;
   active?: boolean;
+  indication?: string;
 }
 
 export interface HealthcareProvider extends BaseSchema {
@@ -98,7 +99,7 @@ export interface HealthcareProvider extends BaseSchema {
   last_visit?: string;
   next_visit?: string;
   notes?: string;
-  follow_up?: string; 
+  follow_up?: string;
 }
 
 export interface ClientMedical extends BaseSchema {

@@ -14,6 +14,8 @@ import {
   MedicareCheatSheet,
   LongTermCareInsurancePolicy,
   CaregiverInformation,
+  InitialCareAssessmentPlan,
+  ComprehensiveCarePlan,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -189,7 +191,7 @@ const fileMap: Record<string, FolderData> = {
     id: "comprehensive-care-plan-assessment",
     name: "Comprehensive Care Plan Assessment",
     description: "Complete assessment for developing comprehensive care plans",
-    content: <div>Comprehensive Care Plan Assessment content</div>,
+    content: <ComprehensiveCarePlan />,
   },
   "care-recipient-questionnaire": {
     id: "care-recipient-questionnaire",
@@ -202,7 +204,7 @@ const fileMap: Record<string, FolderData> = {
     id: "initial-assessment",
     name: "Initial Assessment",
     description: "Initial assessment form for new care recipients",
-    content: <div>Initial Assessment content</div>,
+    content: <InitialCareAssessmentPlan />,
   },
 
   // Medical files (existing and new)
