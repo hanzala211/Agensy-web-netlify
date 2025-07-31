@@ -264,3 +264,10 @@ export const FILLING_FOR_OPTIONS = [
   { label: "Both", value: "Both" },
   { label: "Other", value: "Other" },
 ];
+
+export const OCR_DOCUMENT_TYPES = [
+  { label: "ID Card", value: "id_card" },
+  { label: "Insurance Card", value: "insurance_card" },
+  { label: "Driver License", value: "driver_license" },
+  { label: "Medical Record", value: "medical_record" },
+];

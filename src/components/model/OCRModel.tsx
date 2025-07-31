@@ -3,11 +3,12 @@ import { Modal } from "../common/Modal";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { CommonLoader } from "../common/CommonLoader";
 import { ICONS } from "@agensy/constants";
-import { StatefulInput } from "@agensy/components";
+import { StatefulInput, StatefulSelect } from "@agensy/components";
 import { StringUtils, toast } from "@agensy/utils";
 import { isHeicImage, convertHeicToJpeg } from "../../utils/heicUtils";
 import { useOCRScanMutation } from "@agensy/api";
 import type { OCRField } from "@agensy/types";
+import { OCR_DOCUMENT_TYPES } from "@agensy/constants";
 
 interface OCRModelProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ export const OCRModel: React.FC<OCRModelProps> = ({
   const [isConverting, setIsConverting] = useState(false);
   const [ocrResults, setOcrResults] = useState<OCRField[]>([]);
   const [fileType, setFileType] = useState<string | null>(null);
+  const [selectedDocumentType, setSelectedDocumentType] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -112,8 +115,9 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       reader.onload = async (e) => {
         const imageDataUrl = e.target?.result as string;
         setSelectedImage(imageDataUrl);
+        setConvertedImage(null);
         setFileType(file.type);
-        setCurrentStep(2);
+        setSelectedFile(file);
 
         if (isHeicImage(file.type, file.name)) {
           setIsConverting(true);
@@ -125,46 +129,14 @@ export const OCRModel: React.FC<OCRModelProps> = ({
             toast.error(
               "Failed to convert HEIC image. Please try a different format."
             );
-            setCurrentStep(1);
             setSelectedImage(null);
+            setSelectedFile(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
             return;
           } finally {
             setIsConverting(false);
           }
         }
-        let fileToSubmit = file as File;
-
-        if (file && !file.type) {
-          const fileName = file.name.toLowerCase();
-          let correctMimeType = "";
-
-          if (fileName.endsWith(".heic")) {
-            correctMimeType = "image/heic";
-          } else if (fileName.endsWith(".heif")) {
-            correctMimeType = "image/heif";
-          } else if (fileName.endsWith(".pdf")) {
-            correctMimeType = "application/pdf";
-          } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-            correctMimeType = "image/jpeg";
-          } else if (fileName.endsWith(".png")) {
-            correctMimeType = "image/png";
-          } else if (fileName.endsWith(".gif")) {
-            correctMimeType = "image/gif";
-          }
-
-          if (correctMimeType) {
-            fileToSubmit = new File([file], file.name, {
-              type: correctMimeType,
-              lastModified: file.lastModified,
-            });
-          }
-        }
-        const formData = new FormData();
-        formData.append("document", fileToSubmit);
-        postOCRScanMutation.mutate({
-          data: formData,
-        });
       };
       reader.readAsDataURL(file);
     }
@@ -172,6 +144,55 @@ export const OCRModel: React.FC<OCRModelProps> = ({
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleNextClick = () => {
+    if (!selectedFile) {
+      toast.error("Please select a file first");
+      return;
+    }
+
+    if (!selectedDocumentType) {
+      toast.error("Please select a document type");
+      return;
+    }
+
+    setCurrentStep(2);
+
+    let fileToSubmit = selectedFile as File;
+
+    if (selectedFile && !selectedFile.type) {
+      const fileName = selectedFile.name.toLowerCase();
+      let correctMimeType = "";
+
+      if (fileName.endsWith(".heic")) {
+        correctMimeType = "image/heic";
+      } else if (fileName.endsWith(".heif")) {
+        correctMimeType = "image/heif";
+      } else if (fileName.endsWith(".pdf")) {
+        correctMimeType = "application/pdf";
+      } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+        correctMimeType = "image/jpeg";
+      } else if (fileName.endsWith(".png")) {
+        correctMimeType = "image/png";
+      } else if (fileName.endsWith(".gif")) {
+        correctMimeType = "image/gif";
+      }
+
+      if (correctMimeType) {
+        fileToSubmit = new File([selectedFile], selectedFile.name, {
+          type: correctMimeType,
+          lastModified: selectedFile.lastModified,
+        });
+      }
+    }
+
+    const formData = new FormData();
+    formData.append("document", fileToSubmit);
+    formData.append("document_type", selectedDocumentType);
+    postOCRScanMutation.mutate({
+      data: formData,
+    });
   };
 
   const handleFieldChange = (key: string, value: string) => {
@@ -187,6 +208,8 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       setSelectedImage(null);
       setConvertedImage(null);
       setIsConverting(false);
+      setSelectedDocumentType("");
+      setSelectedFile(null);
     }, 500);
     onClose();
     toast.success(
@@ -202,12 +225,14 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       setSelectedImage(null);
       setConvertedImage(null);
       setIsConverting(false);
+      setSelectedDocumentType("");
+      setSelectedFile(null);
     }, 500);
     onClose();
   };
 
   const renderStep1 = () => (
-    <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
+    <div className="flex flex-col items-center justify-center min-h-[400px] space-y-8">
       <div className="text-center space-y-4">
         <h2 className="text-2xl font-semibold text-gray-800">
           Upload Document for OCR
@@ -218,33 +243,51 @@ export const OCRModel: React.FC<OCRModelProps> = ({
         </p>
       </div>
 
-      <div className="w-full">
-        <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
-          onClick={handleFileSelect}
-        >
-          <div className="space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-              <ICONS.upload className="text-gray-600 w-8 h-8" />
-            </div>
-            <div>
-              <p className="text-lg font-medium text-gray-700">
-                Click to upload
-              </p>
-              <p className="text-sm text-gray-500">or drag and drop</p>
-              <p className="text-xs text-gray-400 mt-2">
-                PNG, JPG, PDF up to 10MB
-              </p>
+      <div className="w-full max-w-lg space-y-6">
+        {/* Document Type Dropdown */}
+        <div className="space-y-2">
+          <StatefulSelect
+            label="Document Type"
+            data={OCR_DOCUMENT_TYPES}
+            value={selectedDocumentType}
+            onChange={(e) => setSelectedDocumentType(e.target.value)}
+            labelOption="Select document type"
+            className="w-full"
+          />
+        </div>
+
+        {/* File Upload Area */}
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Upload Document
+          </label>
+          <div
+            className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
+            onClick={handleFileSelect}
+          >
+            <div className="space-y-4">
+              <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <ICONS.upload className="text-gray-600 w-8 h-8" />
+              </div>
+              <div>
+                <p className="text-lg font-medium text-gray-700">
+                  {selectedFile ? "Click to change" : "Click to upload"}
+                </p>
+                <p className="text-sm text-gray-500">or drag and drop</p>
+                <p className="text-xs text-gray-400 mt-2">
+                  PNG, JPG, PDF up to 20MB
+                </p>
+              </div>
             </div>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,.pdf"
-          onChange={handleImageUpload}
-          className="hidden"
-        />
       </div>
     </div>
   );
@@ -315,7 +358,19 @@ export const OCRModel: React.FC<OCRModelProps> = ({
   );
 
   const renderFooter = () => {
-    if (currentStep === 3) {
+    if (currentStep === 1) {
+      return (
+        <div className="flex justify-end space-x-4">
+          <PrimaryButton
+            onClick={handleNextClick}
+            className="max-w-xs"
+            disabled={!selectedFile || !selectedDocumentType}
+          >
+            Next
+          </PrimaryButton>
+        </div>
+      );
+    } else if (currentStep === 3) {
       return (
         <div className="flex justify-end space-x-4">
           <PrimaryButton onClick={handleSubmit} className="max-w-xs">
@@ -334,7 +389,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       title="OCR Document Processing"
       maxWidth={`${
         currentStep === 1 || currentStep === 2
-          ? "max-w-xl md:h-[60vh] h-[90vh]"
+          ? "max-w-xl md:h-[75vh] h-[90vh]"
           : "max-w-3xl"
       }`}
       footer={renderFooter()}

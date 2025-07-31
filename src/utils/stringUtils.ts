@@ -51,8 +51,10 @@ export const extractLinksFromText = (
 export const formatKeyLabel = (key: string) => {
   return key
     .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (char: string) => char.toUpperCase());
 };
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isFilled(value: any): boolean {
   if (value === null || value === undefined) return false;
@@ -64,7 +66,7 @@ function isFilled(value: any): boolean {
     Object.keys(value).length === 0
   )
     return false;
-  return true; // 0, false, non-empty string/array/object are valid
+  return true;
 }
 
 export const mapExtractedDataToFormValues = (
