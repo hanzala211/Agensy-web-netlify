@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Modal } from "../common/Modal";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { CommonLoader } from "../common/CommonLoader";
@@ -26,6 +26,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
   const [convertedImage, setConvertedImage] = useState<string | null>(null);
   const [isConverting, setIsConverting] = useState(false);
   const [ocrResults, setOcrResults] = useState<OCRField[]>([]);
+  const [fileType, setFileType] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     }
 
     const isValidFile = () => {
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith("image/") || file.type === "application/pdf") {
         return true;
       }
 
@@ -100,6 +101,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
         ".gif",
         ".heic",
         ".heif",
+        ".pdf",
       ];
 
       return validExtensions.some((ext) => fileName.endsWith(ext));
@@ -110,6 +112,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       reader.onload = async (e) => {
         const imageDataUrl = e.target?.result as string;
         setSelectedImage(imageDataUrl);
+        setFileType(file.type);
         setCurrentStep(2);
 
         if (isHeicImage(file.type, file.name)) {
@@ -265,16 +268,26 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     </div>
   );
 
+  const isPDF = useMemo(() => {
+    return fileType === "application/pdf";
+  }, [fileType]);
+
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
         {/* Image Display */}
         <div className="space-y-4">
           <div className="bg-gray-100 rounded-lg p-4">
-            {selectedImage && (
+            {selectedImage && !isPDF ? (
               <img
                 src={convertedImage || selectedImage}
                 alt="Uploaded document"
+                className="w-full h-auto max-h-80 object-contain rounded"
+              />
+            ) : (
+              <iframe
+                src={selectedImage as string}
+                title="Uploaded document"
                 className="w-full h-auto max-h-80 object-contain rounded"
               />
             )}
