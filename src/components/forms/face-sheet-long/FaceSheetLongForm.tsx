@@ -11,6 +11,7 @@ import {
   type Vaccine,
   type MedicalCondition,
   type OpenedFileData,
+  type FaceSheetShortFormData,
 } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
@@ -124,7 +125,7 @@ const defaultValues = {
 export const FaceSheetLongForm: React.FC = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, ocrResult, setOcrResult } = useClientContext();
   const { clientId } = useParams();
   const postFaceSheetLongFormMutation = usePostFaceSheetLongFormMutation();
   const {
@@ -140,6 +141,7 @@ export const FaceSheetLongForm: React.FC = () => {
     getValues,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<FaceSheetLongFormData>({
     resolver: zodResolver(faceSheetLongFormSchema),
     defaultValues,
@@ -148,6 +150,20 @@ export const FaceSheetLongForm: React.FC = () => {
   useEffect(() => {
     refetch();
   }, [clientId, refetch]);
+
+  useEffect(() => {
+    if (ocrResult && ocrResult.length > 0) {
+      const mappedValues = StringUtils.mapExtractedDataToFormValues(
+        ocrResult,
+        defaultValues
+      );
+
+      Object.entries(mappedValues).forEach(([key, value]) => {
+        setValue(key as keyof FaceSheetShortFormData, value);
+      });
+      setOcrResult([]);
+    }
+  }, [ocrResult]);
 
   useEffect(() => {
     if (postFaceSheetLongFormMutation.status === "success") {

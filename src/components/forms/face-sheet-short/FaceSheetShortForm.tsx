@@ -77,7 +77,7 @@ const defaultValues = {
 export const FaceSheetShortForm: React.FC = () => {
   const { clientId } = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, ocrResult, setOcrResult } = useClientContext();
   const {
     data: faceSheetShortForm,
     refetch,
@@ -91,10 +91,25 @@ export const FaceSheetShortForm: React.FC = () => {
     formState: { errors },
     reset,
     getValues,
+    setValue,
   } = useForm<FaceSheetShortFormData>({
     resolver: zodResolver(faceSheetShortFormSchema),
     defaultValues,
   });
+
+  useEffect(() => {
+    if (ocrResult && ocrResult.length > 0) {
+      const mappedValues = StringUtils.mapExtractedDataToFormValues(
+        ocrResult,
+        defaultValues
+      );
+
+      Object.entries(mappedValues).forEach(([key, value]) => {
+        setValue(key as keyof FaceSheetShortFormData, value);
+      });
+      setOcrResult([]);
+    }
+  }, [ocrResult]);
 
   const providersArray = useFieldArray({
     control,

@@ -9,6 +9,7 @@ import type {
   HealthcareProvider,
   IUser,
   Note,
+  OCRField,
   OpenedFileData,
 } from "@agensy/types";
 import { toast } from "@agensy/utils";
@@ -23,6 +24,7 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
   const [openedFileData, setOpenedFileData] = useState<OpenedFileData | null>(
     null
   );
+  const [ocrResult, setOcrResult] = useState<OCRField[]>([]);
 
   const addClientContact = (contact: ClientContact) => {
     setSelectedClient((prev) => {
@@ -257,6 +259,8 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
         updateClientAccess,
         openedFileData,
         setOpenedFileData,
+        ocrResult,
+        setOcrResult,
       }}
     >
       {children}

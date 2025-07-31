@@ -193,8 +193,16 @@ const InitialCareAssessmentPlanPDF: React.FC<{
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Goals for Assessment</Text>
-          <Field label="Goals for Assessment (comma separated)">
-            {data?.goalsForAssessment}
+          <Field label="Goals for Assessment">
+            {Array.isArray(data?.goalsForAssessment) && data?.goalsForAssessment.length > 0 ? (
+              data.goalsForAssessment.map((goal, index) => (
+                <Text key={index} style={styles.detailsList}>
+                  • {goal}
+                </Text>
+              ))
+            ) : (
+              <Text>-</Text>
+            )}
           </Field>
         </View>
 

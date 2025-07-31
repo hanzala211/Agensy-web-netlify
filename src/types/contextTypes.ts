@@ -12,7 +12,7 @@ import type {
   Note,
   Thread,
 } from "./schemas";
-import type { OpenedFileData } from "./otherSchemas";
+import type { OCRField, OpenedFileData } from "./otherSchemas";
 
 export interface AuthContextType {
   userData: IUser | null;
@@ -61,6 +61,8 @@ export interface ClientContextType {
   setOpenedFileData: React.Dispatch<
     React.SetStateAction<OpenedFileData | null>
   >;
+  ocrResult: OCRField[];
+  setOcrResult: React.Dispatch<React.SetStateAction<OCRField[]>>;
 }
 
 export interface DocumentContextType {

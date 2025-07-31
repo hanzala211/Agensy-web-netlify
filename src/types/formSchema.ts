@@ -1936,7 +1936,7 @@ export const initialCareAssessmentPlanSchema = z.object({
   dateOfCarePlan: z.string().optional(),
   personCompletingAssessment: z.string().optional(),
   presentForAssessment: z.string().optional(),
-  goalsForAssessment: z.string().optional(),
+  goalsForAssessment: z.array(z.string()).optional(),
   focusedRecommendations: z
     .array(
       z.object({
@@ -2013,7 +2013,7 @@ export const comprehensiveCarePlanSchema = z.object({
   dateOfCarePlan: z.string().optional(),
   personCompletingAssessment: z.string().optional(),
   presentForAssessment: z.string().optional(),
-  goalsForAssessment: z.string().optional(),
+  goalsForAssessment: z.array(z.string()).optional(),
   focusedRecommendations: z
     .array(
       z.object({

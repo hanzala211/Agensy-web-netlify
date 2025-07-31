@@ -128,3 +128,4 @@ export * from "./forms/caregiver-information/CaregiverInformation";
 export * from "./forms/medical-appointment-template/MedicalAppointmentTemplate";
 export * from "./forms/initial-care-assessment/InitialCareAssessmentPlan";
 export * from "./forms/comprehensive-care-plan/ComprehensiveCarePlan";
+export * from "./model/OCRModel"

@@ -68,7 +68,8 @@ const MultipleTextInputs = ({
               type="text"
               value={item || ""}
               onChange={(e) => updateItem(index, e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className=" text-darkGray bg-lightGray placeholder:text-darkGray p-2
+          border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200"
               placeholder={`Enter ${label.toLowerCase()} item ${index + 1}`}
             />
           </div>
@@ -133,7 +134,7 @@ export const ComprehensiveCarePlan = () => {
       dateOfCarePlan: "",
       personCompletingAssessment: "",
       presentForAssessment: "",
-      goalsForAssessment: "",
+      goalsForAssessment: [] as string[],
       nextStepCareRecipient: [] as string[],
       nextStepCarePartner: [] as string[],
       focusedRecommendations: [],
@@ -1768,8 +1769,10 @@ export const ComprehensiveCarePlan = () => {
           : "",
         goalsForAssessment: comprehensiveCarePlan?.initial_assessment
           ?.goals_for_assessment
-          ? comprehensiveCarePlan?.initial_assessment?.goals_for_assessment
-          : "",
+          ? comprehensiveCarePlan?.initial_assessment?.goals_for_assessment.split(
+              ", "
+            )
+          : [],
         nextStepCareRecipient: comprehensiveCarePlan?.initial_assessment
           ?.next_step_care_recipient
           ? comprehensiveCarePlan?.initial_assessment?.next_step_care_recipient.split(
@@ -1787,8 +1790,8 @@ export const ComprehensiveCarePlan = () => {
             return {
               medicationName: medication.medication_name,
               id: medication.id,
-              dosage: medication.dosage,
-              frequency: medication.frequency,
+              dosage: medication.dosage || "",
+              frequency: medication.frequency || "",
               indication: medication.indication ? medication.indication : "",
               startDate: medication.start_date
                 ? DateUtils.formatDateToRequiredFormat(medication.start_date)
@@ -1802,11 +1805,11 @@ export const ComprehensiveCarePlan = () => {
         healthcareProviders: comprehensiveCarePlan?.healthcare_providers?.map(
           (provider: HealthcareProvider) => {
             return {
-              providerType: provider.provider_type,
-              providerName: provider.provider_name,
-              specialty: provider.specialty,
-              address: provider.address,
-              phone: provider.phone,
+              providerType: provider.provider_type || "",
+              providerName: provider.provider_name || "",
+              specialty: provider.specialty || "",
+              address: provider.address || "",
+              phone: provider.phone || "",
               id: provider.id,
             };
           }
@@ -1932,7 +1935,9 @@ export const ComprehensiveCarePlan = () => {
           ? data.presentForAssessment
           : null,
         goals_for_assessment: data.goalsForAssessment
-          ? data.goalsForAssessment
+          ? data.goalsForAssessment.length > 0
+            ? data.goalsForAssessment.join(", ")
+            : null
           : null,
         next_step_care_recipient: data.nextStepCareRecipient
           ? data.nextStepCareRecipient.length > 0
@@ -3026,14 +3031,46 @@ export const ComprehensiveCarePlan = () => {
         </div>
       </Card>
 
-      <Card title="Goals for Assessment">
-        <div className="mb-5">
-          <TextArea
-            label="Goals for Assessment"
-            register={register("goalsForAssessment")}
-            error={errors.goalsForAssessment?.message}
-            rows={4}
-          />
+      <Card
+        title="Goals for Assessment"
+        buttonText={<ICONS.plus size={16} />}
+        onButtonClick={() => {
+          const currentGoals = watch("goalsForAssessment") || [];
+          setValue("goalsForAssessment", [...currentGoals, ""]);
+        }}
+        ariaLabel="Add Goal for Assessment"
+        showButton={true}
+      >
+        <div className="space-y-6">
+          {(watch("goalsForAssessment") || []).map((goal, index) => (
+            <div key={index} className="p-3 rounded-lg border">
+              <div className="w-full flex gap-4 items-center">
+                <div className="w-full">
+                  <Input
+                    placeholder={`Goal ${index + 1}`}
+                    register={register(`goalsForAssessment.${index}`)}
+                    error={errors.goalsForAssessment?.[index]?.message}
+                  />
+                </div>
+                {(watch("goalsForAssessment") || []).length > 1 && (
+                  <TertiaryButton
+                    type="button"
+                    onClick={() => {
+                      const currentGoals = watch("goalsForAssessment") || [];
+                      console.log(goal);
+                      const newGoals = currentGoals.filter(
+                        (_, i) => i !== index
+                      );
+                      setValue("goalsForAssessment", newGoals);
+                    }}
+                    className="text-red-600 border !m-0 border-red-200 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <ICONS.delete />
+                  </TertiaryButton>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </Card>
 

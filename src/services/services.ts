@@ -13,3 +13,4 @@ export * as UserProfileSettingsService from "./user.profile.settings.service";
 export * as StripeService from "./stripe.service";
 export * as MessagesThreadService from "./messages.thread.service";
 export * as ClientAgensyFormsService from "./client.agensy-forms.service";
+export * as OCRService from "./ocr.service";

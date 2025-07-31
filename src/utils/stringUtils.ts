@@ -1,3 +1,5 @@
+import type { OCRField } from "@agensy/types";
+
 export const capitalizeFirstLetter = (str: string): string => {
   if (!str || str.length === 0) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -44,4 +46,41 @@ export const extractLinksFromText = (
   }
 
   return segments;
+};
+
+export const formatKeyLabel = (key: string) => {
+  return key
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, (char: string) => char.toUpperCase());
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isFilled(value: any): boolean {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string" && value.trim() === "") return false;
+  if (Array.isArray(value) && value.length === 0) return false;
+  if (
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    Object.keys(value).length === 0
+  )
+    return false;
+  return true; // 0, false, non-empty string/array/object are valid
+}
+
+export const mapExtractedDataToFormValues = (
+  extractedData: OCRField[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formDefaults: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Record<string, any> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filledValues: Record<string, any> = {};
+
+  extractedData.forEach(({ key, value }) => {
+    if (key in formDefaults && isFilled(value)) {
+      filledValues[key] = value;
+    }
+  });
+
+  return filledValues;
 };

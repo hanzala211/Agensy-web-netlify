@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { ICONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type {
@@ -12,7 +12,7 @@ import type {
   InitialCareAssessmentPlanFormData,
   MedicalAppointmentTemplateData,
 } from "@agensy/types";
-import { TertiaryButton } from "@agensy/components";
+import { OCRModel, TertiaryButton } from "@agensy/components";
 import { useClientContext } from "@agensy/context";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useParams } from "react-router-dom";
@@ -57,7 +57,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   onPathClick,
   fileContent,
 }) => {
-  const { setOpenedFileData, openedFileData } = useClientContext();
+  const { setOpenedFileData, openedFileData, setOcrResult } =
+    useClientContext();
+  const [isOCRModelOpen, setIsOCRModelOpen] = useState<boolean>(false);
   const params = useParams();
 
   useEffect(() => {
@@ -423,24 +425,44 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                     <ICONS.fileAlt className="text-gray-600" />
                     {fileContent?.name}
                   </div>
-                  {openedFileData &&
-                    pdfDocument &&
-                    typeof openedFileData === "object" &&
-                    Object.keys(openedFileData).length > 0 && (
-                      <PDFDownloadLink
-                        document={pdfDocument}
-                        fileName={`${fileContent?.name}.pdf`}
+                  <div className="flex items-center gap-2">
+                    {(params.formSlug === "face-sheet-short" ||
+                      params.formSlug === "face-sheet-long" ||
+                      params.formSlug === "health-history-form-medical") && (
+                      <TertiaryButton
+                        onClick={() => setIsOCRModelOpen(true)}
+                        aria_label="OCR"
+                        className="hover:bg-green-50 shadow-none hover:text-blue-500 hover:border-blue-300 bg-transparent"
                       >
-                        <TertiaryButton
-                          aria_label="Download PDF"
-                          className="hover:bg-green-50 shadow-none hover:text-green-500 hover:border-green-300 bg-transparent"
-                        >
-                          <span className="flex items-center gap-2">
-                            <ICONS.download />
-                          </span>
-                        </TertiaryButton>
-                      </PDFDownloadLink>
+                        <span className="flex items-center gap-2">
+                          <ICONS.uploadDoc />
+                        </span>
+                      </TertiaryButton>
                     )}
+                    <OCRModel
+                      onSubmitProp={(data) => setOcrResult(data)}
+                      isOpen={isOCRModelOpen}
+                      onClose={() => setIsOCRModelOpen(false)}
+                    />
+                    {openedFileData &&
+                      pdfDocument &&
+                      typeof openedFileData === "object" &&
+                      Object.keys(openedFileData).length > 0 && (
+                        <PDFDownloadLink
+                          document={pdfDocument}
+                          fileName={`${fileContent?.name}.pdf`}
+                        >
+                          <TertiaryButton
+                            aria_label="Download PDF"
+                            className="hover:bg-green-50 shadow-none hover:text-green-500 hover:border-green-300 bg-transparent"
+                          >
+                            <span className="flex items-center gap-2">
+                              <ICONS.download />
+                            </span>
+                          </TertiaryButton>
+                        </PDFDownloadLink>
+                      )}
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">

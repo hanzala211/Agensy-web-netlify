@@ -38,3 +38,10 @@ export interface ChecklistField {
 }
 
 export type ChecklistFormData = Record<string, boolean | string | null>;
+
+export interface OCRField {
+  key: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any;
+  label: string;
+}

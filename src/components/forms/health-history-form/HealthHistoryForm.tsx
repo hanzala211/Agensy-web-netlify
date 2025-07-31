@@ -82,7 +82,7 @@ const defaultValues: HealthHistoryFormData = {
 export const HealthHistoryForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { clientId } = useParams();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, ocrResult, setOcrResult } = useClientContext();
   const {
     data: healthHistoryForm,
     isFetching: isFetchingHealthHistoryForm,
@@ -96,6 +96,7 @@ export const HealthHistoryForm: React.FC = () => {
     formState: { errors },
     reset,
     getValues,
+    setValue,
   } = useForm<HealthHistoryFormData>({
     resolver: zodResolver(healthHistoryFormSchema),
     defaultValues,
@@ -104,6 +105,20 @@ export const HealthHistoryForm: React.FC = () => {
   useEffect(() => {
     refetch();
   }, []);
+
+  useEffect(() => {
+    if (ocrResult && ocrResult.length > 0) {
+      const mappedValues = StringUtils.mapExtractedDataToFormValues(
+        ocrResult,
+        defaultValues
+      );
+
+      Object.entries(mappedValues).forEach(([key, value]) => {
+        setValue(key as keyof HealthHistoryFormData, value);
+      });
+      setOcrResult([]);
+    }
+  }, [ocrResult]);
 
   useEffect(() => {
     if (postHealthHistoryMutation.status === "success") {

@@ -63,7 +63,8 @@ const MultipleTextInputs = ({
               type="text"
               value={item || ""}
               onChange={(e) => updateItem(index, e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className=" text-darkGray bg-lightGray placeholder:text-darkGray p-2
+          border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200"
               placeholder={`Enter ${label.toLowerCase()} item ${index + 1}`}
             />
           </div>
@@ -119,7 +120,7 @@ export const InitialCareAssessmentPlan = () => {
       dateOfCarePlan: "",
       personCompletingAssessment: "",
       presentForAssessment: "",
-      goalsForAssessment: "",
+      goalsForAssessment: [] as string[],
       focusedRecommendations: [],
       functionalAdls: {
         summary: "",
@@ -232,8 +233,14 @@ export const InitialCareAssessmentPlan = () => {
           initialCareAssessment?.initial_care_plan_assessment
             ?.present_for_assessment || "",
         goalsForAssessment:
-          initialCareAssessment?.initial_care_plan_assessment
-            ?.goals_for_assessment || "",
+          (initialCareAssessment?.initial_care_plan_assessment
+            ?.goals_for_assessment &&
+            initialCareAssessment?.initial_care_plan_assessment
+              ?.goals_for_assessment.length > 0 &&
+            initialCareAssessment?.initial_care_plan_assessment?.goals_for_assessment.split(
+              ", "
+            )) ||
+          [],
         focusedRecommendations:
           initialCareAssessment.focused_recommendations &&
           initialCareAssessment.focused_recommendations.length > 0
@@ -337,7 +344,8 @@ export const InitialCareAssessmentPlan = () => {
     console.log(data);
     const focusedRecommendations = data.focusedRecommendations?.map(
       (item, index) => {
-        return {
+        const recommendation =  {
+          id: item.id ? item.id : null,
           option_number: index + 1 || null,
           name: item.name ? item.name : null,
           description: item.description ? item.description : null,
@@ -347,6 +355,13 @@ export const InitialCareAssessmentPlan = () => {
               : null
             : null,
         };
+        if (recommendation.id) {
+          return recommendation;
+        }else {
+          // @ts-expect-error :// TODO: fix this
+          delete recommendation.id
+          return recommendation;
+        }
       }
     );
 
@@ -439,7 +454,9 @@ export const InitialCareAssessmentPlan = () => {
           ? data.presentForAssessment
           : null,
         goals_for_assessment: data.goalsForAssessment
-          ? data.goalsForAssessment
+          ? data.goalsForAssessment.length > 0
+            ? data.goalsForAssessment.join(", ")
+            : null
           : null,
         next_step_care_recipient: data.nextStepCareRecipient
           ? data.nextStepCareRecipient.length > 0
@@ -539,14 +556,46 @@ export const InitialCareAssessmentPlan = () => {
         </div>
       </Card>
 
-      <Card title="Goals for Assessment">
-        <div className="mb-5">
-          <TextArea
-            label="Goals for Assessment (comma separated)"
-            register={register("goalsForAssessment")}
-            error={errors.goalsForAssessment?.message}
-            rows={4}
-          />
+      <Card
+        title="Goals for Assessment"
+        buttonText={<ICONS.plus size={16} />}
+        onButtonClick={() => {
+          const currentGoals = watch("goalsForAssessment") || [];
+          setValue("goalsForAssessment", [...currentGoals, ""]);
+        }}
+        ariaLabel="Add Goal for Assessment"
+        showButton={true}
+      >
+        <div className="space-y-6">
+          {(watch("goalsForAssessment") || []).map((goal, index) => (
+            <div key={index} className="p-3 rounded-lg border">
+              <div className="w-full flex gap-4 items-center">
+                <div className="w-full">
+                  <Input
+                    placeholder={`Goal ${index + 1}`}
+                    register={register(`goalsForAssessment.${index}`)}
+                    error={errors.goalsForAssessment?.[index]?.message}
+                  />
+                </div>
+                {(watch("goalsForAssessment") || []).length > 1 && (
+                  <TertiaryButton
+                    type="button"
+                    onClick={() => {
+                      const currentGoals = watch("goalsForAssessment") || [];
+                      console.log(goal)
+                      const newGoals = currentGoals.filter(
+                        (_, i) => i !== index
+                      );
+                      setValue("goalsForAssessment", newGoals);
+                    }}
+                    className="text-red-600 border !m-0 border-red-200 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <ICONS.delete />
+                  </TertiaryButton>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </Card>
 

@@ -10,6 +10,7 @@ import {
   FaRegEye,
   FaRegEyeSlash,
   FaRegUser,
+  FaUpload,
 } from "react-icons/fa";
 import {
   FiCalendar,
@@ -49,7 +50,7 @@ import {
   FaPrescriptionBottleMedical,
 } from "react-icons/fa6";
 import { PiNotePencilBold } from "react-icons/pi";
-import { IoMdAddCircle } from "react-icons/io";
+import { IoIosCloudUpload, IoMdAddCircle } from "react-icons/io";
 import {
   IoChatbubbleOutline,
   IoCheckmarkOutline,
@@ -118,4 +119,6 @@ export const ICONS = {
   folderOpen: FaFolderOpen,
   fileAlt: FaFileAlt,
   rightSolid: BiSolidRightArrow,
+  upload: IoIosCloudUpload,
+  uploadDoc: FaUpload
 };

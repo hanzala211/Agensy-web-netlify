@@ -273,7 +273,13 @@ const ComprehensiveCarePlanPDF: React.FC<{
             <Text>{data.presentForAssessment || "-"}</Text>
           </Field>
           <Field label="Goals for Assessment">
-            <Text>{data.goalsForAssessment || "-"}</Text>
+            {Array.isArray(data.goalsForAssessment) && data.goalsForAssessment.length > 0 ? (
+              data.goalsForAssessment.map((goal, index) => (
+                <ListItem key={index} text={goal} />
+              ))
+            ) : (
+              <Text>-</Text>
+            )}
           </Field>
         </View>
 
