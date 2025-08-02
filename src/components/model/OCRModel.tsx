@@ -359,7 +359,6 @@ export const OCRModel: React.FC<OCRModelProps> = ({
           <PrimaryButton
             onClick={handleNextClick}
             className="max-w-xs"
-            disabled={!selectedFile || !selectedDocumentType}
           >
             Next
           </PrimaryButton>
