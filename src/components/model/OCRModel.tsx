@@ -44,20 +44,15 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       const response = postOCRScanMutation.data;
 
       const mappedFields = response?.mappedFields || {};
-      const keyValuePairs = response?.rawTextractResults?.keyValuePairs || {};
 
       const structuredData = Object.entries(mappedFields).map(
         ([key, value]) => {
-          const matchedLabelEntry = Object.entries(keyValuePairs).find(
-            ([, kvpValue]) => kvpValue === value
-          );
-
           const formattedKey = StringUtils.formatKeyLabel(key);
 
           return {
             key,
             value,
-            label: matchedLabelEntry?.[0] || formattedKey,
+            label: formattedKey,
           };
         }
       );
@@ -386,7 +381,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="OCR Document Processing"
+      title="Document Text Extraction"
       maxWidth={`${
         currentStep === 1 || currentStep === 2
           ? "max-w-xl md:h-[75vh] h-[90vh]"
