@@ -438,7 +438,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                       <TertiaryButton
                         onClick={() => setIsOCRModelOpen(true)}
                         aria_label="Upload OCR"
-                        className="hover:bg-blue-50 border-gray-600 shadow-none hover:text-blue-500 hover:border-blue-300 bg-transparent"
+                        className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent"
                       >
                         <span className="flex items-center gap-2">
                           Scan Document

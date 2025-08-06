@@ -101,7 +101,8 @@ export const FaceSheetShortForm: React.FC = () => {
     if (ocrResult && ocrResult.length > 0) {
       const mappedValues = StringUtils.mapExtractedDataToFormValues(
         ocrResult,
-        defaultValues
+        defaultValues,
+        getValues()
       );
 
       Object.entries(mappedValues).forEach(([key, value]) => {

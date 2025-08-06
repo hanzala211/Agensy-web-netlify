@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CommonLoader, PrimaryButton } from "@agensy/components";
 import {
@@ -155,7 +155,8 @@ export const FaceSheetLongForm: React.FC = () => {
     if (ocrResult && ocrResult.length > 0) {
       const mappedValues = StringUtils.mapExtractedDataToFormValues(
         ocrResult,
-        defaultValues
+        defaultValues,
+        getValues()
       );
 
       Object.entries(mappedValues).forEach(([key, value]) => {
@@ -179,22 +180,6 @@ export const FaceSheetLongForm: React.FC = () => {
       );
     }
   }, [postFaceSheetLongFormMutation.status]);
-
-  const formValues = useWatch({ control });
-
-  useEffect(() => {
-    if (formValues && Object.keys(formValues).length > 0) {
-      setOpenedFileData({
-        ...formValues,
-        last_update: { updatedAt: faceSheetLongData?.last_update?.updatedAt },
-      } as unknown as OpenedFileData);
-    } else {
-      setOpenedFileData({
-        ...getValues(),
-        last_update: { updatedAt: faceSheetLongData?.last_update?.updatedAt },
-      } as unknown as OpenedFileData);
-    }
-  }, [formValues]);
 
   const providersArray = useFieldArray({
     control,

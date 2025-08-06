@@ -14,7 +14,9 @@ interface DatePickerProps {
   label?: string;
   showTime?: boolean;
   value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
+  setValue?: React.Dispatch<React.SetStateAction<string>>;
+  onChangeFunc?: (date: string) => void;
+  divClass?: string;
 }
 
 export const StatefulDatePicker = ({
@@ -24,11 +26,13 @@ export const StatefulDatePicker = ({
   showTime = false,
   value,
   setValue,
+  onChangeFunc,
+  divClass = "",
 }: DatePickerProps) => {
   const dateFormat = showTime ? `${DATE_FOMRAT} hh:mm A` : DATE_FOMRAT;
 
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${divClass}`}>
       {label && <label>{label}</label>}
       <div className="flex gap-2 flex-col relative w-full">
         <React.Fragment>
@@ -37,9 +41,13 @@ export const StatefulDatePicker = ({
             format={dateFormat}
             placeholder={placeholder || dateFormat}
             className={`${className} !text-darkGray !bg-lightGray p-2
-                  border-[1px] border-mediumGray rounded-xl font-semibold  w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+                    border-[1px] border-mediumGray placeholder:text-darkGray rounded-xl font-semibold  w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
             onChange={(_: unknown, dateString: string | string[]) => {
-              setValue(dateString);
+              if (onChangeFunc) {
+                onChangeFunc(dateString);
+              } else {
+                setValue(dateString);
+              }
             }}
             showTime={
               showTime ? { format: "hh:mm A", use12Hours: true } : false

@@ -3,17 +3,22 @@ import { Modal } from "../common/Modal";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { CommonLoader } from "../common/CommonLoader";
 import { ICONS } from "@agensy/constants";
-import { StatefulInput, StatefulSelect } from "@agensy/components";
+import {
+  StatefulDatePicker,
+  StatefulInput,
+  StatefulSelect,
+} from "@agensy/components";
 import { StringUtils, toast } from "@agensy/utils";
 import { isHeicImage, convertHeicToJpeg } from "../../utils/heicUtils";
 import { useOCRScanMutation } from "@agensy/api";
-import type { OCRField } from "@agensy/types";
+import type { ClientMedications, OCRField } from "@agensy/types";
 import { OCR_DOCUMENT_TYPES } from "@agensy/constants";
 
 interface MappedField {
   field: string;
   label: string;
-  value: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: string | any[];
 }
 
 interface OCRModelProps {
@@ -200,6 +205,61 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     );
   };
 
+  const handleMedicationChange = (
+    key: string,
+    index: number,
+    fieldName: string,
+    value: string
+  ) => {
+    setOcrResults((prev) =>
+      prev.map((field) => {
+        if (field.key === key && Array.isArray(field.value)) {
+          const updatedMedications = [...field.value];
+          updatedMedications[index] = {
+            ...updatedMedications[index],
+            [fieldName]: value,
+          };
+          return { ...field, value: updatedMedications };
+        }
+        return field;
+      })
+    );
+  };
+
+  const addMedication = (key: string) => {
+    setOcrResults((prev) =>
+      prev.map((field) => {
+        if (field.key === key && Array.isArray(field.value)) {
+          const newMedication: ClientMedications = {
+            medication_name: "",
+            dosage: "",
+            frequency: "",
+            purpose: "",
+            indication: "",
+            start_date: "",
+            end_date: "",
+            refill_due: "",
+            id: "",
+          };
+          return { ...field, value: [...field.value, newMedication] };
+        }
+        return field;
+      })
+    );
+  };
+
+  const removeMedication = (key: string, index: number) => {
+    setOcrResults((prev) =>
+      prev.map((field) => {
+        if (field.key === key && Array.isArray(field.value)) {
+          const updatedMedications = field.value.filter((_, i) => i !== index);
+          return { ...field, value: updatedMedications };
+        }
+        return field;
+      })
+    );
+  };
+
   const handleSubmit = () => {
     setTimeout(() => {
       setOcrResults([]);
@@ -215,6 +275,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       "OCR Results Populated",
       "OCR results have been populated to the form"
     );
+    console.log(ocrResults);
     onSubmitProp(ocrResults);
   };
 
@@ -413,11 +474,184 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                 <label className="block text-sm font-medium text-gray-700">
                   {field.label}
                 </label>
-                <StatefulInput
-                  type="text"
-                  value={field.value}
-                  onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                />
+                {Array.isArray(field.value) && field.key === "medications" ? (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <button
+                        type="button"
+                        onClick={() => addMedication(field.key)}
+                        className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm"
+                      >
+                        <ICONS.plus size={14} />
+                        <span>Add Medication</span>
+                      </button>
+                    </div>
+                    <div className="space-y-4">
+                      {field.value.map(
+                        (medication: ClientMedications, index: number) => (
+                          <div
+                            key={index}
+                            className="p-4 rounded-lg border border-gray-200"
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <span className="text-sm font-medium text-gray-700">
+                                Medication {index + 1}
+                              </span>
+                              {field.value.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeMedication(field.key, index)
+                                  }
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <ICONS.delete size={16} />
+                                </button>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <StatefulInput
+                                type="text"
+                                placeholder="Medication Name"
+                                inputClassname="!font-normal"
+                                value={medication.medication_name || ""}
+                                onChange={(e) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "medication_name",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                placeholder="Dosage"
+                                inputClassname="!font-normal"
+                                value={medication.dosage || ""}
+                                onChange={(e) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "dosage",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                placeholder="Frequency"
+                                inputClassname="!font-normal"
+                                value={medication.frequency || ""}
+                                onChange={(e) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "frequency",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                placeholder="Purpose"
+                                inputClassname="!font-normal"
+                                value={medication.purpose || ""}
+                                onChange={(e) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "purpose",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                placeholder="Indication"
+                                inputClassname="!font-normal"
+                                value={medication.indication || ""}
+                                onChange={(e) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "indication",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                placeholder="Prescribing Doctor"
+                                inputClassname="!font-normal"
+                                value={medication.prescribing_doctor || ""}
+                                onChange={(e) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "prescribing_doctor",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulDatePicker
+                                placeholder="Start Date"
+                                value={medication.start_date || ""}
+                                onChangeFunc={(date) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "start_date",
+                                    date
+                                  )
+                                }
+                              />
+                              <StatefulDatePicker
+                                placeholder="End Date"
+                                value={medication.end_date || ""}
+                                onChangeFunc={(date) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "end_date",
+                                    date
+                                  )
+                                }
+                              />
+                              <StatefulDatePicker
+                                placeholder="Refill Due"
+                                value={medication.refill_due || ""}
+                                onChangeFunc={(date) =>
+                                  handleMedicationChange(
+                                    field.key,
+                                    index,
+                                    "refill_due",
+                                    date
+                                  )
+                                }
+                                divClass="col-span-2"
+                              />
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                ) : field.key.includes("date") || field.key.includes("due") ? (
+                  <StatefulDatePicker
+                    placeholder={field.label}
+                    value={field.value || ""}
+                    onChangeFunc={(date) => handleFieldChange(field.key, date)}
+                  />
+                ) : (
+                  <StatefulInput
+                    type="text"
+                    value={field.value}
+                    onChange={(e) =>
+                      handleFieldChange(field.key, e.target.value)
+                    }
+                  />
+                )}
               </div>
             ))}
           </div>

@@ -110,9 +110,10 @@ export const HealthHistoryForm: React.FC = () => {
     if (ocrResult && ocrResult.length > 0) {
       const mappedValues = StringUtils.mapExtractedDataToFormValues(
         ocrResult,
-        defaultValues
+        defaultValues,
+        getValues()
       );
-
+      console.log(mappedValues);
       Object.entries(mappedValues).forEach(([key, value]) => {
         setValue(key as keyof HealthHistoryFormData, value);
       });

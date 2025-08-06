@@ -1,4 +1,4 @@
-import type { OCRField } from "@agensy/types";
+import type { ClientMedications, OCRField } from "@agensy/types";
 
 export const capitalizeFirstLetter = (str: string): string => {
   if (!str || str.length === 0) return str;
@@ -72,7 +72,9 @@ function isFilled(value: any): boolean {
 export const mapExtractedDataToFormValues = (
   extractedData: OCRField[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formDefaults: Record<string, any>
+  formDefaults: Record<string, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  currentFormValues: Record<string, any> = {}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, any> => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,6 +83,115 @@ export const mapExtractedDataToFormValues = (
   extractedData.forEach(({ key, value }) => {
     if (key in formDefaults && isFilled(value)) {
       filledValues[key] = value;
+    } else if (key === "diagnosis") {
+      const existingDiagnoses = currentFormValues.diagnoses || [];
+      const newDiagnoses = !Array.isArray(value)
+        ? value.split(", ").map((item: string) => ({
+            diagnosis: item,
+          }))
+        : value.map((item) => ({
+            diagnosis: item,
+          }));
+
+      filledValues["diagnoses"] = [...existingDiagnoses, ...newDiagnoses];
+    } else if (key === "allergies") {
+      const existingAllergies = currentFormValues.allergies || [];
+      const newAllergies = !Array.isArray(value)
+        ? value.split(", ").map((item: string) => ({
+            allergen: item,
+          }))
+        : value.map((item) => ({
+            allergen: item,
+          }));
+
+      filledValues["allergies"] = [...existingAllergies, ...newAllergies];
+    } else if (
+      key === "medications" &&
+      (formDefaults.medicationsStarted || formDefaults.medicationsEnded)
+    ) {
+      const existingMedicationsStarted =
+        currentFormValues.medicationsStarted || [];
+      const existingMedicationsEnded = currentFormValues.medicationsEnded || [];
+
+      const today = new Date();
+      const todayISO = today.toISOString().split("T")[0]; // Get YYYY-MM-DD format
+
+      const medicationsStarted: Array<{
+        medicationName: string;
+        dosage: string;
+        prescribingDoctor: string;
+        id: string | number | null;
+        startDate: string;
+        endDate: string;
+        frequency: string;
+        purpose: string;
+        indication: string;
+        refillDue: string;
+      }> = [];
+      const medicationsEnded: Array<{
+        medicationName: string;
+        dosage: string;
+        prescribingDoctor: string;
+        id: string | number | null;
+        startDate: string;
+        endDate: string;
+        frequency: string;
+        purpose: string;
+        indication: string;
+        refillDue: string;
+      }> = [];
+
+      value.forEach((item: ClientMedications) => {
+        const medicationData = {
+          medicationName: item.medication_name ? item.medication_name : "",
+          dosage: item.dosage ? item.dosage : "",
+          prescribingDoctor: item.prescribing_doctor
+            ? item.prescribing_doctor
+            : "",
+          id: item.id ? item.id : null,
+          startDate: item.start_date ? item.start_date : "",
+          endDate: item.end_date ? item.end_date : "",
+          frequency: item.frequency ? item.frequency : "",
+          purpose: item.purpose ? item.purpose : "",
+          indication: item.indication ? item.indication : "",
+          refillDue: item.refill_due ? item.refill_due : "",
+        };
+
+        if (item.end_date && item.end_date < todayISO) {
+          medicationsEnded.push(medicationData);
+        } else {
+          medicationsStarted.push(medicationData);
+        }
+      });
+
+      filledValues["medicationsStarted"] = [
+        ...existingMedicationsStarted,
+        ...medicationsStarted,
+      ];
+      filledValues["medicationsEnded"] = [
+        ...existingMedicationsEnded,
+        ...medicationsEnded,
+      ];
+    } else if (key === "medications" && formDefaults.medications) {
+      const existingMedicationsStarted = currentFormValues.medications || [];
+      const newMedications = value.map((item: ClientMedications) => ({
+        medicationName: item.medication_name ? item.medication_name : "",
+        dosage: item.dosage ? item.dosage : "",
+        prescribingDoctor: item.prescribing_doctor
+          ? item.prescribing_doctor
+          : "",
+        id: item.id ? item.id : null,
+        startDate: item.start_date ? item.start_date : "",
+        endDate: item.end_date ? item.end_date : "",
+        frequency: item.frequency ? item.frequency : "",
+        purpose: item.purpose ? item.purpose : "",
+        indication: item.indication ? item.indication : "",
+        refillDue: item.refill_due ? item.refill_due : "",
+      }));
+      filledValues["medications"] = [
+        ...existingMedicationsStarted,
+        ...newMedications,
+      ];
     }
   });
 
