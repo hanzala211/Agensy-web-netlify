@@ -10,6 +10,12 @@ import { useOCRScanMutation } from "@agensy/api";
 import type { OCRField } from "@agensy/types";
 import { OCR_DOCUMENT_TYPES } from "@agensy/constants";
 
+interface MappedField {
+  field: string;
+  label: string;
+  value: string;
+}
+
 interface OCRModelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -43,19 +49,17 @@ export const OCRModel: React.FC<OCRModelProps> = ({
 
       const response = postOCRScanMutation.data;
 
-      const mappedFields = response?.mappedFields || {};
+      const mappedFields = response?.mappedFields || [];
 
-      const structuredData = Object.entries(mappedFields).map(
-        ([key, value]) => {
-          const formattedKey = StringUtils.formatKeyLabel(key);
+      const structuredData = mappedFields.map((field: MappedField) => {
+        const formattedKey = StringUtils.formatKeyLabel(field.field);
 
-          return {
-            key,
-            value,
-            label: formattedKey,
-          };
-        }
-      );
+        return {
+          key: field.label,
+          value: field.value,
+          label: formattedKey,
+        };
+      });
 
       console.log("Structured OCR Data:", structuredData);
       setOcrResults(structuredData as OCRField[]);
@@ -222,8 +226,107 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       setIsConverting(false);
       setSelectedDocumentType("");
       setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }, 500);
     onClose();
+  };
+
+  const isPDF = useMemo(() => {
+    return fileType === "application/pdf";
+  }, [fileType]);
+
+  const renderFilePreview = () => {
+    if (!selectedImage) return null;
+
+    return (
+      <div className="space-y-3 h-full">
+        <div className="bg-gray-100 h-full rounded-lg p-4">
+          {!isPDF ? (
+            isConverting ? (
+              <div className="flex h-[200px] flex-col items-center justify-center py-8">
+                <CommonLoader size={24} />
+                <p className="text-sm text-gray-600 mt-2">
+                  Converting HEIC image...
+                </p>
+              </div>
+            ) : (
+              <div className="relative group">
+                <img
+                  src={convertedImage || selectedImage}
+                  alt="Uploaded document"
+                  className="w-full h-auto max-h-80 object-contain rounded"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <button
+                    onClick={handleFileSelect}
+                    className="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-2"
+                  >
+                    <ICONS.edit className="w-4 h-4 text-black" />
+                  </button>
+                </div>
+              </div>
+            )
+          ) : (
+            <iframe
+              src={selectedImage as string}
+              title="Uploaded document"
+              className="w-full h-[500px] object-contain rounded"
+            />
+          )}
+        </div>
+        {isPDF && (
+          <div className="flex justify-center">
+            <button
+              onClick={handleFileSelect}
+              className="bg-blue-400 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 transition-colors duration-200 flex items-center space-x-2"
+            >
+              <ICONS.edit className="w-4 h-4" />
+              <span>Change PDF</span>
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderUploadArea = () => {
+    if (selectedImage) {
+      return (
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Uploaded Document
+          </label>
+          {renderFilePreview()}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <label className="block text-sm font-medium text-gray-700">
+          Upload Document
+        </label>
+        <div
+          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
+          onClick={handleFileSelect}
+        >
+          <div className="space-y-4">
+            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+              <ICONS.upload className="text-gray-600 w-8 h-8" />
+            </div>
+            <div>
+              <p className="text-lg font-medium text-gray-700">
+                Click to upload
+              </p>
+              <p className="text-sm text-gray-500">or drag and drop</p>
+              <p className="text-xs text-gray-400 mt-2">
+                PNG, JPG, PDF up to 20MB
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const renderStep1 = () => (
@@ -239,7 +342,6 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       </div>
 
       <div className="w-full max-w-lg space-y-6">
-        {/* Document Type Dropdown */}
         <div className="space-y-2">
           <StatefulSelect
             label="Document Type"
@@ -251,38 +353,15 @@ export const OCRModel: React.FC<OCRModelProps> = ({
           />
         </div>
 
-        {/* File Upload Area */}
-        <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Upload Document
-          </label>
-          <div
-            className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
-            onClick={handleFileSelect}
-          >
-            <div className="space-y-4">
-              <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                <ICONS.upload className="text-gray-600 w-8 h-8" />
-              </div>
-              <div>
-                <p className="text-lg font-medium text-gray-700">
-                  {selectedFile ? "Click to change" : "Click to upload"}
-                </p>
-                <p className="text-sm text-gray-500">or drag and drop</p>
-                <p className="text-xs text-gray-400 mt-2">
-                  PNG, JPG, PDF up to 20MB
-                </p>
-              </div>
-            </div>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,.pdf"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-        </div>
+        {renderUploadArea()}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,.pdf"
+          onChange={handleImageUpload}
+          className="hidden"
+        />
       </div>
     </div>
   );
@@ -306,14 +385,9 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     </div>
   );
 
-  const isPDF = useMemo(() => {
-    return fileType === "application/pdf";
-  }, [fileType]);
-
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
-        {/* Image Display */}
         <div className="space-y-4">
           <div className="bg-gray-100 rounded-lg p-4">
             {selectedImage && !isPDF ? (
@@ -356,10 +430,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     if (currentStep === 1) {
       return (
         <div className="flex justify-end space-x-4">
-          <PrimaryButton
-            onClick={handleNextClick}
-            className="max-w-xs"
-          >
+          <PrimaryButton onClick={handleNextClick} className="max-w-xs">
             Next
           </PrimaryButton>
         </div>

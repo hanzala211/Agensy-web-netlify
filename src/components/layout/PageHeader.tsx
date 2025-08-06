@@ -1,9 +1,8 @@
 import React from "react";
 import { H1, PrimaryButton } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
-import { COLORS } from "@agensy/constants";
+import { COLORS, ROUTES } from "@agensy/constants";
 import { useNavigate } from "react-router-dom";
-
 interface PageHeaderProps {
   title: string;
   buttonText?: string;
@@ -11,7 +10,7 @@ interface PageHeaderProps {
   onButtonClick?: () => void;
   showButton?: boolean;
   showBackButton?: boolean;
-  className?: string
+  className?: string;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
@@ -21,16 +20,18 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   onButtonClick,
   showButton = true,
   showBackButton,
-  className = "mb-6"
+  className = "mb-6",
 }) => {
   const navigate = useNavigate();
 
   return (
-    <div className={`flex flex-col md:flex-row justify-between items-start md:items-center ${className}`}>
+    <div
+      className={`flex flex-col md:flex-row justify-between items-start md:items-center ${className}`}
+    >
       <H1 className="text-xl md:my-4 sm:text-2xl md:text-3xl flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         {showBackButton && (
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(`/${ROUTES.clients}`)}
             title="Back"
             className="bg-basicBlue h-[25px] w-[25px] sm:h-[30px] sm:w-[30px] flex-shrink-0 flex items-center justify-center text-[12px] sm:text-[15px] rounded-full"
           >

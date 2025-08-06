@@ -363,6 +363,14 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
     }
   }, [params.formSlug, openedFileData]);
 
+  const showOCRButton = useMemo(() => {
+    return (
+      params.formSlug === "face-sheet-short" ||
+      params.formSlug === "face-sheet-long" ||
+      params.formSlug === "health-history-form-medical"
+    );
+  }, [params.formSlug]);
+
   const renderGridItem = (item: FolderItem) => {
     const isSelected = selectedItem === item.id;
     const Icon = item.type === "folder" ? ICONS.folder : ICONS.fileAlt;
@@ -406,7 +414,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
         <div className="flex items-center justify-between">
           <div
-            className={`flex items-center gap-3 ${
+            className={`flex items-center sm:gap-3 ${
               isShowingFileContent ? "w-full" : "w-fit"
             }`}
           >
@@ -420,22 +428,20 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
             )}
             <h3 className={`font-semibold text-gray-800 w-full`}>
               {isShowingFileContent ? (
-                <div className="flex items-center justify-between w-full gap-2">
+                <div className="flex items-center justify-between sm:flex-row flex-col w-full gap-2">
                   <div className="flex items-center gap-2">
                     <ICONS.fileAlt className="text-gray-600" />
                     {fileContent?.name}
                   </div>
                   <div className="flex items-center gap-2">
-                    {(params.formSlug === "face-sheet-short" ||
-                      params.formSlug === "face-sheet-long" ||
-                      params.formSlug === "health-history-form-medical") && (
+                    {showOCRButton && (
                       <TertiaryButton
                         onClick={() => setIsOCRModelOpen(true)}
-                        aria_label="OCR"
-                        className="hover:bg-green-50 shadow-none hover:text-blue-500 hover:border-blue-300 bg-transparent"
+                        aria_label="Upload OCR"
+                        className="hover:bg-blue-50 border-gray-600 shadow-none hover:text-blue-500 hover:border-blue-300 bg-transparent"
                       >
                         <span className="flex items-center gap-2">
-                          <ICONS.uploadDoc />
+                          Scan Document
                         </span>
                       </TertiaryButton>
                     )}
