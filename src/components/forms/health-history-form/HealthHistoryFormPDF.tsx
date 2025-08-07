@@ -184,24 +184,20 @@ const HealthHistoryFormPDF: React.FC<{
               (provider) =>
                 provider &&
                 (provider.providerName ||
-                  provider.providerAddress ||
-                  provider.providerPhone ||
-                  provider.providerNotes ||
-                  provider.providerFollowUp)
+                  provider.address ||
+                  provider.phone ||
+                  provider.notes ||
+                  provider.follow_up)
             )
             .map((provider, index) => (
               <View key={index} style={styles.fieldRow}>
                 <Text style={styles.label}>Provider {index + 1}</Text>
                 <Text style={styles.value}>
                   {provider.providerName && `Name: ${provider.providerName}`}
-                  {provider.providerAddress &&
-                    `\nAddress: ${provider.providerAddress}`}
-                  {provider.providerPhone &&
-                    `\nPhone: ${provider.providerPhone}`}
-                  {provider.providerNotes &&
-                    `\nNotes: ${provider.providerNotes}`}
-                  {provider.providerFollowUp &&
-                    `\nFollow Up: ${provider.providerFollowUp}`}
+                  {provider.address && `\nAddress: ${provider.address}`}
+                  {provider.phone && `\nPhone: ${provider.phone}`}
+                  {provider.notes && `\nNotes: ${provider.notes}`}
+                  {provider.follow_up && `\nFollow Up: ${provider.follow_up}`}
                 </Text>
               </View>
             ))}
@@ -209,10 +205,10 @@ const HealthHistoryFormPDF: React.FC<{
             (provider) =>
               provider &&
               (provider.providerName ||
-                provider.providerAddress ||
-                provider.providerPhone ||
-                provider.providerNotes ||
-                provider.providerFollowUp)
+                provider.address ||
+                provider.phone ||
+                provider.notes ||
+                provider.follow_up)
           ).length === 0 && <Field label="Providers">None</Field>}
         </View>
         <View style={styles.section}>
