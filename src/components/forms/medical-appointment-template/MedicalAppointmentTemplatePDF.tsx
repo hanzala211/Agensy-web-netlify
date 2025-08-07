@@ -137,7 +137,9 @@ const TableRow = ({
 );
 
 const MedicalAppointmentTemplatePDF: React.FC<{
-  data?: MedicalAppointmentTemplateData & { last_update: { updatedAt: string } };
+  data?: MedicalAppointmentTemplateData & {
+    last_update: { updatedAt: string };
+  };
 }> = ({ data }) => {
   return (
     <Document title="Agensy Medical Appointment Template">
@@ -184,7 +186,9 @@ const MedicalAppointmentTemplatePDF: React.FC<{
           <Text style={styles.sectionTitle}>Visit Information</Text>
           <Field label="Reason for Visit">{data?.reason_for_visit}</Field>
           <Field label="Top 3 Concerns">{data?.top_3_concerns}</Field>
-          <Field label="Tests / Labs / Imaging">{data?.tests_labs_imaging}</Field>
+          <Field label="Tests / Labs / Imaging">
+            {data?.tests_labs_imaging}
+          </Field>
           <Field label="Visit Notes">{data?.visit_notes}</Field>
         </View>
 
@@ -220,7 +224,17 @@ const MedicalAppointmentTemplatePDF: React.FC<{
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Medications</Text>
-          <TableHeader columns={["Medication", "Dosage", "Frequency", "Prescribing Doctor", "Start Date", "End Date", "Notes"]} />
+          <TableHeader
+            columns={[
+              "Medication",
+              "Dosage",
+              "Frequency",
+              "Prescribing Doctor",
+              "Start Date",
+              "End Date",
+              "Notes",
+            ]}
+          />
           {(data?.medications ?? [])
             .filter((m) => m && m.medication_name)
             .map((m, i, arr) => (
@@ -246,14 +260,23 @@ const MedicalAppointmentTemplatePDF: React.FC<{
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Healthcare Providers</Text>
-          <TableHeader columns={["Provider Name", "Specialty", "Address", "Phone", "Follow-up Date", "Notes"]} />
+          <TableHeader
+            columns={[
+              "Provider Name",
+              "Specialty",
+              "Address",
+              "Phone",
+              "Follow-up Date",
+              "Notes",
+            ]}
+          />
           {(data?.healthcareProviders ?? [])
-            .filter((p) => p && p.provider_name)
+            .filter((p) => p && p.providerName)
             .map((p, i, arr) => (
               <TableRow
                 key={i}
                 cells={[
-                  p.provider_name ?? "",
+                  p.providerName ?? "",
                   p.specialty ?? "",
                   p.address ?? "",
                   p.phone ?? "",
