@@ -10,6 +10,7 @@ import {
 import {
   StatefulDatePicker,
   StatefulInput,
+  StatefulPhoneInput,
   StatefulSelect,
 } from "@agensy/components";
 import { StringUtils, toast } from "@agensy/utils";
@@ -19,15 +20,9 @@ import type {
   ClientMedications,
   HealthcareProvider,
   OCRField,
+  MappedField,
 } from "@agensy/types";
 import { OCR_DOCUMENT_TYPES } from "@agensy/constants";
-
-interface MappedField {
-  field: string;
-  label: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: string | any[];
-}
 
 interface OCRModelProps {
   isOpen: boolean;
@@ -73,8 +68,6 @@ export const OCRModel: React.FC<OCRModelProps> = ({
           label: formattedKey,
         };
       });
-
-      console.log("Structured OCR Data:", structuredData);
       setOcrResults(structuredData as OCRField[]);
     } else if (postOCRScanMutation.status === "error") {
       setCurrentStep(1);
@@ -213,7 +206,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     );
   };
 
-  const handleMedicationChange = (
+  const handleValueChange = (
     key: string,
     index: number,
     fieldName: string,
@@ -222,33 +215,12 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     setOcrResults((prev) =>
       prev.map((field) => {
         if (field.key === key && Array.isArray(field.value)) {
-          const updatedMedications = [...field.value];
-          updatedMedications[index] = {
-            ...updatedMedications[index],
+          const updatedValueItem = [...field.value];
+          updatedValueItem[index] = {
+            ...updatedValueItem[index],
             [fieldName]: value,
           };
-          return { ...field, value: updatedMedications };
-        }
-        return field;
-      })
-    );
-  };
-
-  const handleHealthcareProviderChange = (
-    key: string,
-    index: number,
-    fieldName: string,
-    value: string
-  ) => {
-    setOcrResults((prev) =>
-      prev.map((field) => {
-        if (field.key === key && Array.isArray(field.value)) {
-          const updatedHealthcareProviders = [...field.value];
-          updatedHealthcareProviders[index] = {
-            ...updatedHealthcareProviders[index],
-            [fieldName]: value,
-          };
-          return { ...field, value: updatedHealthcareProviders };
+          return { ...field, value: updatedValueItem };
         }
         return field;
       })
@@ -302,26 +274,12 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     );
   };
 
-  const removeMedication = (key: string, index: number) => {
+  const removeItem = (key: string, index: number) => {
     setOcrResults((prev) =>
       prev.map((field) => {
         if (field.key === key && Array.isArray(field.value)) {
-          const updatedMedications = field.value.filter((_, i) => i !== index);
-          return { ...field, value: updatedMedications };
-        }
-        return field;
-      })
-    );
-  };
-
-  const removeHealthcareProvider = (key: string, index: number) => {
-    setOcrResults((prev) =>
-      prev.map((field) => {
-        if (field.key === key && Array.isArray(field.value)) {
-          const updatedHealthcareProviders = field.value.filter(
-            (_, i) => i !== index
-          );
-          return { ...field, value: updatedHealthcareProviders };
+          const updatedItem = field.value.filter((_, i) => i !== index);
+          return { ...field, value: updatedItem };
         }
         return field;
       })
@@ -565,9 +523,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                               {field.value.length > 1 && (
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    removeMedication(field.key, index)
-                                  }
+                                  onClick={() => removeItem(field.key, index)}
                                   className="text-red-600 hover:text-red-700"
                                 >
                                   <ICONS.delete size={16} />
@@ -581,7 +537,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={medication.medication_name || ""}
                                 onChange={(e) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "medication_name",
@@ -595,7 +551,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={medication.dosage || ""}
                                 onChange={(e) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "dosage",
@@ -609,7 +565,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 data={MEDICATION_FREQUENCY_OPTIONS}
                                 value={medication.frequency || ""}
                                 onChange={(e) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "frequency",
@@ -623,7 +579,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={medication.purpose || ""}
                                 onChange={(e) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "purpose",
@@ -637,7 +593,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={medication.indication || ""}
                                 onChange={(e) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "indication",
@@ -651,7 +607,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={medication.prescribing_doctor || ""}
                                 onChange={(e) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "prescribing_doctor",
@@ -663,7 +619,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 label="Start Date"
                                 value={medication.start_date || ""}
                                 onChangeFunc={(date) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "start_date",
@@ -675,7 +631,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 label="End Date"
                                 value={medication.end_date || ""}
                                 onChangeFunc={(date) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "end_date",
@@ -687,7 +643,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 label="Refill Due"
                                 value={medication.refill_due || ""}
                                 onChangeFunc={(date) =>
-                                  handleMedicationChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "refill_due",
@@ -729,9 +685,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                               {field.value.length > 1 && (
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    removeHealthcareProvider(field.key, index)
-                                  }
+                                  onClick={() => removeItem(field.key, index)}
                                   className="text-red-600 hover:text-red-700"
                                 >
                                   <ICONS.delete size={16} />
@@ -745,7 +699,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={healthcareProvider.provider_name || ""}
                                 onChange={(e) =>
-                                  handleHealthcareProviderChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "provider_name",
@@ -759,7 +713,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 value={healthcareProvider.specialty || ""}
                                 data={SPECIALTIES}
                                 onChange={(e) =>
-                                  handleHealthcareProviderChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "specialty",
@@ -773,7 +727,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={healthcareProvider.address || ""}
                                 onChange={(e) =>
-                                  handleHealthcareProviderChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "address",
@@ -781,32 +735,23 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                   )
                                 }
                               />
-                              <StatefulInput
-                                type="text"
+                              <StatefulPhoneInput
                                 label="Phone"
-                                inputClassname="!font-normal"
                                 value={healthcareProvider.phone || ""}
                                 onChange={(e) =>
-                                  handleHealthcareProviderChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "phone",
-                                    e.target.value
+                                    e
                                   )
                                 }
                               />
-                              <StatefulInput
-                                type="text"
+                              <StatefulPhoneInput
                                 label="Fax"
-                                inputClassname="!font-normal"
                                 value={healthcareProvider.fax || ""}
                                 onChange={(e) =>
-                                  handleHealthcareProviderChange(
-                                    field.key,
-                                    index,
-                                    "fax",
-                                    e.target.value
-                                  )
+                                  handleValueChange(field.key, index, "fax", e)
                                 }
                               />
                               <StatefulInput
@@ -815,7 +760,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 inputClassname="!font-normal"
                                 value={healthcareProvider.last_visit || ""}
                                 onChange={(e) =>
-                                  handleHealthcareProviderChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "last_visit",
@@ -827,7 +772,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 label="Next Visit"
                                 value={healthcareProvider.next_visit || ""}
                                 onChangeFunc={(date) =>
-                                  handleHealthcareProviderChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "next_visit",
@@ -840,7 +785,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 label="Follow Up"
                                 value={healthcareProvider.follow_up || ""}
                                 onChangeFunc={(date) =>
-                                  handleHealthcareProviderChange(
+                                  handleValueChange(
                                     field.key,
                                     index,
                                     "follow_up",
@@ -853,7 +798,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                   label="Notes"
                                   value={healthcareProvider.notes || ""}
                                   onChange={(e) =>
-                                    handleHealthcareProviderChange(
+                                    handleValueChange(
                                       field.key,
                                       index,
                                       "notes",
@@ -873,6 +818,11 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                     placeholder={field.label}
                     value={field.value || ""}
                     onChangeFunc={(date) => handleFieldChange(field.key, date)}
+                  />
+                ) : field.key.includes("phone") || field.key.includes("fax") ? (
+                  <StatefulPhoneInput
+                    value={field.value || ""}
+                    onChange={(e) => handleFieldChange(field.key, e)}
                   />
                 ) : (
                   <StatefulInput
@@ -904,7 +854,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       return (
         <div className="flex justify-end space-x-4">
           <PrimaryButton onClick={handleSubmit} className="max-w-xs">
-            Populate form
+            Populate Form
           </PrimaryButton>
         </div>
       );

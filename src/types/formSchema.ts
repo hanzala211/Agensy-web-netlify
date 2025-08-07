@@ -784,19 +784,19 @@ export const healthHistoryFormSchema = z.object({
           .string()
           .optional()
           .transform((val) => (val ? trimString(val) : val)),
-        providerAddress: z
+        address: z
           .string()
           .optional()
           .transform((val) => (val ? trimString(val) : val)),
-        providerPhone: z
+        phone: z
           .string()
           .optional()
           .transform((val) => (val ? trimString(val) : val)),
-        providerNotes: z
+        notes: z
           .string()
           .optional()
           .transform((val) => (val ? trimString(val) : val)),
-        providerFollowUp: z
+        follow_up: z
           .string()
           .optional()
           .transform((val) => (val ? trimString(val) : val)),

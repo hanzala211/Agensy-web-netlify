@@ -55,10 +55,10 @@ const defaultValues: HealthHistoryFormData = {
   providers: [
     {
       providerName: "",
-      providerAddress: "",
-      providerPhone: "",
-      providerNotes: "",
-      providerFollowUp: "",
+      address: "",
+      phone: "",
+      notes: "",
+      follow_up: "",
     },
   ],
   homeHealthName: "",
@@ -204,11 +204,11 @@ export const HealthHistoryForm: React.FC = () => {
       healthcare_providers:
         data.providers?.map((provider) => ({
           provider_name: provider.providerName ? provider.providerName : null,
-          address: provider.providerAddress ? provider.providerAddress : null,
-          phone: provider.providerPhone ? provider.providerPhone : null,
-          notes: provider.providerNotes ? provider.providerNotes : null,
-          follow_up: provider.providerFollowUp
-            ? DateUtils.changetoISO(provider.providerFollowUp)
+          address: provider.address ? provider.address : null,
+          phone: provider.phone ? provider.phone : null,
+          notes: provider.notes ? provider.notes : null,
+          follow_up: provider.follow_up
+            ? DateUtils.changetoISO(provider.follow_up)
             : null,
         })) || [],
       home_health_agency: {
@@ -279,12 +279,12 @@ export const HealthHistoryForm: React.FC = () => {
           healthHistoryForm?.healthcare_providers.map(
             (provider: HealthcareProvider) => ({
               providerName: provider.provider_name || "",
-              providerAddress: provider.address || "",
-              providerPhone: provider.phone || "",
-              providerFollowUp: provider.follow_up
+              address: provider.address || "",
+              phone: provider.phone || "",
+              follow_up: provider.follow_up
                 ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
                 : "",
-              providerNotes: provider.notes || "",
+              notes: provider.notes || "",
             })
           ) || [],
         homeHealthName: healthHistoryForm?.home_health_agency?.name || "",
@@ -536,10 +536,10 @@ export const HealthHistoryForm: React.FC = () => {
           onButtonClick={() =>
             providersArray.append({
               providerName: "",
-              providerAddress: "",
-              providerPhone: "",
-              providerNotes: "",
-              providerFollowUp: "",
+              address: "",
+              phone: "",
+              notes: "",
+              follow_up: "",
             })
           }
           ariaLabel="Add Healthcare Provider"
@@ -560,25 +560,25 @@ export const HealthHistoryForm: React.FC = () => {
                   <PhoneNumberInput
                     label="Phone"
                     control={control}
-                    name={`providers.${index}.providerPhone`}
+                    name={`providers.${index}.phone`}
                   />
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <Input
                     label="Address"
-                    register={register(`providers.${index}.providerAddress`)}
-                    error={errors.providers?.[index]?.providerAddress?.message}
+                    register={register(`providers.${index}.address`)}
+                    error={errors.providers?.[index]?.address?.message}
                   />
                   <DatePickerField
                     control={control}
-                    name={`providers.${index}.providerFollowUp`}
+                    name={`providers.${index}.follow_up`}
                     label="Follow-up Schedule"
                   />
                 </div>
                 <TextArea
                   label="Notes"
-                  register={register(`providers.${index}.providerNotes`)}
-                  error={errors.providers?.[index]?.providerNotes?.message}
+                  register={register(`providers.${index}.notes`)}
+                  error={errors.providers?.[index]?.notes?.message}
                   rows={3}
                 />
                 {providersArray.fields.length > 1 && (

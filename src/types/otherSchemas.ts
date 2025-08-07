@@ -46,3 +46,9 @@ export interface OCRField {
   label: string;
 }
 
+export interface MappedField {
+  field: string;
+  label: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: string | any[];
+}

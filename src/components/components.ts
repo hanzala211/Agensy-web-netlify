@@ -130,3 +130,4 @@ export * from "./forms/initial-care-assessment/InitialCareAssessmentPlan";
 export * from "./forms/comprehensive-care-plan/ComprehensiveCarePlan";
 export * from "./model/OCRModel";
 export * from "./common/MultipleTextInputs";
+export * from "./common/StatefulPhoneInput";
