@@ -754,17 +754,15 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                   handleValueChange(field.key, index, "fax", e)
                                 }
                               />
-                              <StatefulInput
-                                type="text"
+                              <StatefulDatePicker
                                 label="Last Visit"
-                                inputClassname="!font-normal"
                                 value={healthcareProvider.last_visit || ""}
-                                onChange={(e) =>
+                                onChangeFunc={(date) =>
                                   handleValueChange(
                                     field.key,
                                     index,
                                     "last_visit",
-                                    e.target.value
+                                    date
                                   )
                                 }
                               />
