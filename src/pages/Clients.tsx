@@ -71,7 +71,7 @@ export const Clients: React.FC = () => {
 
   const handleViewProfile = (clientId: string) => {
     const client = clients?.find(
-      (client: Client) => client.id.toString() === clientId
+      (client: Client) => client?.id?.toString() === clientId
     );
     if (client) {
       setSelectedClient(client);
@@ -120,7 +120,9 @@ export const Clients: React.FC = () => {
             <ClientCard
               key={client.id}
               client={client}
-              onViewProfile={() => handleViewProfile(client.id.toString())}
+              onViewProfile={() =>
+                handleViewProfile(client?.id?.toString() || "")
+              }
               loadClients={loadClients}
             />
           ))

@@ -87,7 +87,7 @@ export const BillingHistoryCard: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <TertiaryButton
                     onClick={() =>
-                      handleDownloadInvoice(invoice?.id.toString())
+                      handleDownloadInvoice(invoice.id?.toString() || "")
                     }
                     aria_label="Download invoice"
                     className="hover:bg-green-50 hover:text-green-500 hover:border-green-300"

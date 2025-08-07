@@ -40,8 +40,8 @@ export const StatefulInput: React.FC<StatefulInputProps> = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          className={`!text-darkGray !bg-lightGray p-2
-                  border-[1px] border-mediumGray !font-normal placeholder:text-darkGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition  -all duration-200 ${inputClassname} ${
+          className={`!text-darkGray !bg-lightGray p-2 
+                  border-[1px] border-mediumGray !font-normal placeholder:!text-darkGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition  -all duration-200 ${inputClassname} ${
             Icon ? "pl-10" : ""
           }`}
         />

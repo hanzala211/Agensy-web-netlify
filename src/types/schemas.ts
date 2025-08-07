@@ -1,5 +1,5 @@
 export type BaseSchema = {
-  id: string | number;
+  id: string | number | null;
   createdAt?: Date;
   updatedAt?: Date;
 };

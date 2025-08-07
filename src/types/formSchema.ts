@@ -1878,7 +1878,7 @@ export const medicalAppointmentTemplateSchema = z.object({
   healthcareProviders: z
     .array(
       z.object({
-        provider_name: z
+        providerName: z
           .string()
           .optional()
           .transform((val) => (val ? trimString(val) : val)),

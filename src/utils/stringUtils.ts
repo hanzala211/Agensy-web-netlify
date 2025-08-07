@@ -1,4 +1,8 @@
-import type { ClientMedications, OCRField } from "@agensy/types";
+import type {
+  ClientMedications,
+  HealthcareProvider,
+  OCRField,
+} from "@agensy/types";
 
 export const capitalizeFirstLetter = (str: string): string => {
   if (!str || str.length === 0) return str;
@@ -81,7 +85,7 @@ export const mapExtractedDataToFormValues = (
   const filledValues: Record<string, any> = {};
 
   extractedData.forEach(({ key, value }) => {
-    if (key in formDefaults && isFilled(value)) {
+    if (key in formDefaults && isFilled(value) && !Array.isArray(value)) {
       filledValues[key] = value;
     } else if (key === "diagnosis") {
       const existingDiagnoses = currentFormValues.diagnoses || [];
@@ -114,32 +118,10 @@ export const mapExtractedDataToFormValues = (
       const existingMedicationsEnded = currentFormValues.medicationsEnded || [];
 
       const today = new Date();
-      const todayISO = today.toISOString().split("T")[0]; // Get YYYY-MM-DD format
+      const todayISO = today.toISOString().split("T")[0];
 
-      const medicationsStarted: Array<{
-        medicationName: string;
-        dosage: string;
-        prescribingDoctor: string;
-        id: string | number | null;
-        startDate: string;
-        endDate: string;
-        frequency: string;
-        purpose: string;
-        indication: string;
-        refillDue: string;
-      }> = [];
-      const medicationsEnded: Array<{
-        medicationName: string;
-        dosage: string;
-        prescribingDoctor: string;
-        id: string | number | null;
-        startDate: string;
-        endDate: string;
-        frequency: string;
-        purpose: string;
-        indication: string;
-        refillDue: string;
-      }> = [];
+      const medicationsStarted: ClientMedications[] = [];
+      const medicationsEnded: ClientMedications[] = [];
 
       value.forEach((item: ClientMedications) => {
         const medicationData = {
@@ -173,25 +155,54 @@ export const mapExtractedDataToFormValues = (
         ...medicationsEnded,
       ];
     } else if (key === "medications" && formDefaults.medications) {
-      const existingMedicationsStarted = currentFormValues.medications || [];
-      const newMedications = value.map((item: ClientMedications) => ({
-        medicationName: item.medication_name ? item.medication_name : "",
-        dosage: item.dosage ? item.dosage : "",
-        prescribingDoctor: item.prescribing_doctor
-          ? item.prescribing_doctor
-          : "",
-        id: item.id ? item.id : null,
-        startDate: item.start_date ? item.start_date : "",
-        endDate: item.end_date ? item.end_date : "",
-        frequency: item.frequency ? item.frequency : "",
-        purpose: item.purpose ? item.purpose : "",
-        indication: item.indication ? item.indication : "",
-        refillDue: item.refill_due ? item.refill_due : "",
-      }));
-      filledValues["medications"] = [
-        ...existingMedicationsStarted,
-        ...newMedications,
-      ];
+      const existingMedications = currentFormValues.medications || [];
+      const newMedications: ClientMedications[] = [];
+
+      value.forEach((item: ClientMedications) => {
+        const newMedication = {
+          medicationName: item.medication_name ? item.medication_name : "",
+          dosage: item.dosage ? item.dosage : "",
+          prescribingDoctor: item.prescribing_doctor
+            ? item.prescribing_doctor
+            : "",
+          id: item.id ? item.id : null,
+          startDate: item.start_date ? item.start_date : "",
+          endDate: item.end_date ? item.end_date : "",
+          frequency: item.frequency ? item.frequency : "",
+          purpose: item.purpose ? item.purpose : "",
+          indication: item.indication ? item.indication : "",
+          refillDue: item.refill_due ? item.refill_due : "",
+        };
+        newMedications.push(newMedication);
+      });
+
+      filledValues["medications"] = [...existingMedications, ...newMedications];
+    } else if (
+      key === "healthcareProviders" &&
+      (formDefaults.providers || formDefaults.healthcareProviders)
+    ) {
+      const existingProviders = currentFormValues.providers || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newProviders: any[] = [];
+
+      value.forEach((item: HealthcareProvider) => {
+        const newProvider = {
+          providerName: item.provider_name ? item.provider_name : "",
+          providerType: item.provider_type ? item.provider_type : "",
+          address: item.address ? item.address : "",
+          phone: item.phone ? item.phone : "",
+          fax: item.fax ? item.fax : "",
+          follow_up: item.follow_up ? item.follow_up : "",
+          notes: item.notes ? item.notes : "",
+          id: item.id ? item.id : null,
+          specialty: item.specialty ? item.specialty : "",
+        };
+        newProviders.push(newProvider);
+      });
+
+      filledValues[
+        formDefaults.providers ? "providers" : "healthcare_providers"
+      ] = [...existingProviders, ...newProviders];
     }
   });
 

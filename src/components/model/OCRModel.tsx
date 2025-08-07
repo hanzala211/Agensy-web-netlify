@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Modal } from "../common/Modal";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { CommonLoader } from "../common/CommonLoader";
-import { ICONS } from "@agensy/constants";
+import {
+  ICONS,
+  MEDICATION_FREQUENCY_OPTIONS,
+  SPECIALTIES,
+} from "@agensy/constants";
 import {
   StatefulDatePicker,
   StatefulInput,
@@ -11,7 +15,11 @@ import {
 import { StringUtils, toast } from "@agensy/utils";
 import { isHeicImage, convertHeicToJpeg } from "../../utils/heicUtils";
 import { useOCRScanMutation } from "@agensy/api";
-import type { ClientMedications, OCRField } from "@agensy/types";
+import type {
+  ClientMedications,
+  HealthcareProvider,
+  OCRField,
+} from "@agensy/types";
 import { OCR_DOCUMENT_TYPES } from "@agensy/constants";
 
 interface MappedField {
@@ -226,6 +234,27 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     );
   };
 
+  const handleHealthcareProviderChange = (
+    key: string,
+    index: number,
+    fieldName: string,
+    value: string
+  ) => {
+    setOcrResults((prev) =>
+      prev.map((field) => {
+        if (field.key === key && Array.isArray(field.value)) {
+          const updatedHealthcareProviders = [...field.value];
+          updatedHealthcareProviders[index] = {
+            ...updatedHealthcareProviders[index],
+            [fieldName]: value,
+          };
+          return { ...field, value: updatedHealthcareProviders };
+        }
+        return field;
+      })
+    );
+  };
+
   const addMedication = (key: string) => {
     setOcrResults((prev) =>
       prev.map((field) => {
@@ -248,12 +277,51 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     );
   };
 
+  const addHealthcareProvider = (key: string) => {
+    setOcrResults((prev) =>
+      prev.map((field) => {
+        if (field.key === key && Array.isArray(field.value)) {
+          const newHealthcareProvider: HealthcareProvider = {
+            client_id: 0,
+            provider_type: "",
+            provider_name: "",
+            specialty: "",
+            address: "",
+            phone: "",
+            fax: "",
+            last_visit: "",
+            next_visit: "",
+            notes: "",
+            follow_up: "",
+            id: "",
+          };
+          return { ...field, value: [...field.value, newHealthcareProvider] };
+        }
+        return field;
+      })
+    );
+  };
+
   const removeMedication = (key: string, index: number) => {
     setOcrResults((prev) =>
       prev.map((field) => {
         if (field.key === key && Array.isArray(field.value)) {
           const updatedMedications = field.value.filter((_, i) => i !== index);
           return { ...field, value: updatedMedications };
+        }
+        return field;
+      })
+    );
+  };
+
+  const removeHealthcareProvider = (key: string, index: number) => {
+    setOcrResults((prev) =>
+      prev.map((field) => {
+        if (field.key === key && Array.isArray(field.value)) {
+          const updatedHealthcareProviders = field.value.filter(
+            (_, i) => i !== index
+          );
+          return { ...field, value: updatedHealthcareProviders };
         }
         return field;
       })
@@ -493,10 +561,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                             key={index}
                             className="p-4 rounded-lg border border-gray-200"
                           >
-                            <div className="flex items-center justify-between mb-4">
-                              <span className="text-sm font-medium text-gray-700">
-                                Medication {index + 1}
-                              </span>
+                            <div className="flex items-center justify-end mb-4">
                               {field.value.length > 1 && (
                                 <button
                                   type="button"
@@ -512,7 +577,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <StatefulInput
                                 type="text"
-                                placeholder="Medication Name"
+                                label="Medication Name"
                                 inputClassname="!font-normal"
                                 value={medication.medication_name || ""}
                                 onChange={(e) =>
@@ -526,7 +591,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                               />
                               <StatefulInput
                                 type="text"
-                                placeholder="Dosage"
+                                label="Dosage"
                                 inputClassname="!font-normal"
                                 value={medication.dosage || ""}
                                 onChange={(e) =>
@@ -538,10 +603,10 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                   )
                                 }
                               />
-                              <StatefulInput
-                                type="text"
-                                placeholder="Frequency"
-                                inputClassname="!font-normal"
+                              <StatefulSelect
+                                label="Frequency"
+                                labelOption="Select Frequency"
+                                data={MEDICATION_FREQUENCY_OPTIONS}
                                 value={medication.frequency || ""}
                                 onChange={(e) =>
                                   handleMedicationChange(
@@ -554,7 +619,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                               />
                               <StatefulInput
                                 type="text"
-                                placeholder="Purpose"
+                                label="Purpose"
                                 inputClassname="!font-normal"
                                 value={medication.purpose || ""}
                                 onChange={(e) =>
@@ -568,7 +633,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                               />
                               <StatefulInput
                                 type="text"
-                                placeholder="Indication"
+                                label="Indication"
                                 inputClassname="!font-normal"
                                 value={medication.indication || ""}
                                 onChange={(e) =>
@@ -582,7 +647,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                               />
                               <StatefulInput
                                 type="text"
-                                placeholder="Prescribing Doctor"
+                                label="Prescribing Doctor"
                                 inputClassname="!font-normal"
                                 value={medication.prescribing_doctor || ""}
                                 onChange={(e) =>
@@ -595,7 +660,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 }
                               />
                               <StatefulDatePicker
-                                placeholder="Start Date"
+                                label="Start Date"
                                 value={medication.start_date || ""}
                                 onChangeFunc={(date) =>
                                   handleMedicationChange(
@@ -607,7 +672,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 }
                               />
                               <StatefulDatePicker
-                                placeholder="End Date"
+                                label="End Date"
                                 value={medication.end_date || ""}
                                 onChangeFunc={(date) =>
                                   handleMedicationChange(
@@ -619,7 +684,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                 }
                               />
                               <StatefulDatePicker
-                                placeholder="Refill Due"
+                                label="Refill Due"
                                 value={medication.refill_due || ""}
                                 onChangeFunc={(date) =>
                                   handleMedicationChange(
@@ -629,8 +694,174 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                     date
                                   )
                                 }
-                                divClass="col-span-2"
+                                divClass="md:col-span-2"
                               />
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                ) : Array.isArray(field.value) &&
+                  field.key === "healthcareProviders" ? (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <button
+                        type="button"
+                        onClick={() => addHealthcareProvider(field.key)}
+                        className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm"
+                      >
+                        <ICONS.plus size={14} />
+                        <span>Add Healthcare Provider</span>
+                      </button>
+                    </div>
+                    <div className="space-y-4">
+                      {field.value.map(
+                        (
+                          healthcareProvider: HealthcareProvider,
+                          index: number
+                        ) => (
+                          <div
+                            key={index}
+                            className="p-4 rounded-lg border border-gray-200"
+                          >
+                            <div className="flex items-center justify-end mb-4">
+                              {field.value.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeHealthcareProvider(field.key, index)
+                                  }
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <ICONS.delete size={16} />
+                                </button>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <StatefulInput
+                                type="text"
+                                label="Provider Name"
+                                inputClassname="!font-normal"
+                                value={healthcareProvider.provider_name || ""}
+                                onChange={(e) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "provider_name",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulSelect
+                                label="Specialty"
+                                labelOption="Select Specialty"
+                                value={healthcareProvider.specialty || ""}
+                                data={SPECIALTIES}
+                                onChange={(e) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "specialty",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                label="Address"
+                                inputClassname="!font-normal"
+                                value={healthcareProvider.address || ""}
+                                onChange={(e) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "address",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                label="Phone"
+                                inputClassname="!font-normal"
+                                value={healthcareProvider.phone || ""}
+                                onChange={(e) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "phone",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                label="Fax"
+                                inputClassname="!font-normal"
+                                value={healthcareProvider.fax || ""}
+                                onChange={(e) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "fax",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulInput
+                                type="text"
+                                label="Last Visit"
+                                inputClassname="!font-normal"
+                                value={healthcareProvider.last_visit || ""}
+                                onChange={(e) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "last_visit",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <StatefulDatePicker
+                                label="Next Visit"
+                                value={healthcareProvider.next_visit || ""}
+                                onChangeFunc={(date) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "next_visit",
+                                    date
+                                  )
+                                }
+                              />
+
+                              <StatefulDatePicker
+                                label="Follow Up"
+                                value={healthcareProvider.follow_up || ""}
+                                onChangeFunc={(date) =>
+                                  handleHealthcareProviderChange(
+                                    field.key,
+                                    index,
+                                    "follow_up",
+                                    date
+                                  )
+                                }
+                              />
+                              <div className="md:col-span-2">
+                                <StatefulInput
+                                  label="Notes"
+                                  value={healthcareProvider.notes || ""}
+                                  onChange={(e) =>
+                                    handleHealthcareProviderChange(
+                                      field.key,
+                                      index,
+                                      "notes",
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </div>
                             </div>
                           </div>
                         )

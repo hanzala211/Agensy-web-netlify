@@ -48,7 +48,7 @@ const defaultValues: MedicalAppointmentTemplateData = {
   medications: [],
   healthcareProviders: [
     {
-      provider_name: "",
+      providerName: "",
       specialty: "",
       address: "",
     },
@@ -208,7 +208,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               follow_up: provider.follow_up
                 ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
                 : "",
-              provider_name: provider.provider_name || "",
+              providerName: provider.provider_name || "",
               address: provider.address || "",
               phone: provider.phone || "",
               notes: provider.notes || "",
@@ -319,7 +319,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
       data.healthcareProviders.map((item) => {
         if (item.id) {
           return {
-            provider_name: item.provider_name ? item.provider_name : null,
+            provider_name: item.providerName ? item.providerName : null,
             address: item.address ? item.address : null,
             phone: item.phone ? item.phone : null,
             notes: item.notes ? item.notes : null,
@@ -331,7 +331,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           };
         } else {
           return {
-            provider_name: item.provider_name ? item.provider_name : null,
+            provider_name: item.providerName ? item.providerName : null,
             address: item.address ? item.address : null,
             phone: item.phone ? item.phone : null,
             notes: item.notes ? item.notes : null,
@@ -401,7 +401,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
 
   const addHealthcareProvider = () => {
     append({
-      provider_name: "",
+      providerName: "",
       address: "",
       phone: "",
       notes: "",
@@ -779,10 +779,10 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                     <Input
                       label="Provider Name"
                       register={register(
-                        `healthcareProviders.${index}.provider_name`
+                        `healthcareProviders.${index}.providerName`
                       )}
                       error={
-                        errors.healthcareProviders?.[index]?.provider_name
+                        errors.healthcareProviders?.[index]?.providerName
                           ?.message
                       }
                     />

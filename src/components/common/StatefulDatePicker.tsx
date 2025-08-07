@@ -41,7 +41,7 @@ export const StatefulDatePicker = ({
             format={dateFormat}
             placeholder={placeholder || dateFormat}
             className={`${className} !text-darkGray !bg-lightGray p-2
-                    border-[1px] border-mediumGray placeholder:text-darkGray rounded-xl font-semibold  w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+                    border-[1px] border-mediumGray placeholder:!text-gray-400 rounded-xl font-semibold  w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
             onChange={(_: unknown, dateString: string | string[]) => {
               if (onChangeFunc) {
                 onChangeFunc(dateString);

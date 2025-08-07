@@ -52,7 +52,7 @@ export const StatefulSelect: React.FC<StatefulSelectProps> = ({
             aria-label={aria_label}
             value={value}
             onChange={onChange}
-            className={`text-darkGray  bg-lightGray placeholder:text-darkGray p-2 border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200 appearance-none ${className} ${
+            className={`text-darkGray  bg-lightGray placeholder:text-darkGray font-normal p-2 border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200 appearance-none ${className} ${
               Icon ? "pl-10" : "pr-8"
             }`}
           >
