@@ -1,4 +1,3 @@
-import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PrimaryButton, SecondaryButton } from "@agensy/components";
@@ -41,7 +40,9 @@ export const BurialInstructions = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Burial Instructions</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Burial Instructions
+        </h1>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -52,15 +53,10 @@ export const BurialInstructions = () => {
         />
 
         <div className="flex justify-end space-x-4">
-          <SecondaryButton
-            type="button"
-            onClick={handleReset}
-          >
+          <SecondaryButton type="button" onClick={handleReset}>
             Reset
           </SecondaryButton>
-          <PrimaryButton type="submit">
-            Save
-          </PrimaryButton>
+          <PrimaryButton type="submit">Save</PrimaryButton>
         </div>
       </form>
     </div>
