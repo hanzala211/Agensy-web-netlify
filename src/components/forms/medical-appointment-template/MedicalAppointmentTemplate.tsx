@@ -10,6 +10,7 @@ import {
   TextArea,
   TertiaryButton,
   Select,
+  PhoneNumberInput,
 } from "@agensy/components";
 import {
   medicalAppointmentTemplateSchema,
@@ -23,7 +24,11 @@ import {
   useGetMedicalAppointmentTemplate,
   usePostMedicalAppointmentTemplateMutation,
 } from "@agensy/api";
-import { ICONS, SPECIALTIES } from "@agensy/constants";
+import {
+  ICONS,
+  MEDICATION_FREQUENCY_OPTIONS,
+  SPECIALTIES,
+} from "@agensy/constants";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useClientContext } from "@agensy/context";
@@ -555,6 +560,47 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           </div>
         </Card>
 
+        <Card title="Recommendations & Follow-up">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <TextArea
+                  label="Recommendations"
+                  register={register("recommendations")}
+                  error={errors.recommendations?.message}
+                  rows={4}
+                />
+              </div>
+
+              <div>
+                <TextArea
+                  label="Referrals"
+                  register={register("referrals")}
+                  error={errors.referrals?.message}
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <DatePickerField
+                  label="Follow-up"
+                  name="follow_up"
+                  control={control}
+                />
+              </div>
+
+              <div>
+                <TextArea
+                  label="Report Given To"
+                  register={register("report_given_to")}
+                  error={errors.report_given_to?.message}
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+        </Card>
+
         <Card
           title="Diagnoses"
           buttonText={<ICONS.plus size={16} />}
@@ -706,10 +752,12 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                       error={errors.medications?.[index]?.dosage?.message}
                     />
 
-                    <Input
+                    <Select
                       label="Frequency"
-                      register={register(`medications.${index}.frequency`)}
-                      error={errors.medications?.[index]?.frequency?.message}
+                      data={MEDICATION_FREQUENCY_OPTIONS}
+                      labelOption="Select Frequency"
+                      control={control}
+                      name={`medications.${index}.frequency`}
                     />
 
                     <Input
@@ -805,13 +853,10 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                       }
                     />
 
-                    <Input
+                    <PhoneNumberInput
                       label="Phone"
-                      type="tel"
-                      register={register(`healthcareProviders.${index}.phone`)}
-                      error={
-                        errors.healthcareProviders?.[index]?.phone?.message
-                      }
+                      name={`healthcareProviders.${index}.phone`}
+                      control={control}
                     />
                     <div className="md:col-span-2">
                       <DatePickerField
@@ -850,46 +895,6 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           </div>
         </Card>
 
-        <Card title="Recommendations & Follow-up">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <TextArea
-                  label="Recommendations"
-                  register={register("recommendations")}
-                  error={errors.recommendations?.message}
-                  rows={4}
-                />
-              </div>
-
-              <div>
-                <TextArea
-                  label="Referrals"
-                  register={register("referrals")}
-                  error={errors.referrals?.message}
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <DatePickerField
-                  label="Follow-up"
-                  name="follow_up"
-                  control={control}
-                />
-              </div>
-
-              <div>
-                <TextArea
-                  label="Report Given To"
-                  register={register("report_given_to")}
-                  error={errors.report_given_to?.message}
-                  rows={3}
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
         <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
             <PrimaryButton

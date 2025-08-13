@@ -9,13 +9,6 @@ export const checklistSchema: ChecklistField[] = [
     headingId: "0",
   },
   {
-    id: "1",
-    type: "checkbox",
-    label: "Service Agreement",
-    parentId: null,
-    headingId: "0",
-  },
-  {
     id: "2",
     type: "group",
     label: "Release of Information (ROI)",

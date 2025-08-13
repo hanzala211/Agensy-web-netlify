@@ -32,6 +32,7 @@ export const PersonalInfoCard: React.FC = () => {
   }, [updateClientMutation.status]);
 
   const handleUpdateClient = (data: ClientFormData) => {
+    console.log(data);
     const postData = {
       first_name: data.firstName,
       last_name: data.lastName,

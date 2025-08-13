@@ -81,15 +81,13 @@ export const clientSchema = z.object({
   firstName: z
     .string()
     .min(2, { message: "First name is required" })
-    .max(12, "First name must be less than 12 characters")
     .transform(trimString),
   lastName: z
     .string()
     .min(2, { message: "Last name is required" })
-    .max(12, "Last name must be less than 12 characters")
     .transform(trimString),
   dateOfBirth: z.string().optional(),
-  gender: z.enum(["male", "female", "other"]),
+  gender: z.string().optional(),
   maritalStatus: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
@@ -257,16 +255,8 @@ export const documentSchema = z.object({
 export type DocumentFormData = z.infer<typeof documentSchema>;
 
 export const accessSchema = z.object({
-  first_name: z
-    .string()
-    .min(1, "First Name is required")
-    .max(12, "First Name must be less than 12 characters")
-    .transform(trimString),
-  last_name: z
-    .string()
-    .min(1, "Last Name is required")
-    .max(12, "Last Name must be less than 12 characters")
-    .transform(trimString),
+  first_name: z.string().min(1, "First Name is required").transform(trimString),
+  last_name: z.string().min(1, "Last Name is required").transform(trimString),
   relation: z.string().min(1, "Relationship is required").transform(trimString),
   email: z.string().email("Valid email is required").transform(trimString),
   phone: z.string().min(1, "Phone number is required").transform(trimString),
@@ -291,16 +281,8 @@ export const accessSchema = z.object({
 export type AccessFormData = z.infer<typeof accessSchema>;
 
 export const editAccessSchema = z.object({
-  first_name: z
-    .string()
-    .min(1, "First Name is required")
-    .max(12, "First Name must be less than 12 characters")
-    .transform(trimString),
-  last_name: z
-    .string()
-    .min(1, "Last Name is required")
-    .max(12, "Last Name must be less than 12 characters")
-    .transform(trimString),
+  first_name: z.string().min(1, "First Name is required").transform(trimString),
+  last_name: z.string().min(1, "Last Name is required").transform(trimString),
   relation: z.string().min(1, "Relationship is required").transform(trimString),
   phone: z.string().min(1, "Phone number is required").transform(trimString),
   role: z.string().min(1, "Role is required").transform(trimString),
@@ -310,39 +292,28 @@ export type EditAccessFormData = z.infer<typeof editAccessSchema>;
 
 export const appointmentSchema = z
   .object({
-    title: z
-      .string()
-      .min(1, "Title is required")
-      .max(30, "Title must be less than 30 characters")
-      .transform(trimString),
-    appointment_type: z
-      .string()
-      .min(1, "Appointment type is required")
-      .transform(trimString),
-    location: z.string().min(1, "Location is required").transform(trimString),
-    start_time: z
-      .string()
-      .min(1, "Start time is required")
-      .transform(trimString),
-    end_time: z.string().min(1, "End time is required").transform(trimString),
+    title: z.string().transform(trimString),
+    appointment_type: z.string().transform(trimString),
+    location: z.string().transform(trimString),
+    start_time: z.string().transform(trimString),
+    end_time: z.string().transform(trimString),
     notes: z
       .string()
-      .max(50, "Notes must be less than 50 characters")
       .optional()
       .transform((val) => (val ? trimString(val) : val)),
-    clientId: z.string().min(1, "Client is required").transform(trimString),
-    healthcare_provider_id: z
+    clientId: z
       .string()
-      .min(1, "Healthcare provider is required")
+      .min(1, "Care Recipient is Required")
       .transform(trimString),
+    healthcare_provider_id: z.string().transform(trimString),
     post_appointment_notes: z
       .string()
-      .max(50, "Post appointment notes must be less than 50 characters")
       .optional()
       .transform((val) => (val ? trimString(val) : val)),
   })
   .refine(
     (data) => {
+      if (!data.start_time || !data.end_time) return true;
       const start = new Date(data.start_time);
       const end = new Date(data.end_time);
       return start <= end;
@@ -2534,4 +2505,18 @@ export const comprehensiveCarePlanSchema = z.object({
 
 export type ComprehensiveCarePlanFormData = z.infer<
   typeof comprehensiveCarePlanSchema
+>;
+
+export const burialInstructionsFormSchema = z.object({
+  // Personal Identification
+  fullNameOfDeceased: z.string().min(1, "Full name of deceased is required"),
+  dateOfBirth: z.string().optional(),
+  timeOfDeath: z.string().optional(),
+  dateOfDeath: z.string().optional(),
+  countyThatIssuedDeathCertificate: z.string().optional(),
+  numberOfDeathCertificatesOrdered: z.string().optional(),
+});
+
+export type BurialInstructionsFormData = z.infer<
+  typeof burialInstructionsFormSchema
 >;

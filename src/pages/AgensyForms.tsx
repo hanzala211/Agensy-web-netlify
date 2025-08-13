@@ -16,6 +16,7 @@ import {
   CaregiverInformation,
   InitialCareAssessmentPlan,
   ComprehensiveCarePlan,
+  BurialInstructions,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -86,12 +87,6 @@ const rootFolders: FolderItem[] = [
         name: "Health History Form",
         type: "file",
         slug: "health-history-form-medical",
-      },
-      {
-        id: "medicare-cheat-sheet",
-        name: "Medicare Cheat Sheet",
-        type: "file",
-        slug: "medicare-cheat-sheet",
       },
       {
         id: "medical-appointment-template",
@@ -172,6 +167,18 @@ const rootFolders: FolderItem[] = [
         name: "Next Steps after Death",
         type: "file",
         slug: "next-steps-after-death",
+      },
+      {
+        id: "medicare-cheat-sheet",
+        name: "Medicare Cheat Sheet",
+        type: "file",
+        slug: "medicare-cheat-sheet",
+      },
+      {
+        id: "burial-instructions",
+        name: "Burial Instructions",
+        type: "file",
+        slug: "burial-instructions",
       },
     ],
   },
@@ -285,6 +292,12 @@ const fileMap: Record<string, FolderData> = {
     name: "Next Steps after Death",
     description: "Checklist for procedures following death",
     content: <NextStepsAfterDeath />,
+  },
+  "burial-instructions": {
+    id: "burial-instructions",
+    name: "Burial Instructions",
+    description: "Instructions for burial",
+    content: <BurialInstructions />,
   },
 };
 

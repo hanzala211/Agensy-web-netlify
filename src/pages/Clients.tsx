@@ -16,10 +16,10 @@ import {
   PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
-import type { Client } from "@agensy/types";
+import type { Client, ClientFormData } from "@agensy/types";
 import { useNavigate } from "react-router-dom";
 import { useAddClientMutation } from "@agensy/api";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import { useClientManager } from "@agensy/hooks";
 import { useAuthContext, useClientContext } from "@agensy/context";
 
@@ -79,8 +79,31 @@ export const Clients: React.FC = () => {
     }
   };
 
-  const handleAddClient = (data: unknown) => {
-    addClientMutation.mutate(data);
+  const handleAddClient = (data: ClientFormData) => {
+    const postData: unknown = {
+      first_name: data.firstName,
+      last_name: data.lastName,
+      date_of_birth: data.dateOfBirth
+        ? DateUtils.changetoISO(data.dateOfBirth)
+        : null,
+      gender: data.gender ? data.gender : null,
+      marital_status: data.maritalStatus ? data.maritalStatus : null,
+      address: data.address ? data.address : null,
+      city: data.city ? data.city : null,
+      state: data.state ? data.state : null,
+      zip: data.zipCode ? data.zipCode : null,
+      living_situation: data.livingSituation ? data.livingSituation : null,
+      hospital_phone: data.hospital_phone ? data.hospital_phone : null,
+      hospital_address: data.hospital_address ? data.hospital_address : null,
+      pharmacy_name: data.pharmacy_name ? data.pharmacy_name : null,
+      pharmacy_phone: data.pharmacy_phone ? data.pharmacy_phone : null,
+      pharmacy_address: data.pharmacy_address ? data.pharmacy_address : null,
+      pharmacy_fax: data.pharmacy_fax ? data.pharmacy_fax : null,
+      preferred_hospital: data.preferred_hospital
+        ? data.preferred_hospital
+        : null,
+    };
+    addClientMutation.mutate(postData);
   };
 
   const handleEmptyStateClick = () => {

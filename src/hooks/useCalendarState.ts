@@ -69,14 +69,20 @@ export const useCalendarState = (appointments: Appointment[]) => {
 
   const handleEdit = (data: AppointmentFormData) => {
     const postData = {
-      title: data.title,
-      appointment_type: data.appointment_type,
-      start_time: DateUtils.changetoISO(data.start_time),
-      end_time: DateUtils.changetoISO(data.end_time),
-      notes: data.notes,
-      location: data.location,
-      healthcare_provider_id: data.healthcare_provider_id,
-      post_appointment_notes: data.post_appointment_notes || "",
+      title: data.title ? data.title : null,
+      appointment_type: data.appointment_type ? data.appointment_type : null,
+      start_time: data.start_time
+        ? DateUtils.changetoISO(data.start_time)
+        : null,
+      end_time: data.end_time ? DateUtils.changetoISO(data.end_time) : null,
+      notes: data.notes ? data.notes : null,
+      location: data.location ? data.location : null,
+      healthcare_provider_id: data.healthcare_provider_id
+        ? data.healthcare_provider_id
+        : null,
+      post_appointment_notes: data.post_appointment_notes
+        ? data.post_appointment_notes
+        : null,
     };
     editClientAppointmentMutation.mutate({
       clientId: data.clientId as string,

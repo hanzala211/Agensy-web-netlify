@@ -69,15 +69,18 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             <div className="flex items-center gap-2">
               <ICONS.calendar className="text-blue-500" />
               <h3 className="font-semibold text-lg">
-                {appointment.title}{" "}
+                {appointment.title ? appointment.title : "N/A"}{" "}
                 <span className="text-sm">
                   (
-                  {
-                    filterHealthCareProvider(
-                      appointment.client_id,
-                      appointment.healthcare_provider_id
-                    )?.provider_name
-                  }
+                  {filterHealthCareProvider(
+                    appointment?.client_id,
+                    appointment?.healthcare_provider_id
+                  )
+                    ? filterHealthCareProvider(
+                        appointment?.client_id,
+                        appointment?.healthcare_provider_id
+                      )?.provider_name
+                    : "N/A"}
                   )
                 </span>
               </h3>
@@ -93,7 +96,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
                     : "default"
                   : "error"
               }
-              text={appointmentType?.label}
+              text={appointmentType?.label ? appointmentType?.label : "N/A"}
             />
           </div>
 
@@ -105,11 +108,19 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             <div className="flex flex-col gap-2 text-gray-600">
               <div className="flex items-center gap-2 text-gray-600">
                 <ICONS.clockCircle className="text-gray-400" size={14} />
-                <span>{DateUtils.formatDateTime(appointment.start_time)}</span>
+                <span>
+                  {appointment?.start_time
+                    ? DateUtils.formatDateTime(appointment?.start_time)
+                    : "N/A"}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-gray-600">
                 <ICONS.clockCircle className="text-gray-400" size={14} />
-                <span>{DateUtils.formatDateTime(appointment.end_time)}</span>
+                <span>
+                  {appointment?.end_time
+                    ? DateUtils.formatDateTime(appointment?.end_time)
+                    : "N/A"}
+                </span>
               </div>
               {appointment.location && (
                 <div className="flex items-center gap-2 text-gray-600">

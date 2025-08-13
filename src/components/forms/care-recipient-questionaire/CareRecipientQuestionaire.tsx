@@ -211,10 +211,29 @@ export const CareRecipientQuestionaire = () => {
     resolver: zodResolver(careRecipientQuestionnaireSchema),
     defaultValues: defaultValues,
   });
+  const relativesArray = useFieldArray({
+    control,
+    name: "relatives",
+  });
+
+  const friendsNeighborsArray = useFieldArray({
+    control,
+    name: "friendsNeighbors",
+  });
+
+  const healthcareProvidersArray = useFieldArray({
+    control,
+    name: "healthcareProviders",
+  });
+
+  const medicalConditionsArray = useFieldArray({
+    control,
+    name: "medicalConditions",
+  });
 
   useEffect(() => {
     if (careRecipientQuestionnaire) {
-      reset({
+      const formData = {
         // Form Filler Information
         formFillerName:
           careRecipientQuestionnaire.user?.first_name &&
@@ -702,29 +721,14 @@ export const CareRecipientQuestionaire = () => {
           careRecipientQuestionnaire.questionnaire?.major_concerns || "",
         areasAcceptingHelp:
           careRecipientQuestionnaire.questionnaire?.areas_accepting_help || "",
-      });
+      };
+      reset(formData);
+      healthcareProvidersArray.replace(formData.healthcareProviders);
+      medicalConditionsArray.replace(formData.medicalConditions);
+      relativesArray.replace(formData.relatives);
+      friendsNeighborsArray.replace(formData.friendsNeighbors);
     }
   }, [careRecipientQuestionnaire]);
-
-  const relativesArray = useFieldArray({
-    control,
-    name: "relatives",
-  });
-
-  const friendsNeighborsArray = useFieldArray({
-    control,
-    name: "friendsNeighbors",
-  });
-
-  const healthcareProvidersArray = useFieldArray({
-    control,
-    name: "healthcareProviders",
-  });
-
-  const medicalConditionsArray = useFieldArray({
-    control,
-    name: "medicalConditions",
-  });
 
   const formValues = useWatch({ control });
 

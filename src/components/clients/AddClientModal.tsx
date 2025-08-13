@@ -57,18 +57,22 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   useEffect(() => {
     if (editClient) {
       reset({
-        firstName: editClient.first_name,
-        lastName: editClient.last_name,
-        dateOfBirth: DateUtils.formatDateToRequiredFormat(
-          editClient.date_of_birth
-        ),
-        gender: editClient.gender as "male" | "female" | "other",
-        maritalStatus: editClient.marital_status,
-        address: editClient.address,
-        city: editClient.city,
-        state: editClient.state,
-        zipCode: editClient.zip,
-        livingSituation: editClient.living_situation,
+        firstName: editClient.first_name ? editClient.first_name : "",
+        lastName: editClient.last_name ? editClient.last_name : "",
+        dateOfBirth: editClient.date_of_birth
+          ? DateUtils.formatDateToRequiredFormat(editClient.date_of_birth)
+          : "",
+        gender: editClient.gender ? editClient.gender : "",
+        maritalStatus: editClient.marital_status
+          ? editClient.marital_status
+          : "",
+        address: editClient.address ? editClient.address : "",
+        city: editClient.city ? editClient.city : "",
+        state: editClient.state ? editClient.state : "",
+        zipCode: editClient.zip ? editClient.zip : "",
+        livingSituation: editClient.living_situation
+          ? editClient.living_situation
+          : "",
       });
       setValue("isEdit", true);
     } else {
@@ -100,18 +104,18 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
 
   const onSubmit = (data: ClientFormData) => {
     const postData = {
-      first_name: data.firstName,
-      last_name: data.lastName,
-      date_of_birth: data.dateOfBirth
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: data.dateOfBirth
         ? DateUtils.changetoISO(data.dateOfBirth)
         : null,
       gender: data.gender ? data.gender : null,
-      marital_status: data.maritalStatus ? data.maritalStatus : null,
+      maritalStatus: data.maritalStatus ? data.maritalStatus : null,
       address: data.address ? data.address : null,
       city: data.city ? data.city : null,
       state: data.state ? data.state : null,
-      zip: data.zipCode ? data.zipCode : null,
-      living_situation: data.livingSituation ? data.livingSituation : null,
+      zipCode: data.zipCode ? data.zipCode : null,
+      livingSituation: data.livingSituation ? data.livingSituation : null,
       hospital_phone: data.hospital_phone ? data.hospital_phone : null,
       hospital_address: data.hospital_address ? data.hospital_address : null,
       pharmacy_name: data.pharmacy_name ? data.pharmacy_name : null,

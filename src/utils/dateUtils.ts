@@ -69,7 +69,7 @@ export const formatSimpleDate = (isoDate: string): string => {
 };
 
 export const changetoISO = (date: string) => {
-  return dayjs(date).toISOString();
+  return dayjs(date).format("YYYY-MM-DDTHH:mm:ss");
 };
 
 export const changeMonthYearToISO = (date: string) => {

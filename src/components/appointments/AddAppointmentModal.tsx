@@ -85,14 +85,18 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   useEffect(() => {
     if (editData) {
       reset({
-        title: editData.title,
-        appointment_type: editData.appointment_type,
-        location: editData.location,
-        start_time: DateUtils.formatDateTime(editData.start_time),
-        end_time: DateUtils.formatDateTime(editData.end_time),
-        notes: editData.notes,
-        clientId: editData.client_id,
-        healthcare_provider_id: editData.healthcare_provider_id,
+        title: editData.title || "",
+        appointment_type: editData.appointment_type || "",
+        location: editData.location || "",
+        start_time: editData.start_time
+          ? DateUtils.formatDateTime(editData.start_time)
+          : "",
+        end_time: editData.end_time
+          ? DateUtils.formatDateTime(editData.end_time)
+          : "",
+        notes: editData.notes || "",
+        clientId: editData.client_id || "",
+        healthcare_provider_id: editData.healthcare_provider_id || "",
       });
     }
   }, [editData, reset]);

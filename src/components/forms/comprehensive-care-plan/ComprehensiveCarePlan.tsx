@@ -1785,7 +1785,7 @@ export const ComprehensiveCarePlan = () => {
         medication_name: medication.medicationName
           ? medication.medicationName
           : null,
-        dosage: medication.dosage,
+        dosage: medication.dosage ? medication.dosage : null,
         frequency: medication.frequency ? medication.frequency : null,
         start_date: medication.startDate
           ? DateUtils.changetoISO(medication.startDate)
@@ -1881,17 +1881,23 @@ export const ComprehensiveCarePlan = () => {
           : null,
         goals_for_assessment: data.goalsForAssessment
           ? data.goalsForAssessment.length > 0
-            ? data.goalsForAssessment.join(", ")
+            ? data.goalsForAssessment.join(", ").length > 0
+              ? data.goalsForAssessment.join(", ")
+              : null
             : null
           : null,
         next_step_care_recipient: data.nextStepCareRecipient
           ? data.nextStepCareRecipient.length > 0
-            ? data.nextStepCareRecipient.join(", ")
+            ? data.nextStepCareRecipient.join(", ").length > 0
+              ? data.nextStepCareRecipient.join(", ")
+              : null
             : null
           : null,
         next_step_care_partner: data.nextStepCarePartner
           ? data.nextStepCarePartner.length > 0
-            ? data.nextStepCarePartner.join(", ")
+            ? data.nextStepCarePartner.join(", ").length > 0
+              ? data.nextStepCarePartner.join(", ")
+              : null
             : null
           : null,
       },

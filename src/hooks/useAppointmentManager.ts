@@ -23,27 +23,27 @@ export const useAppointmentManager = ({
   const filteredAppointments = useMemo(() => {
     return appointments.filter((appointment) => {
       const matchesSearch = (
-        appointment.title.toLowerCase() +
+        appointment?.title?.toLowerCase() +
         " " +
-        appointment.appointment_type.toLowerCase() +
+        appointment?.appointment_type?.toLowerCase() +
         " " +
-        (appointment.location || "").toLowerCase()
+        (appointment?.location || "").toLowerCase()
       ).includes(searchTerm.toLowerCase());
 
       const matchesFilter =
         filterBy === "all" ||
-        (filterBy === "active" && appointment.active) ||
-        (filterBy === "inactive" && !appointment.active) ||
-        appointment.appointment_type.toLowerCase() === filterBy.toLowerCase();
+        (filterBy === "active" && appointment?.active) ||
+        (filterBy === "inactive" && !appointment?.active) ||
+        appointment?.appointment_type?.toLowerCase() === filterBy.toLowerCase();
 
       const matchesClientFilter =
-        clientFilter === "all" || appointment.client_id === clientFilter;
+        clientFilter === "all" || appointment?.client_id === clientFilter;
 
       const matchesFromtoTo =
         from === "" ||
         to === "" ||
-        (dayjs(appointment.start_time).isAfter(dayjs(from)) &&
-          dayjs(appointment.start_time).isBefore(dayjs(to)));
+        (dayjs(appointment?.start_time).isAfter(dayjs(from)) &&
+          dayjs(appointment?.start_time).isBefore(dayjs(to)));
 
       return (
         matchesSearch && matchesFilter && matchesClientFilter && matchesFromtoTo
@@ -65,11 +65,11 @@ export const useAppointmentManager = ({
             new Date(String(b.createdAt)).getTime()
           );
         case "title-asc":
-          return a.title.localeCompare(b.title);
+          return a?.title?.localeCompare(b?.title);
         case "title-desc":
-          return b.title.localeCompare(a.title);
+          return b?.title?.localeCompare(a?.title);
         case "type":
-          return a.appointment_type.localeCompare(b.appointment_type);
+          return a?.appointment_type?.localeCompare(b?.appointment_type);
         default:
           return 0;
       }
@@ -97,10 +97,10 @@ export const useAppointmentManager = ({
 
   const handleDeleteMoveToLastPage = (appointmentId: string) => {
     const remainingAppointments = sortedAppointments.filter(
-      (appointment) => appointment.id !== appointmentId
+      (appointment) => appointment?.id !== appointmentId
     );
     const newTotalPages = Math.ceil(
-      remainingAppointments.length / itemsPerPage
+      remainingAppointments?.length / itemsPerPage
     );
 
     if (currentPage > newTotalPages && newTotalPages > 0) {
