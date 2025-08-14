@@ -2509,14 +2509,118 @@ export type ComprehensiveCarePlanFormData = z.infer<
 
 export const burialInstructionsFormSchema = z.object({
   // Personal Identification
-  fullNameOfDeceased: z.string().min(1, "Full name of deceased is required"),
+  firstName: z.string().min(1, "First name of deceased is required"),
+  lastName: z.string().min(1, "Last name of deceased is required"),
   dateOfBirth: z.string().optional(),
   timeOfDeath: z.string().optional(),
   dateOfDeath: z.string().optional(),
   countyThatIssuedDeathCertificate: z.string().optional(),
   numberOfDeathCertificatesOrdered: z.string().optional(),
+
+  // Burial Preferences
+  burialType: z.string().optional(),
+  burialTypeOther: z.string().optional(),
+  preferredCemetery: z.string().optional(),
+  plotOwned: z.string().optional(),
+  plotNumberLocation: z.string().optional(),
+  funeralHome: z.string().optional(),
+  vaultCasketPreferences: z.string().optional(),
+  urnSelection: z.string().optional(),
+  ashesDisposition: z.string().optional(),
+  ashesDispositionOther: z.string().optional(),
+
+  // Service Details
+  typeOfService: z.string().optional(),
+  officiantSpeakerRequested: z.string().optional(),
+  locationOfService: z.string().optional(),
+  specialRequests: z.string().optional(),
+
+  // Key Contacts
+  personResponsibleName: z.string().optional(),
+  personResponsiblePhone: z.string().optional(),
+  personResponsibleRelationship: z.string().optional(),
+  legalMedicalPowerOfAttorneyName: z.string().optional(),
+  legalMedicalPowerOfAttorneyPhone: z.string().optional(),
+  clergySpiritualAdvisorName: z.string().optional(),
+  clergySpiritualAdvisorPhone: z.string().optional(),
+
+  // Documents and Notes
+  willLocation: z.string().optional(),
+  advanceDirectiveLocation: z.string().optional(),
+  lifeInsuranceInfo: z.string().optional(),
+  relationship: z.string().optional(),
+  obituaryWishes: z.string().optional(),
 });
 
 export type BurialInstructionsFormData = z.infer<
   typeof burialInstructionsFormSchema
 >;
+
+export const personalInfoFormSchema = z.object({
+  // Personal Identification
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().optional(),
+  socialSecurityNumber: z.string().optional(),
+  driversLicenseNumber: z.string().optional(),
+  driversLicenseState: z.string().optional(),
+  passportNumber: z.string().optional(),
+  passportExpirationDate: z.string().optional(),
+
+  // Emergency Information
+  emergencyContactName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  emergencyContactRelationship: z.string().optional(),
+  healthInsuranceProvider: z.string().optional(),
+  healthInsurancePolicyNumber: z.string().optional(),
+
+  // Digital Accounts & Passwords
+  digitalAccounts: z
+    .array(
+      z.object({
+        accountWebsite: z.string().optional(),
+        usernameEmail: z.string().optional(),
+        password: z.string().optional(),
+        notes: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+      })
+    )
+    .optional(),
+
+  // Financial Accounts
+  bankName: z.string().optional(),
+  bankAccountNumberPartial: z.string().optional(),
+  bankAccountType: z.string().optional(),
+  bankOnlineLoginInfo: z.string().optional(),
+  creditCardIssuer: z.string().optional(),
+  creditCardLastFourDigits: z.string().optional(),
+  creditCardOnlineLoginInfo: z.string().optional(),
+
+  // Utilities & Subscriptions
+  electricityProvider: z.string().optional(),
+  electricityUsername: z.string().optional(),
+  electricityPassword: z.string().optional(),
+  internetProvider: z.string().optional(),
+  internetUsername: z.string().optional(),
+  internetPassword: z.string().optional(),
+  phoneProvider: z.string().optional(),
+  phoneUsername: z.string().optional(),
+  phonePassword: z.string().optional(),
+  streamingServices: z.string().optional(),
+  streamingUsername: z.string().optional(),
+  streamingPassword: z.string().optional(),
+
+  // Common Questions asked by Social Security
+  bankingHistoryInstitutions: z.string().optional(),
+  monthlyCarMortgagePayment: z.string().optional(),
+  previousStreetNames: z.string().optional(),
+  creditCardInstitutions: z.string().optional(),
+  mothersMaidenName: z.string().optional(),
+
+  // Notes & Backup Contacts
+  trustedPersonName: z.string().optional(),
+  trustedPersonPhone: z.string().optional(),
+  additionalNotes: z.string().optional(),
+});
+
+export type PersonalInfoFormData = z.infer<typeof personalInfoFormSchema>;

@@ -22,42 +22,39 @@ export const PersonalIdentificationSection = <T extends FieldValues>({
     <Card title="Personal Identification">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Input
-          label="First Name of Deceased"
+          label="First Name:"
           register={register("firstName" as Path<T>)}
           error={errors.firstName?.message as string}
         />
         <Input
-          label="Last Name of Deceased"
+          label="Last Name:"
           register={register("lastName" as Path<T>)}
           error={errors.lastName?.message as string}
         />
+
         <DatePickerField
           control={control}
           name={"dateOfBirth" as Path<T>}
-          label="Date of Birth"
+          label="Date of Birth:"
         />
+
         <Input
-          label="Time of Death"
-          register={register("timeOfDeath" as Path<T>)}
-          error={errors.timeOfDeath?.message as string}
+          label="Social Security Number (last 4 digits recommended):"
+          register={register("socialSecurityNumber" as Path<T>)}
+          error={errors.socialSecurityNumber?.message as string}
         />
-        <DatePickerField
-          control={control}
-          name={"dateOfDeath" as Path<T>}
-          label="Date of Death"
-        />
+
         <Input
-          label="County That Issued Death Certificate"
-          register={register("countyThatIssuedDeathCertificate" as Path<T>)}
-          error={errors.countyThatIssuedDeathCertificate?.message as string}
+          label="Driver's License Number & State:"
+          register={register("driversLicenseNumber" as Path<T>)}
+          error={errors.driversLicenseNumber?.message as string}
         />
-        <div className="md:col-span-2">
-          <Input
-            label="Number of Death Certificates Ordered"
-            register={register("numberOfDeathCertificatesOrdered" as Path<T>)}
-            error={errors.numberOfDeathCertificatesOrdered?.message as string}
-          />
-        </div>
+
+        <Input
+          label="Passport Number:"
+          register={register("passportNumber" as Path<T>)}
+          error={errors.passportNumber?.message as string}
+        />
       </div>
     </Card>
   );

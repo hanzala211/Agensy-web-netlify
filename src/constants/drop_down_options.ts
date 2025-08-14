@@ -271,3 +271,8 @@ export const OCR_DOCUMENT_TYPES = [
   { label: "Driver License", value: "driver_license" },
   { label: "Medical Record", value: "medical_record" },
 ];
+
+export const ACCOUNT_TYPE_OPTIONS = [
+  { value: "checking", label: "Checking" },
+  { value: "savings", label: "Savings" },
+];

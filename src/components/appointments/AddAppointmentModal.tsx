@@ -127,7 +127,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
           isLoading={isLoading}
           disabled={isLoading}
         >
-          {editData ? "Update Appointment" : "Save Appointment"}
+          {editData ? "Update Appointment" : "Add  Appointment"}
         </PrimaryButton>
       }
     >

@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from "react";
 import { ICONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type {
+  BurialInstructionsFormData,
   CareRecipientQuestionnaireData,
   ComprehensiveCarePlanFormData,
   FaceSheetLongFormData,
@@ -33,6 +34,7 @@ import { CaregiverInformationPDF } from "./caregiver-information/CaregiverInform
 import MedicalAppointmentTemplatePDF from "./medical-appointment-template/MedicalAppointmentTemplatePDF";
 import InitialCareAssessmentPlanPDF from "./initial-care-assessment/InitialCareAssessmentPlanPDF";
 import ComprehensiveCarePlanPDF from "./comprehensive-care-plan/ComprehensiveCarePlanPDF";
+import BurialInstructionsPDF from "./burial-instructions/BurialInstructionsPDF";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -344,6 +346,19 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               <ComprehensiveCarePlanPDF
                 data={
                   openedFileData as unknown as ComprehensiveCarePlanFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "burial-instructions":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <BurialInstructionsPDF
+                data={
+                  openedFileData as unknown as BurialInstructionsFormData & {
                     last_update: { updatedAt: string };
                   }
                 }

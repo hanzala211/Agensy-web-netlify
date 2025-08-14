@@ -17,6 +17,7 @@ import {
   InitialCareAssessmentPlan,
   ComprehensiveCarePlan,
   BurialInstructions,
+  PersonalInfo,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -180,6 +181,12 @@ const rootFolders: FolderItem[] = [
         type: "file",
         slug: "burial-instructions",
       },
+      {
+        id: "personal-info",
+        name: "Personal Information & Password Organization",
+        type: "file",
+        slug: "personal-info",
+      },
     ],
   },
 ];
@@ -298,6 +305,12 @@ const fileMap: Record<string, FolderData> = {
     name: "Burial Instructions",
     description: "Instructions for burial",
     content: <BurialInstructions />,
+  },
+  "personal-info": {
+    id: "personal-info",
+    name: "Personal Information & Password Organization",
+    description: "Personal information and password organization",
+    content: <PersonalInfo />,
   },
 };
 
