@@ -162,3 +162,48 @@ export const useGetComprehensiveCarePlan = (clientId: string) => {
     enabled: false,
   });
 };
+
+export const useGetBurialInstructions = (clientId: string) => {
+  return useQuery({
+    queryKey: ["burial-instructions", clientId],
+    queryFn: () => ClientAgensyFormsService.getBurialInstructions(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostBurialInstructionsMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postBurialInstructions(clientId, data),
+  });
+};
+
+export const useGetPersonalInfo = (clientId: string) => {
+  return useQuery({
+    queryKey: ["personal-info-manager", clientId],
+    queryFn: () => ClientAgensyFormsService.getPersonalInfo(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostPersonalInfoMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postPersonalInfo(clientId, data),
+  });
+};
+
+export const useGetImportantPeopleInLife = (clientId: string) => {
+  return useQuery({
+    queryKey: ["important-people-in-life", clientId],
+    queryFn: () => ClientAgensyFormsService.getImportantPeopleInLife(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostImportantPeopleInLifeMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postImportantPeopleInLife(clientId, data),
+  });
+};

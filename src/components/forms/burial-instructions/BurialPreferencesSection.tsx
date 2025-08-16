@@ -6,6 +6,7 @@ import type {
   UseFormWatch,
 } from "react-hook-form";
 import { Input, Card } from "@agensy/components";
+import { BURIAL_TYPES } from "@agensy/constants";
 
 interface BurialPreferencesSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
@@ -35,7 +36,7 @@ export const BurialPreferencesSection = <T extends FieldValues>({
               <input
                 type="radio"
                 id="traditional-burial"
-                value="traditional-burial"
+                value={BURIAL_TYPES.TRADITIONAL_BURIAL}
                 {...register("burialType" as Path<T>)}
                 className="text-primaryColor focus:ring-primaryColor"
               />
@@ -50,7 +51,7 @@ export const BurialPreferencesSection = <T extends FieldValues>({
               <input
                 type="radio"
                 id="green-burial"
-                value="green-burial"
+                value={BURIAL_TYPES.GREEN_BURIAL}
                 {...register("burialType" as Path<T>)}
                 className="text-primaryColor focus:ring-primaryColor"
               />
@@ -62,7 +63,7 @@ export const BurialPreferencesSection = <T extends FieldValues>({
               <input
                 type="radio"
                 id="cremation"
-                value="cremation"
+                value={BURIAL_TYPES.CREMATION}
                 {...register("burialType" as Path<T>)}
                 className="text-primaryColor focus:ring-primaryColor"
               />
@@ -74,14 +75,14 @@ export const BurialPreferencesSection = <T extends FieldValues>({
               <input
                 type="radio"
                 id="other-burial"
-                value="other"
+                value={BURIAL_TYPES.OTHER}
                 {...register("burialType" as Path<T>)}
                 className="text-primaryColor focus:ring-primaryColor"
               />
               <label htmlFor="other-burial" className="text-sm text-gray-700">
                 Other:
               </label>
-              {burialType === "other" && (
+              {burialType === BURIAL_TYPES.OTHER && (
                 <Input
                   register={register("burialTypeOther" as Path<T>)}
                   error={errors.burialTypeOther?.message as string}
@@ -161,7 +162,7 @@ export const BurialPreferencesSection = <T extends FieldValues>({
         </div>
 
         {/* Urn Selection - Only show if cremation is selected */}
-        {burialType === "cremation" && (
+        {burialType === BURIAL_TYPES.CREMATION && (
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">
               Urn (if cremated)
@@ -199,7 +200,7 @@ export const BurialPreferencesSection = <T extends FieldValues>({
         )}
 
         {/* Ashes Disposition - Only show if cremation is selected */}
-        {burialType === "cremation" && (
+        {burialType === BURIAL_TYPES.CREMATION && (
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">
               Ashes to be

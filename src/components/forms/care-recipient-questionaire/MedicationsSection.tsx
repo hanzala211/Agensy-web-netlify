@@ -6,7 +6,13 @@ import type {
   Path,
   Control,
 } from "react-hook-form";
-import { Input, Card, TertiaryButton, Select } from "@agensy/components";
+import {
+  Input,
+  Card,
+  TertiaryButton,
+  Select,
+  DatePickerField,
+} from "@agensy/components";
 import { ICONS, MEDICATION_FREQUENCY_OPTIONS } from "@agensy/constants";
 
 interface MedicationsSectionProps<T extends FieldValues> {
@@ -63,9 +69,9 @@ export const MedicationsSection = <T extends FieldValues>({
                 />
                 <Input
                   label="Dose"
-                  register={register(`medications.${index}.dose` as Path<T>)}
+                  register={register(`medications.${index}.dosage` as Path<T>)}
                   // @ts-expect-error - TODO: fix this
-                  error={errors.medications?.[index]?.dose?.message as string}
+                  error={errors.medications?.[index]?.dosage?.message as string}
                 />
                 <Input
                   label="Used to Treat"
@@ -83,6 +89,22 @@ export const MedicationsSection = <T extends FieldValues>({
                   labelOption="Select Frequency"
                   name={`medications.${index}.frequency` as Path<T>}
                   control={control}
+                />
+                <Input
+                  label="Prescriber"
+                  register={register(
+                    `medications.${index}.prescribingDoctor` as Path<T>
+                  )}
+                  error={
+                    // @ts-expect-error - TODO: fix this
+                    errors.medications?.[index]?.prescribingDoctor
+                      ?.message as string
+                  }
+                />
+                <DatePickerField
+                  control={control}
+                  label="Refill Due"
+                  name={`medications.${index}.refillDue` as Path<T>}
                 />
               </div>
             </div>

@@ -134,3 +134,5 @@ export * from "./common/StatefulPhoneInput";
 export * from "./forms/burial-instructions/BurialInstructions";
 export * from "./forms/burial-instructions/BurialInstructionsPDF";
 export * from "./forms/personal-info/PersonalInfo";
+export * from "./forms/important-people-in-life/ImportantPeopleInLife";
+export * from "./forms/important-people-in-life/ImportantPersonCard";

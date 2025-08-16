@@ -238,3 +238,10 @@ export interface MedicalCondition extends BaseSchema {
   onset_date: string;
   notes: string;
 }
+
+export interface DigitalAccount extends BaseSchema {
+  account: string;
+  user_name: string;
+  password: string;
+  notes: string;
+}

@@ -326,7 +326,6 @@ export const postComprehensiveCarePlan = async (
   }
 };
 
-
 export const getComprehensiveCarePlan = async (clientId: string) => {
   try {
     const response = await sendRequest({
@@ -340,4 +339,103 @@ export const getComprehensiveCarePlan = async (clientId: string) => {
     );
     throw error;
   }
-}
+};
+
+export const getBurialInstructions = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/burial-instructions`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getBurialInstructions] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postBurialInstructions = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/burial-instructions`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postBurialInstructions] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getPersonalInfo = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/personal-info-password-manager`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getPersonalInfo] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postPersonalInfo = async (clientId: string, data: unknown) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/personal-info-password-manager`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postPersonalInfo] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getImportantPeopleInLife = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/important-people`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getImportantPeopleInLife] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postImportantPeopleInLife = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/important-people`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postImportantPeopleInLife] error: ${error}`
+    );
+    throw error;
+  }
+};

@@ -322,11 +322,13 @@ const FaceSheetLongFormPDF: React.FC<{
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Medications</Text>
-        <TableHeader columns={["Medication", "Dose", "Used to Treat"]} />
+        <TableHeader
+          columns={["Medication", "Dose", "Used to Treat", "Frequency"]}
+        />
         {(data.medications ?? []).map((m, i, arr) => (
           <TableRow
             key={i}
-            cells={[m.medicationName, m.dose, m.usedToTreat]}
+            cells={[m.medicationName, m.dose, m.usedToTreat, m.frequency]}
             last={i === arr.length - 1}
           />
         ))}

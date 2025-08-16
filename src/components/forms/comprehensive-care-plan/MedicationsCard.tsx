@@ -9,9 +9,10 @@ import {
   Input,
   TertiaryButton,
   DatePickerField,
+  Select,
 } from "@agensy/components";
 import { type ComprehensiveCarePlanFormData } from "@agensy/types";
-import { ICONS } from "@agensy/constants";
+import { ICONS, MEDICATION_FREQUENCY_OPTIONS } from "@agensy/constants";
 
 interface MedicationsCardProps {
   register: UseFormRegister<ComprehensiveCarePlanFormData>;
@@ -81,10 +82,12 @@ export const MedicationsCard = ({
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <Input
+              <Select
                 label="Frequency"
-                register={register(`medications.${index}.frequency`)}
-                error={errors.medications?.[index]?.frequency?.message}
+                control={control}
+                name={`medications.${index}.frequency`}
+                data={MEDICATION_FREQUENCY_OPTIONS}
+                labelOption="Select Frequency"
               />
               <Input
                 label="Indication"

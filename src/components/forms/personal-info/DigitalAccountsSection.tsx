@@ -71,6 +71,7 @@ export const DigitalAccountsSection = <T extends FieldValues>({
                 <Input
                   label="Password:"
                   type="password"
+                  isPassword={true}
                   register={register(
                     `digitalAccounts.${index}.password` as Path<T>
                   )}

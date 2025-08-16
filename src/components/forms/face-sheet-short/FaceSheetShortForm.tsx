@@ -231,6 +231,7 @@ export const FaceSheetShortForm: React.FC = () => {
                 ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
                 : "",
               id: medication.id || "",
+              frequency: medication.frequency || "",
             })
           ) || [],
         diagnoses:
@@ -294,6 +295,7 @@ export const FaceSheetShortForm: React.FC = () => {
         dosage: item.dose ? item.dose : null,
         prescribing_doctor: item.prescriber ? item.prescriber : null,
         id: item?.id,
+        frequency: item.frequency ? item.frequency : null,
       };
       if (item.id) {
         return medication;

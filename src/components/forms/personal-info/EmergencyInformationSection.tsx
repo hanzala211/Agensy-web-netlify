@@ -22,13 +22,16 @@ export const EmergencyInformationSection = <T extends FieldValues>({
   return (
     <Card title="Emergency Information">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="md:col-span-2">
-          <Input
-            label="Emergency Contact Name:"
-            register={register("emergencyContactName" as Path<T>)}
-            error={errors.emergencyContactName?.message as string}
-          />
-        </div>
+        <Input
+          label="Emergency Contact First Name:"
+          register={register("emergencyContactFirstName" as Path<T>)}
+          error={errors.emergencyContactFirstName?.message as string}
+        />
+        <Input
+          label="Emergency Contact Last Name:"
+          register={register("emergencyContactLastName" as Path<T>)}
+          error={errors.emergencyContactLastName?.message as string}
+        />
 
         <PhoneNumberInput
           control={control}

@@ -2,9 +2,14 @@ import {
   useGetEssentialDocumentsForAging,
   usePostEssentialDocumentsForAgingMutation,
 } from "@agensy/api";
-import { Card, CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  Card,
+  CommonLoader,
+  DatePickerField,
+  PrimaryButton,
+} from "@agensy/components";
 import { useClientContext } from "@agensy/context";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
@@ -15,6 +20,7 @@ interface AdvanceCareDocument {
   document_name: string;
   in_place: boolean;
   notes?: string | null;
+  last_reviewed: string | null;
 }
 
 interface FormData {
@@ -27,18 +33,21 @@ const advanceCarePlanningDocuments: AdvanceCareDocument[] = [
     document_name: "Medical Power of Attorney (Health Care Proxy)",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Advance Care Planning",
     document_name: "Out of Hospital Do Not Resuscitate (OOH DNR)",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Advance Care Planning",
     document_name: "Physician Orders for Life Sustaining Treatment (POLST)",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Advance Care Planning",
@@ -46,6 +55,7 @@ const advanceCarePlanningDocuments: AdvanceCareDocument[] = [
       "Designation of Guardian in Event of Later Incapacity or Need",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Advance Care Planning",
@@ -53,90 +63,105 @@ const advanceCarePlanningDocuments: AdvanceCareDocument[] = [
       "Directive to Physician and Family or Surrogates (Living Will)",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Advance Care Planning",
     document_name: "Declaration for Mental Health Treatment",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Financial & Legal",
     document_name: "Durable Power of Attorney (Finances)",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Financial & Legal",
     document_name: "Will",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Financial & Legal",
     document_name: "Revocable Living Trust",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Health & Insurance",
     document_name: "Health Insurance Information",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Health & Insurance",
     document_name: "HIPAA Release Form",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "End of Life Planning",
     document_name: "Funeral Instructions",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "End of Life Planning",
     document_name: "Burial Instructions",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "End of Life Preferences",
     document_name: "Organ and Tissue Donation Directive",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Identification & Access",
     document_name: "Photo ID (Driver's License, Passport)",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Identification & Access",
     document_name: "Social Security Card",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Identification & Access",
     document_name: "List of Accounts and Passwords",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Identification & Access",
     document_name: "List of Key Contacts",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
   {
     category: "Other Documents",
     document_name: "Declaration",
     in_place: false,
     notes: "",
+    last_reviewed: "",
   },
 ];
 
@@ -172,6 +197,11 @@ export const EssentialDocumentForAging = () => {
                 id: matchingDoc.id,
                 in_place: matchingDoc.in_place,
                 notes: matchingDoc.notes,
+                last_reviewed: matchingDoc.last_reviewed
+                  ? DateUtils.formatDateToRequiredFormat(
+                      matchingDoc.last_reviewed
+                    )
+                  : "",
               }
             : defaultDoc;
         }
@@ -213,6 +243,9 @@ export const EssentialDocumentForAging = () => {
 
   const onSubmit = (data: FormData) => {
     data.documents.forEach((document) => {
+      document.last_reviewed = document.last_reviewed
+        ? DateUtils.changetoISO(document.last_reviewed)
+        : null;
       if (document.notes && document.notes.length > 0) {
         return document;
       } else {
@@ -264,7 +297,7 @@ export const EssentialDocumentForAging = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Card title="Essential Documents List">
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <div className="grid grid-cols-1 lg:grid-cols-4 bg-gray-50 border-b border-gray-300">
+              <div className="grid grid-cols-1 lg:grid-cols-5 bg-gray-50 border-b border-gray-300">
                 <div className="px-4 py-3 font-medium text-gray-700 border-r border-gray-300">
                   Category
                 </div>
@@ -274,6 +307,9 @@ export const EssentialDocumentForAging = () => {
                 <div className="px-4 py-3 font-medium text-gray-700 border-r border-gray-300">
                   In place? Yes / No
                 </div>
+                <div className="px-4 py-3 font-medium text-gray-700 border-r border-gray-300">
+                  Date Last Reviewed{" "}
+                </div>
                 <div className="px-4 py-3 font-medium text-gray-700">
                   Notes (Where is the document kept. Who has a copy)
                 </div>
@@ -282,7 +318,7 @@ export const EssentialDocumentForAging = () => {
               {fields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="grid items-center grid-cols-1 lg:grid-cols-4 gap-4 p-4 border border-gray-200 hover:bg-gray-50"
+                  className="grid items-center grid-cols-1 lg:grid-cols-5 gap-4 p-4 border border-gray-200 hover:bg-gray-50"
                 >
                   <div className="text-gray-700">
                     {watchedDocuments[index]?.category}
@@ -301,6 +337,12 @@ export const EssentialDocumentForAging = () => {
                         );
                       }}
                       className="ml-2 w-4 h-4"
+                    />
+                  </div>
+                  <div className="text-gray-700">
+                    <DatePickerField
+                      control={control}
+                      name={`documents.${index}.last_reviewed`}
                     />
                   </div>
                   <div>

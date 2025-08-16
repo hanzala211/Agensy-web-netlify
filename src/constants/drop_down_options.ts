@@ -276,3 +276,10 @@ export const ACCOUNT_TYPE_OPTIONS = [
   { value: "checking", label: "Checking" },
   { value: "savings", label: "Savings" },
 ];
+
+export const BURIAL_TYPES = {
+    TRADITIONAL_BURIAL: "traditional-burial",
+    GREEN_BURIAL: "green-burial",
+    CREMATION: "cremation",
+    OTHER: "other",
+  };

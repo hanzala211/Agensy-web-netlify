@@ -198,6 +198,7 @@ interface AdvanceCareDocument {
   document_name: string;
   in_place: boolean;
   notes?: string | null;
+  last_reviewed?: string | null;
 }
 
 interface EssentialDocumentsData {
@@ -275,6 +276,7 @@ const EssentialDocumentsForAgingPDF: React.FC<{
           <View style={styles.tableHeaderRow}>
             <Text style={styles.tableHeaderCellDocument}>Document Name</Text>
             <Text style={styles.tableHeaderCell}>In place? Yes / No</Text>
+            <Text style={styles.tableHeaderCellNotes}>Date Last Reviewed</Text>
             <Text style={styles.tableHeaderCellNotes}>
               Notes (Where is the document kept. Who has a copy)
             </Text>
@@ -297,6 +299,13 @@ const EssentialDocumentsForAgingPDF: React.FC<{
                       ]}
                     />
                   </View>
+                  <Text style={styles.notes}>
+                    {document.last_reviewed
+                      ? DateUtils.formatDateToRequiredFormat(
+                          document.last_reviewed
+                        )
+                      : ""}
+                  </Text>
                   <Text style={styles.notes}>{document.notes || " "}</Text>
                 </View>
               ))}

@@ -324,6 +324,7 @@ export const FaceSheetLongForm: React.FC = () => {
                 ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
                 : "",
               id: medication.id || "",
+              frequency: medication.frequency || ""
             })
           ) || [],
         diagnoses:
@@ -483,6 +484,7 @@ export const FaceSheetLongForm: React.FC = () => {
         medication_name: item.medicationName ? item.medicationName : null,
         dosage: item.dose ? item.dose : null,
         id: item?.id,
+        frequency: item.frequency ? item.frequency : null,
       };
       if (item.id) {
         return medication;
@@ -803,6 +805,7 @@ export const FaceSheetLongForm: React.FC = () => {
           register={register}
           errors={errors}
           medicationsArray={medicationsArray}
+          control={control}
         />
         {/* Medical Conditions */}
         <MedicalConditionsSection

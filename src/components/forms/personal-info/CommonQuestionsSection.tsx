@@ -47,6 +47,11 @@ export const CommonQuestionsSection = <T extends FieldValues>({
           register={register("mothersMaidenName" as Path<T>)}
           error={errors.mothersMaidenName?.message as string}
         />
+        <Input
+          label="Social Security Question:"
+          register={register("socialSecurityQuestion" as Path<T>)}
+          error={errors.socialSecurityQuestion?.message as string}
+        />
       </div>
     </Card>
   );

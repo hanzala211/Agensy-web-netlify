@@ -29,6 +29,7 @@ import {
 } from "@agensy/api";
 import { useClientContext } from "@agensy/context";
 import { useQueryClient } from "@tanstack/react-query";
+import { AnesthesiaSection } from "./AnesthesiaSection";
 
 const defaultValues: HealthHistoryFormData = {
   diagnoses: [
@@ -152,6 +153,11 @@ export const HealthHistoryForm: React.FC = () => {
     name: "providers",
   });
 
+  const anesthesiaArray = useFieldArray({
+    control,
+    name: "anesthesia",
+  });
+
   const onSubmit = (data: HealthHistoryFormData) => {
     const medicationsStarted = data.medicationsStarted?.map((item) => {
       const medication = {
@@ -248,6 +254,10 @@ export const HealthHistoryForm: React.FC = () => {
         treatment: data.hospitalizationTreatment
           ? data.hospitalizationTreatment
           : null,
+        medication_anesthesia_reactions: StringUtils.filterAndJoinWithCommas(
+          data.anesthesia,
+          (anesthesia) => anesthesia.anesthesia || ""
+        ),
       },
     };
     postHealthHistoryMutation.mutate({
@@ -355,6 +365,16 @@ export const HealthHistoryForm: React.FC = () => {
                 : "",
               id: medication.id || "",
             })) || [],
+        anesthesia:
+          healthHistoryForm?.health_history?.medication_anesthesia_reactions &&
+          healthHistoryForm?.health_history?.medication_anesthesia_reactions
+            .length > 0
+            ? healthHistoryForm?.health_history?.medication_anesthesia_reactions
+                ?.split(", ")
+                ?.map((anesthesia: string) => ({
+                  anesthesia: anesthesia || "",
+                }))
+            : [],
       });
       setOpenedFileData({
         ...getValues(),
@@ -529,6 +549,13 @@ export const HealthHistoryForm: React.FC = () => {
             ))}
           </div>
         </Card>
+
+        <AnesthesiaSection
+          register={register}
+          errors={errors}
+          anesthesiaArray={anesthesiaArray}
+        />
+
         {/* Healthcare Provider Section */}
         <Card
           title="Healthcare Providers"

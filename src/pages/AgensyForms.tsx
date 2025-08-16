@@ -18,6 +18,7 @@ import {
   ComprehensiveCarePlan,
   BurialInstructions,
   PersonalInfo,
+  ImportantPeopleInLife,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -183,9 +184,15 @@ const rootFolders: FolderItem[] = [
       },
       {
         id: "personal-info",
-        name: "Personal Information & Password Organization",
+        name: "Personal Information & Password Organizer",
         type: "file",
         slug: "personal-info",
+      },
+      {
+        id: "important-people-in-life",
+        name: "Important People in Life",
+        type: "file",
+        slug: "important-people-in-life",
       },
     ],
   },
@@ -308,9 +315,15 @@ const fileMap: Record<string, FolderData> = {
   },
   "personal-info": {
     id: "personal-info",
-    name: "Personal Information & Password Organization",
-    description: "Personal information and password organization",
+    name: "Personal Information & Password Organizer",
+    description: "Personal information and password Organizer",
     content: <PersonalInfo />,
+  },
+  "important-people-in-life": {
+    id: "important-people-in-life",
+    name: "Important People in Life",
+    description: "Important people in life",
+    content: <ImportantPeopleInLife />,
   },
 };
 

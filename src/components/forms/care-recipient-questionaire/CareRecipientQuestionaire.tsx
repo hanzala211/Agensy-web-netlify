@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm, useWatch, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CommonLoader, PrimaryButton } from "@agensy/components";
 import { useClientContext } from "@agensy/context";
@@ -22,7 +22,10 @@ import { WorkAndRetirementSection } from "./WorkAndRetirementSection";
 import { OtherPertinentInformationSection } from "./OtherPertinentInformationSection";
 import { SummarySection } from "./SummarySection";
 import { careRecipientQuestionnaireSchema } from "@agensy/types";
-import type { CareRecipientQuestionnaireData } from "@agensy/types";
+import type {
+  CareRecipientQuestionnaireData,
+  ClientMedications,
+} from "@agensy/types";
 import { useParams } from "react-router-dom";
 import {
   useGetCareRecipientQuestionnaire,
@@ -31,6 +34,7 @@ import {
 import { DateUtils, toast } from "@agensy/utils";
 import { RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
+import { MedicationsSection } from "./MedicationsSection";
 
 const defaultValues = {
   formFillerName: "",
@@ -127,6 +131,7 @@ const defaultValues = {
   homeEnvironmentAdequacy: undefined,
 
   healthcareProviders: [],
+  medications: [],
 
   medicalConditions: [],
 
@@ -231,6 +236,11 @@ export const CareRecipientQuestionaire = () => {
     name: "medicalConditions",
   });
 
+  const medicationsArray = useFieldArray({
+    control,
+    name: "medications",
+  });
+
   useEffect(() => {
     if (careRecipientQuestionnaire) {
       const formData = {
@@ -299,6 +309,20 @@ export const CareRecipientQuestionaire = () => {
           : "",
         careRecipientLossImpactDescription:
           careRecipientQuestionnaire.client_info?.loss_impact_description || "",
+
+        medications: careRecipientQuestionnaire.medications?.map(
+          (item: ClientMedications) => ({
+            medicationName: item.medication_name || "",
+            dosage: item.dosage || "",
+            usedToTreat: item.purpose || "",
+            refillDue: item.refill_due
+              ? DateUtils.formatDateToRequiredFormat(item.refill_due)
+              : "",
+            frequency: item.frequency || "",
+            id: item.id || "",
+            prescribingDoctor: item.prescribing_doctor || "",
+          })
+        ),
 
         // Work and Retirement Information
         occupationProfession:
@@ -727,28 +751,15 @@ export const CareRecipientQuestionaire = () => {
       medicalConditionsArray.replace(formData.medicalConditions);
       relativesArray.replace(formData.relatives);
       friendsNeighborsArray.replace(formData.friendsNeighbors);
+      medicationsArray.replace(formData.medications);
+      setOpenedFileData({
+        ...getValues,
+        last_update: {
+          updatedAt: careRecipientQuestionnaire?.last_update?.updatedAt || "",
+        },
+      } as unknown as Record<string, string | string[] | Record<string, string | number>>);
     }
   }, [careRecipientQuestionnaire]);
-
-  const formValues = useWatch({ control });
-
-  useEffect(() => {
-    if (formValues && Object.keys(formValues).length > 0) {
-      setOpenedFileData({
-        ...formValues,
-        last_update: {
-          updatedAt: careRecipientQuestionnaire?.last_update?.updatedAt || "",
-        },
-      } as unknown as Record<string, string | string[] | Record<string, string | number>>);
-    } else {
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: careRecipientQuestionnaire?.last_update?.updatedAt || "",
-        },
-      } as unknown as Record<string, string | string[] | Record<string, string | number>>);
-    }
-  }, [formValues, setOpenedFileData, getValues]);
 
   useEffect(() => {
     if (postCareRecipientQuestionaireMutation.status === "success") {
@@ -904,6 +915,27 @@ export const CareRecipientQuestionaire = () => {
         };
       }
     });
+    const medications = data.medications?.map((item) => {
+      const medication = {
+        medication_name: item.medicationName ? item.medicationName : null,
+        dosage: item.dosage ? item.dosage : null,
+        purpose: item.usedToTreat ? item.usedToTreat : null,
+        refill_due: item.refillDue
+          ? DateUtils.changetoISO(item.refillDue)
+          : null,
+        frequency: item.frequency ? item.frequency : null,
+        id: item.id,
+        prescribing_doctor: item.prescribingDoctor
+          ? item.prescribingDoctor
+          : null,
+      };
+      if (medication.id) {
+        return medication;
+      } else {
+        delete medication.id;
+        return medication;
+      }
+    });
 
     const postData = {
       client_info: {
@@ -1002,6 +1034,7 @@ export const CareRecipientQuestionaire = () => {
       friends_contact: friendsContact || [],
       professional_contacts: professional_contacts || [],
       healthcare_providers: healthcare_providers || [],
+      medications: medications || [],
       medical_conditions: {
         problem:
           data.medicalConditions
@@ -1242,6 +1275,13 @@ export const CareRecipientQuestionaire = () => {
           errors={errors}
           // @ts-expect-error - TODO: fix this
           control={control}
+        />
+        <MedicationsSection
+          errors={errors}
+          // @ts-expect-error - TODO: fix this
+          control={control}
+          register={register}
+          medicationsArray={medicationsArray}
         />
         <ProblemAreasSection
           register={register}

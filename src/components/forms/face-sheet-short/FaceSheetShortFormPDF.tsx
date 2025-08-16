@@ -280,6 +280,7 @@ const FaceSheetShortFormPDF: React.FC<{
               "Used to Treat",
               "Prescriber",
               "Refill Due",
+              "Frequency",
             ]}
           />
           {(data?.medications ?? [])
@@ -293,6 +294,7 @@ const FaceSheetShortFormPDF: React.FC<{
                   m.usedToTreat ?? "",
                   m.prescriber ?? "",
                   m.refillDue ?? "",
+                  m.frequency ?? "",
                 ]}
                 last={i === arr.length - 1}
               />

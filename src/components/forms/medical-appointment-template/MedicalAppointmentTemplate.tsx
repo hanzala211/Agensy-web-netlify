@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   PrimaryButton,
@@ -17,7 +17,6 @@ import {
   type ClientMedications,
   type HealthcareProvider,
   type MedicalAppointmentTemplateData,
-  type OpenedFileData,
 } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import {
@@ -106,26 +105,6 @@ export const MedicalAppointmentTemplate: React.FC = () => {
     resolver: zodResolver(medicalAppointmentTemplateSchema),
     defaultValues,
   });
-
-  const formValues = useWatch({ control });
-
-  useEffect(() => {
-    if (formValues && Object.keys(formValues).length > 0) {
-      setOpenedFileData({
-        ...formValues,
-        last_update: {
-          updatedAt: medicalAppointmentTemplate?.last_update?.updatedAt,
-        },
-      } as unknown as OpenedFileData);
-    } else {
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: medicalAppointmentTemplate?.last_update?.updatedAt,
-        },
-      } as unknown as OpenedFileData);
-    }
-  }, [formValues]);
 
   const {
     fields: healthcareProviders,
@@ -274,6 +253,12 @@ export const MedicalAppointmentTemplate: React.FC = () => {
       };
 
       reset(formattedData);
+      setOpenedFileData({
+        ...getValues,
+        last_update: {
+          updatedAt: medicalAppointmentTemplate?.last_update?.updatedAt || "",
+        },
+      } as unknown as Record<string, string | string[] | Record<string, string | number>>);
     }
   }, [medicalAppointmentTemplate, reset]);
 

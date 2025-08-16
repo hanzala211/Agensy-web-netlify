@@ -11,8 +11,9 @@ import {
   Card,
   DatePickerField,
   TertiaryButton,
+  Select,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { ICONS, MEDICATION_FREQUENCY_OPTIONS } from "@agensy/constants";
 
 interface MedicationsSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
@@ -92,14 +93,19 @@ export const MedicationsSection = <T extends FieldValues>({
                     errors.medications?.[index]?.prescriber?.message as string
                   }
                 />
+                <Select
+                  label="Frequency"
+                  data={MEDICATION_FREQUENCY_OPTIONS}
+                  name={`medications.${index}.frequency` as Path<T>}
+                  control={control}
+                  labelOption="Select Frequency"
+                />
+                <DatePickerField
+                  control={control}
+                  label="Refill Due"
+                  name={`medications.${index}.refillDue` as Path<T>}
+                />
               </div>
-            </div>
-            <div className="w-full mt-4">
-              <DatePickerField
-                control={control}
-                label="Refill Due"
-                name={`medications.${index}.refillDue` as Path<T>}
-              />
             </div>
             {medicationFields.length > 1 && (
               <div className="flex justify-end mt-3">

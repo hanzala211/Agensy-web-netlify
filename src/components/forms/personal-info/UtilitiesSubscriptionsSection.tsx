@@ -34,6 +34,7 @@ export const UtilitiesSubscriptionsSection = <T extends FieldValues>({
             <Input
               label="Password:"
               type="password"
+              isPassword={true}
               register={register("electricityPassword" as Path<T>)}
               error={errors.electricityPassword?.message as string}
             />
@@ -56,6 +57,7 @@ export const UtilitiesSubscriptionsSection = <T extends FieldValues>({
             <Input
               label="Password:"
               type="password"
+              isPassword={true}
               register={register("internetPassword" as Path<T>)}
               error={errors.internetPassword?.message as string}
             />
@@ -77,6 +79,7 @@ export const UtilitiesSubscriptionsSection = <T extends FieldValues>({
             />
             <Input
               label="Password:"
+              isPassword={true}
               type="password"
               register={register("phonePassword" as Path<T>)}
               error={errors.phonePassword?.message as string}
@@ -100,6 +103,7 @@ export const UtilitiesSubscriptionsSection = <T extends FieldValues>({
             <Input
               label="Password:"
               type="password"
+              isPassword={true}
               register={register("streamingPassword" as Path<T>)}
               error={errors.streamingPassword?.message as string}
             />

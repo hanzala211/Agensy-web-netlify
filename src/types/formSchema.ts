@@ -450,6 +450,7 @@ export const faceSheetShortFormSchema = z.object({
         prescriber: z.string().optional(),
         refillDue: z.string().optional(),
         id: z.string().optional().nullable().nullish(),
+        frequency: z.string().optional(),
       })
     )
     .optional(),
@@ -599,6 +600,7 @@ export const faceSheetLongFormSchema = z
           dose: z.string().optional(),
           usedToTreat: z.string().optional(),
           id: z.string().optional().nullable().nullish(),
+          frequency: z.string().optional(),
         })
       )
       .optional(),
@@ -702,6 +704,14 @@ export const healthHistoryFormSchema = z.object({
     .array(
       z.object({
         diagnosis: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  anesthesia: z
+    .array(
+      z.object({
+        anesthesia: z.string().optional(),
       })
     )
     .optional(),
@@ -961,6 +971,20 @@ export const careRecipientQuestionnaireSchema = z.object({
     .nullable()
     .optional()
     .transform((val) => val || ""),
+
+  medications: z
+    .array(
+      z.object({
+        medicationName: z.string().optional(),
+        dosage: z.string().optional(),
+        prescribingDoctor: z.string().optional(),
+        id: z.string().optional().nullish().nullable(),
+        usedToTreat: z.string().optional(),
+        frequency: z.string().optional(),
+        refillDue: z.string().optional(),
+      })
+    )
+    .optional(),
 
   // Work and Retirement Information
   occupationProfession: z
@@ -2568,7 +2592,8 @@ export const personalInfoFormSchema = z.object({
   passportExpirationDate: z.string().optional(),
 
   // Emergency Information
-  emergencyContactName: z.string().optional(),
+  emergencyContactFirstName: z.string().optional(),
+  emergencyContactLastName: z.string().optional(),
   emergencyContactPhone: z.string().optional(),
   emergencyContactRelationship: z.string().optional(),
   healthInsuranceProvider: z.string().optional(),
@@ -2616,6 +2641,7 @@ export const personalInfoFormSchema = z.object({
   previousStreetNames: z.string().optional(),
   creditCardInstitutions: z.string().optional(),
   mothersMaidenName: z.string().optional(),
+  socialSecurityQuestion: z.string().optional(),
 
   // Notes & Backup Contacts
   trustedPersonName: z.string().optional(),
@@ -2624,3 +2650,66 @@ export const personalInfoFormSchema = z.object({
 });
 
 export type PersonalInfoFormData = z.infer<typeof personalInfoFormSchema>;
+
+export const importantPersonSchema = z.object({
+  name: z.string().optional(),
+  phone: z.string().optional(),
+  relationship: z.string().optional(),
+});
+
+export type ImportantPersonData = z.infer<typeof importantPersonSchema>;
+
+export const importantPeopleInLifeFormSchema = z.object({
+  medicalPOAName: z.string().optional(),
+  medicalPOAPhone: z.string().optional(),
+  medicalPOARelationship: z.string().optional(),
+
+  financialPOAName: z.string().optional(),
+  financialPOAPhone: z.string().optional(),
+  financialPOARelationship: z.string().optional(),
+
+  lawyerName: z.string().optional(),
+  lawyerPhone: z.string().optional(),
+  lawyerFirm: z.string().optional(),
+
+  accountantName: z.string().optional(),
+  accountantPhone: z.string().optional(),
+  accountantFirm: z.string().optional(),
+
+  financialAdvisorName: z.string().optional(),
+  financialAdvisorPhone: z.string().optional(),
+  financialAdvisorFirm: z.string().optional(),
+
+  trustOfficerName: z.string().optional(),
+  trustOfficerPhone: z.string().optional(),
+  trustOfficerAgency: z.string().optional(),
+
+  emergencyContactOneName: z.string().optional(),
+  emergencyContactOnePhone: z.string().optional(),
+  emergencyContactOneRelationship: z.string().optional(),
+
+  emergencyContactTwoName: z.string().optional(),
+  emergencyContactTwoPhone: z.string().optional(),
+  emergencyContactTwoRelationship: z.string().optional(),
+
+  neighborName: z.string().optional(),
+  neighborPhone: z.string().optional(),
+  neighborAddress: z.string().optional(),
+
+  closeFriendName: z.string().optional(),
+  closeFriendPhone: z.string().optional(),
+  closeFriendRelationship: z.string().optional(),
+
+  faithContactName: z.string().optional(),
+  faithContactPhone: z.string().optional(),
+  faithContactAffiliation: z.string().optional(),
+
+  clubName: z.string().optional(),
+  clubPhone: z.string().optional(),
+
+  notesAndReminders: z.string().optional(),
+});
+
+export type ImportantPeopleInLifeFormData = z.infer<
+  typeof importantPeopleInLifeFormSchema
+>;

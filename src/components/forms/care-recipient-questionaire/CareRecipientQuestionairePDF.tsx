@@ -507,6 +507,37 @@ const CareRecipientQuestionairePDF: React.FC<{
             ))}
         </View>
 
+        {/* Medications */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Medications</Text>
+          <TableHeader
+            columns={[
+              "Medication",
+              "Dose",
+              "Used to Treat",
+              "Prescriber",
+              "Refill Due",
+              "Frequency",
+            ]}
+          />
+          {(data?.medications ?? [])
+            .filter((m) => m && m.medicationName)
+            .map((m, i, arr) => (
+              <TableRow
+                key={i}
+                cells={[
+                  m.medicationName ?? "",
+                  m.dosage ?? "",
+                  m.usedToTreat ?? "",
+                  m.prescribingDoctor ?? "",
+                  m.refillDue ?? "",
+                  m.frequency ?? "",
+                ]}
+                last={i === arr.length - 1}
+              />
+            ))}
+        </View>
+
         {/* Medical Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Medical Information</Text>
