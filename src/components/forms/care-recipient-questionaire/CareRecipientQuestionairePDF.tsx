@@ -527,7 +527,6 @@ const CareRecipientQuestionairePDF: React.FC<{
                 key={i}
                 cells={[
                   m.medicationName ?? "",
-                  m.dosage ?? "",
                   m.usedToTreat ?? "",
                   m.prescribingDoctor ?? "",
                   m.refillDue ?? "",
