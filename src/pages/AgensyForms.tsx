@@ -19,6 +19,10 @@ import {
   BurialInstructions,
   PersonalInfo,
   ImportantPeopleInLife,
+  VitalsTracker,
+  LabsTracker,
+  InPatientStayNotes,
+  ComprehensiveMedicationList,
 } from "@agensy/components";
 import type { FolderItem, FolderData } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
@@ -182,6 +186,14 @@ const rootFolders: FolderItem[] = [
         type: "file",
         slug: "burial-instructions",
       },
+    ],
+  },
+  {
+    id: "trackers",
+    slug: "trackers",
+    name: "Trackers",
+    type: "folder",
+    children: [
       {
         id: "personal-info",
         name: "Personal Information & Password Organizer",
@@ -193,6 +205,30 @@ const rootFolders: FolderItem[] = [
         name: "Important People in Life",
         type: "file",
         slug: "important-people-in-life",
+      },
+      {
+        id: "vitals-tracker",
+        name: "Vitals Tracker",
+        type: "file",
+        slug: "vitals-tracker",
+      },
+      {
+        id: "labs-test-tracker",
+        name: "Labs Test Tracker",
+        type: "file",
+        slug: "labs-test-tracker",
+      },
+      {
+        id: "in-patient-stay-notes",
+        name: "In-Patient Stay Notes",
+        type: "file",
+        slug: "in-patient-stay-notes",
+      },
+      {
+        id: "comprehensive-medication-list",
+        name: "Comprehensive Medication and Supplement List",
+        type: "file",
+        slug: "comprehensive-medication-list",
       },
     ],
   },
@@ -324,6 +360,30 @@ const fileMap: Record<string, FolderData> = {
     name: "Important People in Life",
     description: "Important people in life",
     content: <ImportantPeopleInLife />,
+  },
+  "vitals-tracker": {
+    id: "vitals-tracker",
+    name: "Vitals Tracker",
+    description: "Vitals Tracker",
+    content: <VitalsTracker />,
+  },
+  "labs-test-tracker": {
+    id: "labs-test-tracker",
+    name: "Labs Test Tracker",
+    description: "Labs Test Tracker",
+    content: <LabsTracker />,
+  },
+  "in-patient-stay-notes": {
+    id: "in-patient-stay-notes",
+    name: "In-Patient Stay Notes",
+    description: "In-Patient Stay Notes",
+    content: <InPatientStayNotes />,
+  },
+  "comprehensive-medication-list": {
+    id: "comprehensive-medication-list",
+    name: "Comprehensive Medication and Supplement List",
+    description: "Comprehensive Medication and Supplement List",
+    content: <ComprehensiveMedicationList />,
   },
 };
 

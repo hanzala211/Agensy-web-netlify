@@ -42,10 +42,10 @@ export const MedicationsSection = <T extends FieldValues>({
         appendMedication({
           // @ts-expect-error - TODO: fix this
           medicationName: "",
-          dose: "",
           usedToTreat: "",
           prescriber: "",
           refillDue: "",
+          frequency: "",
         })
       }
       ariaLabel="Add Medication"
@@ -66,12 +66,6 @@ export const MedicationsSection = <T extends FieldValues>({
                     errors.medications?.[index]?.medicationName
                       ?.message as string
                   }
-                />
-                <Input
-                  label="Dose"
-                  register={register(`medications.${index}.dosage` as Path<T>)}
-                  // @ts-expect-error - TODO: fix this
-                  error={errors.medications?.[index]?.dosage?.message as string}
                 />
                 <Input
                   label="Used to Treat"
@@ -101,11 +95,13 @@ export const MedicationsSection = <T extends FieldValues>({
                       ?.message as string
                   }
                 />
-                <DatePickerField
-                  control={control}
-                  label="Refill Due"
-                  name={`medications.${index}.refillDue` as Path<T>}
-                />
+                <div className="md:col-span-2">
+                  <DatePickerField
+                    control={control}
+                    label="Refill Due"
+                    name={`medications.${index}.refillDue` as Path<T>}
+                  />
+                </div>
               </div>
             </div>
             {medicationFields.length > 1 && (

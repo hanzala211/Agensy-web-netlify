@@ -207,3 +207,64 @@ export const usePostImportantPeopleInLifeMutation = () => {
       ClientAgensyFormsService.postImportantPeopleInLife(clientId, data),
   });
 };
+
+export const useGetVitalsTracker = (clientId: string) => {
+  return useQuery({
+    queryKey: ["vitals-tracker", clientId],
+    queryFn: () => ClientAgensyFormsService.getVitalsTrackerForm(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostVitalsTracker = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postVitalsTracker(clientId, data),
+  });
+};
+
+export const useGetLabsTracker = (clientId: string) => {
+  return useQuery({
+    queryKey: ["labs-tracker", clientId],
+    queryFn: () => ClientAgensyFormsService.getLabsTracker(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostLabsTracker = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postLabsTracker(clientId, data),
+  });
+};
+
+export const useGetInPatientStayNotes = (clientId: string) => {
+  return useQuery({
+    queryKey: ["in-patient-stay-notes", clientId],
+    queryFn: () => ClientAgensyFormsService.getInPatientStayNotes(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostInPatientStayNotes = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postInPatientStayNotes(clientId, data),
+  });
+};
+
+export const useGetComprehensiveMedicationList = (clientId: string) => {
+  return useQuery({
+    queryKey: ["comprehensive-medication-list", clientId],
+    queryFn: () =>
+      ClientAgensyFormsService.getComprehensiveMedicationList(clientId),
+    enabled: false,
+  });
+};
+
+export const usePostComprehensiveMedicationList = () => {
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
+      ClientAgensyFormsService.postComprehensiveMedicationList(clientId, data),
+  });
+};

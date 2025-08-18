@@ -439,3 +439,131 @@ export const postImportantPeopleInLife = async (
     throw error;
   }
 };
+
+export const getVitalsTrackerForm = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/vitals-trackers`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getVitalsTrackerForm] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postVitalsTracker = async (clientId: string, data: unknown) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/vitals-trackers`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postVitalsTracker] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getLabsTracker = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/labs-test-imaging-trackers`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(`Client Agensy Forms Service [getLabsTracker] error: ${error}`);
+    throw error;
+  }
+};
+
+export const postLabsTracker = async (clientId: string, data: unknown) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/labs-test-imaging-trackers`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postVitalsTracker] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getInPatientStayNotes = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/in-patient-stay-notes`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getInPatientStayNotes] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postInPatientStayNotes = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/in-patient-stay-notes`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postInPatientStayNotes] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const getComprehensiveMedicationList = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/comprehensive-medication-supplement-list`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getComprehensiveMedicationList] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const postComprehensiveMedicationList = async (
+  clientId: string,
+  data: unknown
+) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/comprehensive-medication-supplement-list`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [postComprehensiveMedicationList] error: ${error}`
+    );
+    throw error;
+  }
+};

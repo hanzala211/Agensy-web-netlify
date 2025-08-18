@@ -169,6 +169,7 @@ export const FaceSheetShortForm: React.FC = () => {
               faceSheetShortForm?.client_info?.date_of_birth
             )
           : "",
+        gender: faceSheetShortForm?.client_info?.gender || "",
         codeStatus:
           CODE_STATUS_OPTIONS.find(
             (codeStatus) =>
@@ -302,7 +303,7 @@ export const FaceSheetShortForm: React.FC = () => {
       } else {
         delete medication.id;
         return medication;
-      }
+      } 
     });
     const providers = data.providers?.map((item) => {
       const provider = {
@@ -353,6 +354,7 @@ export const FaceSheetShortForm: React.FC = () => {
         pharmacy_fax: data.pharmacyFax ? data.pharmacyFax : null,
         code_status: data.codeStatus ? data.codeStatus : null,
         advance_directive: data.advanceDirective ? data.advanceDirective : null,
+        gender: data.gender ? data.gender : null,
       },
 
       medical_info: {

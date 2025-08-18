@@ -10,8 +10,14 @@ import type {
   FolderData,
   FolderItem,
   HealthHistoryFormData,
+  ImportantPeopleInLifeFormData,
   InitialCareAssessmentPlanFormData,
+  InPatientStayNotesFormData,
+  LabsTrackerFormData,
   MedicalAppointmentTemplateData,
+  PersonalInfoFormData,
+  VitalsTrackerFormData,
+  ComprehensiveMedicationListFormData,
 } from "@agensy/types";
 import { OCRModel, TertiaryButton } from "@agensy/components";
 import { useClientContext } from "@agensy/context";
@@ -35,6 +41,12 @@ import MedicalAppointmentTemplatePDF from "./medical-appointment-template/Medica
 import InitialCareAssessmentPlanPDF from "./initial-care-assessment/InitialCareAssessmentPlanPDF";
 import ComprehensiveCarePlanPDF from "./comprehensive-care-plan/ComprehensiveCarePlanPDF";
 import BurialInstructionsPDF from "./burial-instructions/BurialInstructionsPDF";
+import { PersonalInfoPDF } from "./personal-info/PersonalInfoPDF";
+import { ImportantPeopleInLifePDF } from "./important-people-in-life/ImportantPeopleInLifePDF";
+import { VitalsTrackerPDF } from "./vitals-tracker/VitalsTrackerPDF";
+import { LabsTrackerPDF } from "./labs-tracker/LabsTrackerPDF";
+import { InPatientStayNotesPDF } from "./in-patient-stay-notes/InPatientStayNotesPDF";
+import { ComprehensiveMedicationListPDF } from "./comprehensive-medication-list/ComprehensiveMedicationListPDF";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -359,6 +371,84 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               <BurialInstructionsPDF
                 data={
                   openedFileData as unknown as BurialInstructionsFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "personal-info":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <PersonalInfoPDF
+                data={
+                  openedFileData as unknown as PersonalInfoFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "important-people-in-life":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <ImportantPeopleInLifePDF
+                data={
+                  openedFileData as unknown as ImportantPeopleInLifeFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "vitals-tracker":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <VitalsTrackerPDF
+                data={
+                  openedFileData as unknown as VitalsTrackerFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "labs-test-tracker":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <LabsTrackerPDF
+                data={
+                  openedFileData as unknown as LabsTrackerFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "in-patient-stay-notes":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <InPatientStayNotesPDF
+                data={
+                  openedFileData as unknown as InPatientStayNotesFormData & {
+                    last_update: { updatedAt: string };
+                  }
+                }
+              />
+            );
+          }
+          break;
+        case "comprehensive-medication-list":
+          if (openedFileData && typeof openedFileData === "object") {
+            return (
+              <ComprehensiveMedicationListPDF
+                data={
+                  openedFileData as unknown as ComprehensiveMedicationListFormData & {
                     last_update: { updatedAt: string };
                   }
                 }

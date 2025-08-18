@@ -9,6 +9,7 @@ import {
 import {
   importantPeopleInLifeFormSchema,
   type ImportantPeopleInLifeFormData,
+  type OpenedFileData,
 } from "@agensy/types";
 import { ImportantPersonCard } from "./ImportantPersonCard";
 import {
@@ -19,6 +20,7 @@ import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { useClientContext } from "@agensy/context";
 
 const defaultValues: ImportantPeopleInLifeFormData = {
   medicalPOAName: "",
@@ -73,11 +75,13 @@ const defaultValues: ImportantPeopleInLifeFormData = {
 
 export const ImportantPeopleInLife = () => {
   const params = useParams();
+  const { setOpenedFileData } = useClientContext();
   const {
     register,
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<ImportantPeopleInLifeFormData>({
     resolver: zodResolver(importantPeopleInLifeFormSchema),
@@ -188,16 +192,24 @@ export const ImportantPeopleInLife = () => {
           importantPeopleInLifeData.important_people.club_group_contact || "",
         notesAndReminders:
           importantPeopleInLifeData.important_people.additional_notes || "",
-        emergencyContactOneName:
-          importantPeopleInLifeData.emergency_contact.first_name +
-            " " +
-            importantPeopleInLifeData.emergency_contact.last_name || "",
+        emergencyContactOneName: importantPeopleInLifeData.emergency_contact
+          .first_name
+          ? importantPeopleInLifeData.emergency_contact.first_name
+          : "" + " " + importantPeopleInLifeData.emergency_contact.last_name
+          ? importantPeopleInLifeData.emergency_contact.last_name
+          : "",
         emergencyContactOnePhone:
           importantPeopleInLifeData.emergency_contact.phone || "",
         emergencyContactOneRelationship:
           importantPeopleInLifeData.emergency_contact.relationship || "",
       };
       reset(formData);
+      setOpenedFileData({
+        ...getValues(),
+        last_update: {
+          updatedAt: importantPeopleInLifeData?.last_update?.updatedAt || "",
+        },
+      } as unknown as OpenedFileData);
     }
   }, [importantPeopleInLifeData]);
 
@@ -205,15 +217,21 @@ export const ImportantPeopleInLife = () => {
     const postData = {
       emergency_contact: {
         first_name: data.emergencyContactOneName
-          ? data.emergencyContactOneName.split(" ")?.[0] || null
+          ? data.emergencyContactOneName.split(" ").length > 0
+            ? data.emergencyContactOneName.split(" ")?.[0]
+            : null
           : null,
         last_name: data.emergencyContactOneName
-          ? data.emergencyContactOneName.split(" ")?.[1] || null
+          ? data.emergencyContactOneName.split(" ").length > 0
+            ? data.emergencyContactOneName.split(" ")?.[1]
+            : null
           : null,
         phone: data.emergencyContactOnePhone
           ? data.emergencyContactOnePhone
           : null,
-        relationship: data.emergencyContactOneRelationship,
+        relationship: data.emergencyContactOneRelationship
+          ? data.emergencyContactOneRelationship
+          : null,
       },
       important_people: {
         mpoa_name: data.medicalPOAName ? data.medicalPOAName : null,

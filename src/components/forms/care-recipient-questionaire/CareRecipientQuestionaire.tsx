@@ -313,7 +313,6 @@ export const CareRecipientQuestionaire = () => {
         medications: careRecipientQuestionnaire.medications?.map(
           (item: ClientMedications) => ({
             medicationName: item.medication_name || "",
-            dosage: item.dosage || "",
             usedToTreat: item.purpose || "",
             refillDue: item.refill_due
               ? DateUtils.formatDateToRequiredFormat(item.refill_due)
@@ -918,7 +917,6 @@ export const CareRecipientQuestionaire = () => {
     const medications = data.medications?.map((item) => {
       const medication = {
         medication_name: item.medicationName ? item.medicationName : null,
-        dosage: item.dosage ? item.dosage : null,
         purpose: item.usedToTreat ? item.usedToTreat : null,
         refill_due: item.refillDue
           ? DateUtils.changetoISO(item.refillDue)

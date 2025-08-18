@@ -86,6 +86,8 @@ export interface ClientMedications extends BaseSchema {
   notes?: string;
   active?: boolean;
   indication?: string;
+  side_effects?: string;
+  pharmacy?: string;
 }
 
 export interface HealthcareProvider extends BaseSchema {

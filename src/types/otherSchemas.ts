@@ -52,3 +52,16 @@ export interface MappedField {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: string | any[];
 }
+
+export type Vital = {
+  id?: number | null;
+  date: string | null;
+  heart_rate: string | number | null;
+  blood_pressure: string | null;
+  temperature: string | number | null;
+  weight: string | number | null;
+  height: string | number | null;
+  oxygen_saturation: string | number | null;
+  blood_type: string | null;
+  other_vital_signs: string | null;
+};

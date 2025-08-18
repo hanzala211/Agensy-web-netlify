@@ -4,6 +4,7 @@ import { CommonLoader, PrimaryButton } from "@agensy/components";
 import {
   personalInfoFormSchema,
   type DigitalAccount,
+  type OpenedFileData,
   type PersonalInfoFormData,
 } from "@agensy/types";
 import { PersonalIdentificationSection } from "./PersonalIdentificationSection";
@@ -18,6 +19,7 @@ import { useGetPersonalInfo, usePostPersonalInfoMutation } from "@agensy/api";
 import { useEffect } from "react";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { useClientContext } from "@agensy/context";
 
 const defaultValues = {
   firstName: "",
@@ -68,17 +70,19 @@ const defaultValues = {
 export const PersonalInfo = () => {
   const params = useParams();
   const queryClient = useQueryClient();
+  const { setOpenedFileData } = useClientContext();
+  const postPersonalInfoMutation = usePostPersonalInfoMutation();
   const {
     data: personalInfo,
     isFetching: isLoadingPersonalInfo,
     refetch,
   } = useGetPersonalInfo(params.clientId!);
-  const postPersonalInfoMutation = usePostPersonalInfoMutation();
   const {
     register,
     control,
     handleSubmit,
     formState: { errors },
+    getValues,
     reset,
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoFormSchema),
@@ -225,6 +229,12 @@ export const PersonalInfo = () => {
       };
       reset(formData);
       digitalAccountsArray.replace(formData.digitalAccounts);
+      setOpenedFileData({
+        ...getValues(),
+        last_update: {
+          updatedAt: personalInfo?.last_update?.updatedAt || "",
+        },
+      } as unknown as OpenedFileData);
     }
   }, [personalInfo]);
 

@@ -136,3 +136,7 @@ export * from "./forms/burial-instructions/BurialInstructionsPDF";
 export * from "./forms/personal-info/PersonalInfo";
 export * from "./forms/important-people-in-life/ImportantPeopleInLife";
 export * from "./forms/important-people-in-life/ImportantPersonCard";
+export * from "./forms/vitals-tracker/VitalsTracker";
+export * from "./forms/labs-tracker/LabsTracker";
+export * from "./forms/in-patient-stay-notes/InPatientStayNotes";
+export * from "./forms/comprehensive-medication-list/ComprehensiveMedicationList";

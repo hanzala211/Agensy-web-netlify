@@ -10,7 +10,9 @@ import {
   Card,
   DatePickerField,
   PhoneNumberInput,
+  Select,
 } from "@agensy/components";
+import { GENDER_OPTIONS } from "@agensy/constants";
 
 interface PersonalInformationSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
@@ -25,7 +27,7 @@ export const PersonalInformationSection = <T extends FieldValues>({
 }: PersonalInformationSectionProps<T>) => {
   return (
     <Card title="Personal Information">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Input
           label="First Name"
           register={register("firstName" as Path<T>)}
@@ -51,11 +53,20 @@ export const PersonalInformationSection = <T extends FieldValues>({
           register={register("ssn" as Path<T>)}
           error={errors.ssn?.message as string}
         />
-        <Input
-          label="Address"
-          register={register("address" as Path<T>)}
-          error={errors.address?.message as string}
+        <Select
+          data={GENDER_OPTIONS}
+          labelOption="Select Gender"
+          label="Gender"
+          control={control}
+          name={"gender" as Path<T>}
         />
+        <div className="md:col-span-2">
+          <Input
+            label="Address"
+            register={register("address" as Path<T>)}
+            error={errors.address?.message as string}
+          />
+        </div>
       </div>
     </Card>
   );
