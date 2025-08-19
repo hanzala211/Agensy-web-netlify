@@ -22,6 +22,7 @@ export interface Client extends BaseSchema {
   primary_user_id: string;
   first_name: string;
   last_name: string;
+  preferred_name?: string;
   date_of_birth: string;
   ssn: string | null;
   address: string;

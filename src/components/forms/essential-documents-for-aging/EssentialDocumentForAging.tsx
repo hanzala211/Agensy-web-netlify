@@ -4,10 +4,12 @@ import {
 } from "@agensy/api";
 import {
   Card,
+  CommonLink,
   CommonLoader,
   DatePickerField,
   PrimaryButton,
 } from "@agensy/components";
+import { ROUTES } from "@agensy/constants";
 import { useClientContext } from "@agensy/context";
 import { DateUtils, toast } from "@agensy/utils";
 import { useEffect } from "react";
@@ -361,7 +363,7 @@ export const EssentialDocumentForAging = () => {
               ))}
             </div>
 
-            <div className="mt-6 flex justify-end">
+            {/* <div className="mt-6 flex justify-end">
               <PrimaryButton
                 type="submit"
                 isLoading={postEssentialDocumentsForAgingMutation.isPending}
@@ -370,8 +372,29 @@ export const EssentialDocumentForAging = () => {
               >
                 Save Essential Document for Aging
               </PrimaryButton>
-            </div>
+            </div> */}
           </Card>
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <CommonLink
+              to={`/${ROUTES.clients}/${params.clientId}/${ROUTES.agensyFormsFolders}/essential-document-for-aging`}
+            >
+              Essential Document for Aging
+            </CommonLink>
+          </div>
+
+          {/* Form Actions */}
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                isLoading={postEssentialDocumentsForAgingMutation.isPending}
+                disabled={postEssentialDocumentsForAgingMutation.isPending}
+                type="submit"
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Essential Document for Aging
+              </PrimaryButton>
+            </div>
+          </div>
         </form>
       )}
     </div>

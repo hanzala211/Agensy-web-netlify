@@ -38,6 +38,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const defaultValues = {
   firstName: "",
   lastName: "",
+  preferredName: "",
   address: "",
   phoneNumber: "",
   dateOfBirth: "",
@@ -170,6 +171,7 @@ export const FaceSheetShortForm: React.FC = () => {
             )
           : "",
         gender: faceSheetShortForm?.client_info?.gender || "",
+        preferredName: faceSheetShortForm?.client_info?.preferred_name || "",
         codeStatus:
           CODE_STATUS_OPTIONS.find(
             (codeStatus) =>
@@ -303,7 +305,7 @@ export const FaceSheetShortForm: React.FC = () => {
       } else {
         delete medication.id;
         return medication;
-      } 
+      }
     });
     const providers = data.providers?.map((item) => {
       const provider = {
@@ -355,6 +357,7 @@ export const FaceSheetShortForm: React.FC = () => {
         code_status: data.codeStatus ? data.codeStatus : null,
         advance_directive: data.advanceDirective ? data.advanceDirective : null,
         gender: data.gender ? data.gender : null,
+        preferred_name: data.preferredName ? data.preferredName : null,
       },
 
       medical_info: {

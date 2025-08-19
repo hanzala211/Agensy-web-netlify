@@ -39,6 +39,11 @@ export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
             register={register("lastName")}
             error={errors.lastName?.message}
           />
+          <Input
+            label="Preferred Name"
+            register={register("preferredName")}
+            error={errors.preferredName?.message}
+          />
 
           <DatePickerField
             control={control}

@@ -83,6 +83,7 @@ export const Clients: React.FC = () => {
     const postData: unknown = {
       first_name: data.firstName,
       last_name: data.lastName,
+      preferred_name: data.preferredName ? data.preferredName : null,
       date_of_birth: data.dateOfBirth
         ? DateUtils.changetoISO(data.dateOfBirth)
         : null,

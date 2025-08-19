@@ -1737,7 +1737,7 @@ export const ComprehensiveCarePlan = () => {
               id: medication.id,
               dosage: medication.dosage || "",
               frequency: medication.frequency || "",
-              indication: medication.indication ? medication.indication : "",
+              usedToTreat: medication.purpose ? medication.purpose : "",
               startDate: medication.start_date
                 ? DateUtils.formatDateToRequiredFormat(medication.start_date)
                 : "",
@@ -1793,7 +1793,7 @@ export const ComprehensiveCarePlan = () => {
         end_date: medication.endDate
           ? DateUtils.changetoISO(medication.endDate)
           : null,
-        indication: medication.indication ? medication.indication : null,
+        purpose: medication.usedToTreat ? medication.usedToTreat : null,
         id: medication.id ? medication.id : null,
       };
       if (med.id) {

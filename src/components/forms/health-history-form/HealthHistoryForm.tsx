@@ -10,6 +10,7 @@ import {
   DatePickerField,
   TertiaryButton,
   CommonLoader,
+  CommonLink,
 } from "@agensy/components";
 import {
   healthHistoryFormSchema,
@@ -20,7 +21,7 @@ import {
 } from "@agensy/types";
 
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
-import { ICONS } from "@agensy/constants";
+import { ICONS, ROUTES } from "@agensy/constants";
 import { DiagnosesSection } from "../face-sheet-short/DiagnosesSection";
 import { useParams } from "react-router-dom";
 import {
@@ -736,6 +737,14 @@ export const HealthHistoryForm: React.FC = () => {
             />
           </div>
         </Card>
+
+        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+          <CommonLink
+            to={`/${ROUTES.clients}/${clientId}/${ROUTES.agensyFormsFolders}/essential-document-for-aging`}
+          >
+            Essential Document for Aging
+          </CommonLink>
+        </div>
 
         {/* Form Actions */}
         <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">

@@ -36,6 +36,7 @@ export const PersonalInfoCard: React.FC = () => {
     const postData = {
       first_name: data.firstName,
       last_name: data.lastName,
+      preferred_name: data.preferredName ? data.preferredName : null,
       date_of_birth: data.dateOfBirth
         ? DateUtils.changetoISO(data.dateOfBirth)
         : null,

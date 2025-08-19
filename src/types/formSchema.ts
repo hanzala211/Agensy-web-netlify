@@ -86,6 +86,7 @@ export const clientSchema = z.object({
     .string()
     .min(2, { message: "Last name is required" })
     .transform(trimString),
+  preferredName: z.string().optional(),
   dateOfBirth: z.string().optional(),
   gender: z.string().optional(),
   maritalStatus: z.string().optional(),
@@ -382,6 +383,7 @@ export const faceSheetShortFormSchema = z.object({
   // Personal Information
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  preferredName: z.string().optional(),
   gender: z.string().optional(),
   address: z.string().optional(),
   phoneNumber: z.string().optional(),
@@ -489,6 +491,7 @@ export const faceSheetLongFormSchema = z
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     address: z.string().optional(),
+    preferredName: z.string().optional(),
     phoneNumber: z.string().optional(),
     dateOfBirth: z.string().optional(),
     ssn: z.string().optional(),
@@ -602,6 +605,8 @@ export const faceSheetLongFormSchema = z
           usedToTreat: z.string().optional(),
           id: z.string().optional().nullable().nullish(),
           frequency: z.string().optional(),
+          prescriber: z.string().optional(),
+          refillDue: z.string().optional(),
         })
       )
       .optional(),
@@ -892,6 +897,7 @@ export const careRecipientQuestionnaireSchema = z.object({
     .string()
     .min(1, "Last name is required")
     .transform((val) => val || ""),
+  careRecipientPreferredName: z.string().optional(),
   careRecipientAddress: z
     .string()
     .nullable()
@@ -982,6 +988,7 @@ export const careRecipientQuestionnaireSchema = z.object({
         usedToTreat: z.string().optional(),
         frequency: z.string().optional(),
         refillDue: z.string().optional(),
+        dosage: z.string().optional(),
       })
     )
     .optional(),
@@ -2032,7 +2039,7 @@ export const comprehensiveCarePlanSchema = z.object({
         frequency: z.string().optional(),
         startDate: z.string().optional(),
         endDate: z.string().optional(),
-        indication: z.string().optional(),
+        usedToTreat: z.string().optional(),
       })
     )
     .optional(),

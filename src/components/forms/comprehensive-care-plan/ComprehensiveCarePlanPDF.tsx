@@ -134,9 +134,7 @@ const Field = ({
 }) => (
   <View style={styles.fieldRow}>
     <Text style={styles.label}>{label}</Text>
-    <View style={styles.value}>
-      {children || <Text>-</Text>}
-    </View>
+    <View style={styles.value}>{children || <Text>-</Text>}</View>
   </View>
 );
 
@@ -148,12 +146,7 @@ const CheckboxField = ({
   checked?: boolean;
 }) => (
   <View style={styles.checkboxContainer}>
-    <View
-      style={[
-        styles.checkbox,
-        checked ? styles.checkboxChecked : {},
-      ]}
-    />
+    <View style={[styles.checkbox, checked ? styles.checkboxChecked : {}]} />
     <Text style={styles.checkboxLabel}>{label}</Text>
   </View>
 );
@@ -273,7 +266,8 @@ const ComprehensiveCarePlanPDF: React.FC<{
             <Text>{data.presentForAssessment || "-"}</Text>
           </Field>
           <Field label="Goals for Assessment">
-            {Array.isArray(data.goalsForAssessment) && data.goalsForAssessment.length > 0 ? (
+            {Array.isArray(data.goalsForAssessment) &&
+            data.goalsForAssessment.length > 0 ? (
               data.goalsForAssessment.map((goal, index) => (
                 <ListItem key={index} text={goal} />
               ))
@@ -328,7 +322,7 @@ const ComprehensiveCarePlanPDF: React.FC<{
                 "Frequency",
                 "Start Date",
                 "End Date",
-                "Indication",
+                "Used to Treat",
               ]}
             />
             {data.medications.map((medication, index) => (
@@ -344,7 +338,7 @@ const ComprehensiveCarePlanPDF: React.FC<{
                   medication.endDate
                     ? DateUtils.formatDateToRequiredFormat(medication.endDate)
                     : "",
-                  medication.indication,
+                  medication.usedToTreat,
                 ]}
                 last={index === data.medications!.length - 1}
               />
@@ -395,7 +389,8 @@ const ComprehensiveCarePlanPDF: React.FC<{
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Next Steps</Text>
           <Field label="Care Recipient Next Steps">
-            {data.nextStepCareRecipient && data.nextStepCareRecipient.length > 0 ? (
+            {data.nextStepCareRecipient &&
+            data.nextStepCareRecipient.length > 0 ? (
               <View>
                 {data.nextStepCareRecipient.map((step, index) => (
                   <ListItem key={index} text={step} />
@@ -419,31 +414,31 @@ const ComprehensiveCarePlanPDF: React.FC<{
         </View>
 
         {/* Focused Recommendations */}
-        {data.focusedRecommendations && data.focusedRecommendations.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Focused Recommendations</Text>
-            {data.focusedRecommendations.map((recommendation, index) => (
-              <View key={index} style={styles.fieldRow}>
-                <Text style={styles.label}>
-                  Recommendation {index + 1}
-                </Text>
-                <View style={styles.value}>
-                  <Text style={{ fontWeight: "bold" }}>
-                    {recommendation.name || "Unnamed Recommendation"}
-                  </Text>
-                  <Text>{recommendation.description || ""}</Text>
-                  {recommendation.details && recommendation.details.length > 0 && (
-                    <View style={{ marginTop: 4 }}>
-                      {recommendation.details.map((detail, detailIndex) => (
-                        <ListItem key={detailIndex} text={detail} />
-                      ))}
-                    </View>
-                  )}
+        {data.focusedRecommendations &&
+          data.focusedRecommendations.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Focused Recommendations</Text>
+              {data.focusedRecommendations.map((recommendation, index) => (
+                <View key={index} style={styles.fieldRow}>
+                  <Text style={styles.label}>Recommendation {index + 1}</Text>
+                  <View style={styles.value}>
+                    <Text style={{ fontWeight: "bold" }}>
+                      {recommendation.name || "Unnamed Recommendation"}
+                    </Text>
+                    <Text>{recommendation.description || ""}</Text>
+                    {recommendation.details &&
+                      recommendation.details.length > 0 && (
+                        <View style={{ marginTop: 4 }}>
+                          {recommendation.details.map((detail, detailIndex) => (
+                            <ListItem key={detailIndex} text={detail} />
+                          ))}
+                        </View>
+                      )}
+                  </View>
                 </View>
-              </View>
-            ))}
-          </View>
-        )}
+              ))}
+            </View>
+          )}
 
         {/* Functional ADLs */}
         {data.functionalAdls && (
@@ -465,9 +460,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                     <TableRow
                       key={key}
                       cells={[
-                        key.replace(/([A-Z])/g, " $1").replace(/^./, (str) =>
-                          str.toUpperCase()
-                        ),
+                        key
+                          .replace(/([A-Z])/g, " $1")
+                          .replace(/^./, (str) => str.toUpperCase()),
                         value?.description || "",
                         value?.score || "",
                       ]}
@@ -494,9 +489,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                     <TableRow
                       key={key}
                       cells={[
-                        key.replace(/([A-Z])/g, " $1").replace(/^./, (str) =>
-                          str.toUpperCase()
-                        ),
+                        key
+                          .replace(/([A-Z])/g, " $1")
+                          .replace(/^./, (str) => str.toUpperCase()),
                         value?.description || "",
                         value?.score || "",
                       ]}
@@ -521,7 +516,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                           {problem?.identifiedProblem || ""}
                         </Text>
                         <Text>Goal: {problem?.goal || ""}</Text>
-                        <Text>Intervention: {problem?.interventionAction || ""}</Text>
+                        <Text>
+                          Intervention: {problem?.interventionAction || ""}
+                        </Text>
                         <Text>Referral: {problem?.referralOptions || ""}</Text>
                       </View>
                     </View>
@@ -574,7 +571,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
             </Field>
             <Field label="Deficits Noted">
               <Text>
-                {data.memoryAndReasoning.deficitsNoted === "true" ? "Yes" : "No"}
+                {data.memoryAndReasoning.deficitsNoted === "true"
+                  ? "Yes"
+                  : "No"}
               </Text>
             </Field>
             {data.memoryAndReasoning.detailedTable && (
@@ -593,7 +592,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                           {problem?.identifiedProblem || ""}
                         </Text>
                         <Text>Goal: {problem?.goal || ""}</Text>
-                        <Text>Intervention: {problem?.interventionAction || ""}</Text>
+                        <Text>
+                          Intervention: {problem?.interventionAction || ""}
+                        </Text>
                         <Text>Referral: {problem?.referralOptions || ""}</Text>
                       </View>
                     </View>
@@ -613,7 +614,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
             </Field>
             <Field label="Deficits Noted">
               <Text>
-                {data.geriatricDepression.deficitsNoted === "true" ? "Yes" : "No"}
+                {data.geriatricDepression.deficitsNoted === "true"
+                  ? "Yes"
+                  : "No"}
               </Text>
             </Field>
             {data.geriatricDepression.detailedTable && (
@@ -632,7 +635,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                           {problem?.identifiedProblem || ""}
                         </Text>
                         <Text>Goal: {problem?.goal || ""}</Text>
-                        <Text>Intervention: {problem?.interventionAction || ""}</Text>
+                        <Text>
+                          Intervention: {problem?.interventionAction || ""}
+                        </Text>
                         <Text>Referral: {problem?.referralOptions || ""}</Text>
                       </View>
                     </View>
@@ -671,7 +676,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                           {problem?.identifiedProblem || ""}
                         </Text>
                         <Text>Goal: {problem?.goal || ""}</Text>
-                        <Text>Intervention: {problem?.interventionAction || ""}</Text>
+                        <Text>
+                          Intervention: {problem?.interventionAction || ""}
+                        </Text>
                         <Text>Referral: {problem?.referralOptions || ""}</Text>
                       </View>
                     </View>
@@ -710,7 +717,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                           {problem?.identifiedProblem || ""}
                         </Text>
                         <Text>Goal: {problem?.goal || ""}</Text>
-                        <Text>Intervention: {problem?.interventionAction || ""}</Text>
+                        <Text>
+                          Intervention: {problem?.interventionAction || ""}
+                        </Text>
                         <Text>Referral: {problem?.referralOptions || ""}</Text>
                       </View>
                     </View>
@@ -749,7 +758,9 @@ const ComprehensiveCarePlanPDF: React.FC<{
                           {problem?.identifiedProblem || ""}
                         </Text>
                         <Text>Goal: {problem?.goal || ""}</Text>
-                        <Text>Intervention: {problem?.interventionAction || ""}</Text>
+                        <Text>
+                          Intervention: {problem?.interventionAction || ""}
+                        </Text>
                         <Text>Referral: {problem?.referralOptions || ""}</Text>
                       </View>
                     </View>

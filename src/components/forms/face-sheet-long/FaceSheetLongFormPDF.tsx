@@ -174,6 +174,7 @@ const FaceSheetLongFormPDF: React.FC<{
         <Field label="Name">
           {data.firstName} {data.lastName}
         </Field>
+        <Field label="Preferred name">{data.preferredName}</Field>
         <Field label="Date of Birth">{data.dateOfBirth}</Field>
         <Field label="Phone Number">{data.phoneNumber}</Field>
         <Field label="Address">{data.address}</Field>
@@ -323,12 +324,26 @@ const FaceSheetLongFormPDF: React.FC<{
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Medications</Text>
         <TableHeader
-          columns={["Medication", "Dose", "Used to Treat", "Frequency"]}
+          columns={[
+            "Medication",
+            "Dose",
+            "Used to Treat",
+            "Frequency",
+            "Prescriber",
+            "Refill Due",
+          ]}
         />
         {(data.medications ?? []).map((m, i, arr) => (
           <TableRow
             key={i}
-            cells={[m.medicationName, m.dose, m.usedToTreat, m.frequency]}
+            cells={[
+              m.medicationName,
+              m.dose,
+              m.usedToTreat,
+              m.frequency,
+              m.prescriber,
+              m.refillDue,
+            ]}
             last={i === arr.length - 1}
           />
         ))}
@@ -378,16 +393,30 @@ const FaceSheetLongFormPDF: React.FC<{
         </Field>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Caregiver Agency</Text>
-        <Field label="Agency">{data.caregiverAgency}</Field>
-        <Field label="Address">{data.caregiverAddress}</Field>
-        <Field label="Phone">{data.caregiverPhone}</Field>
-        <Field label="Point of Contact">{data.caregiverPhone}</Field>
-        <Field label="Schedule">{data.caregiverSchedule}</Field>
-        <Field label="Duties">{data.caregiverDuties}</Field>
-      </View>
-
+      {(data.caregiverAgency ||
+        data.caregiverAddress ||
+        data.caregiverPhone ||
+        data.caregiverSchedule ||
+        data.caregiverDuties) && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Caregiver Agency</Text>
+          {data.caregiverAgency && (
+            <Field label="Agency">{data.caregiverAgency}</Field>
+          )}
+          {data.caregiverAddress && (
+            <Field label="Address">{data.caregiverAddress}</Field>
+          )}
+          {data.caregiverPhone && (
+            <Field label="Phone">{data.caregiverPhone}</Field>
+          )}
+          {data.caregiverSchedule && (
+            <Field label="Schedule">{data.caregiverSchedule}</Field>
+          )}
+          {data.caregiverDuties && (
+            <Field label="Duties">{data.caregiverDuties}</Field>
+          )}
+        </View>
+      )}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Mental Status</Text>
         <Field label="Status">{data.mentalStatus}</Field>

@@ -55,7 +55,7 @@ export const MedicationsCard = ({
           frequency: "",
           startDate: "",
           endDate: "",
-          indication: "",
+          usedToTreat: "",
         })
       }
       ariaLabel="Add Medication"
@@ -90,9 +90,9 @@ export const MedicationsCard = ({
                 labelOption="Select Frequency"
               />
               <Input
-                label="Indication"
-                register={register(`medications.${index}.indication`)}
-                error={errors.medications?.[index]?.indication?.message}
+                label="Used to Treat"
+                register={register(`medications.${index}.usedToTreat`)}
+                error={errors.medications?.[index]?.usedToTreat?.message}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

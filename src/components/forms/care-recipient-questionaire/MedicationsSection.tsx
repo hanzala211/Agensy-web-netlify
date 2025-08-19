@@ -77,6 +77,14 @@ export const MedicationsSection = <T extends FieldValues>({
                     errors.medications?.[index]?.usedToTreat?.message as string
                   }
                 />
+                <Input
+                  label="Dosage"
+                  register={register(`medications.${index}.dosage` as Path<T>)}
+                  error={
+                    // @ts-expect-error - TODO: fix this
+                    errors.medications?.[index]?.dosage?.message as string
+                  }
+                />
                 <Select
                   data={MEDICATION_FREQUENCY_OPTIONS}
                   label="Frequency"
@@ -95,13 +103,11 @@ export const MedicationsSection = <T extends FieldValues>({
                       ?.message as string
                   }
                 />
-                <div className="md:col-span-2">
-                  <DatePickerField
-                    control={control}
-                    label="Refill Due"
-                    name={`medications.${index}.refillDue` as Path<T>}
-                  />
-                </div>
+                <DatePickerField
+                  control={control}
+                  label="Refill Due"
+                  name={`medications.${index}.refillDue` as Path<T>}
+                />
               </div>
             </div>
             {medicationFields.length > 1 && (

@@ -38,6 +38,11 @@ export const PersonalInformationSection = <T extends FieldValues>({
           register={register("lastName" as Path<T>)}
           error={errors.lastName?.message as string}
         />
+        <Input
+          label="Preferred Name"
+          register={register("preferredName" as Path<T>)}
+          error={errors.preferredName?.message as string}
+        />
         <PhoneNumberInput
           label="Phone Number"
           control={control}
@@ -60,13 +65,11 @@ export const PersonalInformationSection = <T extends FieldValues>({
           control={control}
           name={"gender" as Path<T>}
         />
-        <div className="md:col-span-2">
-          <Input
-            label="Address"
-            register={register("address" as Path<T>)}
-            error={errors.address?.message as string}
-          />
-        </div>
+        <Input
+          label="Address"
+          register={register("address" as Path<T>)}
+          error={errors.address?.message as string}
+        />
       </div>
     </Card>
   );

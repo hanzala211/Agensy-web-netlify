@@ -138,7 +138,7 @@ const rootFolders: FolderItem[] = [
     children: [
       {
         id: "care-plan-checklists",
-        name: "Care plan checklist",
+        name: "When to call a Care Plan",
         type: "file",
         slug: "care-plan-checklists",
       },
@@ -182,16 +182,16 @@ const rootFolders: FolderItem[] = [
       },
       {
         id: "burial-instructions",
-        name: "Burial Instructions",
+        name: "Burial & End of Life Instructions",
         type: "file",
         slug: "burial-instructions",
       },
     ],
   },
   {
-    id: "trackers",
-    slug: "trackers",
-    name: "Trackers",
+    id: "records-trackers",
+    slug: "records-trackers",
+    name: "Records & Trackers",
     type: "folder",
     children: [
       {
@@ -202,7 +202,7 @@ const rootFolders: FolderItem[] = [
       },
       {
         id: "important-people-in-life",
-        name: "Important People in Life",
+        name: "Trusted Network Directory",
         type: "file",
         slug: "important-people-in-life",
       },
@@ -314,7 +314,7 @@ const fileMap: Record<string, FolderData> = {
   // Care Plans files
   "care-plan-checklists": {
     id: "care-plan-checklists",
-    name: "Care plan checklists",
+    name: "When to call a Care Plan",
     description: "Checklists for care plan development",
     content: <CarePlanChecklist />,
   },
@@ -345,8 +345,8 @@ const fileMap: Record<string, FolderData> = {
   },
   "burial-instructions": {
     id: "burial-instructions",
-    name: "Burial Instructions",
-    description: "Instructions for burial",
+    name: "Burial & End of Life Instructions",
+    description: "Instructions for burial and end of life",
     content: <BurialInstructions />,
   },
   "personal-info": {
@@ -357,7 +357,7 @@ const fileMap: Record<string, FolderData> = {
   },
   "important-people-in-life": {
     id: "important-people-in-life",
-    name: "Important People in Life",
+    name: "Trusted Network Directory",
     description: "Important people in life",
     content: <ImportantPeopleInLife />,
   },

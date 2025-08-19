@@ -71,6 +71,11 @@ export const InfoSection = <T extends FieldValues>({
               error={errors.careRecipientName?.message as string}
             />
             <Input
+              label="His/Her Preferred name"
+              register={register("careRecipientPreferredName" as Path<T>)}
+              error={errors.careRecipientPreferredName?.message as string}
+            />
+            <Input
               label="Address"
               register={register("careRecipientAddress" as Path<T>)}
               error={errors.careRecipientAddress?.message as string}
@@ -140,15 +145,13 @@ export const InfoSection = <T extends FieldValues>({
                 errors.careRecipientActiveReligionLocation?.message as string
               }
             />
-            <Select
-              label="Marital Status"
-              control={control}
-              name={"careRecipientMaritalStatus" as Path<T>}
-              data={
-                MARITAL_STATUS_OPTIONS as { label: string; value: string }[]
-              }
-            />
           </div>
+          <Select
+            label="Marital Status"
+            control={control}
+            name={"careRecipientMaritalStatus" as Path<T>}
+            data={MARITAL_STATUS_OPTIONS as { label: string; value: string }[]}
+          />
 
           <DatePickerField
             control={control}

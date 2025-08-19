@@ -47,6 +47,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
       dateOfBirth: "",
       firstName: "",
       lastName: "",
+      preferredName: "",
       address: "",
       city: "",
       state: "",
@@ -59,6 +60,9 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
       reset({
         firstName: editClient.first_name ? editClient.first_name : "",
         lastName: editClient.last_name ? editClient.last_name : "",
+        preferredName: editClient.preferred_name
+          ? editClient.preferred_name
+          : "",
         dateOfBirth: editClient.date_of_birth
           ? DateUtils.formatDateToRequiredFormat(editClient.date_of_birth)
           : "",
@@ -85,6 +89,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
       reset({
         firstName: "",
         lastName: "",
+        preferredName: "",
         dateOfBirth: "",
         gender: "other",
         maritalStatus: "",
@@ -106,6 +111,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
     const postData = {
       firstName: data.firstName,
       lastName: data.lastName,
+      preferredName: data.preferredName ? data.preferredName : null,
       dateOfBirth: data.dateOfBirth
         ? DateUtils.changetoISO(data.dateOfBirth)
         : null,

@@ -85,12 +85,18 @@ export const mapExtractedDataToFormValues = (
   const filledValues: Record<string, any> = {};
 
   extractedData.forEach(({ key, value }) => {
-    if (key in formDefaults && isFilled(value) && !Array.isArray(value)) {
+    if (
+      key in formDefaults &&
+      isFilled(value) &&
+      !Array.isArray(value) &&
+      key !== "allergies" &&
+      key !== "diagnosis"
+    ) {
       filledValues[key] = value;
     } else if (key === "diagnosis") {
       const existingDiagnoses = currentFormValues.diagnoses || [];
       const newDiagnoses = !Array.isArray(value)
-        ? value.split(", ").map((item: string) => ({
+        ? value.split(",").map((item: string) => ({
             diagnosis: item,
           }))
         : value.map((item) => ({
@@ -101,7 +107,7 @@ export const mapExtractedDataToFormValues = (
     } else if (key === "allergies") {
       const existingAllergies = currentFormValues.allergies || [];
       const newAllergies = !Array.isArray(value)
-        ? value.split(", ").map((item: string) => ({
+        ? value.split(",").map((item: string) => ({
             allergen: item,
           }))
         : value.map((item) => ({

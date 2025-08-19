@@ -11,7 +11,6 @@ import {
   type Vaccine,
   type MedicalCondition,
   type OpenedFileData,
-  type FaceSheetShortFormData,
 } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
@@ -158,9 +157,9 @@ export const FaceSheetLongForm: React.FC = () => {
         defaultValues,
         getValues()
       );
-
+      console.log(mappedValues);
       Object.entries(mappedValues).forEach(([key, value]) => {
-        setValue(key as keyof FaceSheetShortFormData, value);
+        setValue(key as keyof FaceSheetLongFormData, value);
       });
       setOcrResult([]);
     }
@@ -233,6 +232,7 @@ export const FaceSheetLongForm: React.FC = () => {
         lastName: faceSheetLongData?.client_info?.last_name || "",
         address: faceSheetLongData?.client_info?.address || "",
         phoneNumber: faceSheetLongData?.client_info?.phone || "",
+        preferredName: faceSheetLongData?.client_info?.preferred_name || "",
         dateOfBirth: DateUtils.formatDateToRequiredFormat(
           faceSheetLongData?.client_info?.date_of_birth || ""
         ),
@@ -324,7 +324,7 @@ export const FaceSheetLongForm: React.FC = () => {
                 ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
                 : "",
               id: medication.id || "",
-              frequency: medication.frequency || ""
+              frequency: medication.frequency || "",
             })
           ) || [],
         diagnoses:
@@ -416,28 +416,35 @@ export const FaceSheetLongForm: React.FC = () => {
           faceSheetLongData?.medical_info?.cognitive_score || "",
         test_type: faceSheetLongData?.medical_info?.test_type || "",
         notesAndConcerns: faceSheetLongData?.medical_info?.notes || "",
-        mentalStatus:
-          faceSheetLongData?.medical_info?.cognitive_status &&
-          faceSheetLongData?.medical_info?.cognitive_status.length > 0
-            ? COGNITIVE_STATUS.some(
-                (item) =>
-                  item.value ===
-                  faceSheetLongData?.medical_info?.cognitive_status
-              )
-              ? faceSheetLongData?.medical_info?.cognitive_status
-              : "Other"
-            : "",
-        mentalStatusText:
-          faceSheetLongData?.medical_info?.cognitive_status &&
-          faceSheetLongData?.medical_info?.cognitive_status.length > 0 &&
-          COGNITIVE_STATUS.some(
-            (item) =>
-              item.value === faceSheetLongData?.medical_info?.cognitive_status
-          )
-            ? ""
-            : faceSheetLongData?.medical_info?.cognitive_status
-            ? faceSheetLongData?.medical_info?.cognitive_status
-            : "",
+        mentalStatus: (() => {
+          const existing = (
+            faceSheetLongData?.medical_info?.cognitive_status || ""
+          ).trim();
+          if (!existing) return "";
+          const tokens = existing.split(", ");
+          const valid = new Set(COGNITIVE_STATUS.map((o) => o.value));
+          const matched: string[] = [];
+          const unmatched: string[] = [];
+          tokens.forEach((t: string) => {
+            if (valid.has(t)) matched.push(t);
+            else if (t.length > 0) unmatched.push(t);
+          });
+          const selections = [...matched];
+          if (unmatched.length > 0) selections.push("Other");
+          return selections.join(", ");
+        })(),
+        mentalStatusText: (() => {
+          const existing = (
+            faceSheetLongData?.medical_info?.cognitive_status || ""
+          ).trim();
+          if (!existing) return "";
+          const tokens = existing.split(", ");
+          const valid = new Set(COGNITIVE_STATUS.map((o) => o.value));
+          const unmatched = tokens.filter(
+            (t: string) => !valid.has(t) && t.length > 0
+          );
+          return unmatched.length > 0 ? unmatched.join(", ") : "";
+        })(),
         dietaryRestrictions:
           faceSheetLongData?.medical_info?.dietary_restrictions
             ?.split(", ")
@@ -485,6 +492,10 @@ export const FaceSheetLongForm: React.FC = () => {
         dosage: item.dose ? item.dose : null,
         id: item?.id,
         frequency: item.frequency ? item.frequency : null,
+        prescribing_doctor: item.prescriber ? item.prescriber : null,
+        refill_due: item.refillDue
+          ? DateUtils.changetoISO(item.refillDue)
+          : null,
       };
       if (item.id) {
         return medication;
@@ -573,6 +584,7 @@ export const FaceSheetLongForm: React.FC = () => {
         first_name: data.firstName,
         last_name: data.lastName,
         address: data.address ? data.address : null,
+        preferred_name: data.preferredName ? data.preferredName : null,
         ssn: data.ssn ? data.ssn : null,
         date_of_birth: data.dateOfBirth
           ? DateUtils.changetoISO(data.dateOfBirth)
@@ -633,13 +645,20 @@ export const FaceSheetLongForm: React.FC = () => {
           data.dietaryRestrictions,
           (dietaryRestrictions) => dietaryRestrictions.dietaryRestrictions || ""
         ),
-        cognitive_status: data.mentalStatus
-          ? data.mentalStatus === "Other"
-            ? data.mentalStatusText
-              ? data.mentalStatusText
-              : null
-            : data.mentalStatus
-          : null,
+        cognitive_status: (() => {
+          const raw = (data.mentalStatus || "").trim();
+          if (!raw) return null;
+          const tokens = raw.split(", ");
+          const replaced = tokens.map((t) =>
+            t === "Other"
+              ? data.mentalStatusText?.trim()
+                ? data.mentalStatusText.trim()
+                : "Other"
+              : t
+          );
+          const joined = replaced.join(", ");
+          return joined.length > 0 ? joined : null;
+        })(),
         last_cognitive_screening: data.cognitiveScreeningDate
           ? DateUtils.changetoISO(data.cognitiveScreeningDate)
           : null,

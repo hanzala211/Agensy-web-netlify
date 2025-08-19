@@ -3,7 +3,6 @@ import type { Control } from "react-hook-form";
 import type { FaceSheetLongFormData } from "@agensy/types";
 import { Card, Select, DatePickerField } from "@agensy/components";
 import {
-  GENDER_OPTIONS,
   RACE_OPTIONS,
   LANGUAGE_OPTIONS,
   MARITAL_STATUS_OPTIONS,
@@ -19,14 +18,7 @@ export const ExtendedPersonalInformationSection: React.FC<
 > = ({ control }) => {
   return (
     <Card title="Extended Personal Information">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <Select<FaceSheetLongFormData>
-          label="Gender"
-          control={control}
-          name="gender"
-          data={GENDER_OPTIONS}
-          labelOption="Gender"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 mb-4 gap-5">
         <Select<FaceSheetLongFormData>
           label="Race"
           control={control}
@@ -55,12 +47,12 @@ export const ExtendedPersonalInformationSection: React.FC<
           data={LIVING_SITUATION_OPTIONS}
           labelOption="Living Situation"
         />
-        <DatePickerField<FaceSheetLongFormData>
-          control={control}
-          name="dateOfLastCarePlan"
-          label="Date of Last Care Plan"
-        />
       </div>
+      <DatePickerField<FaceSheetLongFormData>
+        control={control}
+        name="dateOfLastCarePlan"
+        label="Date of Last Care Plan"
+      />
     </Card>
   );
 };

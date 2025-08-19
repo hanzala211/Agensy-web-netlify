@@ -276,6 +276,8 @@ export const CareRecipientQuestionaire = () => {
           careRecipientQuestionnaire.client_info?.first_name || "",
         careRecipientLastName:
           careRecipientQuestionnaire.client_info?.last_name || "",
+        careRecipientPreferredName:
+          careRecipientQuestionnaire.client_info?.preferred_name || "",
         careRecipientAddress:
           careRecipientQuestionnaire.client_info?.address || "",
         careRecipientCity: careRecipientQuestionnaire.client_info?.city || "",
@@ -320,6 +322,7 @@ export const CareRecipientQuestionaire = () => {
             frequency: item.frequency || "",
             id: item.id || "",
             prescribingDoctor: item.prescribing_doctor || "",
+            dosage: item.dosage || "",
           })
         ),
 
@@ -752,7 +755,7 @@ export const CareRecipientQuestionaire = () => {
       friendsNeighborsArray.replace(formData.friendsNeighbors);
       medicationsArray.replace(formData.medications);
       setOpenedFileData({
-        ...getValues,
+        ...getValues(),
         last_update: {
           updatedAt: careRecipientQuestionnaire?.last_update?.updatedAt || "",
         },
@@ -926,6 +929,7 @@ export const CareRecipientQuestionaire = () => {
         prescribing_doctor: item.prescribingDoctor
           ? item.prescribingDoctor
           : null,
+        dosage: item.dosage ? item.dosage : null,
       };
       if (medication.id) {
         return medication;
@@ -942,6 +946,9 @@ export const CareRecipientQuestionaire = () => {
           : null,
         last_name: data.careRecipientLastName
           ? data.careRecipientLastName
+          : null,
+        preferred_name: data.careRecipientPreferredName
+          ? data.careRecipientPreferredName
           : null,
         preferred_hospital: data.hospitalPreference
           ? data.hospitalPreference

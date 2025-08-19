@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Modal,
   PrimaryButton,
@@ -54,6 +54,10 @@ export const AddClientMedicalHistory: React.FC<
     },
   });
 
+  const [selectedCognitiveStatuses, setSelectedCognitiveStatuses] = useState<
+    string[]
+  >([]);
+
   useEffect(() => {
     if (!isOpen && !editData) {
       reset({
@@ -67,11 +71,27 @@ export const AddClientMedicalHistory: React.FC<
         notes: "",
         cognitive_status_text: "",
       });
+      setSelectedCognitiveStatuses([]);
     }
   }, [isOpen, reset, editData]);
 
   useEffect(() => {
     if (editData) {
+      const existingStatus = (editData?.cognitive_status || "").trim();
+      const parts = existingStatus.length > 0 ? existingStatus.split(", ") : [];
+      const validValues = new Set(COGNITIVE_STATUS.map((o) => o.value));
+      const matched: string[] = [];
+      const unmatched: string[] = [];
+      parts.forEach((p) => {
+        if (validValues.has(p)) matched.push(p);
+        else if (p.length > 0) unmatched.push(p);
+      });
+      const initialSelections = [...matched];
+      if (unmatched.length > 0) {
+        initialSelections.push("Other");
+      }
+      setSelectedCognitiveStatuses(initialSelections);
+
       reset({
         diagnoses: editData?.diagnoses ? editData?.diagnoses?.split(", ") : [],
         allergies: editData?.allergies ? editData?.allergies?.split(", ") : [],
@@ -81,21 +101,8 @@ export const AddClientMedicalHistory: React.FC<
         surgical_history: editData?.surgical_history
           ? editData?.surgical_history?.split(", ")
           : [],
-        cognitive_status:
-          editData?.cognitive_status && editData?.cognitive_status.length > 0
-            ? COGNITIVE_STATUS.some(
-                (item) => item?.value === editData?.cognitive_status
-              )
-              ? editData?.cognitive_status
-              : "Other"
-            : "",
-        cognitive_status_text: COGNITIVE_STATUS.some(
-          (item) => item?.value === editData?.cognitive_status
-        )
-          ? ""
-          : editData?.cognitive_status
-          ? editData?.cognitive_status
-          : "",
+        cognitive_status: existingStatus,
+        cognitive_status_text: unmatched.length > 0 ? unmatched.join(", ") : "",
         last_cognitive_screening: DateUtils.formatDateToRequiredFormat(
           editData?.last_cognitive_screening
         ),
@@ -105,6 +112,33 @@ export const AddClientMedicalHistory: React.FC<
       });
     }
   }, [editData, reset, isOpen]);
+
+  const updateCognitiveStatusField = (
+    selections: string[],
+    otherText: string
+  ) => {
+    const normalized = selections.map((s) =>
+      s === "Other" ? (otherText?.trim() ? otherText.trim() : "Other") : s
+    );
+    const value = normalized.join(", ");
+    setValue("cognitive_status", value);
+  };
+
+  const handleToggleCognitiveStatus = (value: string) => {
+    const current = new Set(selectedCognitiveStatuses);
+    if (current.has(value)) {
+      current.delete(value);
+      if (value === "Other") {
+        setValue("cognitive_status_text", "");
+      }
+    } else {
+      current.add(value);
+    }
+    const next = Array.from(current);
+    setSelectedCognitiveStatuses(next);
+    const otherText = watch("cognitive_status_text") || "";
+    updateCognitiveStatusField(next, otherText);
+  };
 
   const handleClose = () => {
     setIsOpen(false);
@@ -182,17 +216,36 @@ export const AddClientMedicalHistory: React.FC<
           addArrayItem={addArrayItem}
           field="surgical_history"
         />
-        <Select
-          label="Cognitive Status"
-          control={control}
-          labelOption="Select Cognitive Status"
-          name="cognitive_status"
-          data={COGNITIVE_STATUS as { label: string; value: string }[]}
-          enableTextInput={true}
-          textInputTriggerValue="Other"
-          textInputName="cognitive_status_text"
-          textInputPlaceholder="Enter Cognitive Status"
-        />
+        <div className="space-y-2">
+          <label className="text-neutralGray">Cognitive Status</label>
+          <div className="flex flex-wrap gap-4">
+            {COGNITIVE_STATUS.map((opt) => (
+              <label key={opt.value} className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  checked={selectedCognitiveStatuses.includes(opt.value)}
+                  onChange={() => handleToggleCognitiveStatus(opt.value)}
+                  className="mr-2"
+                />
+                <span className="md:text-[16px] text-[13px]">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+          {selectedCognitiveStatuses.includes("Other") && (
+            <input
+              type="text"
+              placeholder="Enter Cognitive Status"
+              {...register("cognitive_status_text", {
+                onChange: (e) =>
+                  updateCognitiveStatusField(
+                    selectedCognitiveStatuses,
+                    e.target.value
+                  ),
+              })}
+              className={`text-darkGray bg-lightGray placeholder:text-darkGray p-2 border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+            />
+          )}
+        </div>
 
         <DatePickerField
           control={control}

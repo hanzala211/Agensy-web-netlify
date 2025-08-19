@@ -229,6 +229,9 @@ const CareRecipientQuestionairePDF: React.FC<{
           </Text>
           <Field label="First Name">{data?.careRecipientFirstName}</Field>
           <Field label="Last Name">{data?.careRecipientLastName}</Field>
+          <Field label="Preferred Name">
+            {data?.careRecipientPreferredName}
+          </Field>
           <Field label="Address">{data?.careRecipientAddress}</Field>
           <Field label="City">{data?.careRecipientCity}</Field>
           <Field label="State">{data?.careRecipientState}</Field>
@@ -512,8 +515,8 @@ const CareRecipientQuestionairePDF: React.FC<{
           <Text style={styles.sectionTitle}>Medications</Text>
           <TableHeader
             columns={[
-              "Medication",
-              "Dose",
+              "Medication Name",
+              "Dosage",
               "Used to Treat",
               "Prescriber",
               "Refill Due",
@@ -527,6 +530,7 @@ const CareRecipientQuestionairePDF: React.FC<{
                 key={i}
                 cells={[
                   m.medicationName ?? "",
+                  m.dosage ?? "",
                   m.usedToTreat ?? "",
                   m.prescribingDoctor ?? "",
                   m.refillDue ?? "",

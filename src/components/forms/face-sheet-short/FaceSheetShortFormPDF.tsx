@@ -176,6 +176,7 @@ const FaceSheetShortFormPDF: React.FC<{
           <Field label="Name">
             {data?.firstName} {data?.lastName}
           </Field>
+          <Field label="Preferred name">{data?.preferredName}</Field>
           <Field label="Date of Birth">{data?.dateOfBirth}</Field>
           <Field label="Phone Number">{data?.phoneNumber}</Field>
           <Field label="Address">{data?.address}</Field>
