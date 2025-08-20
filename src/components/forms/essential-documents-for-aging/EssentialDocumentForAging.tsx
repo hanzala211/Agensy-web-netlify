@@ -4,7 +4,6 @@ import {
 } from "@agensy/api";
 import {
   Card,
-  CommonLink,
   CommonLoader,
   DatePickerField,
   PrimaryButton,
@@ -374,12 +373,13 @@ export const EssentialDocumentForAging = () => {
               </PrimaryButton>
             </div> */}
           </Card>
-          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-            <CommonLink
-              to={`/${ROUTES.clients}/${params.clientId}/${ROUTES.agensyFormsFolders}/essential-document-for-aging`}
+          <div className="bg-basicWhite/90 my-4 backdrop-blur-sm rounded-2xl !p-6 border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <a
+              href={`/${ROUTES.clients}/${params.clientId}/${ROUTES.agensyFormsFolders}/medical/health-history-form-medical`}
+              className="text-blue-500 hover:text-blue-600 transition-colors"
             >
-              Essential Document for Aging
-            </CommonLink>
+              Health History Form
+            </a>
           </div>
 
           {/* Form Actions */}
