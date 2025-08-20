@@ -248,3 +248,20 @@ export interface DigitalAccount extends BaseSchema {
   password: string;
   notes: string;
 }
+
+export type LogFormType =
+  | "essential_document"
+  | "vitals_tracker"
+  | "care_plan_checklist"
+  | "health_history_form"
+  | "medical_appointment_template";
+
+export interface LogEntry {
+  id: string;
+  created_at: string;
+  form_type: LogFormType;
+  user: {
+    first_name: string;
+    last_name: string;
+  };
+}

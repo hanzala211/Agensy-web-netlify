@@ -35,4 +35,5 @@ export const ROUTES = {
   agensyFormsFolders: "agensy-forms",
   agensyFormsForms: "agensy-forms/:folderSlug",
   agensyFormsForm: "agensy-forms/:folderSlug/:formSlug",
+  logs: "logs",
 };

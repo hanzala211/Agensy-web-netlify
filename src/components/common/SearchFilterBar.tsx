@@ -7,9 +7,9 @@ import { PrimaryButton } from "./PrimaryButton";
 import StatefulDatePicker from "./StatefulDatePicker";
 
 interface SearchFilterBarProps {
-  searchPlaceholder: string;
-  searchValue: string;
-  setSearchValue: (value: string) => void;
+  searchPlaceholder?: string;
+  searchValue?: string;
+  setSearchValue?: (value: string) => void;
   filterBy: string;
   setFilterBy: (value: string) => void;
   sortBy: string;
@@ -67,28 +67,40 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
     <div className="rounded-xl mb-6">
       <div
         className={`flex flex-col ${
-          showDatePicker ? "2xl:flex-row 2xl:items-end" : "xl:flex-row xl:items-end"
+          showDatePicker
+            ? "2xl:flex-row 2xl:items-end"
+            : "xl:flex-row xl:items-end"
         } gap-4`}
       >
-        <div className="flex-1">
-          <StatefulInput
-            icon={ICONS.search}
-            placeholder={searchPlaceholder}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            iconSize={18}
-            iconColor={COLORS.darkGray}
-          />
-        </div>
+        {searchPlaceholder && searchValue !== undefined && setSearchValue && (
+          <div className="flex-1">
+            <StatefulInput
+              icon={ICONS.search}
+              placeholder={searchPlaceholder}
+              value={searchValue}
+              onChange={(e) => setSearchValue?.(e.target.value)}
+              iconSize={18}
+              iconColor={COLORS.darkGray}
+            />
+          </div>
+        )}
 
         <div
           className={`flex flex-col ${
-            showDatePicker ? "2xl:flex-row 2xl:items-end" : "xl:flex-row xl:items-end"
+            showDatePicker
+              ? "2xl:flex-row 2xl:items-end"
+              : "xl:flex-row xl:items-end"
           } gap-4`}
         >
           {showExtraFilter && (
             <div
-              className={`w-full ${showDatePicker ? "2xl:w-48" : "xl:w-48"}`}
+              className={`w-full ${
+                showDatePicker && searchPlaceholder
+                  ? "2xl:w-48"
+                  : !searchPlaceholder
+                  ? "w-full"
+                  : "xl:w-48"
+              }`}
             >
               <StatefulSelect
                 label={extraFilterLabel}
@@ -100,7 +112,15 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
             </div>
           )}
 
-          <div className={`w-full ${showDatePicker ? "2xl:w-48" : "xl:w-48"}`}>
+          <div
+            className={`w-full ${
+              showDatePicker && searchPlaceholder
+                ? "2xl:w-48"
+                : !searchPlaceholder
+                ? "w-full"
+                : "xl:w-48"
+            }`}
+          >
             <StatefulSelect
               label={filterLabel}
               name="filterBy"
@@ -110,7 +130,15 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
             />
           </div>
 
-          <div className={`w-full ${showDatePicker ? "2xl:w-48" : "xl:w-48"}`}>
+          <div
+            className={`w-full ${
+              showDatePicker && searchPlaceholder
+                ? "2xl:w-48"
+                : !searchPlaceholder
+                ? "w-full"
+                : "xl:w-48"
+            }`}
+          >
             <StatefulSelect
               label={sortLabel}
               name="sortBy"
@@ -133,6 +161,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
         )}
         {showDatePicker && (
           <StatefulDatePicker
+            divClass={`${searchPlaceholder ? "" : "2xl:!w-[26.5rem]"}`}
             value={firstDateValue as string}
             setValue={
               setFirstDateValue as React.Dispatch<React.SetStateAction<string>>
@@ -144,6 +173,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
         )}
         {showDatePicker && (
           <StatefulDatePicker
+            divClass={`${searchPlaceholder ? "" : "2xl:!w-[26.5rem]"}`}
             value={secondDateValue as string}
             setValue={
               setSecondDateValue as React.Dispatch<React.SetStateAction<string>>

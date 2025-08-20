@@ -268,3 +268,14 @@ export const usePostComprehensiveMedicationList = () => {
       ClientAgensyFormsService.postComprehensiveMedicationList(clientId, data),
   });
 };
+
+export const useGetClientAuditLogs = (
+  clientId: string,
+  params: Record<string, unknown>
+) => {
+  return useQuery({
+    queryKey: ["client-audit-logs", clientId, params],
+    queryFn: () => ClientAgensyFormsService.getAuditLogs(clientId, params),
+    enabled: !!clientId,
+  });
+};

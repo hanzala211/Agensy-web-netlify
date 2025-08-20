@@ -567,3 +567,20 @@ export const postComprehensiveMedicationList = async (
     throw error;
   }
 };
+
+export const getAuditLogs = async (
+  clientId: string,
+  params?: Record<string, unknown>
+) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/audits`,
+      params,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(`Client Agensy Forms Service [getAuditLogs] error: ${error}`);
+    throw error;
+  }
+};

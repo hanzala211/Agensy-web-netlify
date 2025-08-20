@@ -108,6 +108,12 @@ export const ClientProfile: React.FC = () => {
           >
             Agensy Forms
           </TabLink>
+          <TabLink
+            to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.logs}`}
+            className="min-w-[100px] sm:min-w-0"
+          >
+            Logs
+          </TabLink>
           {userPermissions.includes(APP_ACTIONS.AccessControl) && (
             <TabLink
               to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.access}`}

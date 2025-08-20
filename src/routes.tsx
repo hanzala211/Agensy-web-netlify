@@ -31,6 +31,7 @@ import {
 } from "@agensy/pages";
 import { useAuthContext } from "@agensy/context";
 import { AgensyForms } from "./pages/AgensyForms";
+import { ClientLogs } from "./pages/ClientLogs";
 
 export const Routes: React.FC = () => {
   const { isAuthLoading } = useAuthContext();
@@ -95,6 +96,7 @@ export const Routes: React.FC = () => {
           <Route path={ROUTES.agensyFormsFolders} element={<AgensyForms />} />
           <Route path={ROUTES.agensyFormsForms} element={<AgensyForms />} />
           <Route path={ROUTES.agensyFormsForm} element={<AgensyForms />} />
+          <Route path={ROUTES.logs} element={<ClientLogs />} />
         </Route>
       </Route>
     </RouterRoutes>

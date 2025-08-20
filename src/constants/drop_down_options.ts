@@ -278,8 +278,104 @@ export const ACCOUNT_TYPE_OPTIONS = [
 ];
 
 export const BURIAL_TYPES = {
-    TRADITIONAL_BURIAL: "traditional-burial",
-    GREEN_BURIAL: "green-burial",
-    CREMATION: "cremation",
-    OTHER: "other",
-  };
+  TRADITIONAL_BURIAL: "traditional-burial",
+  GREEN_BURIAL: "green-burial",
+  CREMATION: "cremation",
+  OTHER: "other",
+};
+
+export const FORM_TYPE_OPTIONS: {
+  label: string;
+  value: string;
+}[] = [
+  { label: "All", value: "all" },
+  {
+    label: "Face sheet short",
+    value: "face_sheet_short",
+  },
+  {
+    label: "Face sheet long",
+    value: "face_sheet_long",
+  },
+  {
+    label: "Health history form",
+    value: "health_history",
+  },
+  {
+    label: "Care recipient questionnaire",
+    value: "care_recipient_questionnaire",
+  },
+  {
+    label: "Caregiver information sheet",
+    value: "caregiver_information_sheet",
+  },
+  {
+    label: "Initial care plan assessment",
+    value: "initial_care_plan_assessment",
+  },
+  {
+    label: "Comprehensive care plan assessment",
+    value: "comprehensive_care_plan_assessment",
+  },
+  {
+    label: "Essential Document for Aging",
+    value: "essential_document",
+  },
+  {
+    label: "Labs test imaging tracker",
+    value: "labs_test_imaging_tracker",
+  },
+  {
+    label: "Burial instructions",
+    value: "burial_instructions",
+  },
+  {
+    label: "In patient stay notes",
+    value: "in_patient_stay_notes",
+  },
+  {
+    label: "Comprehensive medication supplement list",
+    value: "comprehensive_medication_supplement_list",
+  },
+  {
+    label: "Personal info password manager",
+    value: "personal_info_password_manager",
+  },
+  {
+    label: "Trusted Network Directory",
+    value: "important_people",
+  },
+  {
+    label: "Start of care",
+    value: "start_of_care",
+  },
+  {
+    label: "Hospitalization Checklist",
+    value: "hospitalization",
+  },
+  {
+    label: "Move in",
+    value: "move_in",
+  },
+  {
+    label: "Next step after death",
+    value: "next_step_after_death",
+  },
+  {
+    label: "Vitals Tracker",
+    value: "vitals_tracker",
+  },
+  {
+    label: "When to call a care plan",
+    value: "care_plan",
+  },
+  {
+    label: "Medical Appointment Template",
+    value: "medical_template",
+  },
+];
+
+export const SORT_OPTIONS = [
+  { label: "Newest first", value: "DESC" },
+  { label: "Oldest first", value: "ASC" },
+];

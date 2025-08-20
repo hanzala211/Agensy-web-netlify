@@ -2,6 +2,33 @@ import { getJwtToken } from "./authCognito";
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
+// Remove empty query params (undefined, null, empty string) recursively
+const removeEmptyValues = (value: unknown): unknown => {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === "string" && value.trim() === "") return undefined;
+
+  if (Array.isArray(value)) {
+    const cleanedArray = value
+      .map((item) => removeEmptyValues(item))
+      .filter((item) => item !== undefined);
+    return cleanedArray.length > 0 ? cleanedArray : undefined;
+  }
+
+  if (typeof value === "object") {
+    const input = value as Record<string, unknown>;
+    const result: Record<string, unknown> = {};
+    Object.keys(input).forEach((key) => {
+      const cleaned = removeEmptyValues(input[key]);
+      if (cleaned !== undefined) {
+        result[key] = cleaned;
+      }
+    });
+    return Object.keys(result).length > 0 ? result : undefined;
+  }
+
+  return value;
+};
+
 export const sendRequest = async (
   configs: AxiosRequestConfig
 ): Promise<AxiosResponse> => {
@@ -17,6 +44,12 @@ export const sendRequest = async (
     ...configs,
     headers,
   };
+
+  // Clean query params to avoid sending empty values
+  if (requestConfig.params) {
+    const cleaned = removeEmptyValues(requestConfig.params);
+    requestConfig.params = cleaned as AxiosRequestConfig["params"];
+  }
 
   try {
     return await axios(requestConfig);
