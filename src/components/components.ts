@@ -140,4 +140,4 @@ export * from "./forms/vitals-tracker/VitalsTracker";
 export * from "./forms/labs-tracker/LabsTracker";
 export * from "./forms/in-patient-stay-notes/InPatientStayNotes";
 export * from "./forms/comprehensive-medication-list/ComprehensiveMedicationList";
-export * from "./logs/LogsCard";
+export * from "./client-logs/LogsCard";
