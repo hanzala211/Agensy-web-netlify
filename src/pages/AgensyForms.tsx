@@ -24,7 +24,11 @@ import {
   InPatientStayNotes,
   ComprehensiveMedicationList,
 } from "@agensy/components";
-import type { FolderItem, FolderData } from "@agensy/types";
+import type {
+  FolderItem,
+  FolderData,
+  MedicalAppointmentTemplateData,
+} from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@agensy/constants";
 import { MedicalAppointmentTemplate } from "@agensy/components";
@@ -390,8 +394,71 @@ const fileMap: Record<string, FolderData> = {
 export const AgensyForms: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [selectedItem, setSelectedItem] = useState<string>();
+  const [medicalAppointmentTemplates, setMedicalAppointmentTemplates] =
+    useState<
+      Array<{
+        id: string;
+        name: string;
+        data: MedicalAppointmentTemplateData | null;
+      }>
+    >([]);
   const navigate = useNavigate();
   const params = useParams();
+
+  const handleAddMedicalAppointmentTemplate = () => {
+    const newTemplate = {
+      id: `medical-appointment-template-${Date.now()}`,
+      name: `Medical Appointment Template ${
+        medicalAppointmentTemplates.length + 1
+      }`,
+      data: null,
+    };
+    setMedicalAppointmentTemplates((prev) => [...prev, newTemplate]);
+  };
+
+  const getDynamicMedicalTemplates = () => {
+    return medicalAppointmentTemplates.map((template) => ({
+      id: template.id,
+      name: template.name,
+      type: "file" as const,
+      slug: template.id,
+    }));
+  };
+
+  const getCurrentFolders = (): FolderItem[] => {
+    if (currentPath.length === 0) {
+      const updatedRootFolders = rootFolders.map((folder) => {
+        if (folder.id === "medical") {
+          return {
+            ...folder,
+            children: [
+              ...(folder.children || []),
+              ...getDynamicMedicalTemplates(),
+            ],
+          };
+        }
+        return folder;
+      });
+      return updatedRootFolders;
+    }
+
+    let currentLevel: FolderItem[] = rootFolders;
+    let foundAll = true;
+    currentPath.forEach((pathItem) => {
+      if (!foundAll) return;
+      const folder = currentLevel.find((item) => item.name === pathItem);
+      if (folder && folder.children) {
+        if (folder.id === "medical") {
+          currentLevel = [...folder.children, ...getDynamicMedicalTemplates()];
+        } else {
+          currentLevel = folder.children;
+        }
+      } else {
+        foundAll = false;
+      }
+    });
+    return foundAll ? currentLevel : [];
+  };
 
   const findItemBySlug = (
     items: FolderItem[],
@@ -437,6 +504,21 @@ export const AgensyForms: React.FC = () => {
       }
     });
 
+    if (!result && slug.startsWith("medical-appointment-template-")) {
+      const dynamicTemplate = medicalAppointmentTemplates.find(
+        (t) => t.id === slug
+      );
+      if (dynamicTemplate) {
+        const virtualFile: FolderItem = {
+          id: dynamicTemplate.id,
+          name: dynamicTemplate.name,
+          type: "file",
+          slug: dynamicTemplate.id,
+        };
+        result = { file: virtualFile, path: currentPath };
+      }
+    }
+
     return result;
   };
 
@@ -459,25 +541,7 @@ export const AgensyForms: React.FC = () => {
       setCurrentPath([]);
       setSelectedItem(undefined);
     }
-  }, [params.folderSlug, params.formSlug]);
-
-  const getCurrentFolders = (): FolderItem[] => {
-    if (currentPath.length === 0) {
-      return rootFolders;
-    }
-    let currentLevel = rootFolders;
-    let foundAll = true;
-    currentPath.forEach((pathItem) => {
-      if (!foundAll) return;
-      const folder = currentLevel.find((item) => item.name === pathItem);
-      if (folder && folder.children) {
-        currentLevel = folder.children;
-      } else {
-        foundAll = false;
-      }
-    });
-    return foundAll ? currentLevel : [];
-  };
+  }, [params.folderSlug, params.formSlug, medicalAppointmentTemplates]);
 
   const getFileContent = useCallback(
     (fileId: string): FolderData | undefined => {
@@ -541,6 +605,13 @@ export const AgensyForms: React.FC = () => {
           `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/${params.folderSlug}/${file.slug}`
         );
       } else {
+        setSelectedItem(fileId);
+      }
+    } else {
+      const dynamicTemplate = medicalAppointmentTemplates.find(
+        (t) => t.id === fileId
+      );
+      if (dynamicTemplate) {
         setSelectedItem(fileId);
       }
     }
@@ -635,6 +706,11 @@ export const AgensyForms: React.FC = () => {
           onBackClick={handleBackClick}
           fileContent={selectedFileContent}
           onPathClick={handlePathClick}
+          onAddMedicalAppointmentTemplate={handleAddMedicalAppointmentTemplate}
+          showAddMedicalAppointmentButton={
+            currentPath.length > 0 &&
+            currentPath[currentPath.length - 1] === "Medical"
+          }
         />
       </div>
     </div>

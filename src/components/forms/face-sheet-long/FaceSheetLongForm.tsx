@@ -374,10 +374,17 @@ export const FaceSheetLongForm: React.FC = () => {
           faceSheetLongData?.caregiver_agency?.important_information || "",
         homeHealthAgency: faceSheetLongData?.home_health_agency?.name || "",
         homeHealthAddress: faceSheetLongData?.home_health_agency?.address || "",
-        homeHealthStartDate:
-          faceSheetLongData?.home_health_agency?.start_date || "",
-        homeHealthDischargeDate:
-          faceSheetLongData?.home_health_agency?.discharge_date || "",
+        homeHealthStartDate: faceSheetLongData?.home_health_agency?.start_date
+          ? DateUtils.formatDateToRequiredFormat(
+              faceSheetLongData?.home_health_agency?.start_date
+            )
+          : "",
+        homeHealthDischargeDate: faceSheetLongData?.home_health_agency
+          ?.discharge_date
+          ? DateUtils.formatDateToRequiredFormat(
+              faceSheetLongData?.home_health_agency?.discharge_date
+            )
+          : "",
         homeHealthFax: faceSheetLongData?.home_health_agency?.fax || "",
         homeHealthPhone: faceSheetLongData?.home_health_agency?.phone || "",
         homeHealthSchedule:

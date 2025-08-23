@@ -58,6 +58,8 @@ interface FolderExplorerProps {
   onBackClick?: () => void;
   onPathClick?: (pathIndex: number) => void;
   fileContent?: FolderData;
+  onAddMedicalAppointmentTemplate?: () => void;
+  showAddMedicalAppointmentButton?: boolean;
 }
 
 export const FolderExplorer: React.FC<FolderExplorerProps> = ({
@@ -70,6 +72,8 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   onBackClick,
   onPathClick,
   fileContent,
+  onAddMedicalAppointmentTemplate,
+  showAddMedicalAppointmentButton,
 }) => {
   const { setOpenedFileData, openedFileData, setOcrResult } =
     useClientContext();
@@ -457,6 +461,23 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           }
           break;
         default:
+          // Handle dynamic medical appointment templates
+          if (
+            params.formSlug &&
+            params.formSlug.startsWith("medical-appointment-template-")
+          ) {
+            if (openedFileData && typeof openedFileData === "object") {
+              return (
+                <MedicalAppointmentTemplatePDF
+                  data={
+                    openedFileData as unknown as MedicalAppointmentTemplateData & {
+                      last_update: { updatedAt: string };
+                    }
+                  }
+                />
+              );
+            }
+          }
           console.warn(`Unknown form type: ${params.formSlug}`);
           return null;
       }
@@ -590,24 +611,37 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           )}
         </div>
         {!isShowingFileContent && currentPath.length > 0 && (
-          <div className="mt-2 text-xs text-gray-400 flex items-center gap-1">
-            <span
-              className="hover:text-blue-600 cursor-pointer transition-colors"
-              onClick={() => onPathClick?.(-1)}
-            >
-              Agensy Forms
-            </span>
-            {currentPath.map((pathSegment, index) => (
-              <React.Fragment key={index}>
-                <span className="text-gray-300">{">"}</span>
-                <span
-                  className="hover:text-blue-600 cursor-pointer transition-colors"
-                  onClick={() => onPathClick?.(index)}
+          <div className="mt-2 flex items-center justify-between sm:flex-row flex-col sm:gap-0 gap-4">
+            <div className="text-xs text-gray-400 flex items-center gap-1">
+              <span
+                className="hover:text-blue-600 cursor-pointer transition-colors"
+                onClick={() => onPathClick?.(-1)}
+              >
+                Agensy Forms
+              </span>
+              {currentPath.map((pathSegment, index) => (
+                <React.Fragment key={index}>
+                  <span className="text-gray-300">{">"}</span>
+                  <span
+                    className="hover:text-blue-600 cursor-pointer transition-colors"
+                    onClick={() => onPathClick?.(index)}
+                  >
+                    {pathSegment}
+                  </span>
+                </React.Fragment>
+              ))}
+            </div>
+            {showAddMedicalAppointmentButton &&
+              onAddMedicalAppointmentTemplate && (
+                <TertiaryButton
+                  onClick={onAddMedicalAppointmentTemplate}
+                  className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent"
                 >
-                  {pathSegment}
-                </span>
-              </React.Fragment>
-            ))}
+                  <span className="flex items-center gap-2">
+                    Add Medical Appointment Template
+                  </span>
+                </TertiaryButton>
+              )}
           </div>
         )}
       </div>
