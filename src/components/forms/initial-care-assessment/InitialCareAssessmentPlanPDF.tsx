@@ -156,162 +156,217 @@ const InitialCareAssessmentPlanPDF: React.FC<{
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Initial Care Assessment Plan</Text>
-          <Field label="First Name">{data?.firstName}</Field>
-          <Field label="Last Name">{data?.lastName}</Field>
-          <Field label="Date of Birth">
-            {data?.dateOfBirth
-              ? DateUtils.formatDateToRequiredFormat(data.dateOfBirth)
-              : ""}
-          </Field>
-          <Field label="Date of Assessment">
-            {data?.dateOfAssessment
-              ? DateUtils.formatDateToRequiredFormat(data.dateOfAssessment)
-              : ""}
-          </Field>
-          <Field label="Date of Care Plan">
-            {data?.dateOfCarePlan
-              ? DateUtils.formatDateToRequiredFormat(data.dateOfCarePlan)
-              : ""}
-          </Field>
-        </View>
+        {/* Initial Care Assessment Plan Section */}
+        {(data?.firstName ||
+          data?.lastName ||
+          data?.dateOfBirth ||
+          data?.dateOfAssessment ||
+          data?.dateOfCarePlan) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Initial Care Assessment Plan
+            </Text>
+            {data?.firstName && (
+              <Field label="First Name">{data.firstName}</Field>
+            )}
+            {data?.lastName && <Field label="Last Name">{data.lastName}</Field>}
+            {data?.dateOfBirth && (
+              <Field label="Date of Birth">
+                {DateUtils.formatDateToRequiredFormat(data.dateOfBirth)}
+              </Field>
+            )}
+            {data?.dateOfAssessment && (
+              <Field label="Date of Assessment">
+                {DateUtils.formatDateToRequiredFormat(data.dateOfAssessment)}
+              </Field>
+            )}
+            {data?.dateOfCarePlan && (
+              <Field label="Date of Care Plan">
+                {DateUtils.formatDateToRequiredFormat(data.dateOfCarePlan)}
+              </Field>
+            )}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Assessment Information</Text>
-          <Field label="Person Completing Assessment">
-            {data?.personCompletingAssessment}
-          </Field>
-        </View>
+        {/* Assessment Information Section */}
+        {data?.personCompletingAssessment && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Assessment Information</Text>
+            <Field label="Person Completing Assessment">
+              {data.personCompletingAssessment}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Assessment Details</Text>
-          <Field label="Present for Assessment">
-            {data?.presentForAssessment}
-          </Field>
-        </View>
+        {/* Assessment Details Section */}
+        {data?.presentForAssessment && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Assessment Details</Text>
+            <Field label="Present for Assessment">
+              {data.presentForAssessment}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Goals for Assessment</Text>
-          <Field label="Goals for Assessment">
-            {Array.isArray(data?.goalsForAssessment) && data?.goalsForAssessment.length > 0 ? (
-              data.goalsForAssessment.map((goal, index) => (
+        {/* Goals for Assessment Section */}
+        {data?.goalsForAssessment && data.goalsForAssessment.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Goals for Assessment</Text>
+            <Field label="Goals for Assessment">
+              {data.goalsForAssessment.map((goal, index) => (
                 <Text key={index} style={styles.detailsList}>
                   • {goal}
                 </Text>
-              ))
-            ) : (
-              <Text>-</Text>
-            )}
-          </Field>
-        </View>
+              ))}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Focused Recommendations</Text>
-          {(data?.focusedRecommendations ?? [])
-            .filter(
-              (rec) =>
-                rec &&
-                (rec.name ||
-                  rec.description ||
-                  (rec.details && rec.details.length > 0))
-            )
-            .map((recommendation, index) => (
-              <View key={index} style={styles.recommendationItem}>
-                <Text style={styles.recommendationTitle}>
-                  Option {index + 1}:{" "}
-                  {recommendation.name || "Unnamed Recommendation"}
-                </Text>
-                {recommendation.description && (
-                  <Text style={styles.recommendationContent}>
-                    Description: {recommendation.description}
-                  </Text>
-                )}
-                {recommendation.details &&
-                  recommendation.details.length > 0 && (
-                    <View>
-                      <Text style={styles.recommendationContent}>Details:</Text>
-                      {recommendation.details.map((detail, detailIndex) => (
-                        <Text key={detailIndex} style={styles.detailsList}>
-                          • {detail}
-                        </Text>
-                      ))}
-                    </View>
-                  )}
-              </View>
-            ))}
-          {(data?.focusedRecommendations ?? []).filter(
+        {/* Focused Recommendations Section */}
+        {data?.focusedRecommendations &&
+          data.focusedRecommendations.some(
             (rec) =>
               rec &&
               (rec.name ||
                 rec.description ||
                 (rec.details && rec.details.length > 0))
-          ).length === 0 && <Field label="Recommendations">None</Field>}
-        </View>
+          ) && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Focused Recommendations</Text>
+              {data.focusedRecommendations
+                .filter(
+                  (rec) =>
+                    rec &&
+                    (rec.name ||
+                      rec.description ||
+                      (rec.details && rec.details.length > 0))
+                )
+                .map((recommendation, index) => (
+                  <View key={index} style={styles.recommendationItem}>
+                    <Text style={styles.recommendationTitle}>
+                      Option {index + 1}:{" "}
+                      {recommendation.name || "Unnamed Recommendation"}
+                    </Text>
+                    {recommendation.description && (
+                      <Text style={styles.recommendationContent}>
+                        Description: {recommendation.description}
+                      </Text>
+                    )}
+                    {recommendation.details &&
+                      recommendation.details.length > 0 && (
+                        <View>
+                          <Text style={styles.recommendationContent}>
+                            Details:
+                          </Text>
+                          {recommendation.details.map((detail, detailIndex) => (
+                            <Text key={detailIndex} style={styles.detailsList}>
+                              • {detail}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
+                  </View>
+                ))}
+            </View>
+          )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Functional</Text>
-          <Field label="Activities of Daily Living (ADLs)">
-            {data?.functionalAdls?.summary}
-          </Field>
-          <Field label="Independent Activities of Daily Living (IADLs)">
-            {data?.functionalIadls?.summary}
-          </Field>
-        </View>
+        {/* Functional Section */}
+        {(data?.functionalAdls?.summary || data?.functionalIadls?.summary) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Functional</Text>
+            {data?.functionalAdls?.summary && (
+              <Field label="Activities of Daily Living (ADLs)">
+                {data.functionalAdls.summary}
+              </Field>
+            )}
+            {data?.functionalIadls?.summary && (
+              <Field label="Independent Activities of Daily Living (IADLs)">
+                {data.functionalIadls.summary}
+              </Field>
+            )}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Home Safety</Text>
-          <Field label="Home Safety Summary">{data?.homeSafety?.summary}</Field>
-        </View>
+        {/* Home Safety Section */}
+        {data?.homeSafety?.summary && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Home Safety</Text>
+            <Field label="Home Safety Summary">{data.homeSafety.summary}</Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Memory & Reasoning</Text>
-          <Field label="Memory & Reasoning Summary">
-            {data?.memoryAndRecommendations?.summary}
-          </Field>
-        </View>
+        {/* Memory & Reasoning Section */}
+        {data?.memoryAndRecommendations?.summary && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Memory & Reasoning</Text>
+            <Field label="Memory & Reasoning Summary">
+              {data.memoryAndRecommendations.summary}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Geriatric Depression</Text>
-          <Field label="Geriatric Depression Summary">
-            {data?.geriatricDepression?.summary}
-          </Field>
-        </View>
+        {/* Geriatric Depression Section */}
+        {data?.geriatricDepression?.summary && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Geriatric Depression</Text>
+            <Field label="Geriatric Depression Summary">
+              {data.geriatricDepression.summary}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Nutritional Health</Text>
-          <Field label="Nutritional Health Summary">
-            {data?.nutritionalHealth?.summary}
-          </Field>
-        </View>
+        {/* Nutritional Health Section */}
+        {data?.nutritionalHealth?.summary && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Nutritional Health</Text>
+            <Field label="Nutritional Health Summary">
+              {data.nutritionalHealth.summary}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Legal and Financial</Text>
-          <Field label="Legal and Financial Summary">
-            {data?.legalAndFinancial?.summary}
-          </Field>
-        </View>
+        {/* Legal and Financial Section */}
+        {data?.legalAndFinancial?.summary && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Legal and Financial</Text>
+            <Field label="Legal and Financial Summary">
+              {data.legalAndFinancial.summary}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Caregiver Support</Text>
-          <Field label="Caregiver Support Summary">
-            {data?.caregiverSupport?.summary}
-          </Field>
-        </View>
+        {/* Caregiver Support Section */}
+        {data?.caregiverSupport?.summary && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Caregiver Support</Text>
+            <Field label="Caregiver Support Summary">
+              {data.caregiverSupport.summary}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Next Steps - Care Recipient</Text>
-          <Field label="Next Steps for Care Recipient">
-            {(data?.nextStepCareRecipient ?? []).join(", ") || "None"}
-          </Field>
-        </View>
+        {/* Next Steps - Care Recipient Section */}
+        {data?.nextStepCareRecipient &&
+          data.nextStepCareRecipient.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Next Steps - Care Recipient
+              </Text>
+              <Field label="Next Steps for Care Recipient">
+                {data.nextStepCareRecipient.join(", ")}
+              </Field>
+            </View>
+          )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Next Steps - Care Partner</Text>
-          <Field label="Next Steps for Care Partner">
-            {(data?.nextStepCarePartner ?? []).join(", ") || "None"}
-          </Field>
-        </View>
+        {/* Next Steps - Care Partner Section */}
+        {data?.nextStepCarePartner && data.nextStepCarePartner.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Next Steps - Care Partner</Text>
+            <Field label="Next Steps for Care Partner">
+              {data.nextStepCarePartner.join(", ")}
+            </Field>
+          </View>
+        )}
       </Page>
     </Document>
   );

@@ -1874,39 +1874,43 @@ export const medicalAppointmentTemplateSchema = z.object({
           .optional()
           .transform((val) => (val ? trimString(val) : val)),
         id: z.string().nullable().nullish().optional(),
+        client_medication_id: z.string().nullable().nullish().optional(),
       })
     )
     .optional(),
-  healthcareProviders: z
-    .array(
-      z.object({
-        providerName: z
-          .string()
-          .optional()
-          .transform((val) => (val ? trimString(val) : val)),
-        address: z
-          .string()
-          .optional()
-          .transform((val) => (val ? trimString(val) : val)),
-        phone: z
-          .string()
-          .optional()
-          .transform((val) => (val ? trimString(val) : val)),
-        notes: z
-          .string()
-          .optional()
-          .transform((val) => (val ? trimString(val) : val)),
-        follow_up: z
-          .string()
-          .optional()
-          .transform((val) => (val ? trimString(val) : val)),
-        specialty: z
-          .string()
-          .optional()
-          .transform((val) => (val ? trimString(val) : val)),
-        id: z.string().nullable().nullish().optional(),
-      })
-    )
+  healthcareProvider: z
+    .object({
+      providerName: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
+      providerType: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
+      address: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
+      phone: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
+      notes: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
+      follow_up: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
+      specialty: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
+      id: z.string().nullable().nullish().optional(),
+      provider_id: z.string().nullable().nullish().optional(),
+    })
     .optional(),
   recommendations: z
     .string()
@@ -2659,61 +2663,21 @@ export const personalInfoFormSchema = z.object({
 export type PersonalInfoFormData = z.infer<typeof personalInfoFormSchema>;
 
 export const importantPersonSchema = z.object({
+  id: z.string().optional().nullable().nullish(),
+  type: z.string().optional(),
   name: z.string().optional(),
   phone: z.string().optional(),
   relationship: z.string().optional(),
+  firm: z.string().optional(),
+  agency: z.string().optional(),
+  affiliation: z.string().optional(),
+  address: z.string().optional(),
 });
 
 export type ImportantPersonData = z.infer<typeof importantPersonSchema>;
 
 export const importantPeopleInLifeFormSchema = z.object({
-  medicalPOAName: z.string().optional(),
-  medicalPOAPhone: z.string().optional(),
-  medicalPOARelationship: z.string().optional(),
-
-  financialPOAName: z.string().optional(),
-  financialPOAPhone: z.string().optional(),
-  financialPOARelationship: z.string().optional(),
-
-  lawyerName: z.string().optional(),
-  lawyerPhone: z.string().optional(),
-  lawyerFirm: z.string().optional(),
-
-  accountantName: z.string().optional(),
-  accountantPhone: z.string().optional(),
-  accountantFirm: z.string().optional(),
-
-  financialAdvisorName: z.string().optional(),
-  financialAdvisorPhone: z.string().optional(),
-  financialAdvisorFirm: z.string().optional(),
-
-  trustOfficerName: z.string().optional(),
-  trustOfficerPhone: z.string().optional(),
-  trustOfficerAgency: z.string().optional(),
-
-  emergencyContactOneName: z.string().optional(),
-  emergencyContactOnePhone: z.string().optional(),
-  emergencyContactOneRelationship: z.string().optional(),
-
-  emergencyContactTwoName: z.string().optional(),
-  emergencyContactTwoPhone: z.string().optional(),
-  emergencyContactTwoRelationship: z.string().optional(),
-
-  neighborName: z.string().optional(),
-  neighborPhone: z.string().optional(),
-  neighborAddress: z.string().optional(),
-
-  closeFriendName: z.string().optional(),
-  closeFriendPhone: z.string().optional(),
-  closeFriendRelationship: z.string().optional(),
-
-  faithContactName: z.string().optional(),
-  faithContactPhone: z.string().optional(),
-  faithContactAffiliation: z.string().optional(),
-
-  clubName: z.string().optional(),
-  clubPhone: z.string().optional(),
-
+  importantPeople: z.array(importantPersonSchema).optional(),
   notesAndReminders: z.string().optional(),
 });
 

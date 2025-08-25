@@ -32,6 +32,12 @@ import type {
 import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@agensy/constants";
 import { MedicalAppointmentTemplate } from "@agensy/components";
+import {
+  useCreateNewMedicalTemplateMutation,
+  useGetAllMedicalAppointmentTemplates,
+} from "@agensy/api";
+import { toast } from "@agensy/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 const rootFolders: FolderItem[] = [
   {
@@ -97,12 +103,6 @@ const rootFolders: FolderItem[] = [
         name: "Health History Form",
         type: "file",
         slug: "health-history-form-medical",
-      },
-      {
-        id: "medical-appointment-template",
-        name: "Medical Appointment Template",
-        type: "file",
-        slug: "medical-appointment-template",
       },
     ],
   },
@@ -293,12 +293,6 @@ const fileMap: Record<string, FolderData> = {
     description: "Medicare Cheat Sheet for medications guidance",
     content: <MedicareCheatSheet />,
   },
-  "medical-appointment-template": {
-    id: "medical-appointment-template",
-    name: "Medical Appointment Template",
-    description: "Templates for standardized medical appointment notes",
-    content: <MedicalAppointmentTemplate />,
-  },
 
   // Long Term Care Planning files
   "long-term-care-insurance-policy": {
@@ -394,6 +388,7 @@ const fileMap: Record<string, FolderData> = {
 export const AgensyForms: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [selectedItem, setSelectedItem] = useState<string>();
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [medicalAppointmentTemplates, setMedicalAppointmentTemplates] =
     useState<
       Array<{
@@ -404,22 +399,45 @@ export const AgensyForms: React.FC = () => {
     >([]);
   const navigate = useNavigate();
   const params = useParams();
+  const queryClient = useQueryClient();
+  const { data: medicalAppointmentTemplatesData } =
+    useGetAllMedicalAppointmentTemplates(params.clientId as string);
+  const createNewMedicalTemplateMutation =
+    useCreateNewMedicalTemplateMutation();
+
+  useEffect(() => {
+    if (createNewMedicalTemplateMutation.status === "success") {
+      toast.success(
+        "Medical Appointment Template Created",
+        "New medical appointment template has been created successfully."
+      );
+      queryClient.invalidateQueries({
+        queryKey: ["medical-appointment-templates", params.clientId],
+      });
+      navigate(
+        `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/medical/medical-appointment-template_${createNewMedicalTemplateMutation.data.id}`
+      );
+    } else if (createNewMedicalTemplateMutation.status === "error") {
+      toast.error(
+        "Failed to Create Template",
+        "An error occurred while creating the medical appointment template. Please try again."
+      );
+    }
+  }, [createNewMedicalTemplateMutation.status]);
 
   const handleAddMedicalAppointmentTemplate = () => {
-    const newTemplate = {
-      id: `medical-appointment-template-${Date.now()}`,
-      name: `Medical Appointment Template ${
-        medicalAppointmentTemplates.length + 1
-      }`,
-      data: null,
-    };
-    setMedicalAppointmentTemplates((prev) => [...prev, newTemplate]);
+    createNewMedicalTemplateMutation.mutate({
+      clientId: params.clientId as string,
+    });
   };
 
   const getDynamicMedicalTemplates = () => {
     return medicalAppointmentTemplates.map((template) => ({
       id: template.id,
-      name: template.name,
+      name:
+        template.name === "Medical Appointment Template"
+          ? template.name + " (Empty)"
+          : template.name,
       type: "file" as const,
       slug: template.id,
     }));
@@ -429,12 +447,20 @@ export const AgensyForms: React.FC = () => {
     if (currentPath.length === 0) {
       const updatedRootFolders = rootFolders.map((folder) => {
         if (folder.id === "medical") {
+          const staticFiles = folder.children || [];
+          const dynamicTemplates = getDynamicMedicalTemplates();
+
+          let allMedicalItems = [...staticFiles, ...dynamicTemplates];
+
+          if (searchQuery) {
+            allMedicalItems = allMedicalItems.filter((item) =>
+              item.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+          }
+
           return {
             ...folder,
-            children: [
-              ...(folder.children || []),
-              ...getDynamicMedicalTemplates(),
-            ],
+            children: allMedicalItems,
           };
         }
         return folder;
@@ -449,7 +475,18 @@ export const AgensyForms: React.FC = () => {
       const folder = currentLevel.find((item) => item.name === pathItem);
       if (folder && folder.children) {
         if (folder.id === "medical") {
-          currentLevel = [...folder.children, ...getDynamicMedicalTemplates()];
+          const staticFiles = folder.children || [];
+          const dynamicTemplates = getDynamicMedicalTemplates();
+
+          let allMedicalItems = [...staticFiles, ...dynamicTemplates];
+
+          if (searchQuery) {
+            allMedicalItems = allMedicalItems.filter((item) =>
+              item.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+          }
+
+          currentLevel = allMedicalItems;
         } else {
           currentLevel = folder.children;
         }
@@ -489,6 +526,29 @@ export const AgensyForms: React.FC = () => {
     currentPath: string[] = []
   ): { file: FolderItem; path: string[] } | null => {
     let result: { file: FolderItem; path: string[] } | null = null;
+
+    if (slug.startsWith("medical-appointment-template_")) {
+      const dynamicTemplate = medicalAppointmentTemplates.find(
+        (t) => t.id === slug
+      );
+      if (dynamicTemplate) {
+        const medicalFolder = rootFolders.find(
+          (folder) => folder.id === "medical"
+        );
+        if (medicalFolder) {
+          return {
+            file: {
+              id: dynamicTemplate.id,
+              name: dynamicTemplate.name,
+              type: "file" as const,
+              slug: dynamicTemplate.id,
+            },
+            path: [medicalFolder.name],
+          };
+        }
+      }
+    }
+
     items.forEach((item) => {
       if (result) return;
       if (item.type === "file" && item.slug === slug) {
@@ -504,23 +564,21 @@ export const AgensyForms: React.FC = () => {
       }
     });
 
-    if (!result && slug.startsWith("medical-appointment-template-")) {
-      const dynamicTemplate = medicalAppointmentTemplates.find(
-        (t) => t.id === slug
-      );
-      if (dynamicTemplate) {
-        const virtualFile: FolderItem = {
-          id: dynamicTemplate.id,
-          name: dynamicTemplate.name,
-          type: "file",
-          slug: dynamicTemplate.id,
-        };
-        result = { file: virtualFile, path: currentPath };
-      }
-    }
-
     return result;
   };
+
+  useEffect(() => {
+    if (medicalAppointmentTemplatesData) {
+      const templates = medicalAppointmentTemplatesData?.templates.map(
+        (template: { id: string; template_name: string }) => ({
+          id: `medical-appointment-template_${template.id}`,
+          name: template.template_name,
+          data: template,
+        })
+      );
+      setMedicalAppointmentTemplates(templates);
+    }
+  }, [medicalAppointmentTemplatesData]);
 
   useEffect(() => {
     const { folderSlug, formSlug } = params;
@@ -541,13 +599,41 @@ export const AgensyForms: React.FC = () => {
       setCurrentPath([]);
       setSelectedItem(undefined);
     }
-  }, [params.folderSlug, params.formSlug, medicalAppointmentTemplates]);
+  }, [
+    params.folderSlug,
+    params.formSlug,
+    medicalAppointmentTemplates,
+    searchQuery,
+  ]);
+
+  useEffect(() => {
+    if (
+      currentPath.length === 0 ||
+      currentPath[currentPath.length - 1] !== "Medical"
+    ) {
+      setSearchQuery("");
+    }
+  }, [currentPath, setSearchQuery]);
 
   const getFileContent = useCallback(
     (fileId: string): FolderData | undefined => {
+      if (fileId.startsWith("medical-appointment-template_")) {
+        const template = medicalAppointmentTemplates.find(
+          (t) => t.id === fileId
+        );
+        if (template) {
+          return {
+            id: template.id,
+            name: template.name,
+            description: "Dynamic medical appointment template",
+            content: <MedicalAppointmentTemplate />,
+          };
+        }
+      }
+
       return fileMap[fileId];
     },
-    []
+    [medicalAppointmentTemplates]
   );
 
   const handleFolderClick = (folderId: string) => {
@@ -612,13 +698,27 @@ export const AgensyForms: React.FC = () => {
         (t) => t.id === fileId
       );
       if (dynamicTemplate) {
-        setSelectedItem(fileId);
+        if (params.folderSlug) {
+          navigate(
+            `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/${params.folderSlug}/${fileId}`
+          );
+        } else {
+          setSelectedItem(fileId);
+        }
       }
     }
   };
 
   const handleFileClose = () => {
-    if (params.folderSlug) {
+    if (params.formSlug) {
+      if (params.folderSlug) {
+        navigate(
+          `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/${params.folderSlug}`
+        );
+      } else {
+        navigate(`/clients/${params.clientId}/${ROUTES.agensyFormsFolders}`);
+      }
+    } else if (params.folderSlug) {
       navigate(
         `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/${params.folderSlug}`
       );
@@ -711,6 +811,9 @@ export const AgensyForms: React.FC = () => {
             currentPath.length > 0 &&
             currentPath[currentPath.length - 1] === "Medical"
           }
+          isCreatingMedicalTemplate={createNewMedicalTemplateMutation.isPending}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
       </div>
     </div>

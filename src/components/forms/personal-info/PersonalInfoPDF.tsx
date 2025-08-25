@@ -141,135 +141,306 @@ const TableRow = ({
 
 export const PersonalInfoPDF: React.FC<{
   data?: PersonalInfoFormData & { last_update?: { updatedAt?: string } };
-}> = ({ data }) => (
-  <Document title="Agensy Personal Information">
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.formTitle}>Agensy Personal Information</Text>
+}> = ({ data }) => {
+  return (
+    <Document title="Agensy Personal Information">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>Agensy Personal Information</Text>
 
-      <View style={styles.headerRow}>
-        <Image src={logo} style={styles.headerLogo} />
-        <View style={styles.headerDateBoxContainer}>
-          <Text style={styles.headerDateBox}>
-            {`Print Date: ${DateUtils.formatDateToRequiredFormat(
-              new Date().toISOString()
-            )}`}
-          </Text>
-          {data?.last_update?.updatedAt && (
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <View style={styles.headerDateBoxContainer}>
             <Text style={styles.headerDateBox}>
-              {`Update Date: ${DateUtils.formatDateToRequiredFormat(
-                data.last_update.updatedAt
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
               )}`}
             </Text>
-          )}
+            {data?.last_update?.updatedAt && (
+              <Text style={styles.headerDateBox}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Personal Identification</Text>
-        <Field label="First Name">{data?.firstName}</Field>
-        <Field label="Last Name">{data?.lastName}</Field>
-        <Field label="Date of Birth">{data?.dateOfBirth}</Field>
-        <Field label="Social Security Number">
-          {data?.socialSecurityNumber}
-        </Field>
-        <Field label="Driver's License Number">
-          {data?.driversLicenseNumber}
-        </Field>
-        <Field label="Driver's License State">
-          {data?.driversLicenseState}
-        </Field>
-        <Field label="Passport Number">{data?.passportNumber}</Field>
-        <Field label="Passport Expiration Date">
-          {data?.passportExpirationDate}
-        </Field>
-      </View>
+        {/* Personal Identification Section */}
+        {(data?.firstName ||
+          data?.lastName ||
+          data?.dateOfBirth ||
+          data?.socialSecurityNumber ||
+          data?.driversLicenseNumber ||
+          data?.driversLicenseState ||
+          data?.passportNumber ||
+          data?.passportExpirationDate) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Personal Identification</Text>
+            {data?.firstName && (
+              <Field label="First Name">{data.firstName}</Field>
+            )}
+            {data?.lastName && <Field label="Last Name">{data.lastName}</Field>}
+            {data?.dateOfBirth && (
+              <Field label="Date of Birth">{data.dateOfBirth}</Field>
+            )}
+            {data?.socialSecurityNumber && (
+              <Field label="Social Security Number">
+                {data.socialSecurityNumber}
+              </Field>
+            )}
+            {data?.driversLicenseNumber && (
+              <Field label="Driver's License Number">
+                {data.driversLicenseNumber}
+              </Field>
+            )}
+            {data?.driversLicenseState && (
+              <Field label="Driver's License State">
+                {data.driversLicenseState}
+              </Field>
+            )}
+            {data?.passportNumber && (
+              <Field label="Passport Number">{data.passportNumber}</Field>
+            )}
+            {data?.passportExpirationDate && (
+              <Field label="Passport Expiration Date">
+                {data.passportExpirationDate}
+              </Field>
+            )}
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Emergency Information</Text>
-        <Field label="First Name">{data?.emergencyContactFirstName}</Field>
-        <Field label="Last Name">{data?.emergencyContactLastName}</Field>
-        <Field label="Phone">{data?.emergencyContactPhone}</Field>
-        <Field label="Relationship">{data?.emergencyContactRelationship}</Field>
-      </View>
+        {/* Emergency Information Section */}
+        {(data?.emergencyContactFirstName ||
+          data?.emergencyContactLastName ||
+          data?.emergencyContactPhone ||
+          data?.emergencyContactRelationship) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Emergency Information</Text>
+            {data?.emergencyContactFirstName && (
+              <Field label="First Name">{data.emergencyContactFirstName}</Field>
+            )}
+            {data?.emergencyContactLastName && (
+              <Field label="Last Name">{data.emergencyContactLastName}</Field>
+            )}
+            {data?.emergencyContactPhone && (
+              <Field label="Phone">{data.emergencyContactPhone}</Field>
+            )}
+            {data?.emergencyContactRelationship && (
+              <Field label="Relationship">
+                {data.emergencyContactRelationship}
+              </Field>
+            )}
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Financial Accounts</Text>
-        <Field label="Bank Name">{data?.bankName}</Field>
-        <Field label="Bank Account Type">{data?.bankAccountType}</Field>
-        <Field label="Bank Account (partial)">
-          {data?.bankAccountNumberPartial}
-        </Field>
-        <Field label="Bank Online Login Info">
-          {data?.bankOnlineLoginInfo}
-        </Field>
-        <Field label="Credit Card Issuer">{data?.creditCardIssuer}</Field>
-        <Field label="Credit Card Last 4">
-          {data?.creditCardLastFourDigits}
-        </Field>
-        <Field label="Credit Card Online Login Info">
-          {data?.creditCardOnlineLoginInfo}
-        </Field>
-      </View>
+        {/* Financial Accounts Section */}
+        {(data?.bankName ||
+          data?.bankAccountType ||
+          data?.bankAccountNumberPartial ||
+          data?.bankOnlineLoginInfo ||
+          data?.creditCardIssuer ||
+          data?.creditCardLastFourDigits ||
+          data?.creditCardOnlineLoginInfo) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Financial Accounts</Text>
+            {data?.bankName && <Field label="Bank Name">{data.bankName}</Field>}
+            {data?.bankAccountType && (
+              <Field label="Bank Account Type">{data.bankAccountType}</Field>
+            )}
+            {data?.bankAccountNumberPartial && (
+              <Field label="Bank Account (partial)">
+                {data.bankAccountNumberPartial}
+              </Field>
+            )}
+            {data?.bankOnlineLoginInfo && (
+              <Field label="Bank Online Login Info">
+                {data.bankOnlineLoginInfo}
+              </Field>
+            )}
+            {data?.creditCardIssuer && (
+              <Field label="Credit Card Issuer">{data.creditCardIssuer}</Field>
+            )}
+            {data?.creditCardLastFourDigits && (
+              <Field label="Credit Card Last 4">
+                {data.creditCardLastFourDigits}
+              </Field>
+            )}
+            {data?.creditCardOnlineLoginInfo && (
+              <Field label="Credit Card Online Login Info">
+                {data.creditCardOnlineLoginInfo}
+              </Field>
+            )}
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Utilities & Subscriptions</Text>
-        <Field label="Electricity Provider">{data?.electricityProvider}</Field>
-        <Field label="Electricity Username">{data?.electricityUsername}</Field>
-        <Field label="Electricity Password">{data?.electricityPassword}</Field>
-        <Field label="Internet Provider">{data?.internetProvider}</Field>
-        <Field label="Internet Username">{data?.internetUsername}</Field>
-        <Field label="Internet Password">{data?.internetPassword}</Field>
-        <Field label="Phone Provider">{data?.phoneProvider}</Field>
-        <Field label="Phone Username">{data?.phoneUsername}</Field>
-        <Field label="Phone Password">{data?.phonePassword}</Field>
-        <Field label="Streaming Services">{data?.streamingServices}</Field>
-        <Field label="Streaming Username">{data?.streamingUsername}</Field>
-        <Field label="Streaming Password">{data?.streamingPassword}</Field>
-      </View>
+        {/* Utilities & Subscriptions Section */}
+        {(data?.electricityProvider ||
+          data?.electricityUsername ||
+          data?.electricityPassword ||
+          data?.internetProvider ||
+          data?.internetUsername ||
+          data?.internetPassword ||
+          data?.phoneProvider ||
+          data?.phoneUsername ||
+          data?.phonePassword ||
+          data?.streamingServices ||
+          data?.streamingUsername ||
+          data?.streamingPassword) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Utilities & Subscriptions</Text>
+            {data?.electricityProvider && (
+              <Field label="Electricity Provider">
+                {data.electricityProvider}
+              </Field>
+            )}
+            {data?.electricityUsername && (
+              <Field label="Electricity Username">
+                {data.electricityUsername}
+              </Field>
+            )}
+            {data?.electricityPassword && (
+              <Field label="Electricity Password">
+                {data.electricityPassword}
+              </Field>
+            )}
+            {data?.internetProvider && (
+              <Field label="Internet Provider">{data.internetProvider}</Field>
+            )}
+            {data?.internetUsername && (
+              <Field label="Internet Username">{data.internetUsername}</Field>
+            )}
+            {data?.internetPassword && (
+              <Field label="Internet Password">{data.internetPassword}</Field>
+            )}
+            {data?.phoneProvider && (
+              <Field label="Phone Provider">{data.phoneProvider}</Field>
+            )}
+            {data?.phoneUsername && (
+              <Field label="Phone Username">{data.phoneUsername}</Field>
+            )}
+            {data?.phonePassword && (
+              <Field label="Phone Password">{data.phonePassword}</Field>
+            )}
+            {data?.streamingServices && (
+              <Field label="Streaming Services">{data.streamingServices}</Field>
+            )}
+            {data?.streamingUsername && (
+              <Field label="Streaming Username">{data.streamingUsername}</Field>
+            )}
+            {data?.streamingPassword && (
+              <Field label="Streaming Password">{data.streamingPassword}</Field>
+            )}
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Digital Accounts & Passwords</Text>
-        <TableHeader
-          columns={["Website / App", "Username / Email", "Password", "Notes"]}
-        />
-        {(data?.digitalAccounts ?? []).map((acc, i, arr) => (
-          <TableRow
-            key={i}
-            cells={[
-              acc?.accountWebsite ?? "",
-              acc?.usernameEmail ?? "",
-              acc?.password ?? "",
-              acc?.notes ?? "",
-            ]}
-            last={i === (arr?.length || 0) - 1}
-          />
-        ))}
-      </View>
+        {/* Digital Accounts & Passwords Section */}
+        {data?.digitalAccounts &&
+          data.digitalAccounts.some(
+            (acc) =>
+              acc?.accountWebsite ||
+              acc?.usernameEmail ||
+              acc?.password ||
+              acc?.notes
+          ) && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Digital Accounts & Passwords
+              </Text>
+              <TableHeader
+                columns={[
+                  "Website / App",
+                  "Username / Email",
+                  "Password",
+                  "Notes",
+                ]}
+              />
+              {data.digitalAccounts
+                .filter(
+                  (acc) =>
+                    acc?.accountWebsite ||
+                    acc?.usernameEmail ||
+                    acc?.password ||
+                    acc?.notes
+                )
+                .map((acc, i, arr) => (
+                  <TableRow
+                    key={i}
+                    cells={[
+                      acc?.accountWebsite ?? "",
+                      acc?.usernameEmail ?? "",
+                      acc?.password ?? "",
+                      acc?.notes ?? "",
+                    ]}
+                    last={i === arr.length - 1}
+                  />
+                ))}
+            </View>
+          )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Common Questions</Text>
-        <Field label="Banking History (Institutions)">
-          {data?.bankingHistoryInstitutions}
-        </Field>
-        <Field label="Monthly Car/Mortgage Payment">
-          {data?.monthlyCarMortgagePayment}
-        </Field>
-        <Field label="Previous Street Names">{data?.previousStreetNames}</Field>
-        <Field label="Credit Card Institutions">
-          {data?.creditCardInstitutions}
-        </Field>
-        <Field label="Mother's Maiden Name">{data?.mothersMaidenName}</Field>
-        <Field label="Social Security Question">
-          {data?.socialSecurityQuestion}
-        </Field>
-      </View>
+        {/* Common Questions Section */}
+        {(data?.bankingHistoryInstitutions ||
+          data?.monthlyCarMortgagePayment ||
+          data?.previousStreetNames ||
+          data?.creditCardInstitutions ||
+          data?.mothersMaidenName ||
+          data?.socialSecurityQuestion) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Common Questions</Text>
+            {data?.bankingHistoryInstitutions && (
+              <Field label="Banking History (Institutions)">
+                {data.bankingHistoryInstitutions}
+              </Field>
+            )}
+            {data?.monthlyCarMortgagePayment && (
+              <Field label="Monthly Car/Mortgage Payment">
+                {data.monthlyCarMortgagePayment}
+              </Field>
+            )}
+            {data?.previousStreetNames && (
+              <Field label="Previous Street Names">
+                {data.previousStreetNames}
+              </Field>
+            )}
+            {data?.creditCardInstitutions && (
+              <Field label="Credit Card Institutions">
+                {data.creditCardInstitutions}
+              </Field>
+            )}
+            {data?.mothersMaidenName && (
+              <Field label="Mother's Maiden Name">
+                {data.mothersMaidenName}
+              </Field>
+            )}
+            {data?.socialSecurityQuestion && (
+              <Field label="Social Security Question">
+                {data.socialSecurityQuestion}
+              </Field>
+            )}
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notes & Backup Contacts</Text>
-        <Field label="Trusted Person Name">{data?.trustedPersonName}</Field>
-        <Field label="Trusted Person Phone">{data?.trustedPersonPhone}</Field>
-        <Field label="Additional Notes">{data?.additionalNotes}</Field>
-      </View>
-    </Page>
-  </Document>
-);
+        {/* Notes & Backup Contacts Section */}
+        {(data?.trustedPersonName ||
+          data?.trustedPersonPhone ||
+          data?.additionalNotes) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Notes & Backup Contacts</Text>
+            {data?.trustedPersonName && (
+              <Field label="Trusted Person Name">
+                {data.trustedPersonName}
+              </Field>
+            )}
+            {data?.trustedPersonPhone && (
+              <Field label="Trusted Person Phone">
+                {data.trustedPersonPhone}
+              </Field>
+            )}
+            {data?.additionalNotes && (
+              <Field label="Additional Notes">{data.additionalNotes}</Field>
+            )}
+          </View>
+        )}
+      </Page>
+    </Document>
+  );
+};

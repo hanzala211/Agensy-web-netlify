@@ -6,11 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@agensy/utils";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 export const Register: React.FC = () => {
   const signupMutation = useSignupMutation();
   const navigate = useNavigate();
+  const [isAcceptedTerms, setIsAcceptedTerms] = useState(false);
 
   const {
     handleSubmit,
@@ -109,13 +110,36 @@ export const Register: React.FC = () => {
           isPassword={true}
         />
 
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={isAcceptedTerms}
+            onChange={(e) => setIsAcceptedTerms(e.target.checked)}
+          />
+          <label htmlFor="terms">
+            I accept the{" "}
+            <CommonLink
+              to={`/${ROUTES.termsAndConditions}`}
+              className="text-blue-500"
+            >
+              Terms of Use Agreement
+            </CommonLink>{" "}
+            and{" "}
+            <CommonLink
+              to={`/${ROUTES.privacyPolicy}`}
+              className="text-blue-500"
+            >
+              Privacy Policy
+            </CommonLink>
+          </label>
+        </div>
         <div className="mt-2">
           <PrimaryButton
             type="submit"
             className="w-full py-3 font-medium"
             aria_label="Signup Button"
             isLoading={signupMutation.isPending}
-            disabled={signupMutation.isPending}
+            disabled={signupMutation.isPending || !isAcceptedTerms}
           >
             Create Account
           </PrimaryButton>

@@ -116,19 +116,37 @@ export const usePostCaregiverInformationMutation = () => {
   });
 };
 
-export const useGetMedicalAppointmentTemplate = (clientId: string) => {
+export const useGetMedicalAppointmentTemplate = (
+  clientId: string,
+  medicalTemplateId: string
+) => {
   return useQuery({
     queryKey: ["medical-appointment-template", clientId],
     queryFn: () =>
-      ClientAgensyFormsService.getMedicalAppointmentTemplate(clientId),
+      ClientAgensyFormsService.getMedicalAppointmentTemplate(
+        clientId,
+        medicalTemplateId
+      ),
     enabled: false,
   });
 };
 
 export const usePostMedicalAppointmentTemplateMutation = () => {
   return useMutation({
-    mutationFn: ({ clientId, data }: { clientId: string; data: unknown }) =>
-      ClientAgensyFormsService.postMedicalAppointmentTemplate(clientId, data),
+    mutationFn: ({
+      clientId,
+      data,
+      templateId,
+    }: {
+      clientId: string;
+      data: unknown;
+      templateId: string;
+    }) =>
+      ClientAgensyFormsService.postMedicalAppointmentTemplate(
+        clientId,
+        data,
+        templateId
+      ),
   });
 };
 
@@ -269,6 +287,13 @@ export const usePostComprehensiveMedicationList = () => {
   });
 };
 
+export const useCreateNewMedicalTemplateMutation = () => {
+  return useMutation({
+    mutationFn: ({ clientId }: { clientId: string }) =>
+      ClientAgensyFormsService.createNewMedicalTemplate(clientId),
+  });
+};
+
 export const useGetClientAuditLogs = (
   clientId: string,
   params: Record<string, unknown>
@@ -276,6 +301,14 @@ export const useGetClientAuditLogs = (
   return useQuery({
     queryKey: ["client-audit-logs", clientId, params],
     queryFn: () => ClientAgensyFormsService.getAuditLogs(clientId, params),
+    enabled: !!clientId,
+  });
+};
+
+export const useGetAllMedicalAppointmentTemplates = (clientId: string) => {
+  return useQuery({
+    queryKey: ["medical-appointment-templates", clientId],
+    queryFn: () => ClientAgensyFormsService.getAllMedicalTemplate(clientId),
     enabled: !!clientId,
   });
 };

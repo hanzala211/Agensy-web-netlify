@@ -164,143 +164,203 @@ const MedicalAppointmentTemplatePDF: React.FC<{
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Patient Information</Text>
-          <Field label="Name">
-            {data?.firstName} {data?.lastName}
-          </Field>
-          <Field label="Date of Birth">{data?.dateOfBirth}</Field>
-          <Field label="Appointment Date">{data?.date}</Field>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Field label="First Name">{data?.firstName}</Field>
+          <Field label="Last Name">{data?.lastName}</Field>
+          {data?.date && <Field label="Date">{data.date}</Field>}
+          {data?.dateOfBirth && (
+            <Field label="Date of Birth">{data.dateOfBirth}</Field>
+          )}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Vital Signs</Text>
-          <Field label="Height">{data?.height}</Field>
-          <Field label="Weight">{data?.weight}</Field>
-          <Field label="Blood Pressure">{data?.blood_pressure}</Field>
-          <Field label="Temperature">{data?.temperature}</Field>
-          <Field label="Heart Rate">{data?.heart_rate}</Field>
-          <Field label="Additional Vitals">{data?.additional_vitals}</Field>
-        </View>
+        {(data?.height ||
+          data?.weight ||
+          data?.blood_pressure ||
+          data?.temperature ||
+          data?.heart_rate ||
+          data?.additional_vitals) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Vital Signs</Text>
+            {data.height && <Field label="Height">{data.height}</Field>}
+            {data.weight && <Field label="Weight">{data.weight}</Field>}
+            {data.blood_pressure && (
+              <Field label="Blood Pressure">{data.blood_pressure}</Field>
+            )}
+            {data.temperature && (
+              <Field label="Temperature">{data.temperature}</Field>
+            )}
+            {data.heart_rate && (
+              <Field label="Heart Rate">{data.heart_rate}</Field>
+            )}
+            {data.additional_vitals && (
+              <Field label="Additional Vitals">{data.additional_vitals}</Field>
+            )}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Visit Information</Text>
-          <Field label="Reason for Visit">{data?.reason_for_visit}</Field>
-          <Field label="Top 3 Concerns">{data?.top_3_concerns}</Field>
-          <Field label="Tests / Labs / Imaging">
-            {data?.tests_labs_imaging}
-          </Field>
-          <Field label="Visit Notes">{data?.visit_notes}</Field>
-        </View>
+        {(data?.reason_for_visit ||
+          data?.top_3_concerns ||
+          data?.tests_labs_imaging ||
+          data?.visit_notes) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Visit Information</Text>
+            {data.reason_for_visit && (
+              <Field label="Reason for Visit">{data.reason_for_visit}</Field>
+            )}
+            {data.top_3_concerns && (
+              <Field label="Top 3 Concerns">{data.top_3_concerns}</Field>
+            )}
+            {data.tests_labs_imaging && (
+              <Field label="Tests / Labs / Imaging">
+                {data.tests_labs_imaging}
+              </Field>
+            )}
+            {data.visit_notes && (
+              <Field label="Visit Notes">{data.visit_notes}</Field>
+            )}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Diagnoses</Text>
-          <Field label="Diagnoses">
-            {data?.diagnoses
-              ?.filter((d) => d && d.diagnosis)
-              ?.map((d) => d.diagnosis)
-              .join(", ") ?? ""}
-          </Field>
-        </View>
+        {(data?.recommendations ||
+          data?.referrals ||
+          data?.follow_up ||
+          data?.report_given_to) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Recommendations & Follow-up</Text>
+            {data.recommendations && (
+              <Field label="Recommendations">{data.recommendations}</Field>
+            )}
+            {data.referrals && (
+              <Field label="Referrals">{data.referrals}</Field>
+            )}
+            {data.follow_up && data.follow_up.trim() !== "" && (
+              <Field label="Follow-up Date">
+                {DateUtils.formatDateToRequiredFormat(data.follow_up)}
+              </Field>
+            )}
+            {data.report_given_to && (
+              <Field label="Report Given To">{data.report_given_to}</Field>
+            )}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Allergies</Text>
-          <Field label="Allergies">
-            {data?.allergies
-              ?.filter((a) => a && a.allergen)
-              ?.map((a) => a.allergen)
-              .join(", ") ?? ""}
-          </Field>
-        </View>
+        {data?.diagnoses?.some((d) => d && d.diagnosis) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Diagnoses</Text>
+            <Field label="Diagnoses">
+              {data.diagnoses
+                ?.filter((d) => d && d.diagnosis)
+                ?.map((d) => d.diagnosis)
+                .join(", ") ?? ""}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Surgical History</Text>
-          <Field label="Surgical History">
-            {data?.surgical_history
-              ?.filter((s) => s && s.surgicalHistory)
-              ?.map((s) => s.surgicalHistory)
-              .join(", ") ?? ""}
-          </Field>
-        </View>
+        {data?.allergies?.some((a) => a && a.allergen) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Allergies</Text>
+            <Field label="Allergies">
+              {data.allergies
+                ?.filter((a) => a && a.allergen)
+                ?.map((a) => a.allergen)
+                .join(", ") ?? ""}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medications</Text>
-          <TableHeader
-            columns={[
-              "Medication",
-              "Dosage",
-              "Frequency",
-              "Prescribing Doctor",
-              "Start Date",
-              "End Date",
-              "Notes",
-            ]}
-          />
-          {(data?.medications ?? [])
-            .filter((m) => m && m.medication_name)
-            .map((m, i, arr) => (
-              <TableRow
-                key={i}
-                cells={[
-                  m.medication_name ?? "",
-                  m.dosage ?? "",
-                  m.frequency ?? "",
-                  m.prescribing_doctor ?? "",
-                  m.start_date && m.start_date.trim() !== ""
-                    ? DateUtils.formatDateToRequiredFormat(m.start_date)
-                    : "",
-                  m.end_date && m.end_date.trim() !== ""
-                    ? DateUtils.formatDateToRequiredFormat(m.end_date)
-                    : "",
-                  m.notes ?? "",
-                ]}
-                last={i === arr.length - 1}
-              />
-            ))}
-        </View>
+        {data?.surgical_history?.some((s) => s && s.surgicalHistory) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Surgical History</Text>
+            <Field label="Surgical History">
+              {data.surgical_history
+                ?.filter((s) => s && s.surgicalHistory)
+                ?.map((s) => s.surgicalHistory)
+                .join(", ") ?? ""}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Healthcare Providers</Text>
-          <TableHeader
-            columns={[
-              "Provider Name",
-              "Specialty",
-              "Address",
-              "Phone",
-              "Follow-up Date",
-              "Notes",
-            ]}
-          />
-          {(data?.healthcareProviders ?? [])
-            .filter((p) => p && p.providerName)
-            .map((p, i, arr) => (
-              <TableRow
-                key={i}
-                cells={[
-                  p.providerName ?? "",
-                  p.specialty ?? "",
-                  p.address ?? "",
-                  p.phone ?? "",
-                  p.follow_up && p.follow_up.trim() !== ""
-                    ? DateUtils.formatDateToRequiredFormat(p.follow_up)
-                    : "",
-                  p.notes ?? "",
-                ]}
-                last={i === arr.length - 1}
-              />
-            ))}
-        </View>
+        {data?.medications?.some((m) => m && m.medication_name) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Medications</Text>
+            <TableHeader
+              columns={[
+                "Medication Name",
+                "Dosage",
+                "Frequency",
+                "Prescribing Doctor",
+                "Start Date",
+                "End Date",
+                "Notes",
+              ]}
+            />
+            {(data.medications ?? [])
+              .filter((m) => m && m.medication_name)
+              .map((m, i, arr) => (
+                <TableRow
+                  key={i}
+                  cells={[
+                    m.medication_name ?? "",
+                    m.dosage ?? "",
+                    m.frequency ?? "",
+                    m.prescribing_doctor ?? "",
+                    m.start_date && m.start_date.trim() !== ""
+                      ? DateUtils.formatDateToRequiredFormat(m.start_date)
+                      : "",
+                    m.end_date && m.end_date.trim() !== ""
+                      ? DateUtils.formatDateToRequiredFormat(m.end_date)
+                      : "",
+                    m.notes ?? "",
+                  ]}
+                  last={i === arr.length - 1}
+                />
+              ))}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recommendations & Follow-up</Text>
-          <Field label="Recommendations">{data?.recommendations}</Field>
-          <Field label="Referrals">{data?.referrals}</Field>
-          <Field label="Follow-up Date">
-            {data?.follow_up && data.follow_up.trim() !== ""
-              ? DateUtils.formatDateToRequiredFormat(data.follow_up)
-              : ""}
-          </Field>
-          <Field label="Report Given To">{data?.report_given_to}</Field>
-        </View>
+        {(data?.healthcareProvider?.providerName ||
+          data?.healthcareProvider?.providerType ||
+          data?.healthcareProvider?.specialty ||
+          data?.healthcareProvider?.address ||
+          data?.healthcareProvider?.phone ||
+          data?.healthcareProvider?.follow_up ||
+          data?.healthcareProvider?.notes) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Healthcare Provider</Text>
+            {data.healthcareProvider?.providerName && (
+              <Field label="Provider Name">
+                {data.healthcareProvider.providerName}
+              </Field>
+            )}
+            {data.healthcareProvider?.providerType && (
+              <Field label="Provider Type">
+                {data.healthcareProvider.providerType}
+              </Field>
+            )}
+            {data.healthcareProvider?.specialty && (
+              <Field label="Specialty">
+                {data.healthcareProvider.specialty}
+              </Field>
+            )}
+            {data.healthcareProvider?.address && (
+              <Field label="Address">{data.healthcareProvider.address}</Field>
+            )}
+            {data.healthcareProvider?.phone && (
+              <Field label="Phone">{data.healthcareProvider.phone}</Field>
+            )}
+            {data.healthcareProvider?.follow_up &&
+              data.healthcareProvider.follow_up.trim() !== "" && (
+                <Field label="Follow-up">
+                  {DateUtils.formatDateToRequiredFormat(
+                    data.healthcareProvider.follow_up
+                  )}
+                </Field>
+              )}
+            {data.healthcareProvider?.notes && (
+              <Field label="Notes">{data.healthcareProvider.notes}</Field>
+            )}
+          </View>
+        )}
       </Page>
     </Document>
   );

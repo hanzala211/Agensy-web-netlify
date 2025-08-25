@@ -113,83 +113,146 @@ const NotesLists: React.FC<{
   questions?: { question?: string }[];
   updates?: { update?: string }[];
   recommendations?: { recommendation?: string }[];
-}> = ({ questions = [], updates = [], recommendations = [] }) => (
-  <View style={{}}>
-    <View style={styles.listContainer}>
-      <Text style={styles.listTitle}>Questions for Provider</Text>
-      {(questions?.length ? questions : [{ question: "" }]).map((q, i) => (
-        <Text key={i} style={styles.listItem}>{`- ${q?.question ?? ""}`}</Text>
-      ))}
+}> = ({ questions = [], updates = [], recommendations = [] }) => {
+  // Only render if there's actual content
+  const hasQuestions = questions?.some((q) => q?.question?.trim());
+  const hasUpdates = updates?.some((u) => u?.update?.trim());
+  const hasRecommendations = recommendations?.some((r) =>
+    r?.recommendation?.trim()
+  );
+
+  if (!hasQuestions && !hasUpdates && !hasRecommendations) {
+    return null;
+  }
+
+  return (
+    <View>
+      {hasQuestions && (
+        <View style={styles.listContainer}>
+          <Text style={styles.listTitle}>Questions for Provider</Text>
+          {questions
+            ?.filter((q) => q?.question?.trim())
+            .map((q, i) => (
+              <Text key={i} style={styles.listItem}>{`- ${q.question}`}</Text>
+            ))}
+        </View>
+      )}
+      {hasUpdates && (
+        <View style={styles.listContainer}>
+          <Text style={styles.listTitle}>Updates from Provider</Text>
+          {updates
+            ?.filter((u) => u?.update?.trim())
+            .map((u, i) => (
+              <Text key={i} style={styles.listItem}>{`- ${u.update}`}</Text>
+            ))}
+        </View>
+      )}
+      {hasRecommendations && (
+        <View style={styles.listContainer}>
+          <Text style={styles.listTitle}>Recommendations / Next Steps</Text>
+          {recommendations
+            ?.filter((r) => r?.recommendation?.trim())
+            .map((r, i) => (
+              <Text
+                key={i}
+                style={styles.listItem}
+              >{`- ${r.recommendation}`}</Text>
+            ))}
+        </View>
+      )}
     </View>
-    <View style={styles.listContainer}>
-      <Text style={styles.listTitle}>Updates from Provider</Text>
-      {(updates?.length ? updates : [{ update: "" }]).map((u, i) => (
-        <Text key={i} style={styles.listItem}>{`- ${u?.update ?? ""}`}</Text>
-      ))}
-    </View>
-    <View style={styles.listContainer}>
-      <Text style={styles.listTitle}>Recommendations / Next Steps</Text>
-      {(recommendations?.length
-        ? recommendations
-        : [{ recommendation: "" }]
-      ).map((r, i) => (
-        <Text key={i} style={styles.listItem}>{`- ${
-          r?.recommendation ?? ""
-        }`}</Text>
-      ))}
-    </View>
-  </View>
-);
+  );
+};
 
 export const InPatientStayNotesPDF: React.FC<{
   data?: InPatientStayNotesFormData & { last_update?: { updatedAt?: string } };
-}> = ({ data }) => (
-  <Document title="Agensy In-Patient Stay Notes">
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.formTitle}>Agensy In-Patient Stay Notes</Text>
-      <View style={styles.headerRow}>
-        <Image src={logo} style={styles.headerLogo} />
-        <View style={styles.headerDateBoxContainer}>
-          <Text style={styles.headerDateBox}>
-            {`Print Date: ${DateUtils.formatDateToRequiredFormat(
-              new Date().toISOString()
-            )}`}
-          </Text>
-          {data?.last_update?.updatedAt && (
+}> = ({ data }) => {
+  // Check if Entry 1 has any data
+  const hasEntry1Data =
+    data?.date1 ||
+    data?.facilityName1 ||
+    data?.medicalProvider1 ||
+    data?.specialty1 ||
+    data?.questionsForProvider1?.some((q) => q?.question?.trim()) ||
+    data?.updatesFromProvider1?.some((u) => u?.update?.trim()) ||
+    data?.recommendationsNextSteps1?.some((r) => r?.recommendation?.trim());
+
+  // Check if Entry 2 has any data
+  const hasEntry2Data =
+    data?.date2 ||
+    data?.facilityName2 ||
+    data?.medicalProvider2 ||
+    data?.specialty2 ||
+    data?.questionsForProvider2?.some((q) => q?.question?.trim()) ||
+    data?.updatesFromProvider2?.some((u) => u?.update?.trim()) ||
+    data?.recommendationsNextSteps2?.some((r) => r?.recommendation?.trim());
+
+  return (
+    <Document title="Agensy In-Patient Stay Notes">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>Agensy In-Patient Stay Notes</Text>
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <View style={styles.headerDateBoxContainer}>
             <Text style={styles.headerDateBox}>
-              {`Update Date: ${DateUtils.formatDateToRequiredFormat(
-                data.last_update.updatedAt
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
               )}`}
             </Text>
-          )}
+            {data?.last_update?.updatedAt && (
+              <Text style={styles.headerDateBox}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Entry 1</Text>
-        <Field label="Date">{data?.date1}</Field>
-        <Field label="Facility Name">{data?.facilityName1}</Field>
-        <Field label="Medical Provider">{data?.medicalProvider1}</Field>
-        <Field label="Specialty">{data?.specialty1}</Field>
-        <NotesLists
-          questions={data?.questionsForProvider1}
-          updates={data?.updatesFromProvider1}
-          recommendations={data?.recommendationsNextSteps1}
-        />
-      </View>
+        {/* Entry 1 Section - only show if it has data */}
+        {hasEntry1Data && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Entry 1</Text>
+            {data?.date1 && <Field label="Date">{data.date1}</Field>}
+            {data?.facilityName1 && (
+              <Field label="Facility Name">{data.facilityName1}</Field>
+            )}
+            {data?.medicalProvider1 && (
+              <Field label="Medical Provider">{data.medicalProvider1}</Field>
+            )}
+            {data?.specialty1 && (
+              <Field label="Specialty">{data.specialty1}</Field>
+            )}
+            <NotesLists
+              questions={data?.questionsForProvider1}
+              updates={data?.updatesFromProvider1}
+              recommendations={data?.recommendationsNextSteps1}
+            />
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Entry 2</Text>
-        <Field label="Date">{data?.date2}</Field>
-        <Field label="Facility Name">{data?.facilityName2}</Field>
-        <Field label="Medical Provider">{data?.medicalProvider2}</Field>
-        <Field label="Specialty">{data?.specialty2}</Field>
-        <NotesLists
-          questions={data?.questionsForProvider2}
-          updates={data?.updatesFromProvider2}
-          recommendations={data?.recommendationsNextSteps2}
-        />
-      </View>
-    </Page>
-  </Document>
-);
+        {/* Entry 2 Section - only show if it has data */}
+        {hasEntry2Data && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Entry 2</Text>
+            {data?.date2 && <Field label="Date">{data.date2}</Field>}
+            {data?.facilityName2 && (
+              <Field label="Facility Name">{data.facilityName2}</Field>
+            )}
+            {data?.medicalProvider2 && (
+              <Field label="Medical Provider">{data.medicalProvider2}</Field>
+            )}
+            {data?.specialty2 && (
+              <Field label="Specialty">{data.specialty2}</Field>
+            )}
+            <NotesLists
+              questions={data?.questionsForProvider2}
+              updates={data?.updatesFromProvider2}
+              recommendations={data?.recommendationsNextSteps2}
+            />
+          </View>
+        )}
+      </Page>
+    </Document>
+  );
+};

@@ -135,138 +135,194 @@ const HealthHistoryFormPDF: React.FC<{
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Diagnoses</Text>
-          <Field label="Diagnoses">
-            {(data?.diagnoses ?? [])
-              .filter((d) => d?.diagnosis)
-              .map((d) => d.diagnosis)
-              .join(", ") || "None"}
-          </Field>
-        </View>
+        {data?.diagnoses?.some((d) => d?.diagnosis) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Diagnoses</Text>
+            <Field label="Diagnoses">
+              {(data.diagnoses ?? [])
+                .filter((d) => d?.diagnosis)
+                .map((d) => d.diagnosis)
+                .join(", ") || "None"}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Description of Health Concern</Text>
-          <Field label="Description of Health Concern">
-            {data?.descriptionOfHealthConcern}
-          </Field>
-        </View>
+        {data?.descriptionOfHealthConcern && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Description of Health Concern
+            </Text>
+            <Field label="Description of Health Concern">
+              {data.descriptionOfHealthConcern}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Onset of Symptoms</Text>
-          <Field label="Onset of Symptoms">{data?.onsetOfSymptoms}</Field>
-        </View>
+        {data?.onsetOfSymptoms && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Onset of Symptoms</Text>
+            <Field label="Onset of Symptoms">{data.onsetOfSymptoms}</Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Frequency of Symptoms</Text>
-          <Field label="Frequency of Symptoms">
-            {data?.frequencyOfSymptoms}
-          </Field>
-        </View>
+        {data?.frequencyOfSymptoms && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Frequency of Symptoms</Text>
+            <Field label="Frequency of Symptoms">
+              {data.frequencyOfSymptoms}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Severity of Symptoms</Text>
-          <Field label="Severity of Symptoms">{data?.severityOfSymptoms}</Field>
-        </View>
+        {data?.severityOfSymptoms && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Severity of Symptoms</Text>
+            <Field label="Severity of Symptoms">
+              {data.severityOfSymptoms}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hospitalization</Text>
-          <Field label="Admitting Diagnosis">{data?.admittingDiagnosis}</Field>
-          <Field label="Hospitalization Treatment">
-            {data?.hospitalizationTreatment}
-          </Field>
-        </View>
+        {(data?.admittingDiagnosis || data?.hospitalizationTreatment) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Hospitalization</Text>
+            {data.admittingDiagnosis && (
+              <Field label="Admitting Diagnosis">
+                {data.admittingDiagnosis}
+              </Field>
+            )}
+            {data.hospitalizationTreatment && (
+              <Field label="Hospitalization Treatment">
+                {data.hospitalizationTreatment}
+              </Field>
+            )}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Healthcare Providers</Text>
-          {(data?.providers ?? [])
-            .filter(
-              (provider) =>
-                provider &&
-                (provider.providerName ||
-                  provider.address ||
-                  provider.phone ||
-                  provider.notes ||
-                  provider.follow_up)
-            )
-            .map((provider, index) => (
-              <View key={index} style={styles.fieldRow}>
-                <Text style={styles.label}>Provider {index + 1}</Text>
-                <Text style={styles.value}>
-                  {provider.providerName && `Name: ${provider.providerName}`}
-                  {provider.address && `\nAddress: ${provider.address}`}
-                  {provider.phone && `\nPhone: ${provider.phone}`}
-                  {provider.notes && `\nNotes: ${provider.notes}`}
-                  {provider.follow_up && `\nFollow Up: ${provider.follow_up}`}
-                </Text>
-              </View>
-            ))}
-          {(data?.providers ?? []).filter(
-            (provider) =>
-              provider &&
-              (provider.providerName ||
-                provider.address ||
-                provider.phone ||
-                provider.notes ||
-                provider.follow_up)
-          ).length === 0 && <Field label="Providers">None</Field>}
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medication Started</Text>
-          <Field label="Medication Name">
-            {(data?.medicationsStarted ?? [])
-              .map((m) => m.medicationName)
-              .join(", ")}
-          </Field>
-          <Field label="Dosage">
-            {(data?.medicationsStarted ?? []).map((m) => m.dosage).join(", ")}
-          </Field>
-          <Field label="Prescribing Doctor">
-            {(data?.medicationsStarted ?? [])
-              .map((m) => m.prescribingDoctor)
-              .join(", ")}
-          </Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medication Ended</Text>
-          <Field label="Medication Name">
-            {(data?.medicationsEnded ?? [])
-              .map((m) => m.medicationName)
-              .join(", ")}
-          </Field>
-          <Field label="Dosage">
-            {(data?.medicationsEnded ?? []).map((m) => m.dosage).join(", ")}
-          </Field>
-          <Field label="Prescribing Doctor">
-            {(data?.medicationsEnded ?? [])
-              .map((m) => m.prescribingDoctor)
-              .join(", ")}
-          </Field>
-        </View>
+        {data?.providers?.some(
+          (provider) =>
+            provider &&
+            (provider.providerName ||
+              provider.address ||
+              provider.phone ||
+              provider.notes ||
+              provider.follow_up)
+        ) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Healthcare Providers</Text>
+            {(data.providers ?? [])
+              .filter(
+                (provider) =>
+                  provider &&
+                  (provider.providerName ||
+                    provider.address ||
+                    provider.phone ||
+                    provider.notes ||
+                    provider.follow_up)
+              )
+              .map((provider, index) => (
+                <View key={index} style={styles.fieldRow}>
+                  <Text style={styles.label}>Provider {index + 1}</Text>
+                  <Text style={styles.value}>
+                    {provider.providerName && `Name: ${provider.providerName}`}
+                    {provider.address && `\nAddress: ${provider.address}`}
+                    {provider.phone && `\nPhone: ${provider.phone}`}
+                    {provider.notes && `\nNotes: ${provider.notes}`}
+                    {provider.follow_up && `\nFollow Up: ${provider.follow_up}`}
+                  </Text>
+                </View>
+              ))}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Home Health Agency</Text>
-          <Field label="Home Health Name">{data?.homeHealthName}</Field>
-          <Field label="Home Health Phone">{data?.homeHealthPhone}</Field>
-          <Field label="Home Health Address">{data?.homeHealthAddress}</Field>
-          <Field label="Home Health Fax">{data?.homeHealthFax}</Field>
-          <Field label="Home Health Service Received">
-            {data?.homeHealthServiceReceived}
-          </Field>
-          <Field label="Home Health Start Date">
-            {data?.homeHealthStartDate}
-          </Field>
-        </View>
+        {data?.medicationsStarted?.some((m) => m.medicationName) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Medication Started</Text>
+            <Field label="Medication Name">
+              {(data.medicationsStarted ?? [])
+                .map((m) => m.medicationName)
+                .join(", ")}
+            </Field>
+            <Field label="Dosage">
+              {(data.medicationsStarted ?? []).map((m) => m.dosage).join(", ")}
+            </Field>
+            <Field label="Prescribing Doctor">
+              {(data.medicationsStarted ?? [])
+                .map((m) => m.prescribingDoctor)
+                .join(", ")}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What Worked</Text>
-          <Field label="What Worked">{data?.whatWorked}</Field>
-        </View>
+        {data?.medicationsEnded?.some((m) => m.medicationName) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Medication Ended</Text>
+            <Field label="Medication Name">
+              {(data.medicationsEnded ?? [])
+                .map((m) => m.medicationName)
+                .join(", ")}
+            </Field>
+            <Field label="Dosage">
+              {(data.medicationsEnded ?? []).map((m) => m.dosage).join(", ")}
+            </Field>
+            <Field label="Prescribing Doctor">
+              {(data.medicationsEnded ?? [])
+                .map((m) => m.prescribingDoctor)
+                .join(", ")}
+            </Field>
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Health History Notes</Text>
-          <Field label="Health History Notes">{data?.healthHistoryNotes}</Field>
-        </View>
+        {(data?.homeHealthName ||
+          data?.homeHealthPhone ||
+          data?.homeHealthAddress ||
+          data?.homeHealthFax ||
+          data?.homeHealthServiceReceived ||
+          data?.homeHealthStartDate) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Home Health Agency</Text>
+            {data.homeHealthName && (
+              <Field label="Home Health Name">{data.homeHealthName}</Field>
+            )}
+            {data.homeHealthPhone && (
+              <Field label="Home Health Phone">{data.homeHealthPhone}</Field>
+            )}
+            {data.homeHealthAddress && (
+              <Field label="Home Health Address">
+                {data.homeHealthAddress}
+              </Field>
+            )}
+            {data.homeHealthFax && (
+              <Field label="Home Health Fax">{data.homeHealthFax}</Field>
+            )}
+            {data.homeHealthServiceReceived && (
+              <Field label="Home Health Service Received">
+                {data.homeHealthServiceReceived}
+              </Field>
+            )}
+            {data.homeHealthStartDate && (
+              <Field label="Home Health Start Date">
+                {data.homeHealthStartDate}
+              </Field>
+            )}
+          </View>
+        )}
+
+        {data?.whatWorked && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>What Worked</Text>
+            <Field label="What Worked">{data.whatWorked}</Field>
+          </View>
+        )}
+
+        {data?.healthHistoryNotes && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Health History Notes</Text>
+            <Field label="Health History Notes">
+              {data.healthHistoryNotes}
+            </Field>
+          </View>
+        )}
       </Page>
     </Document>
   );

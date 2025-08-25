@@ -111,56 +111,72 @@ const getValue = (
   return value ?? "";
 };
 
+// Helper function to check if a row has any data
+const hasRowData = (data: LabsTrackerFormData | undefined, idx: number) => {
+  return columns.some((column) => {
+    const value = getValue(data, idx, column.key);
+    return value && value.trim() !== "";
+  });
+};
+
 export const LabsTrackerPDF: React.FC<{
   data?: LabsTrackerFormData & { last_update?: { updatedAt?: string } };
-}> = ({ data }) => (
-  <Document title="Agensy Labs Tracker">
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.formTitle}>Agensy Labs Tracker</Text>
-      <View style={styles.headerRow}>
-        <Image src={logo} style={styles.headerLogo} />
-        <View style={styles.headerDateBoxContainer}>
-          <Text style={styles.headerDateBox}>
-            {`Print Date: ${DateUtils.formatDateToRequiredFormat(
-              new Date().toISOString()
-            )}`}
-          </Text>
-          {data?.last_update?.updatedAt && (
+}> = ({ data }) => {
+  // Filter rows that have data
+  const rowsWithData = Array.from({ length: 8 })
+    .map((_, i) => i + 1)
+    .filter((idx) => hasRowData(data, idx));
+
+  return (
+    <Document title="Agensy Labs Tracker">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>Agensy Labs Tracker</Text>
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <View style={styles.headerDateBoxContainer}>
             <Text style={styles.headerDateBox}>
-              {`Update Date: ${DateUtils.formatDateToRequiredFormat(
-                data.last_update.updatedAt
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
               )}`}
             </Text>
-          )}
+            {data?.last_update?.updatedAt && (
+              <Text style={styles.headerDateBox}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          Labs Tests & Imaging (8 entries)
-        </Text>
-        <View style={styles.tableHeader}>
-          {columns.map((c, i) => (
-            <Text key={i} style={[styles.th, { flex: c.flex }]}>
-              {c.label}
+        {/* Only show the section if there are rows with data */}
+        {rowsWithData.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Labs Tests & Imaging ({rowsWithData.length}{" "}
+              {rowsWithData.length === 1 ? "entry" : "entries"})
             </Text>
-          ))}
-        </View>
-        {Array.from({ length: 8 }).map((_, i) => {
-          const idx = i + 1;
-          return (
-            <View key={idx} style={styles.tableRow}>
-              {columns.map((c, j) => (
-                <Text key={j} style={[styles.td, { flex: c.flex }]}>
-                  {getValue(data, idx, c.key)}
+            <View style={styles.tableHeader}>
+              {columns.map((c, i) => (
+                <Text key={i} style={[styles.th, { flex: c.flex }]}>
+                  {c.label}
                 </Text>
               ))}
             </View>
-          );
-        })}
-      </View>
-    </Page>
-  </Document>
-);
+            {rowsWithData.map((idx) => (
+              <View key={idx} style={styles.tableRow}>
+                {columns.map((c, j) => (
+                  <Text key={j} style={[styles.td, { flex: c.flex }]}>
+                    {getValue(data, idx, c.key)}
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        )}
+      </Page>
+    </Document>
+  );
+};
 
 export const LabsTrackerPDf = LabsTrackerPDF;

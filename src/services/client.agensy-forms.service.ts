@@ -239,11 +239,14 @@ export const postClientCaregiverInformation = async (
   }
 };
 
-export const getMedicalAppointmentTemplate = async (clientId: string) => {
+export const getMedicalAppointmentTemplate = async (
+  clientId: string,
+  medicalTemplateId: string
+) => {
   try {
     const response = await sendRequest({
       method: "GET",
-      url: `/client/${clientId}/agensy-forms/medical-template`,
+      url: `/client/${clientId}/agensy-forms/medical-templates/${medicalTemplateId}`,
     });
     return response.data.data;
   } catch (error) {
@@ -256,12 +259,13 @@ export const getMedicalAppointmentTemplate = async (clientId: string) => {
 
 export const postMedicalAppointmentTemplate = async (
   clientId: string,
-  data: unknown
+  data: unknown,
+  templateId: string
 ) => {
   try {
     const response = await sendRequest({
-      method: "POST",
-      url: `/client/${clientId}/agensy-forms/medical-template`,
+      method: "PUT",
+      url: `/client/${clientId}/agensy-forms/medical-templates/${templateId}`,
       data,
     });
     return response.data.data;
@@ -581,6 +585,36 @@ export const getAuditLogs = async (
     return response.data.data;
   } catch (error) {
     console.log(`Client Agensy Forms Service [getAuditLogs] error: ${error}`);
+    throw error;
+  }
+};
+
+export const getAllMedicalTemplate = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "GET",
+      url: `/client/${clientId}/agensy-forms/medical-templates`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [getAllMedicalTemplate] error: ${error}`
+    );
+    throw error;
+  }
+};
+
+export const createNewMedicalTemplate = async (clientId: string) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/agensy-forms/medical-templates`,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(
+      `Client Agensy Forms Service [createNewMedicalTemplate] error: ${error}`
+    );
     throw error;
   }
 };

@@ -141,3 +141,7 @@ export * from "./forms/labs-tracker/LabsTracker";
 export * from "./forms/in-patient-stay-notes/InPatientStayNotes";
 export * from "./forms/comprehensive-medication-list/ComprehensiveMedicationList";
 export * from "./client-logs/LogsCard";
+export * from "./model/HealthcareProviderSelectionModal";
+export * from "./model/MedicationSelectionModal";
+export * from "./model/DiagnosisSelectionModal";
+export * from "./model/AllergySelectionModal";

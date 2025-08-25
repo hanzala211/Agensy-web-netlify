@@ -7,9 +7,12 @@ interface CardProps {
   title?: string;
   buttonText?: React.ReactNode;
   onButtonClick?: () => void;
+  secondaryButtonText?: React.ReactNode;
+  onSecondaryButtonClick?: () => void;
   className?: string;
   ariaLabel?: string;
   showButton?: boolean;
+  showSecondaryButton?: boolean;
   childrenClasses?: string;
 }
 
@@ -18,9 +21,12 @@ export const Card: React.FC<CardProps> = ({
   title,
   buttonText,
   onButtonClick,
+  secondaryButtonText,
+  onSecondaryButtonClick,
   className = "",
   ariaLabel,
   showButton = true,
+  showSecondaryButton = false,
   childrenClasses = "",
 }) => {
   return (
@@ -32,17 +38,29 @@ export const Card: React.FC<CardProps> = ({
           <h2 className="text-xl font-semibold text-gray-800 flex items-center">
             {title}
           </h2>
-          {buttonText && showButton && (
-            <div className="flex">
-              <SecondaryButton
-                aria_label={ariaLabel}
-                onClick={onButtonClick}
-                className="hover:!bg-gray-100"
-              >
-                {buttonText}
-              </SecondaryButton>
-            </div>
-          )}
+          {(buttonText || secondaryButtonText) &&
+            (showButton || showSecondaryButton) && (
+              <div className="flex gap-2">
+                {secondaryButtonText && showSecondaryButton && (
+                  <SecondaryButton
+                    aria_label={ariaLabel}
+                    onClick={onSecondaryButtonClick}
+                    className="hover:!bg-gray-100"
+                  >
+                    {secondaryButtonText}
+                  </SecondaryButton>
+                )}
+                {buttonText && showButton && (
+                  <SecondaryButton
+                    aria_label={ariaLabel}
+                    onClick={onButtonClick}
+                    className="hover:!bg-gray-100"
+                  >
+                    {buttonText}
+                  </SecondaryButton>
+                )}
+              </div>
+            )}
         </div>
       )}
 

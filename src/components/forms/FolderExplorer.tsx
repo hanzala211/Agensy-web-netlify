@@ -19,7 +19,12 @@ import type {
   VitalsTrackerFormData,
   ComprehensiveMedicationListFormData,
 } from "@agensy/types";
-import { OCRModel, TertiaryButton } from "@agensy/components";
+import {
+  CommonLoader,
+  OCRModel,
+  StatefulInput,
+  TertiaryButton,
+} from "@agensy/components";
 import { useClientContext } from "@agensy/context";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useParams } from "react-router-dom";
@@ -60,6 +65,9 @@ interface FolderExplorerProps {
   fileContent?: FolderData;
   onAddMedicalAppointmentTemplate?: () => void;
   showAddMedicalAppointmentButton?: boolean;
+  isCreatingMedicalTemplate?: boolean;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
 }
 
 export const FolderExplorer: React.FC<FolderExplorerProps> = ({
@@ -74,11 +82,20 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   fileContent,
   onAddMedicalAppointmentTemplate,
   showAddMedicalAppointmentButton,
+  isCreatingMedicalTemplate = false,
+  searchQuery,
+  setSearchQuery,
 }) => {
   const { setOpenedFileData, openedFileData, setOcrResult } =
     useClientContext();
   const [isOCRModelOpen, setIsOCRModelOpen] = useState<boolean>(false);
   const params = useParams();
+
+  useEffect(() => {
+    if (searchQuery) {
+      console.log("Search query:", searchQuery);
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
     return () => {
@@ -461,10 +478,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           }
           break;
         default:
-          // Handle dynamic medical appointment templates
           if (
             params.formSlug &&
-            params.formSlug.startsWith("medical-appointment-template-")
+            params.formSlug.startsWith("medical-appointment-template_")
           ) {
             if (openedFileData && typeof openedFileData === "object") {
               return (
@@ -632,7 +648,15 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               ))}
             </div>
             {showAddMedicalAppointmentButton &&
-              onAddMedicalAppointmentTemplate && (
+              onAddMedicalAppointmentTemplate &&
+              (isCreatingMedicalTemplate ? (
+                <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                  <CommonLoader size={16} />
+                  <span className="text-sm text-gray-600">
+                    Creating Template...
+                  </span>
+                </div>
+              ) : (
                 <TertiaryButton
                   onClick={onAddMedicalAppointmentTemplate}
                   className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent"
@@ -641,7 +665,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                     Add Medical Appointment Template
                   </span>
                 </TertiaryButton>
-              )}
+              ))}
           </div>
         )}
       </div>
@@ -650,6 +674,25 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
         <FileContentDisplay fileContent={fileContent as FolderData} />
       ) : (
         <div className="p-6">
+          {showAddMedicalAppointmentButton && (
+            <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <StatefulInput
+                    type="text"
+                    placeholder="Search forms and templates..."
+                    value={searchQuery || ""}
+                    onChange={(e) => setSearchQuery?.(e.target.value)}
+                    inputClassname="pl-10"
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <ICONS.search size={16} className="text-gray-400" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {folders.map((folder) => renderGridItem(folder))}
           </div>

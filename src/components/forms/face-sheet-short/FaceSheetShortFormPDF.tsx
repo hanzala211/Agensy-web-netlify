@@ -176,158 +176,256 @@ const FaceSheetShortFormPDF: React.FC<{
           <Field label="Name">
             {data?.firstName} {data?.lastName}
           </Field>
-          <Field label="Preferred name">{data?.preferredName}</Field>
-          <Field label="Date of Birth">{data?.dateOfBirth}</Field>
-          <Field label="Phone Number">{data?.phoneNumber}</Field>
-          <Field label="Address">{data?.address}</Field>
-          <Field label="SSN">{data?.ssn}</Field>
+          {data?.preferredName && (
+            <Field label="Preferred name">{data.preferredName}</Field>
+          )}
+          {data?.dateOfBirth && (
+            <Field label="Date of Birth">{data.dateOfBirth}</Field>
+          )}
+          {data?.phoneNumber && (
+            <Field label="Phone Number">{data.phoneNumber}</Field>
+          )}
+          {data?.address && <Field label="Address">{data.address}</Field>}
+          {data?.ssn && <Field label="SSN">{data.ssn}</Field>}
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Emergency Contact</Text>
-          <Field label="Name">
-            {data?.emergencyContactFirstName} {data?.emergencyContactLastName}
-          </Field>
-          <Field label="Relationship">
-            {
-              RELATIONSHIP_TO_CLIENT.find(
-                (item) => item.value === data?.emergencyContactRelationship
-              )?.label
-            }
-          </Field>
-          <Field label="Phone">{data?.emergencyContactPhone}</Field>
-          <Field label="Email">{data?.emergencyContactEmail}</Field>
-          <Field label="Address">{data?.emergencyContactAddress}</Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medical Settings</Text>
-          <Field label="Code Status">
-            {
-              CODE_STATUS_OPTIONS.find(
-                (item) => item.value === data?.codeStatus
-              )?.label
-            }
-          </Field>
-          <Field label="Advance Directive">
-            {
-              ADVANCE_DIRECTIVE_OPTIONS.find(
-                (item) => item.value === data?.advanceDirective
-              )?.label
-            }
-          </Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hospital Preference</Text>
-          <Field label="Hospital Preference">{data?.hospitalPreference}</Field>
-          <Field label="Hospital Address">{data?.hospitalAddress}</Field>
-          <Field label="Hospital Phone">{data?.hospitalPhoneNumber}</Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Insurance Information</Text>
-          <Field label="Insurance">{data?.insurance}</Field>
-          <Field label="Group Number">{data?.groupNumber}</Field>
-          <Field label="ID Number">{data?.idNumber}</Field>
-          <Field label="Medicare">{data?.medicare}</Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pharmacy Information</Text>
-          <Field label="Pharmacy Name">{data?.pharmacyName}</Field>
-          <Field label="Pharmacy Address">{data?.pharmacyAddress}</Field>
-          <Field label="Pharmacy Phone">{data?.pharmacyPhone}</Field>
-          <Field label="Pharmacy Fax">{data?.pharmacyFax}</Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>MPOA</Text>
-          <Field label="MPOA Name">{data?.mpoaName}</Field>
-          <Field label="MPOA Phone">{data?.mpoaPhone}</Field>
-          <Field label="MPOA Address">{data?.mpoaAddress}</Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>DPOA</Text>
-          <Field label="DPOA Name">{data?.dpoaName}</Field>
-          <Field label="DPOA Phone">{data?.dpoaPhone}</Field>
-          <Field label="DPOA Address">{data?.dpoaAddress}</Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Healthcare Providers</Text>
-          <TableHeader
-            columns={[
-              "Provider Name",
-              "Specialty",
-              "Phone / Fax",
-              "Last / Next Visit",
-            ]}
-          />
-          {(data?.providers ?? [])
-            .filter((p) => p && p.providerName)
-            .map((p, i, arr) => (
-              <TableRow
-                key={i}
-                cells={[
-                  p.providerName ?? "",
-                  p.specialty ?? "",
-                  `${p.phone || ""} ${p.fax ? "/" : ""} ${p.fax || ""}`,
-                  `${p.lastVisit || ""} / ${p.nextVisit || ""}`,
-                ]}
-                last={i === arr.length - 1}
-              />
-            ))}
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medications</Text>
-          <TableHeader
-            columns={[
-              "Medication",
-              "Dose",
-              "Used to Treat",
-              "Prescriber",
-              "Refill Due",
-              "Frequency",
-            ]}
-          />
-          {(data?.medications ?? [])
-            .filter((m) => m && m.medicationName)
-            .map((m, i, arr) => (
-              <TableRow
-                key={i}
-                cells={[
-                  m.medicationName ?? "",
-                  m.dose ?? "",
-                  m.usedToTreat ?? "",
-                  m.prescriber ?? "",
-                  m.refillDue ?? "",
-                  m.frequency ?? "",
-                ]}
-                last={i === arr.length - 1}
-              />
-            ))}
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Diagnoses</Text>
-          <Field label="Diagnoses">
-            {data?.diagnoses
-              ?.filter((d) => d && d.diagnosis)
-              ?.map((d) => d.diagnosis)
-              .join(", ") ?? ""}
-          </Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Allergies</Text>
-          <Field label="Allergies">
-            {data?.allergies
-              ?.filter((a) => a && a.allergen)
-              ?.map((a) => a.allergen)
-              .join(", ") ?? ""}
-          </Field>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Surgical History</Text>
-          <Field label="Surgical History">
-            {data?.surgicalHistory
-              ?.filter((s) => s && s.surgicalHistory)
-              ?.map((s) => s.surgicalHistory)
-              .join(", ") ?? ""}
-          </Field>
-        </View>
+
+        {(data?.emergencyContactFirstName ||
+          data?.emergencyContactLastName ||
+          data?.emergencyContactRelationship ||
+          data?.emergencyContactPhone ||
+          data?.emergencyContactEmail ||
+          data?.emergencyContactAddress) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Emergency Contact</Text>
+            {(data.emergencyContactFirstName ||
+              data.emergencyContactLastName) && (
+              <Field label="Name">
+                {data.emergencyContactFirstName} {data.emergencyContactLastName}
+              </Field>
+            )}
+            {data.emergencyContactRelationship && (
+              <Field label="Relationship">
+                {
+                  RELATIONSHIP_TO_CLIENT.find(
+                    (item) => item.value === data.emergencyContactRelationship
+                  )?.label
+                }
+              </Field>
+            )}
+            {data.emergencyContactPhone && (
+              <Field label="Phone">{data.emergencyContactPhone}</Field>
+            )}
+            {data.emergencyContactEmail && (
+              <Field label="Email">{data.emergencyContactEmail}</Field>
+            )}
+            {data.emergencyContactAddress && (
+              <Field label="Address">{data.emergencyContactAddress}</Field>
+            )}
+          </View>
+        )}
+
+        {(data?.codeStatus || data?.advanceDirective) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Medical Settings</Text>
+            {data.codeStatus && (
+              <Field label="Code Status">
+                {
+                  CODE_STATUS_OPTIONS.find(
+                    (item) => item.value === data.codeStatus
+                  )?.label
+                }
+              </Field>
+            )}
+            {data.advanceDirective && (
+              <Field label="Advance Directive">
+                {
+                  ADVANCE_DIRECTIVE_OPTIONS.find(
+                    (item) => item.value === data.advanceDirective
+                  )?.label
+                }
+              </Field>
+            )}
+          </View>
+        )}
+
+        {(data?.hospitalPreference ||
+          data?.hospitalAddress ||
+          data?.hospitalPhoneNumber) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Hospital Preference</Text>
+            {data.hospitalPreference && (
+              <Field label="Hospital Preference">
+                {data.hospitalPreference}
+              </Field>
+            )}
+            {data.hospitalAddress && (
+              <Field label="Hospital Address">{data.hospitalAddress}</Field>
+            )}
+            {data.hospitalPhoneNumber && (
+              <Field label="Hospital Phone">{data.hospitalPhoneNumber}</Field>
+            )}
+          </View>
+        )}
+
+        {(data?.insurance ||
+          data?.groupNumber ||
+          data?.idNumber ||
+          data?.medicare) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Insurance Information</Text>
+            {data.insurance && (
+              <Field label="Insurance">{data.insurance}</Field>
+            )}
+            {data.groupNumber && (
+              <Field label="Group Number">{data.groupNumber}</Field>
+            )}
+            {data.idNumber && <Field label="ID Number">{data.idNumber}</Field>}
+            {data.medicare && <Field label="Medicare">{data.medicare}</Field>}
+          </View>
+        )}
+
+        {(data?.pharmacyName ||
+          data?.pharmacyAddress ||
+          data?.pharmacyPhone ||
+          data?.pharmacyFax) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Pharmacy Information</Text>
+            {data.pharmacyName && (
+              <Field label="Pharmacy Name">{data.pharmacyName}</Field>
+            )}
+            {data.pharmacyAddress && (
+              <Field label="Pharmacy Address">{data.pharmacyAddress}</Field>
+            )}
+            {data.pharmacyPhone && (
+              <Field label="Pharmacy Phone">{data.pharmacyPhone}</Field>
+            )}
+            {data.pharmacyFax && (
+              <Field label="Pharmacy Fax">{data.pharmacyFax}</Field>
+            )}
+          </View>
+        )}
+
+        {(data?.mpoaName || data?.mpoaPhone || data?.mpoaAddress) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>MPOA</Text>
+            {data.mpoaName && <Field label="MPOA Name">{data.mpoaName}</Field>}
+            {data.mpoaPhone && (
+              <Field label="MPOA Phone">{data.mpoaPhone}</Field>
+            )}
+            {data.mpoaAddress && (
+              <Field label="MPOA Address">{data.mpoaAddress}</Field>
+            )}
+          </View>
+        )}
+
+        {(data?.dpoaName || data?.dpoaPhone || data?.dpoaAddress) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>DPOA</Text>
+            {data.dpoaName && <Field label="DPOA Name">{data.dpoaName}</Field>}
+            {data.dpoaPhone && (
+              <Field label="DPOA Phone">{data.dpoaPhone}</Field>
+            )}
+            {data.dpoaAddress && (
+              <Field label="DPOA Address">{data.dpoaAddress}</Field>
+            )}
+          </View>
+        )}
+
+        {data?.providers?.some((p) => p && p.providerName) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Healthcare Providers</Text>
+            <TableHeader
+              columns={[
+                "Provider Name",
+                "Specialty",
+                "Phone / Fax",
+                "Last / Next Visit",
+              ]}
+            />
+            {(data.providers ?? [])
+              .filter((p) => p && p.providerName)
+              .map((p, i, arr) => (
+                <TableRow
+                  key={i}
+                  cells={[
+                    p.providerName ?? "",
+                    p.specialty ?? "",
+                    `${p.phone || ""} ${p.fax ? "/" : ""} ${p.fax || ""}`,
+                    `${p.lastVisit || ""} / ${p.nextVisit || ""}`,
+                  ]}
+                  last={i === arr.length - 1}
+                />
+              ))}
+          </View>
+        )}
+
+        {data?.medications?.some((m) => m && m.medicationName) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Medications</Text>
+            <TableHeader
+              columns={[
+                "Medication",
+                "Dose",
+                "Used to Treat",
+                "Prescriber",
+                "Refill Due",
+                "Frequency",
+              ]}
+            />
+            {(data.medications ?? [])
+              .filter((m) => m && m.medicationName)
+              .map((m, i, arr) => (
+                <TableRow
+                  key={i}
+                  cells={[
+                    m.medicationName ?? "",
+                    m.dose ?? "",
+                    m.usedToTreat ?? "",
+                    m.prescriber ?? "",
+                    m.refillDue ?? "",
+                    m.frequency ?? "",
+                  ]}
+                  last={i === arr.length - 1}
+                />
+              ))}
+          </View>
+        )}
+
+        {data?.diagnoses?.some((d) => d && d.diagnosis) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Diagnoses</Text>
+            <Field label="Diagnoses">
+              {data.diagnoses
+                ?.filter((d) => d && d.diagnosis)
+                ?.map((d) => d.diagnosis)
+                .join(", ") ?? ""}
+            </Field>
+          </View>
+        )}
+
+        {data?.allergies?.some((a) => a && a.allergen) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Allergies</Text>
+            <Field label="Allergies">
+              {data.allergies
+                ?.filter((a) => a && a.allergen)
+                ?.map((a) => a.allergen)
+                .join(", ") ?? ""}
+            </Field>
+          </View>
+        )}
+
+        {data?.surgicalHistory?.some((s) => s && s.surgicalHistory) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Surgical History</Text>
+            <Field label="Surgical History">
+              {data.surgicalHistory
+                ?.filter((s) => s && s.surgicalHistory)
+                ?.map((s) => s.surgicalHistory)
+                .join(", ") ?? ""}
+            </Field>
+          </View>
+        )}
       </Page>
     </Document>
   );

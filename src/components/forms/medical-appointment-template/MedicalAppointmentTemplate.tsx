@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -11,9 +11,14 @@ import {
   TertiaryButton,
   Select,
   PhoneNumberInput,
+  HealthcareProviderSelectionModal,
+  MedicationSelectionModal,
+  DiagnosisSelectionModal,
+  AllergySelectionModal,
 } from "@agensy/components";
 import {
   medicalAppointmentTemplateSchema,
+  type Client,
   type ClientMedications,
   type HealthcareProvider,
   type MedicalAppointmentTemplateData,
@@ -50,13 +55,14 @@ const defaultValues: MedicalAppointmentTemplateData = {
   allergies: [],
   surgical_history: [],
   medications: [],
-  healthcareProviders: [
-    {
-      providerName: "",
-      specialty: "",
-      address: "",
-    },
-  ],
+  healthcareProvider: {
+    providerName: "",
+    specialty: "",
+    address: "",
+    phone: "",
+    notes: "",
+    follow_up: "",
+  },
   recommendations: "",
   referrals: "",
   follow_up: "",
@@ -66,12 +72,22 @@ const defaultValues: MedicalAppointmentTemplateData = {
 export const MedicalAppointmentTemplate: React.FC = () => {
   const queryClient = useQueryClient();
   const { setOpenedFileData } = useClientContext();
-  const { clientId } = useParams();
+  const { clientId, formSlug } = useParams();
+  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
+  const [isMedicationModalOpen, setIsMedicationModalOpen] = useState(false);
+  const [isDiagnosisModalOpen, setIsDiagnosisModalOpen] = useState(false);
+  const [isAllergyModalOpen, setIsAllergyModalOpen] = useState(false);
+
+  const clientData = queryClient.getQueryData(["client", clientId]) as Client;
+
   const {
     data: medicalAppointmentTemplate,
     isFetching: isFetchingMedicalAppointmentTemplate,
     refetch,
-  } = useGetMedicalAppointmentTemplate(clientId as string);
+  } = useGetMedicalAppointmentTemplate(
+    clientId as string,
+    formSlug?.split("_")?.[1] as string
+  );
   const postMedicalAppointmentTemplateMutation =
     usePostMedicalAppointmentTemplateMutation();
 
@@ -86,6 +102,9 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         "The medical appointment template has been saved successfully."
       );
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+      queryClient.invalidateQueries({
+        queryKey: ["medical-appointment-templates", clientId],
+      });
     } else if (postMedicalAppointmentTemplateMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -104,15 +123,6 @@ export const MedicalAppointmentTemplate: React.FC = () => {
   } = useForm<MedicalAppointmentTemplateData>({
     resolver: zodResolver(medicalAppointmentTemplateSchema),
     defaultValues,
-  });
-
-  const {
-    fields: healthcareProviders,
-    append,
-    remove,
-  } = useFieldArray({
-    control,
-    name: "healthcareProviders",
   });
 
   const {
@@ -167,9 +177,8 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               medicalAppointmentTemplate?.medical_template.date
             )
           : "",
-        // Format dates in medications array
         medications:
-          medicalAppointmentTemplate?.medications?.map(
+          medicalAppointmentTemplate?.client_medications_template?.map(
             (med: ClientMedications) => ({
               start_date: med.start_date
                 ? DateUtils.formatDateToRequiredFormat(med.start_date)
@@ -182,33 +191,52 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               prescribing_doctor: med.prescribing_doctor || "",
               dosage: med.dosage || "",
               notes: med.notes || "",
-              id: med.id || "",
+              client_medication_id: med?.client_medication_id || "",
             })
           ) || [],
-        // Format dates in healthcareProviders array
-        healthcareProviders:
-          medicalAppointmentTemplate?.healthcare_providers?.map(
-            (provider: HealthcareProvider) => ({
-              follow_up: provider.follow_up
-                ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
-                : "",
-              providerName: provider.provider_name || "",
-              address: provider.address || "",
-              phone: provider.phone || "",
-              notes: provider.notes || "",
-              specialty: provider.specialty || "",
-              id: provider.id || "",
-            })
-          ) || [],
-        height: medicalAppointmentTemplate?.medical_info?.height || "",
-        weight: medicalAppointmentTemplate?.medical_info?.weight || "",
+        healthcareProvider:
+          medicalAppointmentTemplate?.healthcare_provider_template
+            ? {
+                follow_up: medicalAppointmentTemplate
+                  .healthcare_provider_template.follow_up
+                  ? DateUtils.formatDateToRequiredFormat(
+                      medicalAppointmentTemplate.healthcare_provider_template
+                        .healthcare_provider_follow_up
+                    )
+                  : "",
+                providerName:
+                  medicalAppointmentTemplate.healthcare_provider_template
+                    .healthcare_provider_name || "",
+                address:
+                  medicalAppointmentTemplate.healthcare_provider_template
+                    .healthcare_provider_address || "",
+                phone:
+                  medicalAppointmentTemplate.healthcare_provider_template
+                    .healthcare_provider_phone || "",
+                notes:
+                  medicalAppointmentTemplate.healthcare_provider_template
+                    .healthcare_provider_name || "",
+                specialty:
+                  medicalAppointmentTemplate.healthcare_provider_template
+                    .healthcare_provider_specialty || "",
+                provider_id:
+                  medicalAppointmentTemplate.healthcare_provider_template
+                    .healthcare_provider_id || "",
+                providerType:
+                  medicalAppointmentTemplate.healthcare_provider_template
+                    .healthcare_provider_type || "",
+              }
+            : undefined,
+        height: medicalAppointmentTemplate?.medical_template?.height || "",
+        weight: medicalAppointmentTemplate?.medical_template?.weight || "",
         blood_pressure:
-          medicalAppointmentTemplate?.medical_info?.blood_pressure || "",
+          medicalAppointmentTemplate?.medical_template?.blood_pressure || "",
         temperature:
-          medicalAppointmentTemplate?.medical_info?.temperature || "",
-        heart_rate: medicalAppointmentTemplate?.medical_info?.heart_rate || "",
+          medicalAppointmentTemplate?.medical_template?.temperature || "",
+        heart_rate:
+          medicalAppointmentTemplate?.medical_template?.heart_rate || "",
         additional_vitals:
-          medicalAppointmentTemplate?.medical_info?.additional_vitals || "",
+          medicalAppointmentTemplate?.medical_template?.additional_vitals || "",
         reason_for_visit:
           medicalAppointmentTemplate?.medical_template?.reason_for_visit || "",
         top_3_concerns:
@@ -219,23 +247,26 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         visit_notes:
           medicalAppointmentTemplate?.medical_template?.visit_notes || "",
         diagnoses:
-          medicalAppointmentTemplate?.medical_info?.diagnoses &&
-          medicalAppointmentTemplate?.medical_info?.diagnoses.length > 0
-            ? medicalAppointmentTemplate?.medical_info?.diagnoses
+          medicalAppointmentTemplate?.medical_info_template?.diagnoses &&
+          medicalAppointmentTemplate?.medical_info_template?.diagnoses.length >
+            0
+            ? medicalAppointmentTemplate?.medical_info_template?.diagnoses
                 .split(", ")
                 .map((diagnosis: string) => ({ diagnosis }))
             : [],
         allergies:
-          medicalAppointmentTemplate?.medical_info?.allergies &&
-          medicalAppointmentTemplate?.medical_info?.allergies.length > 0
-            ? medicalAppointmentTemplate?.medical_info?.allergies
+          medicalAppointmentTemplate?.medical_info_template?.allergies &&
+          medicalAppointmentTemplate?.medical_info_template?.allergies.length >
+            0
+            ? medicalAppointmentTemplate?.medical_info_template?.allergies
                 .split(", ")
                 .map((allergen: string) => ({ allergen }))
             : [],
         surgical_history:
-          medicalAppointmentTemplate?.medical_info?.surgical_history &&
-          medicalAppointmentTemplate?.medical_info?.surgical_history.length > 0
-            ? medicalAppointmentTemplate?.medical_info?.surgical_history
+          medicalAppointmentTemplate?.medical_template?.surgical_history &&
+          medicalAppointmentTemplate?.medical_template?.surgical_history
+            .length > 0
+            ? medicalAppointmentTemplate?.medical_template?.surgical_history
                 .split(", ")
                 .map((surgicalHistory: string) => ({ surgicalHistory }))
             : [],
@@ -254,7 +285,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
 
       reset(formattedData);
       setOpenedFileData({
-        ...getValues,
+        ...getValues(),
         last_update: {
           updatedAt: medicalAppointmentTemplate?.last_update?.updatedAt || "",
         },
@@ -267,71 +298,91 @@ export const MedicalAppointmentTemplate: React.FC = () => {
     const medications =
       data.medications &&
       data.medications.map((item) => {
-        if (item.id) {
-          return {
-            medication_name: item.medication_name ? item.medication_name : null,
-            dosage: item.dosage ? item.dosage : null,
-            frequency: item.frequency ? item.frequency : null,
-            notes: item.notes ? item.notes : null,
-            prescribing_doctor: item.prescribing_doctor
-              ? item.prescribing_doctor
-              : null,
-            start_date: item.start_date
-              ? DateUtils.changetoISO(item.start_date)
-              : null,
-            end_date: item.end_date
-              ? DateUtils.changetoISO(item.end_date)
-              : null,
-            id: item.id,
-          };
-        } else {
-          return {
-            medication_name: item.medication_name ? item.medication_name : null,
-            dosage: item.dosage ? item.dosage : null,
-            frequency: item.frequency ? item.frequency : null,
-            notes: item.notes ? item.notes : null,
-            prescribing_doctor: item.prescribing_doctor
-              ? item.prescribing_doctor
-              : null,
-            start_date: item.start_date
-              ? DateUtils.changetoISO(item.start_date)
-              : null,
-            end_date: item.end_date
-              ? DateUtils.changetoISO(item.end_date)
-              : null,
-          };
-        }
+        const medication = {
+          medication_name: item.medication_name ? item.medication_name : null,
+          dosage: item.dosage ? item.dosage : null,
+          frequency: item.frequency ? item.frequency : null,
+          notes: item.notes ? item.notes : null,
+          prescribing_doctor: item.prescribing_doctor
+            ? item.prescribing_doctor
+            : null,
+          start_date: item.start_date
+            ? DateUtils.changetoISO(item.start_date)
+            : null,
+          end_date: item.end_date ? DateUtils.changetoISO(item.end_date) : null,
+          active: true,
+          id: item.id ? item.id : null,
+          client_medication_id: item.client_medication_id
+            ? item.client_medication_id
+            : null,
+        };
+        return medication;
       });
 
-    const providers =
-      data.healthcareProviders &&
-      data.healthcareProviders.length > 0 &&
-      data.healthcareProviders.map((item) => {
-        if (item.id) {
-          return {
-            provider_name: item.providerName ? item.providerName : null,
-            address: item.address ? item.address : null,
-            phone: item.phone ? item.phone : null,
-            notes: item.notes ? item.notes : null,
-            follow_up: item.follow_up
-              ? DateUtils.changetoISO(item.follow_up)
-              : null,
-            specialty: item.specialty ? item.specialty : null,
-            id: item.id,
-          };
-        } else {
-          return {
-            provider_name: item.providerName ? item.providerName : null,
-            address: item.address ? item.address : null,
-            phone: item.phone ? item.phone : null,
-            notes: item.notes ? item.notes : null,
-            follow_up: item.follow_up
-              ? DateUtils.changetoISO(item.follow_up)
-              : null,
-            specialty: item.specialty ? item.specialty : null,
-          };
+    medications?.forEach((item) => {
+      if (item.client_medication_id) {
+        // @ts-expect-error // fix this
+        delete item.id;
+      } else {
+        // @ts-expect-error // fix this
+        delete item.client_medication_id;
+      }
+      if (!item.id && !item.client_medication_id) {
+        // @ts-expect-error // fix this
+        delete item.id;
+        // @ts-expect-error // fix this
+        delete item.client_medication_id;
+      }
+    });
+
+    const provider = data.healthcareProvider
+      ? {
+          healthcare_provider_name: data.healthcareProvider.providerName
+            ? data.healthcareProvider.providerName
+            : null,
+          healthcare_provider_address: data.healthcareProvider.address
+            ? data.healthcareProvider.address
+            : null,
+          healthcare_provider_phone: data.healthcareProvider.phone
+            ? data.healthcareProvider.phone
+            : null,
+          healthcare_provider_notes: data.healthcareProvider.notes
+            ? data.healthcareProvider.notes
+            : null,
+          healthcare_provider_follow_up: data.healthcareProvider.follow_up
+            ? data.healthcareProvider.follow_up
+            : null,
+          healthcare_provider_specialty: data.healthcareProvider.specialty
+            ? data.healthcareProvider.specialty
+            : null,
+          id: data.healthcareProvider.id ? data.healthcareProvider.id : null,
+          healthcare_provider_type: data.healthcareProvider.providerType
+            ? data.healthcareProvider.providerType
+            : null,
+          healthcare_provider_id: data.healthcareProvider.provider_id
+            ? data.healthcareProvider.provider_id
+            : null,
         }
-      });
+      : null;
+
+    if (provider?.healthcare_provider_id) {
+      // @ts-expect-error // fix this
+      delete provider.id;
+    } else {
+      // @ts-expect-error // fix this
+      delete provider?.healthcare_provider_id;
+    }
+    if (!provider?.healthcare_provider_id && !provider?.id) {
+      // @ts-expect-error // fix this
+      delete provider?.healthcare_provider_id;
+      // @ts-expect-error // fix this
+      delete provider.id;
+    }
+
+    if (provider?.healthcare_provider_id === null) {
+      // @ts-expect-error // fix this
+      delete provider?.healthcare_provider_id;
+    }
 
     const postData = {
       client_info: {
@@ -341,20 +392,35 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           ? DateUtils.changetoISO(data.dateOfBirth)
           : null,
       },
-      medical_info: {
-        diagnoses:
-          data.diagnoses && data.diagnoses.length > 0
-            ? data.diagnoses.map((item) => item.diagnosis).join(", ")
-            : null,
-        allergies:
-          data.allergies && data.allergies.length > 0
+      global_allergies: clientData?.medical?.allergies
+        ? clientData?.medical?.allergies
+        : null,
+      allergies:
+        data.allergies && data.allergies.length > 0
+          ? data.allergies.map((item) => item.allergen).join(", ").length > 0
             ? data.allergies.map((item) => item.allergen).join(", ")
-            : null,
+            : null
+          : null,
+      global_diagnoses: clientData?.medical?.diagnoses
+        ? clientData?.medical?.diagnoses
+        : null,
+      diagnoses:
+        data.diagnoses && data.diagnoses.length > 0
+          ? data.diagnoses.map((item) => item.diagnosis).join(", ").length > 0
+            ? data.diagnoses.map((item) => item.diagnosis).join(", ")
+            : null
+          : null,
+      medical_template: {
+        date: data.date ? DateUtils.changetoISO(data.date) : null,
         surgical_history:
           data.surgical_history && data.surgical_history.length > 0
             ? data.surgical_history
                 .map((item) => item.surgicalHistory)
-                .join(", ")
+                .join(", ").length > 0
+              ? data.surgical_history
+                  .map((item) => item.surgicalHistory)
+                  .join(", ")
+              : null
             : null,
         height: data.height ? data.height : null,
         weight: data.weight ? data.weight : null,
@@ -364,11 +430,6 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         additional_vitals: data.additional_vitals
           ? data.additional_vitals
           : null,
-      },
-      medications: medications || [],
-      healthcare_providers: providers || [],
-      medical_template: {
-        date: data.date ? DateUtils.changetoISO(data.date) : null,
         reason_for_visit: data.reason_for_visit ? data.reason_for_visit : null,
         top_3_concerns: data.top_3_concerns ? data.top_3_concerns : null,
         tests_labs_imaging: data.tests_labs_imaging
@@ -382,21 +443,59 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           : null,
         report_given_to: data.report_given_to ? data.report_given_to : null,
       },
+      healthcare_provider: provider ? provider : null,
+      medications: medications || [],
     };
     postMedicalAppointmentTemplateMutation.mutate({
       clientId: clientId!,
+      templateId: formSlug?.split("_")?.[1] as string,
       data: postData,
     });
   };
 
-  const addHealthcareProvider = () => {
-    append({
-      providerName: "",
-      address: "",
-      phone: "",
-      notes: "",
-      follow_up: "",
-      specialty: "",
+  const handleProviderSelect = (provider: HealthcareProvider) => {
+    reset({
+      ...getValues(),
+      healthcareProvider: {
+        providerName: provider.provider_name || "",
+        address: provider.address || "",
+        phone: provider.phone || "",
+        notes: provider.notes || "",
+        follow_up: provider.follow_up
+          ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
+          : "",
+        specialty: provider.specialty || "",
+        id: provider.id ? String(provider.id) : "",
+      },
+    });
+  };
+
+  const handleMedicationSelect = (medication: ClientMedications) => {
+    appendMedication({
+      medication_name: medication.medication_name || "",
+      dosage: medication.dosage || "",
+      frequency: medication.frequency || "",
+      notes: medication.notes || "",
+      prescribing_doctor: medication.prescribing_doctor || "",
+      start_date: medication.start_date
+        ? DateUtils.formatDateToRequiredFormat(medication.start_date)
+        : "",
+      end_date: medication.end_date
+        ? DateUtils.formatDateToRequiredFormat(medication.end_date)
+        : "",
+      id: medication.id ? (medication.id as string) : "",
+    });
+  };
+
+  const handleDiagnosisSelect = (diagnosis: string) => {
+    appendDiagnosis({
+      diagnosis: diagnosis,
+    });
+  };
+
+  const handleAllergySelect = (allergy: string) => {
+    appendAllergy({
+      allergen: allergy,
     });
   };
 
@@ -594,8 +693,18 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               diagnosis: "",
             })
           }
+          secondaryButtonText={
+            <p>
+              <span className="lg:inline hidden">
+                Add from existing diagnoses
+              </span>{" "}
+              <ICONS.plus size={16} className="lg:hidden block" />{" "}
+            </p>
+          }
+          onSecondaryButtonClick={() => setIsDiagnosisModalOpen(true)}
           ariaLabel="Add Diagnosis"
           showButton={true}
+          showSecondaryButton={true}
         >
           <div className="space-y-6">
             {diagnosesFields.map((field, index) => (
@@ -630,8 +739,18 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               allergen: "",
             })
           }
+          secondaryButtonText={
+            <p>
+              <span className="lg:inline hidden">
+                Add from existing allergies
+              </span>{" "}
+              <ICONS.plus size={16} className="lg:hidden block" />{" "}
+            </p>
+          }
+          onSecondaryButtonClick={() => setIsAllergyModalOpen(true)}
           ariaLabel="Add Allergy"
           showButton={true}
+          showSecondaryButton={true}
         >
           <div className="space-y-6">
             {allergiesFields.map((field, index) => (
@@ -713,8 +832,18 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               end_date: "",
             })
           }
+          secondaryButtonText={
+            <p>
+              <span className="lg:inline hidden">
+                Add from existing medications
+              </span>{" "}
+              <ICONS.medicine size={16} className="lg:hidden block" />{" "}
+            </p>
+          }
+          onSecondaryButtonClick={() => setIsMedicationModalOpen(true)}
           ariaLabel="Add Medication"
           showButton={true}
+          showSecondaryButton={true}
         >
           <div className="space-y-6">
             {medicationsFields.map((field, index) => (
@@ -798,85 +927,70 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         </Card>
 
         <Card
-          title="Healthcare Providers"
-          buttonText={<ICONS.plus size={16} />}
-          onButtonClick={addHealthcareProvider}
-          ariaLabel="Add Healthcare Provider"
+          title="Healthcare Provider"
+          buttonText={
+            <p>
+              <span className="lg:inline hidden">
+                Add from existing provider
+              </span>{" "}
+              <ICONS.doctor size={16} className="lg:hidden block" />{" "}
+            </p>
+          }
+          onButtonClick={() => setIsProviderModalOpen(true)}
+          ariaLabel="Select Healthcare Provider"
           showButton={true}
         >
           <div className="space-y-6">
-            {healthcareProviders.map((field, index) => (
-              <div key={field.id} className="p-3 rounded-lg border">
-                <div className="w-full flex gap-4 items-center">
-                  <div className="w-full grid md:grid-cols-2 gap-4">
-                    <Input
-                      label="Provider Name"
-                      register={register(
-                        `healthcareProviders.${index}.providerName`
-                      )}
-                      error={
-                        errors.healthcareProviders?.[index]?.providerName
-                          ?.message
-                      }
-                    />
+            <div className="p-3 rounded-lg border">
+              <div className="w-full flex gap-4 items-center">
+                <div className="w-full grid md:grid-cols-2 gap-4">
+                  <Input
+                    label="Provider Name"
+                    register={register("healthcareProvider.providerName")}
+                    error={errors.healthcareProvider?.providerName?.message}
+                  />
 
-                    <Select
-                      label="Specialty"
-                      control={control}
-                      name={`healthcareProviders.${index}.specialty`}
-                      data={SPECIALTIES}
-                      labelOption="Select Specialty"
-                    />
+                  <Input
+                    label="Provider Type"
+                    register={register("healthcareProvider.providerType")}
+                    error={errors.healthcareProvider?.providerType?.message}
+                  />
 
-                    <Input
-                      label="Address"
-                      register={register(
-                        `healthcareProviders.${index}.address`
-                      )}
-                      error={
-                        errors.healthcareProviders?.[index]?.address?.message
-                      }
-                    />
+                  <Select
+                    label="Specialty"
+                    control={control}
+                    name="healthcareProvider.specialty"
+                    data={SPECIALTIES}
+                    labelOption="Select Specialty"
+                  />
 
-                    <PhoneNumberInput
-                      label="Phone"
-                      name={`healthcareProviders.${index}.phone`}
-                      control={control}
+                  <Input
+                    label="Address"
+                    register={register("healthcareProvider.address")}
+                    error={errors.healthcareProvider?.address?.message}
+                  />
+
+                  <PhoneNumberInput
+                    label="Phone"
+                    name="healthcareProvider.phone"
+                    control={control}
+                  />
+                  <DatePickerField
+                    label="Follow-up"
+                    name="healthcareProvider.follow_up"
+                    control={control}
+                  />
+                  <div className="md:col-span-2">
+                    <TextArea
+                      label="Notes"
+                      register={register("healthcareProvider.notes")}
+                      error={errors.healthcareProvider?.notes?.message}
+                      rows={3}
                     />
-                    <div className="md:col-span-2">
-                      <DatePickerField
-                        label="Follow-up"
-                        name={`healthcareProviders.${index}.follow_up`}
-                        control={control}
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <TextArea
-                        label="Notes"
-                        register={register(
-                          `healthcareProviders.${index}.notes`
-                        )}
-                        error={
-                          errors.healthcareProviders?.[index]?.notes?.message
-                        }
-                        rows={3}
-                      />
-                    </div>
                   </div>
                 </div>
-                {healthcareProviders.length > 1 && (
-                  <div className="flex justify-end mt-3">
-                    <TertiaryButton
-                      type="button"
-                      onClick={() => remove(index)}
-                      className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
-                    >
-                      <ICONS.delete />
-                    </TertiaryButton>
-                  </div>
-                )}
               </div>
-            ))}
+            </div>
           </div>
         </Card>
 
@@ -893,6 +1007,44 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           </div>
         </div>
       </form>
+
+      <HealthcareProviderSelectionModal
+        isOpen={isProviderModalOpen}
+        onClose={() => setIsProviderModalOpen(false)}
+        onSelectProvider={handleProviderSelect}
+        title="Select Healthcare Provider"
+      />
+
+      <MedicationSelectionModal
+        isOpen={isMedicationModalOpen}
+        onClose={() => setIsMedicationModalOpen(false)}
+        onSelectMedication={handleMedicationSelect}
+        title="Select Existing Medication"
+      />
+
+      <DiagnosisSelectionModal
+        isOpen={isDiagnosisModalOpen}
+        onClose={() => setIsDiagnosisModalOpen(false)}
+        onSelectDiagnosis={handleDiagnosisSelect}
+        title="Select Existing Diagnosis"
+        existingDiagnoses={
+          clientData?.medical?.diagnoses
+            ? clientData.medical.diagnoses.split(", ").filter(Boolean)
+            : []
+        }
+      />
+
+      <AllergySelectionModal
+        isOpen={isAllergyModalOpen}
+        onClose={() => setIsAllergyModalOpen(false)}
+        onSelectAllergy={handleAllergySelect}
+        title="Select Existing Allergy"
+        existingAllergies={
+          clientData?.medical?.allergies
+            ? clientData.medical.allergies.split(", ").filter(Boolean)
+            : []
+        }
+      />
     </div>
   );
 };

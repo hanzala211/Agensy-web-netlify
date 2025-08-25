@@ -32,6 +32,8 @@ import {
 import { useAuthContext } from "@agensy/context";
 import { AgensyForms } from "./pages/AgensyForms";
 import { ClientLogs } from "./pages/ClientLogs";
+import { TermsAndConditions } from "./pages/TermsAndConditions";
+import { PrivacyAndPolicy } from "./pages/PrivacyAndPolicy";
 
 export const Routes: React.FC = () => {
   const { isAuthLoading } = useAuthContext();
@@ -47,6 +49,11 @@ export const Routes: React.FC = () => {
         <Route path={ROUTES.resetPassword} element={<ResetPassword />} />
         <Route path={ROUTES.verifyEmail} element={<VerifyEmail />} />
       </Route>
+      <Route
+        path={`/${ROUTES.termsAndConditions}`}
+        element={<TermsAndConditions />}
+      />
+      <Route path={`/${ROUTES.privacyPolicy}`} element={<PrivacyAndPolicy />} />
 
       <Route path="/" element={<AppLayout />}>
         <Route path="*" element={<Navigate to="/" />} />

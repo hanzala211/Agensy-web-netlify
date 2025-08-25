@@ -227,89 +227,108 @@ const ComprehensiveCarePlanPDF: React.FC<{
           <Field label="Last Name">
             <Text>{data.lastName || "-"}</Text>
           </Field>
-          <Field label="Date of Birth">
-            <Text>
-              {data.dateOfBirth
-                ? DateUtils.formatDateToRequiredFormat(data.dateOfBirth)
-                : "-"}
-            </Text>
-          </Field>
-          <Field label="Preferred Hospital">
-            <Text>{data.preferredHospital || "-"}</Text>
-          </Field>
-          <Field label="Pharmacy Name">
-            <Text>{data.pharmacyName || "-"}</Text>
-          </Field>
+          {data.dateOfBirth && (
+            <Field label="Date of Birth">
+              <Text>
+                {DateUtils.formatDateToRequiredFormat(data.dateOfBirth)}
+              </Text>
+            </Field>
+          )}
+          {data.preferredHospital && (
+            <Field label="Preferred Hospital">
+              <Text>{data.preferredHospital}</Text>
+            </Field>
+          )}
+          {data.pharmacyName && (
+            <Field label="Pharmacy Name">
+              <Text>{data.pharmacyName}</Text>
+            </Field>
+          )}
         </View>
 
         {/* Assessment Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Assessment Information</Text>
-          <Field label="Date of Assessment">
-            <Text>
-              {data.dateOfAssessment
-                ? DateUtils.formatDateToRequiredFormat(data.dateOfAssessment)
-                : "-"}
-            </Text>
-          </Field>
-          <Field label="Date of Care Plan">
-            <Text>
-              {data.dateOfCarePlan
-                ? DateUtils.formatDateToRequiredFormat(data.dateOfCarePlan)
-                : "-"}
-            </Text>
-          </Field>
-          <Field label="Person Completing Assessment">
-            <Text>{data.personCompletingAssessment || "-"}</Text>
-          </Field>
-          <Field label="Present for Assessment">
-            <Text>{data.presentForAssessment || "-"}</Text>
-          </Field>
-          <Field label="Goals for Assessment">
-            {Array.isArray(data.goalsForAssessment) &&
-            data.goalsForAssessment.length > 0 ? (
-              data.goalsForAssessment.map((goal, index) => (
-                <ListItem key={index} text={goal} />
-              ))
-            ) : (
-              <Text>-</Text>
+        {(data.dateOfAssessment ||
+          data.dateOfCarePlan ||
+          data.personCompletingAssessment ||
+          data.presentForAssessment ||
+          (data.goalsForAssessment && data.goalsForAssessment.length > 0)) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Assessment Information</Text>
+            {data.dateOfAssessment && (
+              <Field label="Date of Assessment">
+                <Text>
+                  {DateUtils.formatDateToRequiredFormat(data.dateOfAssessment)}
+                </Text>
+              </Field>
             )}
-          </Field>
-        </View>
+            {data.dateOfCarePlan && (
+              <Field label="Date of Care Plan">
+                <Text>
+                  {DateUtils.formatDateToRequiredFormat(data.dateOfCarePlan)}
+                </Text>
+              </Field>
+            )}
+            {data.personCompletingAssessment && (
+              <Field label="Person Completing Assessment">
+                <Text>{data.personCompletingAssessment}</Text>
+              </Field>
+            )}
+            {data.presentForAssessment && (
+              <Field label="Present for Assessment">
+                <Text>{data.presentForAssessment}</Text>
+              </Field>
+            )}
+            {data.goalsForAssessment && data.goalsForAssessment.length > 0 && (
+              <Field label="Goals for Assessment">
+                {data.goalsForAssessment.map((goal, index) => (
+                  <ListItem key={index} text={goal} />
+                ))}
+              </Field>
+            )}
+          </View>
+        )}
 
         {/* Initial Request */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Initial Request</Text>
-          <Field label="Initial Request">
-            <Text>{data.initialRequest || "-"}</Text>
-          </Field>
-        </View>
+        {data.initialRequest && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Initial Request</Text>
+            <Field label="Initial Request">
+              <Text>{data.initialRequest}</Text>
+            </Field>
+          </View>
+        )}
 
         {/* Care Recipient Goals */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Care Recipient Goals</Text>
-          <Field label="Goals">
-            <Text>{data.careRecipientGoals || "-"}</Text>
-          </Field>
-        </View>
+        {data.careRecipientGoals && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Care Recipient Goals</Text>
+            <Field label="Goals">
+              <Text>{data.careRecipientGoals}</Text>
+            </Field>
+          </View>
+        )}
 
         {/* Demographic and Historic Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            Demographic and Historic Information
-          </Text>
-          <Field label="Information">
-            <Text>{data.demographicAndHistoricInformation || "-"}</Text>
-          </Field>
-        </View>
+        {data.demographicAndHistoricInformation && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Demographic and Historic Information
+            </Text>
+            <Field label="Information">
+              <Text>{data.demographicAndHistoricInformation}</Text>
+            </Field>
+          </View>
+        )}
 
         {/* Medical History */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medical History</Text>
-          <Field label="History">
-            <Text>{data.medicalHistory || "-"}</Text>
-          </Field>
-        </View>
+        {data.medicalHistory && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Medical History</Text>
+            <Field label="History">
+              <Text>{data.medicalHistory}</Text>
+            </Field>
+          </View>
+        )}
 
         {/* Medications */}
         {data.medications && data.medications.length > 0 && (
@@ -386,32 +405,34 @@ const ComprehensiveCarePlanPDF: React.FC<{
         )}
 
         {/* Next Steps */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Next Steps</Text>
-          <Field label="Care Recipient Next Steps">
+        {((data.nextStepCareRecipient &&
+          data.nextStepCareRecipient.length > 0) ||
+          (data.nextStepCarePartner &&
+            data.nextStepCarePartner.length > 0)) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Next Steps</Text>
             {data.nextStepCareRecipient &&
-            data.nextStepCareRecipient.length > 0 ? (
-              <View>
-                {data.nextStepCareRecipient.map((step, index) => (
-                  <ListItem key={index} text={step} />
-                ))}
-              </View>
-            ) : (
-              <Text>-</Text>
-            )}
-          </Field>
-          <Field label="Care Partner Next Steps">
-            {data.nextStepCarePartner && data.nextStepCarePartner.length > 0 ? (
-              <View>
-                {data.nextStepCarePartner.map((step, index) => (
-                  <ListItem key={index} text={step} />
-                ))}
-              </View>
-            ) : (
-              <Text>-</Text>
-            )}
-          </Field>
-        </View>
+              data.nextStepCareRecipient.length > 0 && (
+                <Field label="Care Recipient Next Steps">
+                  <View>
+                    {data.nextStepCareRecipient.map((step, index) => (
+                      <ListItem key={index} text={step} />
+                    ))}
+                  </View>
+                </Field>
+              )}
+            {data.nextStepCarePartner &&
+              data.nextStepCarePartner.length > 0 && (
+                <Field label="Care Partner Next Steps">
+                  <View>
+                    {data.nextStepCarePartner.map((step, index) => (
+                      <ListItem key={index} text={step} />
+                    ))}
+                  </View>
+                </Field>
+              )}
+          </View>
+        )}
 
         {/* Focused Recommendations */}
         {data.focusedRecommendations &&
@@ -444,14 +465,18 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.functionalAdls && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Functional ADLs</Text>
-            <Field label="Summary">
-              <Text>{data.functionalAdls.summary || "-"}</Text>
-            </Field>
-            <Field label="Deficits Noted">
-              <Text>
-                {data.functionalAdls.deficitsNoted === "true" ? "Yes" : "No"}
-              </Text>
-            </Field>
+            {data.functionalAdls.summary && (
+              <Field label="Summary">
+                <Text>{data.functionalAdls.summary}</Text>
+              </Field>
+            )}
+            {data.functionalAdls.deficitsNoted && (
+              <Field label="Deficits Noted">
+                <Text>
+                  {data.functionalAdls.deficitsNoted === "true" ? "Yes" : "No"}
+                </Text>
+              </Field>
+            )}
             {data.functionalAdls.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <TableHeader columns={["Activity", "Description", "Score"]} />
@@ -478,9 +503,11 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.functionalIadls && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Functional IADLs</Text>
-            <Field label="Summary">
-              <Text>{data.functionalIadls.summary || "-"}</Text>
-            </Field>
+            {data.functionalIadls.summary && (
+              <Field label="Summary">
+                <Text>{data.functionalIadls.summary}</Text>
+              </Field>
+            )}
             {data.functionalIadls.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <TableHeader columns={["Activity", "Description", "Score"]} />
@@ -533,14 +560,18 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.homeSafety && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Home Safety Assessment</Text>
-            <Field label="Summary">
-              <Text>{data.homeSafety.summary || "-"}</Text>
-            </Field>
-            <Field label="Deficits Noted">
-              <Text>
-                {data.homeSafety.deficitsNoted === "true" ? "Yes" : "No"}
-              </Text>
-            </Field>
+            {data.homeSafety.summary && (
+              <Field label="Summary">
+                <Text>{data.homeSafety.summary}</Text>
+              </Field>
+            )}
+            {data.homeSafety.deficitsNoted && (
+              <Field label="Deficits Noted">
+                <Text>
+                  {data.homeSafety.deficitsNoted === "true" ? "Yes" : "No"}
+                </Text>
+              </Field>
+            )}
             {data.homeSafety.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <Text style={[styles.sectionTitle, { fontSize: 9 }]}>
@@ -566,16 +597,20 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.memoryAndReasoning && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Memory and Reasoning</Text>
-            <Field label="Summary">
-              <Text>{data.memoryAndReasoning.summary || "-"}</Text>
-            </Field>
-            <Field label="Deficits Noted">
-              <Text>
-                {data.memoryAndReasoning.deficitsNoted === "true"
-                  ? "Yes"
-                  : "No"}
-              </Text>
-            </Field>
+            {data.memoryAndReasoning.summary && (
+              <Field label="Summary">
+                <Text>{data.memoryAndReasoning.summary}</Text>
+              </Field>
+            )}
+            {data.memoryAndReasoning.deficitsNoted && (
+              <Field label="Deficits Noted">
+                <Text>
+                  {data.memoryAndReasoning.deficitsNoted === "true"
+                    ? "Yes"
+                    : "No"}
+                </Text>
+              </Field>
+            )}
             {data.memoryAndReasoning.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <Text style={[styles.sectionTitle, { fontSize: 9 }]}>
@@ -609,16 +644,20 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.geriatricDepression && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Geriatric Depression</Text>
-            <Field label="Summary">
-              <Text>{data.geriatricDepression.summary || "-"}</Text>
-            </Field>
-            <Field label="Deficits Noted">
-              <Text>
-                {data.geriatricDepression.deficitsNoted === "true"
-                  ? "Yes"
-                  : "No"}
-              </Text>
-            </Field>
+            {data.geriatricDepression.summary && (
+              <Field label="Summary">
+                <Text>{data.geriatricDepression.summary}</Text>
+              </Field>
+            )}
+            {data.geriatricDepression.deficitsNoted && (
+              <Field label="Deficits Noted">
+                <Text>
+                  {data.geriatricDepression.deficitsNoted === "true"
+                    ? "Yes"
+                    : "No"}
+                </Text>
+              </Field>
+            )}
             {data.geriatricDepression.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <Text style={[styles.sectionTitle, { fontSize: 9 }]}>
@@ -652,14 +691,20 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.nutritionalHealth && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Nutritional Health</Text>
-            <Field label="Summary">
-              <Text>{data.nutritionalHealth.summary || "-"}</Text>
-            </Field>
-            <Field label="Deficits Noted">
-              <Text>
-                {data.nutritionalHealth.deficitsNoted === "true" ? "Yes" : "No"}
-              </Text>
-            </Field>
+            {data.nutritionalHealth.summary && (
+              <Field label="Summary">
+                <Text>{data.nutritionalHealth.summary}</Text>
+              </Field>
+            )}
+            {data.nutritionalHealth.deficitsNoted && (
+              <Field label="Deficits Noted">
+                <Text>
+                  {data.nutritionalHealth.deficitsNoted === "true"
+                    ? "Yes"
+                    : "No"}
+                </Text>
+              </Field>
+            )}
             {data.nutritionalHealth.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <Text style={[styles.sectionTitle, { fontSize: 9 }]}>
@@ -693,14 +738,20 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.legalAndFinancial && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Legal and Financial</Text>
-            <Field label="Summary">
-              <Text>{data.legalAndFinancial.summary || "-"}</Text>
-            </Field>
-            <Field label="Deficits Noted">
-              <Text>
-                {data.legalAndFinancial.deficitsNoted === "true" ? "Yes" : "No"}
-              </Text>
-            </Field>
+            {data.legalAndFinancial.summary && (
+              <Field label="Summary">
+                <Text>{data.legalAndFinancial.summary}</Text>
+              </Field>
+            )}
+            {data.legalAndFinancial.deficitsNoted && (
+              <Field label="Deficits Noted">
+                <Text>
+                  {data.legalAndFinancial.deficitsNoted === "true"
+                    ? "Yes"
+                    : "No"}
+                </Text>
+              </Field>
+            )}
             {data.legalAndFinancial.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <Text style={[styles.sectionTitle, { fontSize: 9 }]}>
@@ -734,14 +785,20 @@ const ComprehensiveCarePlanPDF: React.FC<{
         {data.careGiverSupport && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Caregiver Support</Text>
-            <Field label="Summary">
-              <Text>{data.careGiverSupport.summary || "-"}</Text>
-            </Field>
-            <Field label="Deficits Noted">
-              <Text>
-                {data.careGiverSupport.deficitsNoted === "true" ? "Yes" : "No"}
-              </Text>
-            </Field>
+            {data.careGiverSupport.summary && (
+              <Field label="Summary">
+                <Text>{data.careGiverSupport.summary}</Text>
+              </Field>
+            )}
+            {data.careGiverSupport.deficitsNoted && (
+              <Field label="Deficits Noted">
+                <Text>
+                  {data.careGiverSupport.deficitsNoted === "true"
+                    ? "Yes"
+                    : "No"}
+                </Text>
+              </Field>
+            )}
             {data.careGiverSupport.detailedTable && (
               <View style={{ marginTop: 10 }}>
                 <Text style={[styles.sectionTitle, { fontSize: 9 }]}>

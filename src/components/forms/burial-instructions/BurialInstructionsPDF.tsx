@@ -212,108 +212,195 @@ const BurialInstructionsPDF: React.FC<{
         </View>
 
         {/* Personal Identification Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Personal Identification</Text>
-          <Field label="Name">
-            {data?.firstName} {data?.lastName}
-          </Field>
-          <Field label="Date of Birth">{data?.dateOfBirth}</Field>
-          <Field label="Time of Death">{data?.timeOfDeath}</Field>
-          <Field label="Date of Death">{data?.dateOfDeath}</Field>
-          <Field label="County That Issued Death Certificate">
-            {data?.countyThatIssuedDeathCertificate}
-          </Field>
-          <Field label="Number of Death Certificates Ordered">
-            {data?.numberOfDeathCertificatesOrdered}
-          </Field>
-        </View>
+        {(data?.firstName ||
+          data?.lastName ||
+          data?.dateOfBirth ||
+          data?.timeOfDeath ||
+          data?.countyThatIssuedDeathCertificate ||
+          data?.numberOfDeathCertificatesOrdered) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Personal Identification</Text>
+            {(data?.firstName || data?.lastName) && (
+              <Field label="Name">
+                {data?.firstName} {data?.lastName}
+              </Field>
+            )}
+            {data?.dateOfBirth && (
+              <Field label="Date of Birth">{data.dateOfBirth}</Field>
+            )}
+            {data?.timeOfDeath && (
+              <Field label="Time of Death">{data.timeOfDeath}</Field>
+            )}
+            {data?.countyThatIssuedDeathCertificate && (
+              <Field label="County That Issued Death Certificate">
+                {data.countyThatIssuedDeathCertificate}
+              </Field>
+            )}
+            {data?.numberOfDeathCertificatesOrdered && (
+              <Field label="Number of Death Certificates Ordered">
+                {data.numberOfDeathCertificatesOrdered}
+              </Field>
+            )}
+          </View>
+        )}
 
         {/* Burial Preferences Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Burial Preferences</Text>
-          <Field label="Burial Type">
-            {getBurialTypeDisplay(data?.burialType, data?.burialTypeOther)}
-          </Field>
-          <Field label="Preferred Cemetery">{data?.preferredCemetery}</Field>
-          <Field label="Plot Owned">
-            {getPlotOwnedDisplay(data?.plotOwned)}
-          </Field>
-          {data?.plotOwned === "yes" && (
-            <Field label="Plot Number/Location">
-              {data?.plotNumberLocation}
-            </Field>
-          )}
-          <Field label="Funeral Home">{data?.funeralHome}</Field>
-          <Field label="Vault/Casket Preferences">
-            {data?.vaultCasketPreferences}
-          </Field>
-          {data?.burialType === "cremation" && (
-            <>
-              <Field label="Urn Selection">
-                {getUrnSelectionDisplay(data?.urnSelection)}
+        {(data?.burialType ||
+          data?.preferredCemetery ||
+          data?.plotOwned ||
+          data?.funeralHome ||
+          data?.vaultCasketPreferences ||
+          data?.urnSelection ||
+          data?.ashesDisposition) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Burial Preferences</Text>
+            {data?.burialType && (
+              <Field label="Burial Type">
+                {getBurialTypeDisplay(data.burialType, data.burialTypeOther)}
               </Field>
+            )}
+            {data?.preferredCemetery && (
+              <Field label="Preferred Cemetery">{data.preferredCemetery}</Field>
+            )}
+            {data?.plotOwned && (
+              <Field label="Plot Owned">
+                {getPlotOwnedDisplay(data.plotOwned)}
+              </Field>
+            )}
+            {data?.plotOwned === "yes" && data?.plotNumberLocation && (
+              <Field label="Plot Number/Location">
+                {data.plotNumberLocation}
+              </Field>
+            )}
+            {data?.funeralHome && (
+              <Field label="Funeral Home">{data.funeralHome}</Field>
+            )}
+            {data?.vaultCasketPreferences && (
+              <Field label="Vault/Casket Preferences">
+                {data.vaultCasketPreferences}
+              </Field>
+            )}
+            {data?.burialType === "cremation" && data?.urnSelection && (
+              <Field label="Urn Selection">
+                {getUrnSelectionDisplay(data.urnSelection)}
+              </Field>
+            )}
+            {data?.burialType === "cremation" && data?.ashesDisposition && (
               <Field label="Ashes Disposition">
                 {getAshesDispositionDisplay(
-                  data?.ashesDisposition,
-                  data?.ashesDispositionOther
+                  data.ashesDisposition,
+                  data.ashesDispositionOther
                 )}
               </Field>
-            </>
-          )}
-        </View>
+            )}
+          </View>
+        )}
 
         {/* Service Details Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Service Details</Text>
-          <Field label="Type of Service">
-            {getServiceTypeDisplay(data?.typeOfService)}
-          </Field>
-          <Field label="Officiant/Speaker Requested">
-            {data?.officiantSpeakerRequested}
-          </Field>
-          <Field label="Location of Service">{data?.locationOfService}</Field>
-          <Field label="Special Requests">{data?.specialRequests}</Field>
-        </View>
+        {(data?.typeOfService ||
+          data?.officiantSpeakerRequested ||
+          data?.locationOfService ||
+          data?.specialRequests) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Service Details</Text>
+            {data?.typeOfService && (
+              <Field label="Type of Service">
+                {getServiceTypeDisplay(data.typeOfService)}
+              </Field>
+            )}
+            {data?.officiantSpeakerRequested && (
+              <Field label="Officiant/Speaker Requested">
+                {data.officiantSpeakerRequested}
+              </Field>
+            )}
+            {data?.locationOfService && (
+              <Field label="Location of Service">
+                {data.locationOfService}
+              </Field>
+            )}
+            {data?.specialRequests && (
+              <Field label="Special Requests">{data.specialRequests}</Field>
+            )}
+          </View>
+        )}
 
         {/* Key Contacts Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Key Contacts</Text>
-          <Field label="Person Responsible Name">
-            {data?.personResponsibleName}
-          </Field>
-          <Field label="Person Responsible Phone">
-            {data?.personResponsiblePhone}
-          </Field>
-          <Field label="Person Responsible Relationship">
-            {getRelationshipDisplay(data?.personResponsibleRelationship)}
-          </Field>
-          <Field label="Legal/Medical Power of Attorney Name">
-            {data?.legalMedicalPowerOfAttorneyName}
-          </Field>
-          <Field label="Legal/Medical Power of Attorney Phone">
-            {data?.legalMedicalPowerOfAttorneyPhone}
-          </Field>
-          <Field label="Clergy/Spiritual Advisor Name">
-            {data?.clergySpiritualAdvisorName}
-          </Field>
-          <Field label="Clergy/Spiritual Advisor Phone">
-            {data?.clergySpiritualAdvisorPhone}
-          </Field>
-        </View>
+        {(data?.personResponsibleName ||
+          data?.personResponsiblePhone ||
+          data?.personResponsibleRelationship ||
+          data?.legalMedicalPowerOfAttorneyName ||
+          data?.legalMedicalPowerOfAttorneyPhone ||
+          data?.clergySpiritualAdvisorName ||
+          data?.clergySpiritualAdvisorPhone) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Key Contacts</Text>
+            {data?.personResponsibleName && (
+              <Field label="Person Responsible Name">
+                {data.personResponsibleName}
+              </Field>
+            )}
+            {data?.personResponsiblePhone && (
+              <Field label="Person Responsible Phone">
+                {data.personResponsiblePhone}
+              </Field>
+            )}
+            {data?.personResponsibleRelationship && (
+              <Field label="Person Responsible Relationship">
+                {getRelationshipDisplay(data.personResponsibleRelationship)}
+              </Field>
+            )}
+            {data?.legalMedicalPowerOfAttorneyName && (
+              <Field label="Legal/Medical Power of Attorney Name">
+                {data.legalMedicalPowerOfAttorneyName}
+              </Field>
+            )}
+            {data?.legalMedicalPowerOfAttorneyPhone && (
+              <Field label="Legal/Medical Power of Attorney Phone">
+                {data.legalMedicalPowerOfAttorneyPhone}
+              </Field>
+            )}
+            {data?.clergySpiritualAdvisorName && (
+              <Field label="Clergy/Spiritual Advisor Name">
+                {data.clergySpiritualAdvisorName}
+              </Field>
+            )}
+            {data?.clergySpiritualAdvisorPhone && (
+              <Field label="Clergy/Spiritual Advisor Phone">
+                {data.clergySpiritualAdvisorPhone}
+              </Field>
+            )}
+          </View>
+        )}
 
         {/* Documents and Notes Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Documents and Notes</Text>
-          <Field label="Will Location">{data?.willLocation}</Field>
-          <Field label="Advance Directive Location">
-            {data?.advanceDirectiveLocation}
-          </Field>
-          <Field label="Life Insurance Information">
-            {data?.lifeInsuranceInfo}
-          </Field>
-          <Field label="Relationship">{data?.relationship}</Field>
-          <Field label="Obituary Wishes">{data?.obituaryWishes}</Field>
-        </View>
+        {(data?.willLocation ||
+          data?.advanceDirectiveLocation ||
+          data?.lifeInsuranceInfo ||
+          data?.relationship ||
+          data?.obituaryWishes) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Documents and Notes</Text>
+            {data?.willLocation && (
+              <Field label="Will Location">{data.willLocation}</Field>
+            )}
+            {data?.advanceDirectiveLocation && (
+              <Field label="Advance Directive Location">
+                {data.advanceDirectiveLocation}
+              </Field>
+            )}
+            {data?.lifeInsuranceInfo && (
+              <Field label="Life Insurance Information">
+                {data.lifeInsuranceInfo}
+              </Field>
+            )}
+            {data?.relationship && (
+              <Field label="Relationship">{data.relationship}</Field>
+            )}
+            {data?.obituaryWishes && (
+              <Field label="Obituary Wishes">{data.obituaryWishes}</Field>
+            )}
+          </View>
+        )}
       </Page>
     </Document>
   );

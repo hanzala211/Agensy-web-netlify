@@ -361,17 +361,6 @@ export const EssentialDocumentForAging = () => {
                 </div>
               ))}
             </div>
-
-            {/* <div className="mt-6 flex justify-end">
-              <PrimaryButton
-                type="submit"
-                isLoading={postEssentialDocumentsForAgingMutation.isPending}
-                disabled={postEssentialDocumentsForAgingMutation.isPending}
-                className="sm:!w-fit w-full md:text-base text-sm"
-              >
-                Save Essential Document for Aging
-              </PrimaryButton>
-            </div> */}
           </Card>
           <div className="bg-basicWhite/90 my-4 backdrop-blur-sm rounded-2xl !p-6 border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <a

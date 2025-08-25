@@ -89,6 +89,7 @@ export interface ClientMedications extends BaseSchema {
   indication?: string;
   side_effects?: string;
   pharmacy?: string;
+  client_medication_id?: string;
 }
 
 export interface HealthcareProvider extends BaseSchema {
@@ -260,6 +261,8 @@ export interface LogEntry {
   id: string;
   created_at: string;
   form_type: LogFormType;
+  subtype_name: string;
+  subtype_id: string;
   user: {
     first_name: string;
     last_name: string;
