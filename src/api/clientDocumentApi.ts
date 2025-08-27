@@ -8,6 +8,13 @@ export const useAddDocumentMutation = () => {
   });
 };
 
+export const useAnalyzeDocumentMutation = () => {
+  return useMutation({
+    mutationFn: async (data: { clientId: string; data: FormData }) =>
+      await ClientDocumentService.analyzeDocument(data.clientId, data.data),
+  });
+};
+
 export const useDeleteDocumentMutation = () => {
   return useMutation({
     mutationFn: async (data: { clientId: string; documentId: string }) =>

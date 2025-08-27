@@ -15,9 +15,13 @@ import {
 import type React from "react";
 import { useEffect, useState } from "react";
 import { EmptyStateCard } from "@agensy/components";
-import { useAddDocumentMutation, useDeleteDocumentMutation } from "@agensy/api";
+import {
+  useAddDocumentMutation,
+  useAnalyzeDocumentMutation,
+  useDeleteDocumentMutation,
+} from "@agensy/api";
 import { useAuthContext, useClientContext } from "@agensy/context";
-import type { DocumentFormData } from "@agensy/types";
+import type { ConfidenceScore, DocumentFormData } from "@agensy/types";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -53,6 +57,10 @@ export const ClientDocuments: React.FC = () => {
   const navigate = useNavigate();
   const userPermissions =
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+  const clientDocumentAnalyzeMutation = useAnalyzeDocumentMutation();
+  const [analyzedDocRes, setAnalyzedDocRes] = useState<ConfidenceScore | null>(
+    null
+  );
 
   useEffect(() => {
     if (addDocumentMutation.status === "success") {
@@ -66,6 +74,16 @@ export const ClientDocuments: React.FC = () => {
       toast.error("Failed to add document");
     }
   }, [addDocumentMutation.status]);
+
+  useEffect(() => {
+    if (clientDocumentAnalyzeMutation.status === "success") {
+      console.log(clientDocumentAnalyzeMutation.data);
+      setAnalyzedDocRes(clientDocumentAnalyzeMutation.data);
+      toast.success("Document analyzed successfully");
+    } else if (clientDocumentAnalyzeMutation.status === "error") {
+      toast.error("Failed to analyze document");
+    }
+  }, [clientDocumentAnalyzeMutation.status]);
 
   useEffect(() => {
     if (deleteDocumentMutation.status === "success") {
@@ -95,7 +113,7 @@ export const ClientDocuments: React.FC = () => {
       clientId: selectedClient?.id as string,
       data: formData,
     });
-};
+  };
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -109,6 +127,16 @@ export const ClientDocuments: React.FC = () => {
     deleteDocumentMutation.mutate({
       clientId: selectedClient?.id as string,
       documentId: documentId,
+    });
+  };
+
+  const handleAnalyze = (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    toast.info("Analyzing document.");
+    clientDocumentAnalyzeMutation.mutate({
+      clientId: selectedClient?.id as string,
+      data: formData,
     });
   };
 
@@ -172,9 +200,15 @@ export const ClientDocuments: React.FC = () => {
       </div>
       <AddDocumentModal
         isOpen={isAddDocumentModalOpen}
-        onClose={() => setIsAddDocumentModalOpen(false)}
+        onClose={() => {
+          setAnalyzedDocRes(null);
+          setIsAddDocumentModalOpen(false);
+        }}
         onSubmit={handleSubmit}
         isLoading={addDocumentMutation.isPending}
+        handleAnalyze={handleAnalyze}
+        isAnalyzing={clientDocumentAnalyzeMutation.isPending}
+        analyzedDocRes={analyzedDocRes}
       />
     </div>
   );

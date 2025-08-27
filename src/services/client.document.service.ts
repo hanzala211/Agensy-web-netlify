@@ -1,9 +1,6 @@
 import { sendRequest } from "@agensy/utils";
 
-export const addDocument = async (
-  clientId: string,
-  data: FormData
-) => {
+export const addDocument = async (clientId: string, data: FormData) => {
   try {
     const response = await sendRequest({
       method: "POST",
@@ -13,6 +10,20 @@ export const addDocument = async (
     return response.data.data;
   } catch (error) {
     console.log(`Client Document Service [addDocument] error: ${error}`);
+    throw error;
+  }
+};
+
+export const analyzeDocument = async (clientId: string, data: FormData) => {
+  try {
+    const response = await sendRequest({
+      method: "POST",
+      url: `/client/${clientId}/documents/analyze`,
+      data,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.log(`Client Document Service [analyzeDocument] error: ${error}`);
     throw error;
   }
 };

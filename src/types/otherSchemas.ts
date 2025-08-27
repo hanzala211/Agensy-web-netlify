@@ -65,3 +65,14 @@ export type Vital = {
   blood_type: string | null;
   other_vital_signs: string | null;
 };
+
+export interface ConfidenceScore {
+  category: string;
+  title: string;
+  description: string;
+  confidenceScores: {
+    category: number;
+    title: number;
+    description: number;
+  };
+}

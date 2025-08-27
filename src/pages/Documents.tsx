@@ -1,11 +1,18 @@
-import { useAddGeneralDocumentMutation } from "@agensy/api";
+import {
+  useAddGeneralDocumentMutation,
+  useAnalyzeGeneralDocumentMutation,
+} from "@agensy/api";
 import { AddDocumentModal, PageHeader } from "@agensy/components";
 import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
 import { useAuthContext, useDocumentContext } from "@agensy/context";
-import type { Document, DocumentFormData } from "@agensy/types";
+import type {
+  ConfidenceScore,
+  Document,
+  DocumentFormData,
+} from "@agensy/types";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 export const Documents: React.FC = () => {
@@ -17,6 +24,27 @@ export const Documents: React.FC = () => {
   const queryClient = useQueryClient();
   const userPermissions =
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+  const generalDocumentAnalyzeMutation = useAnalyzeGeneralDocumentMutation();
+  const [analyzedDocRes, setAnalyzedDocRes] = useState<ConfidenceScore | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (generalDocumentAnalyzeMutation.status === "success") {
+      console.log(generalDocumentAnalyzeMutation.data);
+      setAnalyzedDocRes(generalDocumentAnalyzeMutation.data);
+      toast.success("Document analyzed successfully");
+    } else if (generalDocumentAnalyzeMutation.status === "error") {
+      toast.error("Failed to analyze document");
+    }
+  }, [generalDocumentAnalyzeMutation.status]);
+
+  const handleAnalyze = (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    toast.info("Analyzing document.");
+    generalDocumentAnalyzeMutation.mutate(formData);
+  };
 
   const handleSubmit = (data: DocumentFormData) => {
     const formData = new FormData();
@@ -61,6 +89,9 @@ export const Documents: React.FC = () => {
         onClose={() => setIsAddDocumentModalOpen(false)}
         onSubmit={handleSubmit}
         isLoading={addGeneralDocumentMutation.isPending}
+        handleAnalyze={handleAnalyze}
+        isAnalyzing={generalDocumentAnalyzeMutation.isPending}
+        analyzedDocRes={analyzedDocRes}
       />
     </div>
   );

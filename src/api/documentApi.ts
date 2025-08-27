@@ -16,6 +16,13 @@ export const useAddGeneralDocumentMutation = () => {
   });
 };
 
+export const useAnalyzeGeneralDocumentMutation = () => {
+  return useMutation({
+    mutationFn: async (data: FormData) =>
+      await DocumentService.analyzeGeneralDocument(data),
+  });
+};
+
 export const useDeleteGeneralDocumentMutation = () => {
   return useMutation({
     mutationFn: async (documentId: string) =>
