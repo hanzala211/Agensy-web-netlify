@@ -521,7 +521,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
       <div
         key={item.id}
         className={`
-          flex flex-col items-center p-6 rounded-xl cursor-pointer transition-all duration-200
+          flex flex-col items-center p-4 sm:p-6 rounded-xl cursor-pointer transition-all duration-200
           hover:bg-blue-50 hover:shadow-md border-2 border-transparent
           ${
             isSelected
@@ -531,15 +531,15 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
         `}
         onClick={() => handleItemClick(item)}
       >
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <Icon
-            size={64}
+            size={48}
             className={`${
               item.type === "folder" ? "text-blue-600" : "text-gray-600"
-            } drop-shadow-sm`}
+            } drop-shadow-sm sm:w-16 sm:h-16 w-12 h-12`}
           />
         </div>
-        <span className="text-sm font-medium text-gray-800 text-center leading-tight">
+        <span className="text-xs sm:text-sm font-medium text-gray-800 text-center leading-tight">
           {item.name}
         </span>
         {item.children && item.children.length > 0 && (
@@ -552,9 +552,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   };
 
   return (
-    <div className="!p-0 overflow-hidden border-2 border-gray-200 rounded-lg">
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
-        <div className="flex items-center justify-between">
+    <div className="!p-0 overflow-hidden border-2 border-gray-200 rounded-lg w-full">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b">
+        <div className="flex items-start justify-between sm:flex-row flex-col gap-3">
           <div
             className={`flex items-center sm:gap-3 ${
               isShowingFileContent ? "w-full" : "w-fit"
@@ -570,20 +570,23 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
             )}
             <h3 className={`font-semibold text-gray-800 w-full`}>
               {isShowingFileContent ? (
-                <div className="flex items-center justify-between sm:flex-row flex-col w-full gap-2">
-                  <div className="flex items-center gap-2">
-                    <ICONS.fileAlt className="text-gray-600" />
-                    {fileContent?.name}
+                <div className="flex items-center justify-between sm:flex-row flex-col w-full gap-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <ICONS.fileAlt className="text-gray-600 flex-shrink-0" />
+                    <span className="truncate">{fileContent?.name}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                     {showOCRButton && (
                       <TertiaryButton
                         onClick={() => setIsOCRModelOpen(true)}
                         aria_label="Upload OCR"
-                        className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent"
+                        className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent text-sm"
                       >
-                        <span className="flex items-center gap-2">
-                          Scan Document
+                        <span className="flex items-center gap-2 whitespace-nowrap">
+                          <span className="hidden sm:inline">
+                            Scan Document
+                          </span>
+                          <span className="sm:hidden">Scan</span>
                         </span>
                       </TertiaryButton>
                     )}
@@ -615,9 +618,11 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               ) : (
                 <div className="flex items-center gap-2">
                   <ICONS.folder className="text-blue-600" />
-                  {currentPath.length > 0
-                    ? currentPath[currentPath.length - 1]
-                    : "Agensy Forms"}
+                  <span className="truncate">
+                    {currentPath.length > 0
+                      ? currentPath[currentPath.length - 1]
+                      : "Agensy Forms"}
+                  </span>
                 </div>
               )}
             </h3>
@@ -628,44 +633,26 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
         </div>
         {!isShowingFileContent && currentPath.length > 0 && (
           <div className="mt-2 flex items-center justify-between sm:flex-row flex-col sm:gap-0 gap-4">
-            <div className="text-xs text-gray-400 flex items-center gap-1">
+            <div className="text-xs text-gray-400 flex flex-wrap items-center gap-1 min-w-0">
               <span
-                className="hover:text-blue-600 cursor-pointer transition-colors"
+                className="hover:text-blue-600 cursor-pointer transition-colors whitespace-nowrap"
                 onClick={() => onPathClick?.(-1)}
               >
                 Agensy Forms
               </span>
               {currentPath.map((pathSegment, index) => (
                 <React.Fragment key={index}>
-                  <span className="text-gray-300">{">"}</span>
+                  <span className="text-gray-300 flex-shrink-0">{">"}</span>
                   <span
-                    className="hover:text-blue-600 cursor-pointer transition-colors"
+                    className="hover:text-blue-600 cursor-pointer transition-colors break-words max-w-[120px] sm:max-w-[150px] truncate"
                     onClick={() => onPathClick?.(index)}
+                    title={pathSegment}
                   >
                     {pathSegment}
                   </span>
                 </React.Fragment>
               ))}
             </div>
-            {showAddMedicalAppointmentButton &&
-              onAddMedicalAppointmentTemplate &&
-              (isCreatingMedicalTemplate ? (
-                <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
-                  <CommonLoader size={16} />
-                  <span className="text-sm text-gray-600">
-                    Creating Template...
-                  </span>
-                </div>
-              ) : (
-                <TertiaryButton
-                  onClick={onAddMedicalAppointmentTemplate}
-                  className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent"
-                >
-                  <span className="flex items-center gap-2">
-                    Add Medical Appointment Template
-                  </span>
-                </TertiaryButton>
-              ))}
           </div>
         )}
       </div>
@@ -673,14 +660,14 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
       {isShowingFileContent ? (
         <FileContentDisplay fileContent={fileContent as FolderData} />
       ) : (
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {showAddMedicalAppointmentButton && (
             <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="flex-1 max-w-md">
+              <div className="flex-1 w-full sm:max-w-md">
                 <div className="relative">
                   <StatefulInput
                     type="text"
-                    placeholder="Search forms and templates..."
+                    placeholder="Search medical appointment templates..."
                     value={searchQuery || ""}
                     onChange={(e) => setSearchQuery?.(e.target.value)}
                     inputClassname="pl-10"
@@ -690,17 +677,46 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   </div>
                 </div>
               </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+                {isCreatingMedicalTemplate ? (
+                  <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                    <CommonLoader size={16} />
+                    <span className="text-sm text-gray-600">
+                      Creating Template...
+                    </span>
+                  </div>
+                ) : (
+                  <TertiaryButton
+                    onClick={onAddMedicalAppointmentTemplate}
+                    className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent text-sm"
+                  >
+                    <span className="flex items-center gap-2 whitespace-nowrap">
+                      <span className="hidden sm:inline">
+                        Add Medical Appointment Template
+                      </span>
+                      <span className="sm:hidden">Add Template</span>
+                    </span>
+                  </TertiaryButton>
+                )}
+              </div>
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
             {folders.map((folder) => renderGridItem(folder))}
           </div>
           {folders.length === 0 && (
-            <div className="text-center py-12">
-              <ICONS.folder size={48} className="text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 font-medium">This folder is empty</p>
-              <p className="text-sm text-gray-400 mt-1">No items to display</p>
+            <div className="text-center py-8 sm:py-12">
+              <ICONS.folder
+                size={40}
+                className="text-gray-300 mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12 w-10 h-10"
+              />
+              <p className="text-gray-500 font-medium text-sm sm:text-base">
+                This folder is empty
+              </p>
+              <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                No items to display
+              </p>
             </div>
           )}
         </div>

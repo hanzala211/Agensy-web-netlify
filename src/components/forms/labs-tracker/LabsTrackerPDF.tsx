@@ -105,27 +105,43 @@ const getValue = (
   idx: number,
   key: string
 ) => {
-  const value = (data as unknown as Record<string, string | null | undefined>)[
-    `${key}${idx}`
-  ];
-  return value ?? "";
+  if (!data?.labs || !data.labs[idx]) return "";
+  
+  const lab = data.labs[idx];
+  switch (key) {
+    case "date":
+      return lab.date ?? "";
+    case "doctorName":
+      return lab.doctorName ?? "";
+    case "type":
+      return lab.type ?? "";
+    case "providerCompanyUsed":
+      return lab.providerCompanyUsed ?? "";
+    case "purpose":
+      return lab.purpose ?? "";
+    case "results":
+      return lab.results ?? "";
+    default:
+      return "";
+  }
 };
 
 // Helper function to check if a row has any data
 const hasRowData = (data: LabsTrackerFormData | undefined, idx: number) => {
-  return columns.some((column) => {
-    const value = getValue(data, idx, column.key);
-    return value && value.trim() !== "";
-  });
+  if (!data?.labs || !data.labs[idx]) return false;
+  
+  const lab = data.labs[idx];
+  return lab.date || lab.doctorName || lab.type || lab.providerCompanyUsed || lab.purpose || lab.results;
 };
 
 export const LabsTrackerPDF: React.FC<{
   data?: LabsTrackerFormData & { last_update?: { updatedAt?: string } };
 }> = ({ data }) => {
   // Filter rows that have data
-  const rowsWithData = Array.from({ length: 8 })
-    .map((_, i) => i + 1)
-    .filter((idx) => hasRowData(data, idx));
+  const rowsWithData = data?.labs ? 
+    data.labs
+      .map((_, index) => index)
+      .filter((idx) => hasRowData(data, idx)) : [];
 
   return (
     <Document title="Agensy Labs Tracker">

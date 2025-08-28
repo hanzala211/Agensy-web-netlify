@@ -10,14 +10,14 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "1",
-    type: "group",
+    type: "checkbox",
     label: "I have a copy of the full policy (not just the summary).",
     parentId: null,
     headingId: "0",
   },
   {
     id: "2",
-    type: "group",
+    type: "checkbox",
     label: "I know the name of the insurance company and how to contact them.",
     parentId: null,
     headingId: "0",
@@ -32,14 +32,14 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "3",
-    type: "group",
+    type: "checkbox",
     label: "I know the policy number.",
     parentId: null,
     headingId: "0",
   },
   {
     id: "4",
-    type: "group",
+    type: "checkbox",
     label:
       "I know the date the policy was issued and whether it is still active.",
     parentId: null,
@@ -47,7 +47,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "5",
-    type: "group",
+    type: "checkbox",
     label:
       "I understand whether my policy is tax-qualified (can affect how benefits are taxed).",
     parentId: null,
@@ -55,7 +55,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "6",
-    type: "group",
+    type: "checkbox",
     label:
       "I know whether my policy is reimbursement-based (pays me back) or indemnity-based (pays a set amount).",
     parentId: null,
@@ -63,7 +63,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "7",
-    type: "group",
+    type: "checkbox",
     label:
       "I have identified a family member or advocate who understands my policy and can help manage claims.",
     parentId: null,
@@ -86,21 +86,21 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "9",
-    type: "group",
+    type: "checkbox",
     label: "I know the daily or monthly benefit limit",
     parentId: null,
     headingId: "8",
   },
   {
     id: "10",
-    type: "group",
+    type: "checkbox",
     label: "I know the maximum lifetime benefit",
     parentId: null,
     headingId: "8",
   },
   {
     id: "11",
-    type: "group",
+    type: "checkbox",
     label: "I understand the types of services covered, including:",
     parentId: null,
     headingId: "8",
@@ -163,14 +163,14 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "12",
-    type: "group",
+    type: "checkbox",
     label: "In home safety assessments and home modifications",
     parentId: null,
     headingId: "8",
   },
   {
     id: "13",
-    type: "group",
+    type: "checkbox",
     label:
       "I know if my policy covers informal caregivers (like family or friends) or only professional/licensed caregivers.",
     parentId: null,
@@ -178,7 +178,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "14",
-    type: "group",
+    type: "checkbox",
     label: "I understand what is not covered (exclusions or limitations).",
     parentId: null,
     headingId: "8",
@@ -192,7 +192,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "16",
-    type: "group",
+    type: "checkbox",
     label:
       "I know the 'benefit trigger'—what must happen before I can receive benefits",
     parentId: null,
@@ -200,7 +200,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "17",
-    type: "group",
+    type: "checkbox",
     label:
       "Most policies require that you need assistance with two or more Activities of Daily Living (ADL's) and / or a diagnosis of cognitive impairment. Please group, Activities of Daily Living (ADL's) are different from Instrumental Activities of Daily Living (IADL's).",
     parentId: null,
@@ -208,7 +208,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "18",
-    type: "group",
+    type: "checkbox",
     label: "I know the elimination period.",
     parentId: null,
     headingId: "15",
@@ -223,14 +223,14 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "20",
-    type: "group",
+    type: "checkbox",
     label: "I know how to file a claim and what documentation is required.",
     parentId: null,
     headingId: "15",
   },
   {
     id: "21",
-    type: "group",
+    type: "checkbox",
     label:
       "What information does my Primary Care Physician need to provide so I can file a claim?",
     parentId: null,
@@ -246,7 +246,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "23",
-    type: "group",
+    type: "checkbox",
     label:
       "My physician may not be familiar with long-term care insurance, or the requirements to file a claim. I have a short paragraph explaining the policy, my benefits, and the requirements of the insurance company.",
     parentId: null,
@@ -254,7 +254,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "24",
-    type: "group",
+    type: "checkbox",
     label:
       "I have a care plan or care assessment ready, or I know how to get one.",
     parentId: null,
@@ -262,7 +262,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "25",
-    type: "group",
+    type: "checkbox",
     label:
       "I understand the role of the insurance company's care manager or nurse evaluator.",
     parentId: null,
@@ -285,14 +285,14 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "28",
-    type: "group",
+    type: "checkbox",
     label: "I know if my policy includes inflation protection",
     parentId: null,
     headingId: "27",
   },
   {
     id: "29",
-    type: "group",
+    type: "checkbox",
     label: "I know whether there is a waiver of premium",
     parentId: null,
     headingId: "27",
@@ -307,14 +307,14 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "30",
-    type: "group",
+    type: "checkbox",
     label: "I know if there are shared benefits for spouses or partners",
     parentId: null,
     headingId: "27",
   },
   {
     id: "31",
-    type: "group",
+    type: "checkbox",
     label:
       "I know if I have any riders or optional features added to my policy.",
     parentId: null,
@@ -329,21 +329,21 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "33",
-    type: "group",
+    type: "checkbox",
     label: "I know how much the premium is and how often it is due.",
     parentId: null,
     headingId: "32",
   },
   {
     id: "34",
-    type: "group",
+    type: "checkbox",
     label: "I know what happens if I miss a payment.",
     parentId: null,
     headingId: "32",
   },
   {
     id: "35",
-    type: "group",
+    type: "checkbox",
     label: "I know if my policy has a non-forfeiture benefit",
     parentId: null,
     headingId: "32",
@@ -357,7 +357,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "36",
-    type: "group",
+    type: "checkbox",
     label: "I have set up auto-pay or reminders for premiums.",
     parentId: null,
     headingId: "32",
@@ -372,7 +372,7 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "37",
-    type: "group",
+    type: "checkbox",
     label:
       "I've told a trusted person where to find the policy and this checklist.",
     parentId: null,
@@ -402,28 +402,28 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "39.1",
-    type: "group",
+    type: "checkbox",
     label: "A copy of your LTCI policy",
     parentId: "39",
     headingId: "38",
   },
   {
     id: "39.2",
-    type: "group",
+    type: "checkbox",
     label: "This checklist",
     parentId: "39",
     headingId: "38",
   },
   {
     id: "39.3",
-    type: "group",
+    type: "checkbox",
     label: "Contact information for the insurer",
     parentId: "39",
     headingId: "38",
   },
   {
     id: "39.4",
-    type: "group",
+    type: "checkbox",
     label:
       "Phone Number, Name of the Company, Address, Any previous company names and the date of the name change",
     parentId: "39",
@@ -431,21 +431,21 @@ export const longTermCareInsurancePolicySchema: ChecklistField[] = [
   },
   {
     id: "39.5",
-    type: "group",
+    type: "checkbox",
     label: "Copies of care plans and the evaluation from my medical provider",
     parentId: "39",
     headingId: "38",
   },
   {
     id: "39.6",
-    type: "group",
-    label: "groups from any communication with the insurance company",
+    type: "checkbox",
+    label: "Copies from any communication with the insurance company",
     parentId: "39",
     headingId: "38",
   },
   {
     id: "39.7",
-    type: "group",
+    type: "checkbox",
     label: "Records of services provided and receipts",
     parentId: "39",
     headingId: "38",
@@ -459,7 +459,7 @@ export const generateLongTermCareInsurancePolicyDefaultValues = (): Record<
   const defaultValues: Record<string, boolean | null> = {};
 
   longTermCareInsurancePolicySchema.forEach((field) => {
-    if (field.type === "group") {
+    if (field.type === "checkbox") {
       defaultValues[field.id] = false;
     } else if (field.type === "radio") {
       defaultValues[field.id] = null;

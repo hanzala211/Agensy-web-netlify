@@ -373,6 +373,10 @@ export const FORM_TYPE_OPTIONS: {
     label: "Medical Appointment Template",
     value: "medical_template",
   },
+  {
+    label: "Long Term Care Insurance Policy",
+    value: "long_term_care_insurance_policy",
+  },
 ];
 
 export const SORT_OPTIONS = [

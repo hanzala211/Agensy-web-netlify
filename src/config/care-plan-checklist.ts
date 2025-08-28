@@ -96,7 +96,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "13",
-    type: "group",
+    type: "checkbox",
     label: "Schedule a Care Plan within two days of admission.",
     parentId: null,
     headingId: "12",
@@ -179,7 +179,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "14",
-    type: "group",
+    type: "checkbox",
     label:
       "Schedule a care plan every 14 days if care recipient has extended admission.",
     parentId: null,
@@ -188,7 +188,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
 
   {
     id: "15",
-    type: "group",
+    type: "checkbox",
     label: "Schedule a care plan 2 days prior to discharge.",
     parentId: null,
     headingId: "12",
@@ -260,7 +260,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
       "Is patient being discharged with any new durable medical equipment",
   },
   {
-    id: "15.2.1.1",
+    id: "15.2.1.2",
     type: "radio",
     options: [
       "Assisted Living, Memory Care, Home with caregiver support, Independent Living / Home.",
@@ -280,7 +280,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "17",
-    type: "group",
+    type: "checkbox",
     label: "Schedule a Care Plan within one week of admission",
     parentId: null,
     headingId: "16",
@@ -374,14 +374,14 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "19",
-    type: "group",
+    type: "checkbox",
     label: "Schedule a Care Plan within first few days of admission.",
     parentId: null,
     headingId: "18",
   },
   {
     id: "20",
-    type: "group",
+    type: "checkbox",
     label:
       "Schedule Care Plans every six months, or if the client has an acute change in condition or behaviors that need to be addressed.",
     parentId: null,
@@ -389,14 +389,14 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "21",
-    type: "group",
+    type: "checkbox",
     label: "Review Medication list and update in Care Tree.",
     parentId: null,
     headingId: "18",
   },
   {
     id: "22",
-    type: "group",
+    type: "checkbox",
     label:
       "Review any likes / dislikes or anticipated concerns that Agensy staff has.",
     parentId: null,
@@ -404,7 +404,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "23",
-    type: "group",
+    type: "checkbox",
     label: "If Care Plan is for change in condition:",
     parentId: null,
     headingId: "18",
@@ -446,7 +446,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "24",
-    type: "group",
+    type: "checkbox",
     label: "If Care Plan is to address behavioral concerns:",
     parentId: null,
     headingId: "18",
@@ -475,7 +475,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "25",
-    type: "group",
+    type: "checkbox",
     label: "If Care Plan is for a general update.",
     parentId: null,
     headingId: "18",
@@ -525,14 +525,14 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "27",
-    type: "group",
+    type: "checkbox",
     label: "Use sample care plan document and face sheet to create care plan.",
     parentId: null,
     headingId: "26",
   },
   {
     id: "28",
-    type: "group",
+    type: "checkbox",
     label:
       "Review the care plan every six months or if there is a hospitalization, change in condition or new diagnosis.",
     parentId: null,
@@ -585,7 +585,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "29",
-    type: "group",
+    type: "checkbox",
     label:
       "Consider future needs and identify resources for long term care planning.",
     parentId: null,
@@ -600,7 +600,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "31",
-    type: "group",
+    type: "checkbox",
     label: "Document symptoms",
     parentId: null,
     headingId: "30",
@@ -622,7 +622,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
 
   {
     id: "32",
-    type: "group",
+    type: "checkbox",
     label: "Document symptoms",
     parentId: null,
     headingId: "30",
@@ -658,14 +658,14 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "33",
-    type: "group",
+    type: "checkbox",
     label: "Discuss any medication changes",
     parentId: null,
     headingId: "30",
   },
   {
     id: "34",
-    type: "group",
+    type: "checkbox",
     label: "Review emergency plan",
     parentId: null,
     headingId: "30",
@@ -700,7 +700,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "36",
-    type: "group",
+    type: "checkbox",
     label: "When did behaviors begin",
     parentId: null,
     headingId: "35",
@@ -721,21 +721,21 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "37",
-    type: "group",
+    type: "checkbox",
     label: "Discuss appropriate medication changes",
     parentId: null,
     headingId: "35",
   },
   {
     id: "38",
-    type: "group",
+    type: "checkbox",
     label: "Notify medical providers of behavior changes and concerns",
     parentId: null,
     headingId: "35",
   },
   {
     id: "39",
-    type: "group",
+    type: "checkbox",
     label:
       "Discuss environmental changes that can be made to alleviate behaviors",
     parentId: null,
@@ -743,7 +743,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "40",
-    type: "group",
+    type: "checkbox",
     label:
       "Identify safety concerns and steps being taken to address behaviors",
     parentId: null,
@@ -758,28 +758,28 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "42",
-    type: "group",
+    type: "checkbox",
     label: "Review medication list",
     parentId: null,
     headingId: "41",
   },
   {
     id: "43",
-    type: "group",
+    type: "checkbox",
     label: "Confirm all information on Face Sheet is correct",
     parentId: null,
     headingId: "41",
   },
   {
     id: "44",
-    type: "group",
+    type: "checkbox",
     label: "Update emergency contact list",
     parentId: null,
     headingId: "41",
   },
   {
     id: "45",
-    type: "group",
+    type: "checkbox",
     label: "Confirm code status",
     parentId: null,
     headingId: "41",
@@ -793,7 +793,7 @@ export const carePlanChecklistSchema: ChecklistField[] = [
   },
   {
     id: "46",
-    type: "group",
+    type: "checkbox",
     label: "Update list of providers",
     parentId: null,
     headingId: "41",

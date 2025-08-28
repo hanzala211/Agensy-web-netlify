@@ -284,6 +284,11 @@ export const MedicalAppointmentTemplate: React.FC = () => {
       };
 
       reset(formattedData);
+    }
+  }, [medicalAppointmentTemplate]);
+
+  useEffect(() => {
+    if (Object.keys(getValues()).length > 0) {
       setOpenedFileData({
         ...getValues(),
         last_update: {
@@ -291,7 +296,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         },
       } as unknown as Record<string, string | string[] | Record<string, string | number>>);
     }
-  }, [medicalAppointmentTemplate, reset]);
+  }, [Object.keys(getValues()).length]);
 
   const onSubmit = (data: MedicalAppointmentTemplateData) => {
     console.log(data);
@@ -539,6 +544,74 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                   label="Date of Birth"
                   name="dateOfBirth"
                 />
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Card
+          title="Healthcare Provider"
+          buttonText={
+            <p>
+              <span className="lg:inline hidden">
+                Add from existing provider
+              </span>{" "}
+              <ICONS.doctor size={16} className="lg:hidden block" />{" "}
+            </p>
+          }
+          onButtonClick={() => setIsProviderModalOpen(true)}
+          ariaLabel="Select Healthcare Provider"
+          showButton={true}
+        >
+          <div className="space-y-6">
+            <div className="p-3 rounded-lg border">
+              <div className="w-full flex gap-4 items-center">
+                <div className="w-full grid md:grid-cols-2 gap-4">
+                  <Input
+                    label="Provider Name"
+                    register={register("healthcareProvider.providerName")}
+                    error={errors.healthcareProvider?.providerName?.message}
+                  />
+
+                  <Input
+                    label="Provider Type"
+                    register={register("healthcareProvider.providerType")}
+                    error={errors.healthcareProvider?.providerType?.message}
+                  />
+
+                  <Select
+                    label="Specialty"
+                    control={control}
+                    name="healthcareProvider.specialty"
+                    data={SPECIALTIES}
+                    labelOption="Select Specialty"
+                  />
+
+                  <Input
+                    label="Address"
+                    register={register("healthcareProvider.address")}
+                    error={errors.healthcareProvider?.address?.message}
+                  />
+
+                  <PhoneNumberInput
+                    label="Phone"
+                    name="healthcareProvider.phone"
+                    control={control}
+                  />
+                  <DatePickerField
+                    label="Follow-up"
+                    name="healthcareProvider.follow_up"
+                    control={control}
+                  />
+                  <div className="md:col-span-2">
+                    <TextArea
+                      label="Notes"
+                      register={register("healthcareProvider.notes")}
+                      error={errors.healthcareProvider?.notes?.message}
+                      rows={3}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -923,74 +996,6 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                 )}
               </div>
             ))}
-          </div>
-        </Card>
-
-        <Card
-          title="Healthcare Provider"
-          buttonText={
-            <p>
-              <span className="lg:inline hidden">
-                Add from existing provider
-              </span>{" "}
-              <ICONS.doctor size={16} className="lg:hidden block" />{" "}
-            </p>
-          }
-          onButtonClick={() => setIsProviderModalOpen(true)}
-          ariaLabel="Select Healthcare Provider"
-          showButton={true}
-        >
-          <div className="space-y-6">
-            <div className="p-3 rounded-lg border">
-              <div className="w-full flex gap-4 items-center">
-                <div className="w-full grid md:grid-cols-2 gap-4">
-                  <Input
-                    label="Provider Name"
-                    register={register("healthcareProvider.providerName")}
-                    error={errors.healthcareProvider?.providerName?.message}
-                  />
-
-                  <Input
-                    label="Provider Type"
-                    register={register("healthcareProvider.providerType")}
-                    error={errors.healthcareProvider?.providerType?.message}
-                  />
-
-                  <Select
-                    label="Specialty"
-                    control={control}
-                    name="healthcareProvider.specialty"
-                    data={SPECIALTIES}
-                    labelOption="Select Specialty"
-                  />
-
-                  <Input
-                    label="Address"
-                    register={register("healthcareProvider.address")}
-                    error={errors.healthcareProvider?.address?.message}
-                  />
-
-                  <PhoneNumberInput
-                    label="Phone"
-                    name="healthcareProvider.phone"
-                    control={control}
-                  />
-                  <DatePickerField
-                    label="Follow-up"
-                    name="healthcareProvider.follow_up"
-                    control={control}
-                  />
-                  <div className="md:col-span-2">
-                    <TextArea
-                      label="Notes"
-                      register={register("healthcareProvider.notes")}
-                      error={errors.healthcareProvider?.notes?.message}
-                      rows={3}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </Card>
 

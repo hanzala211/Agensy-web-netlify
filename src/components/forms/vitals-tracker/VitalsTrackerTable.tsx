@@ -1,89 +1,134 @@
-import { DatePickerField, Input } from "@agensy/components";
+import { DatePickerField, Input, TertiaryButton } from "@agensy/components";
+import { ICONS } from "@agensy/constants";
 import type { VitalsTrackerFormData } from "@agensy/types";
-import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
+import type {
+  Control,
+  FieldErrors,
+  UseFormRegister,
+  FieldArrayWithId,
+} from "react-hook-form";
+import { HeightInput } from "./HeightInput";
 
 interface VitalsTrackerTableProps {
-  columns: number[];
+  fields: FieldArrayWithId<VitalsTrackerFormData, "vitals", "id">[];
   vitalsFields: {
-    key?: string;
-    label?: string;
-    type?: string;
+    key: string;
+    label: string;
+    type: string;
     placeholder?: string;
   }[];
   control: Control<VitalsTrackerFormData>;
   register: UseFormRegister<VitalsTrackerFormData>;
   errors: FieldErrors<VitalsTrackerFormData>;
+  onDeleteRow: (index: number) => void;
+  onHeightChange: (rowIndex: number, value: string) => void;
 }
 
 export const VitalsTrackerTable = ({
-  columns,
+  fields,
   vitalsFields,
   control,
   register,
   errors,
+  onDeleteRow,
+  onHeightChange,
 }: VitalsTrackerTableProps) => {
-  const getFieldName = (
-    fieldKey: string,
-    col: number
-  ): keyof VitalsTrackerFormData => {
-    return `${fieldKey}${col}` as keyof VitalsTrackerFormData;
-  };
   return (
     <div className="overflow-x-auto w-screen md:max-w-[calc(100vw-400px)] max-w-[calc(100vw-120px)]">
       <table className="min-w-[800px] border-collapse border border-blue-800">
         <thead>
           <tr className="bg-blue-50">
-            <th className="border border-blue-800 px-4 py-3 text-left text-blue-800 font-semibold italic min-w-[150px]">
-              Vital Signs
+            <th className="border border-blue-800 px-4 py-3 text-left text-blue-800 font-semibold italic min-w-[120px]">
+              Date
             </th>
-            {columns.map((col) => (
+            {vitalsFields.map((field) => (
               <th
-                key={col}
+                key={field.key}
                 className="border border-blue-800 px-4 py-3 text-left text-blue-800 font-semibold italic min-w-[120px]"
               >
-                Date {col}
+                {field.label}
               </th>
             ))}
+            <th className="border border-blue-800 px-4 py-3 text-left text-blue-800 font-semibold italic min-w-[80px]">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
-          {vitalsFields.map((field, rowIndex) => (
-            <tr
-              key={field.key}
-              className={rowIndex % 2 === 0 ? "bg-gray-100" : "bg-white"}
-            >
-              <td className="border border-blue-800 px-4 py-3 text-blue-800 font-semibold italic min-w-[150px]">
-                {field.label}
+          {fields.length === 0 ? (
+            <tr>
+              <td
+                colSpan={vitalsFields.length + 2}
+                className="border border-blue-800 px-4 py-8 text-center text-gray-500"
+              >
+                No vitals entries yet. Click the "+" button above to add your
+                first entry.
               </td>
-              {columns.map((col) => {
-                const fieldName = getFieldName(field?.key || "", col);
-                return (
-                  <td
-                    key={col}
-                    className="border border-blue-800 px-4 py-3 min-w-[120px]"
-                  >
-                    {field.key === "date" ? (
-                      <DatePickerField
-                        label=""
-                        control={control}
-                        name={fieldName}
-                        className="w-full min-w-[100px]"
-                      />
-                    ) : (
-                      <Input
-                        label=""
-                        type={field.type}
-                        register={register(fieldName)}
-                        error={errors[fieldName]?.message}
-                        placeholder={field.placeholder}
-                        inputClassname="w-full min-w-[100px]"
-                      />
-                    )}
-                  </td>
-                );
-              })}
             </tr>
-          ))}
+          ) : (
+            fields.map((field, rowIndex) => (
+              <tr
+                key={field.id}
+                className={rowIndex % 2 === 0 ? "bg-gray-100" : "bg-white"}
+              >
+                <td className="border border-blue-800 px-4 py-3 text-blue-800 font-semibold italic min-w-[120px]">
+                  Date {rowIndex + 1}
+                </td>
+                {vitalsFields.map((vitalField) => {
+                  const fieldName =
+                    `vitals.${rowIndex}.${vitalField.key}` as const;
+                  return (
+                    <td
+                      key={vitalField.key}
+                      className="border border-blue-800 px-4 py-3 min-w-[120px]"
+                    >
+                      {vitalField.key === "date" ? (
+                        <DatePickerField
+                          label=""
+                          control={control}
+                          // @ts-expect-error // fix this
+                          name={fieldName}
+                          className="w-full min-w-[100px]"
+                        />
+                      ) : vitalField.key === "height" ? (
+                        <HeightInput
+                          value={field.height || ""}
+                          onChange={(value) => onHeightChange(rowIndex, value)}
+                        />
+                      ) : (
+                        <Input
+                          label=""
+                          type={vitalField.type}
+                          // @ts-expect-error // fix this
+                          register={register(fieldName)}
+                          error={
+                            errors.vitals?.[rowIndex]?.[
+                              vitalField.key as keyof NonNullable<
+                                VitalsTrackerFormData["vitals"]
+                              >[0]
+                            ]?.message
+                          }
+                          placeholder={vitalField.placeholder}
+                          inputClassname="w-full min-w-[100px]"
+                        />
+                      )}
+                    </td>
+                  );
+                })}
+                <td className="border border-blue-800 px-4 py-3 min-w-[80px]">
+                  {fields.length > 1 && (
+                    <TertiaryButton
+                      type="button"
+                      onClick={() => onDeleteRow(rowIndex)}
+                      className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
+                    >
+                      <ICONS.delete />
+                    </TertiaryButton>
+                  )}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

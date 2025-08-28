@@ -1,4 +1,10 @@
-import { DatePickerField, Input, TextArea } from "@agensy/components";
+import {
+  DatePickerField,
+  Input,
+  TextArea,
+  TertiaryButton,
+} from "@agensy/components";
+import { ICONS } from "@agensy/constants";
 import type { LabsTrackerFormData } from "@agensy/types";
 import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 
@@ -7,6 +13,8 @@ interface LabsTrackerCardProps {
   errors: FieldErrors<LabsTrackerFormData>;
   register: UseFormRegister<LabsTrackerFormData>;
   control: Control<LabsTrackerFormData>;
+  onRemove: () => void;
+  canRemove: boolean;
 }
 
 export const LabsTrackerCard = ({
@@ -14,21 +22,26 @@ export const LabsTrackerCard = ({
   errors,
   register,
   control,
+  onRemove,
+  canRemove,
 }: LabsTrackerCardProps) => {
-  const dateField = `date${index}` as keyof LabsTrackerFormData;
-  const doctorNameField = `doctorName${index}` as keyof LabsTrackerFormData;
-  const typeField = `type${index}` as keyof LabsTrackerFormData;
-  const providerCompanyUsedField =
-    `providerCompanyUsed${index}` as keyof LabsTrackerFormData;
-  const purposeField = `purpose${index}` as keyof LabsTrackerFormData;
-  const resultsField = `results${index}` as keyof LabsTrackerFormData;
   return (
-    <div
-      key={index}
-      className={`p-6 border border-gray-200 rounded-lg ${
-        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-      }`}
-    >
+    <div key={index} className="p-6 border border-gray-200 rounded-lg bg-white">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-medium text-gray-800">
+          Lab Test {index + 1}
+        </h3>
+        {canRemove && (
+          <TertiaryButton
+            type="button"
+            onClick={onRemove}
+            className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
+          >
+            <ICONS.delete />
+          </TertiaryButton>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* Date and Doctor's Name row */}
         <div className="space-y-2">
@@ -37,12 +50,12 @@ export const LabsTrackerCard = ({
           </label>
           <DatePickerField
             control={control}
-            name={dateField}
+            name={`labs.${index}.date`}
             className="w-full"
           />
-          {errors[dateField] && (
+          {errors.labs?.[index]?.date && (
             <span className="text-red-500 text-sm">
-              {errors[dateField]?.message}
+              {errors.labs?.[index]?.date?.message}
             </span>
           )}
         </div>
@@ -52,15 +65,11 @@ export const LabsTrackerCard = ({
             Doctor's Name
           </label>
           <Input
-            register={register(doctorNameField)}
+            register={register(`labs.${index}.doctorName`)}
             placeholder="Enter doctor's name"
             inputClassname="w-full"
+            error={errors.labs?.[index]?.doctorName?.message as string}
           />
-          {errors[doctorNameField] && (
-            <span className="text-red-500 text-sm">
-              {errors[doctorNameField]?.message}
-            </span>
-          )}
         </div>
       </div>
 
@@ -68,15 +77,14 @@ export const LabsTrackerCard = ({
       <div className="space-y-2 mb-4">
         <label className="block text-sm font-medium text-gray-700">Type</label>
         <Input
-          register={register(typeField)}
+          register={register(`labs.${index}.type`)}
           placeholder="Enter lab type"
           inputClassname="w-full"
+          error={
+            // @ts-expect-error - TODO: fix this
+            errors.labs?.[index]?.type?.message as string
+          }
         />
-        {errors[typeField] && (
-          <span className="text-red-500 text-sm">
-            {errors[typeField]?.message}
-          </span>
-        )}
       </div>
 
       {/* Provider / Company Used field */}
@@ -85,15 +93,11 @@ export const LabsTrackerCard = ({
           Provider / Company Used
         </label>
         <Input
-          register={register(providerCompanyUsedField)}
+          register={register(`labs.${index}.providerCompanyUsed`)}
           placeholder="Enter provider or company name"
           inputClassname="w-full"
+          error={errors.labs?.[index]?.providerCompanyUsed?.message as string}
         />
-        {errors[providerCompanyUsedField] && (
-          <span className="text-red-500 text-sm">
-            {errors[providerCompanyUsedField]?.message}
-          </span>
-        )}
       </div>
 
       {/* Purpose field */}
@@ -102,16 +106,12 @@ export const LabsTrackerCard = ({
           Purpose
         </label>
         <TextArea
-          register={register(purposeField)}
+          register={register(`labs.${index}.purpose`)}
           placeholder="Enter purpose of the lab test"
           className="w-full"
           rows={2}
+          error={errors.labs?.[index]?.purpose?.message as string}
         />
-        {errors[purposeField] && (
-          <span className="text-red-500 text-sm">
-            {errors[purposeField]?.message}
-          </span>
-        )}
       </div>
 
       {/* Results field */}
@@ -120,16 +120,12 @@ export const LabsTrackerCard = ({
           Results
         </label>
         <TextArea
-          register={register(resultsField)}
+          register={register(`labs.${index}.results`)}
           placeholder="Enter lab results"
           className="w-full"
           rows={3}
+          error={errors.labs?.[index]?.results?.message as string}
         />
-        {errors[resultsField] && (
-          <span className="text-red-500 text-sm">
-            {errors[resultsField]?.message}
-          </span>
-        )}
       </div>
     </div>
   );

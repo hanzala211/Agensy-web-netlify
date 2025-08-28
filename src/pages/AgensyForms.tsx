@@ -87,6 +87,13 @@ const rootFolders: FolderItem[] = [
     type: "folder",
     children: [
       {
+        id: "medical-appointment-templates",
+        slug: "medical-appointment-templates",
+        name: "Medical Appointment Templates",
+        type: "folder",
+        children: [],
+      },
+      {
         id: "face-sheet-short",
         name: "Face Sheet Short",
         type: "file",
@@ -432,6 +439,7 @@ export const AgensyForms: React.FC = () => {
   };
 
   const getDynamicMedicalTemplates = () => {
+    // Always return an array, even if empty
     return medicalAppointmentTemplates.map((template) => ({
       id: template.id,
       name:
@@ -447,21 +455,27 @@ export const AgensyForms: React.FC = () => {
     if (currentPath.length === 0) {
       const updatedRootFolders = rootFolders.map((folder) => {
         if (folder.id === "medical") {
-          const staticFiles = folder.children || [];
-          const dynamicTemplates = getDynamicMedicalTemplates();
+          const staticFiles =
+            folder.children?.filter((item) => item.type === "file") || [];
+          const medicalAppointmentTemplatesFolder = folder.children?.find(
+            (item) => item.id === "medical-appointment-templates"
+          );
 
-          let allMedicalItems = [...staticFiles, ...dynamicTemplates];
+          if (medicalAppointmentTemplatesFolder) {
+            const dynamicTemplates = getDynamicMedicalTemplates();
+            const allMedicalItems = [
+              ...staticFiles,
+              {
+                ...medicalAppointmentTemplatesFolder,
+                children: dynamicTemplates,
+              },
+            ];
 
-          if (searchQuery) {
-            allMedicalItems = allMedicalItems.filter((item) =>
-              item.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            return {
+              ...folder,
+              children: allMedicalItems,
+            };
           }
-
-          return {
-            ...folder,
-            children: allMedicalItems,
-          };
         }
         return folder;
       });
@@ -475,18 +489,56 @@ export const AgensyForms: React.FC = () => {
       const folder = currentLevel.find((item) => item.name === pathItem);
       if (folder && folder.children) {
         if (folder.id === "medical") {
-          const staticFiles = folder.children || [];
+          const staticFiles =
+            folder.children?.filter((item) => item.type === "file") || [];
+          const medicalAppointmentTemplatesFolder = folder.children?.find(
+            (item) => item.id === "medical-appointment-templates"
+          );
+
+          if (medicalAppointmentTemplatesFolder) {
+            const dynamicTemplates = getDynamicMedicalTemplates();
+
+            const allMedicalItems = [
+              ...staticFiles,
+              {
+                ...medicalAppointmentTemplatesFolder,
+                children: dynamicTemplates,
+              },
+            ];
+
+            if (
+              searchQuery &&
+              currentPath.length > 0 &&
+              currentPath[currentPath.length - 1] ===
+                "Medical Appointment Templates"
+            ) {
+              const filteredTemplates = dynamicTemplates.filter((item) =>
+                item.name.toLowerCase().includes(searchQuery.toLowerCase())
+              );
+              currentLevel = [
+                ...staticFiles,
+                {
+                  ...medicalAppointmentTemplatesFolder,
+                  children: filteredTemplates,
+                },
+              ];
+              return;
+            }
+
+            currentLevel = allMedicalItems;
+          } else {
+            currentLevel = folder.children;
+          }
+        } else if (folder.id === "medical-appointment-templates") {
           const dynamicTemplates = getDynamicMedicalTemplates();
 
-          let allMedicalItems = [...staticFiles, ...dynamicTemplates];
-
           if (searchQuery) {
-            allMedicalItems = allMedicalItems.filter((item) =>
+            currentLevel = dynamicTemplates.filter((item) =>
               item.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
+          } else {
+            currentLevel = dynamicTemplates;
           }
-
-          currentLevel = allMedicalItems;
         } else {
           currentLevel = folder.children;
         }
@@ -609,7 +661,7 @@ export const AgensyForms: React.FC = () => {
   useEffect(() => {
     if (
       currentPath.length === 0 ||
-      currentPath[currentPath.length - 1] !== "Medical"
+      currentPath[currentPath.length - 1] !== "Medical Appointment Templates"
     ) {
       setSearchQuery("");
     }
@@ -656,7 +708,7 @@ export const AgensyForms: React.FC = () => {
       return result;
     };
 
-    const folder = findFolderById(getCurrentFolders(), folderId);
+    const folder = findFolderById(rootFolders, folderId);
     if (folder && folder.type === "folder") {
       navigate(
         `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/${folder.slug}`
@@ -809,7 +861,8 @@ export const AgensyForms: React.FC = () => {
           onAddMedicalAppointmentTemplate={handleAddMedicalAppointmentTemplate}
           showAddMedicalAppointmentButton={
             currentPath.length > 0 &&
-            currentPath[currentPath.length - 1] === "Medical"
+            currentPath[currentPath.length - 1] ===
+              "Medical Appointment Templates"
           }
           isCreatingMedicalTemplate={createNewMedicalTemplateMutation.isPending}
           searchQuery={searchQuery}

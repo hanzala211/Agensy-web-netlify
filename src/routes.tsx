@@ -101,6 +101,22 @@ export const Routes: React.FC = () => {
             <Route path={`:threadId`} element={<ChatPage />} />
           </Route>
           <Route path={ROUTES.agensyFormsFolders} element={<AgensyForms />} />
+          <Route
+            path={`${ROUTES.agensyFormsFolders}/:folderSlug`}
+            element={<AgensyForms />}
+          />
+          <Route
+            path={`${ROUTES.agensyFormsFolders}/:folderSlug/:formSlug`}
+            element={<AgensyForms />}
+          />
+          <Route
+            path={`${ROUTES.agensyFormsFolders}/:parentFolder/:folderSlug`}
+            element={<AgensyForms />}
+          />
+          <Route
+            path={`${ROUTES.agensyFormsFolders}/:parentFolder/:folderSlug/:formSlug`}
+            element={<AgensyForms />}
+          />
           <Route path={ROUTES.agensyFormsForms} element={<AgensyForms />} />
           <Route path={ROUTES.agensyFormsForm} element={<AgensyForms />} />
           <Route path={ROUTES.logs} element={<ClientLogs />} />

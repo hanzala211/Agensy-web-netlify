@@ -227,53 +227,6 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     );
   };
 
-  const addMedication = (key: string) => {
-    setOcrResults((prev) =>
-      prev.map((field) => {
-        if (field.key === key && Array.isArray(field.value)) {
-          const newMedication: ClientMedications = {
-            medication_name: "",
-            dosage: "",
-            frequency: "",
-            purpose: "",
-            indication: "",
-            start_date: "",
-            end_date: "",
-            refill_due: "",
-            id: "",
-          };
-          return { ...field, value: [...field.value, newMedication] };
-        }
-        return field;
-      })
-    );
-  };
-
-  const addHealthcareProvider = (key: string) => {
-    setOcrResults((prev) =>
-      prev.map((field) => {
-        if (field.key === key && Array.isArray(field.value)) {
-          const newHealthcareProvider: HealthcareProvider = {
-            client_id: 0,
-            provider_type: "",
-            provider_name: "",
-            specialty: "",
-            address: "",
-            phone: "",
-            fax: "",
-            last_visit: "",
-            next_visit: "",
-            notes: "",
-            follow_up: "",
-            id: "",
-          };
-          return { ...field, value: [...field.value, newHealthcareProvider] };
-        }
-        return field;
-      })
-    );
-  };
-
   const removeItem = (key: string, index: number) => {
     setOcrResults((prev) =>
       prev.map((field) => {
@@ -503,16 +456,6 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                   </label>
                   {Array.isArray(field.value) && field.key === "medications" ? (
                     <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <button
-                          type="button"
-                          onClick={() => addMedication(field.key)}
-                          className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm"
-                        >
-                          <ICONS.plus size={14} />
-                          <span>Add Medication</span>
-                        </button>
-                      </div>
                       <div className="space-y-4">
                         {field.value.map(
                           (medication: ClientMedications, index: number) => (
@@ -662,16 +605,6 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                   ) : Array.isArray(field.value) &&
                     field.key === "healthcareProviders" ? (
                     <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <button
-                          type="button"
-                          onClick={() => addHealthcareProvider(field.key)}
-                          className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm"
-                        >
-                          <ICONS.plus size={14} />
-                          <span>Add Healthcare Provider</span>
-                        </button>
-                      </div>
                       <div className="space-y-4">
                         {field.value.map(
                           (

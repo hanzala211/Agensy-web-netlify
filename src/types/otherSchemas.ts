@@ -54,7 +54,7 @@ export interface MappedField {
 }
 
 export type Vital = {
-  id?: number | null;
+  id?: string | null;
   date: string | null;
   heart_rate: string | number | null;
   blood_pressure: string | null;

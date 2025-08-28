@@ -14,6 +14,8 @@ export const PERMISSIONS = {
     APP_ACTIONS.AddDocs,
   ],
   caregiver: [
+    APP_ACTIONS.AddDocs,
+    APP_ACTIONS.DeleteDocs,
     APP_ACTIONS.EditClientMedicalInfo,
     APP_ACTIONS.ClientAppointmentInfoEdit,
   ],

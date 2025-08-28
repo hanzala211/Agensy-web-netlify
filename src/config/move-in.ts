@@ -45,7 +45,7 @@ export const moveInSchema: ChecklistField[] = [
     type: "radio",
     label: "",
     options: [
-      "Needs to be completed by client’s current primary care physician",
+      "Needs to be completed by client's current primary care physician",
       "Client needs to have seen their primary care physician within the last six months",
       "Vaccination records / Is client allowed to have flu vaccine",
       "Medication list",
@@ -96,11 +96,11 @@ export const moveInSchema: ChecklistField[] = [
     type: "radio",
     label: "",
     options: [
-      "For memory care, make sure you bring some personal items so you can orient your loved one to their new space. It’s often disorienting if they don’t recognize any of the items in their room.",
+      "For memory care, make sure you bring some personal items so you can orient your loved one to their new space. It's often disorienting if they don't recognize any of the items in their room.",
       "Take inventory of any items you might need, like shower curtain rings, trash cans, or silverware.",
       "Make note of any durable medical or safety equipment your loved one might need, like a shower chair or a bedside rail.",
       "In the state of Texas, it is legally required that you post notice if you are using video monitoring equipment. Understand your state and community rules on remote video monitoring",
-      "As you’re considering what furniture to bring, imagine navigating the space using a walker or a wheelchair. Make sure to keep pathways clear and avoid using rugs or carpets that might be a trip hazard.",
+      "As you're considering what furniture to bring, imagine navigating the space using a walker or a wheelchair. Make sure to keep pathways clear and avoid using rugs or carpets that might be a trip hazard.",
     ],
     parentId: "1.4",
     headingId: "0",
@@ -142,7 +142,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "3",
-    type: "group",
+    type: "checkbox",
     label:
       "Confirm with administration that all of your paperwork is complete and correct. Discuss what time you should arrive and who you should expect to greet you and orient you to the community",
     parentId: null,
@@ -150,7 +150,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "4",
-    type: "group",
+    type: "checkbox",
     label:
       "If there is concern about your loved one becoming distressed when you leave, notify staff and how they plan to redirect their new resident.",
     parentId: null,
@@ -176,7 +176,7 @@ export const moveInSchema: ChecklistField[] = [
     label:
       "Check medications and med list into nursing staff first thing in the morning (reconciliation often takes several hours)",
     parentId: null,
-    type: "group",
+    type: "checkbox",
     headingId: "5",
   },
   {
@@ -204,7 +204,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "7",
-    type: "group",
+    type: "checkbox",
     label: "Unpack clothing and personal items",
     parentId: null,
     headingId: "5",
@@ -226,7 +226,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "8",
-    type: "group",
+    type: "checkbox",
     label:
       "Make a list of toiletries (shampoo, soap, toilet paper, toothpaste) that you are responsible for ordering, if possible, set these items to auto ship",
     parentId: null,
@@ -234,7 +234,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "9",
-    type: "group",
+    type: "checkbox",
     label:
       "Orient the resident to community (introduce to staff, show them where dining room and activity areas are)",
     parentId: null,
@@ -242,7 +242,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "10",
-    type: "group",
+    type: "checkbox",
     label:
       "Introduce yourself to staff (executive director, sales office, nursing staff, med techs, front desk) and learn who your point of contact is for questions during the week, at night, and on the weekend",
     parentId: null,
@@ -250,7 +250,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "11",
-    type: "group",
+    type: "checkbox",
     label:
       "Make sure staff knows if your loved one has a cell phone and if they require assistance charging the device and making calls",
     parentId: null,
@@ -265,7 +265,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "13",
-    type: "group",
+    type: "checkbox",
     label:
       "Request current copy of medication list, reconcile this against the admission med list",
     parentId: null,
@@ -273,7 +273,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "14",
-    type: "group",
+    type: "checkbox",
     label:
       "Request a hard copy of the care plan to review shower days, laundry and housekeeping times, and hands on assistance provided by staff.",
     parentId: null,
@@ -281,7 +281,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "15",
-    type: "group",
+    type: "checkbox",
     label:
       "Coordinate visits with visiting providers (primary care, podiatry, dentist, home health, etc.)",
     parentId: null,
@@ -312,14 +312,14 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "16",
-    type: "group",
+    type: "checkbox",
     label: "Check supplies and order as needed",
     parentId: null,
     headingId: "12",
   },
   {
     id: "17",
-    type: "group",
+    type: "checkbox",
     label:
       "Check in with AM, PM, and weekend floor staff to see how the resident is settling in",
     parentId: null,
@@ -335,7 +335,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "18",
-    type: "group",
+    type: "checkbox",
     label:
       "Update the Face Sheet to reflect new medical providers and home health agencies involved in care",
     parentId: null,
@@ -343,7 +343,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "19",
-    type: "group",
+    type: "checkbox",
     label:
       "Make sure all demographic information (address, phone number, etc.) has been updated on the emergency list",
     parentId: null,
@@ -351,7 +351,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "20",
-    type: "group",
+    type: "checkbox",
     label:
       "Schedule Care Plan with nursing and administrative staff (see Care Plan form and video)",
     parentId: null,
@@ -359,7 +359,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "21",
-    type: "group",
+    type: "checkbox",
     label:
       "Update address with Social Security, Medicare and other insurance companies forward mail",
     parentId: null,
@@ -367,7 +367,7 @@ export const moveInSchema: ChecklistField[] = [
   },
   {
     id: "22",
-    type: "group",
+    type: "checkbox",
     label: "Update address on drivers license or identification card",
     parentId: null,
     headingId: "12",

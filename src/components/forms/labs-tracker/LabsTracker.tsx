@@ -1,6 +1,7 @@
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CommonLoader, PrimaryButton } from "@agensy/components";
+import { ICONS } from "@agensy/constants";
 import {
   labsTrackerFormSchema,
   type LabsTrackerFormData,
@@ -14,73 +15,8 @@ import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useClientContext } from "@agensy/context";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FlatFormData = { [key: string]: any };
-
 const defaultValues: LabsTrackerFormData = {
-  date1: "",
-  doctorName1: "",
-  type1: "",
-  providerCompanyUsed1: "",
-  purpose1: "",
-  results1: "",
-  id1: "",
-
-  date2: "",
-  doctorName2: "",
-  type2: "",
-  providerCompanyUsed2: "",
-  purpose2: "",
-  results2: "",
-  id2: "",
-
-  date3: "",
-  doctorName3: "",
-  type3: "",
-  providerCompanyUsed3: "",
-  purpose3: "",
-  results3: "",
-  id3: "",
-
-  date4: "",
-  doctorName4: "",
-  type4: "",
-  providerCompanyUsed4: "",
-  purpose4: "",
-  results4: "",
-  id4: "",
-
-  date5: "",
-  doctorName5: "",
-  type5: "",
-  providerCompanyUsed5: "",
-  purpose5: "",
-  results5: "",
-  id5: "",
-
-  date6: "",
-  doctorName6: "",
-  type6: "",
-  providerCompanyUsed6: "",
-  purpose6: "",
-  results6: "",
-  id6: "",
-
-  date7: "",
-  doctorName7: "",
-  type7: "",
-  providerCompanyUsed7: "",
-  purpose7: "",
-  results7: "",
-  id7: "",
-
-  date8: "",
-  doctorName8: "",
-  type8: "",
-  providerCompanyUsed8: "",
-  purpose8: "",
-  results8: "",
-  id8: "",
+  labs: [],
 };
 
 export const LabsTracker = () => {
@@ -103,6 +39,12 @@ export const LabsTracker = () => {
     resolver: zodResolver(labsTrackerFormSchema),
     defaultValues,
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "labs",
+  });
+
   const postLabsTracker = usePostLabsTracker();
 
   useEffect(() => {
@@ -116,70 +58,75 @@ export const LabsTracker = () => {
       toast.error("Error Occurred", String(postLabsTracker.error));
     }
   }, [postLabsTracker.status]);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapLabsToFormData = (labs: any[]) => {
-    const formData: FlatFormData = {};
-
-    for (let i = 0; i < 12; i++) {
-      const item = labs[i];
-
-      const idx = item?.index;
-
-      formData[`date${idx}`] = DateUtils.formatDateToRequiredFormat(
-        item?.date ?? ""
-      );
-      formData[`doctorName${idx}`] = item?.doctor_name ?? "";
-      formData[`type${idx}`] = item?.type ?? "";
-      formData[`providerCompanyUsed${idx}`] = item?.provider_company ?? "";
-      formData[`purpose${idx}`] = item?.purpose ?? "";
-      formData[`results${idx}`] = item?.results ?? "";
-      formData[`id${idx}`] = item?.id ?? null;
+    if (!labs || labs.length === 0) {
+      return { labs: [] };
     }
 
-    return formData;
+    const mappedLabs = labs.map((item) => ({
+      date: DateUtils.formatDateToRequiredFormat(item?.date ?? ""),
+      doctorName: item?.doctor_name ?? "",
+      type: item?.type ?? "",
+      providerCompanyUsed: item?.provider_company ?? "",
+      purpose: item?.purpose ?? "",
+      results: item?.results ?? "",
+      id: item?.id ?? "",
+    }));
+
+    return { labs: mappedLabs };
   };
 
-  const mapFormDataToVitals = (formData: FlatFormData) => {
+  const mapFormDataToVitals = (formData: LabsTrackerFormData) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const labs: any[] = [];
 
-    for (let i = 1; i <= 12; i++) {
-      const date = formData[`date${i}`];
-      const doctorName = formData[`doctorName${i}`];
-      const type = formData[`type${i}`];
-      const providerCompanyUsed = formData[`providerCompanyUsed${i}`];
-      const purpose = formData[`purpose${i}`];
-      const results = formData[`results${i}`];
-      const id = formData[`id${i}`];
-      const index = i;
-
-      if (
-        date ||
-        doctorName ||
-        type ||
-        purpose ||
-        providerCompanyUsed ||
-        results ||
-        id
-      ) {
-        const item = {
-          id: id ? id : null,
-          date: date ? DateUtils.changetoISO(date) : null,
-          doctor_name: doctorName ? doctorName : null,
-          type: type ? type : null,
-          provider_company: providerCompanyUsed ? providerCompanyUsed : null,
-          purpose: purpose ? purpose : null,
-          results: results ? results : null,
-          index: index ? index : null,
-        };
-        if (!item.id) {
-          delete item.id;
+    if (formData.labs && formData.labs.length > 0) {
+      formData.labs.forEach((lab, index) => {
+        if (
+          lab.date ||
+          lab.doctorName ||
+          lab.type ||
+          lab.purpose ||
+          lab.providerCompanyUsed ||
+          lab.results ||
+          lab.id
+        ) {
+          const item = {
+            id: lab.id ? lab.id : null,
+            date: lab.date ? DateUtils.changetoISO(lab.date) : null,
+            doctor_name: lab.doctorName ? lab.doctorName : null,
+            type: lab.type ? lab.type : null,
+            provider_company: lab.providerCompanyUsed
+              ? lab.providerCompanyUsed
+              : null,
+            purpose: lab.purpose ? lab.purpose : null,
+            results: lab.results ? lab.results : null,
+            index: index + 1,
+          };
+          if (!item.id) {
+            // @ts-expect-error // fix this
+            delete item.id;
+          }
+          labs.push(item);
         }
-        labs.push(item);
-      }
+      });
     }
 
     return labs;
+  };
+
+  const addNewLab = () => {
+    append({
+      date: "",
+      doctorName: "",
+      type: "",
+      providerCompanyUsed: "",
+      purpose: "",
+      results: "",
+      id: "",
+    });
   };
 
   useEffect(() => {
@@ -219,16 +166,35 @@ export const LabsTracker = () => {
   return (
     <div className="bg-gray-50 w-full">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <Card title="Labs Tracker" className="mb-6">
+        <Card
+          title="Labs Tracker"
+          className="mb-6"
+          buttonText={<ICONS.plus size={16} />}
+          onButtonClick={addNewLab}
+          ariaLabel="Add New Lab Test"
+          showButton={true}
+        >
           <div className="space-y-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-              <LabsTrackerCard
-                register={register}
-                errors={errors}
-                index={item}
-                control={control}
-              />
-            ))}
+            {fields.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>No lab tests added yet.</p>
+                <p className="text-sm">
+                  Click the + button above to add your first lab test.
+                </p>
+              </div>
+            ) : (
+              fields.map((field, index) => (
+                <LabsTrackerCard
+                  key={field.id}
+                  register={register}
+                  errors={errors}
+                  index={index}
+                  control={control}
+                  onRemove={() => remove(index)}
+                  canRemove={fields.length > 1}
+                />
+              ))
+            )}
           </div>
         </Card>
 

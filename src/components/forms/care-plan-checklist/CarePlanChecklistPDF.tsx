@@ -88,6 +88,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
 
+  groupText: {
+    color: BORDER,
+    fontWeight: "normal",
+    fontSize: 9,
+    lineHeight: 1.2,
+  },
+
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -341,7 +348,7 @@ const GroupField: React.FC<{
       <View style={[styles.groupTitle, indentStyle]}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <RightArrow />
-          <Text>{field.label}</Text>
+          <Text style={styles.groupText}>{field.label}</Text>
         </View>
       </View>
       {childFields.map((childField) => (
@@ -380,10 +387,10 @@ const LinkField: React.FC<{
     if (match.index > lastIndex) {
       segments.push({ text: field.label.slice(lastIndex, match.index) });
     }
-    
+
     // Add the URL segment
     segments.push({ text: match[1], url: match[1] });
-    
+
     lastIndex = match.index + match[1].length;
   }
 
@@ -444,7 +451,14 @@ const FieldRenderer: React.FC<{
   }
 
   if (field.type === "radio") {
-    return <RadioField field={field} data={data} schema={schema} nestingLevel={nestingLevel} />;
+    return (
+      <RadioField
+        field={field}
+        data={data}
+        schema={schema}
+        nestingLevel={nestingLevel}
+      />
+    );
   }
 
   if (field.type === "link") {
@@ -454,9 +468,10 @@ const FieldRenderer: React.FC<{
   return null;
 };
 
-export const CarePlanChecklistPDF: React.FC<
-  CarePlanChecklistPDFProps
-> = ({ data, schema = carePlanChecklistSchema }) => {
+export const CarePlanChecklistPDF: React.FC<CarePlanChecklistPDFProps> = ({
+  data,
+  schema = carePlanChecklistSchema,
+}) => {
   const headings = schema.filter((field) => field.type === "heading");
 
   return (

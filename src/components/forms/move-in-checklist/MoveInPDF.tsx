@@ -380,10 +380,10 @@ const LinkField: React.FC<{
     if (match.index > lastIndex) {
       segments.push({ text: field.label.slice(lastIndex, match.index) });
     }
-    
+
     // Add the URL segment
     segments.push({ text: match[1], url: match[1] });
-    
+
     lastIndex = match.index + match[1].length;
   }
 
@@ -421,9 +421,9 @@ const FieldRenderer: React.FC<{
 }> = ({ field, data, schema }) => {
   const nestingLevel = getNestingLevel(field.id, schema);
 
-  if (field.type === "group") {
+  if (field.type === "checkbox") {
     return (
-      <GroupField
+      <CheckboxField
         field={field}
         data={data}
         schema={schema}
@@ -432,9 +432,9 @@ const FieldRenderer: React.FC<{
     );
   }
 
-  if (field.type === "checkbox") {
+  if (field.type === "group") {
     return (
-      <CheckboxField
+      <GroupField
         field={field}
         data={data}
         schema={schema}
@@ -461,9 +461,10 @@ const FieldRenderer: React.FC<{
   return null;
 };
 
-export const MoveInPDF: React.FC<
-  MoveInPDFProps
-> = ({ data, schema = moveInSchema }) => {
+export const MoveInPDF: React.FC<MoveInPDFProps> = ({
+  data,
+  schema = moveInSchema,
+}) => {
   const headings = schema.filter((field) => field.type === "heading");
 
   return (

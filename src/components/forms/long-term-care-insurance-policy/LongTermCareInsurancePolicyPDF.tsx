@@ -88,26 +88,81 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
 
-  groupContent: {
-    paddingVertical: 3,
-    paddingHorizontal: 6,
+  groupText: {
+    color: BORDER,
+    fontWeight: "normal",
     fontSize: 9,
     lineHeight: 1.2,
   },
 
-  linkContainer: {
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LITE,
+  },
+
+  checkboxIcon: {
+    width: 8,
+    height: 8,
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginRight: 6,
+    marginTop: 1,
+    backgroundColor: "white",
+  },
+
+  checkboxChecked: {
+    backgroundColor: BORDER,
+  },
+
+  checkboxLabel: {
+    flex: 1,
+    fontSize: 9,
+    lineHeight: 1.2,
+  },
+
+  radioContainer: {
     paddingVertical: 3,
     paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LITE,
   },
 
-  linkText: {
+  radioLabel: {
     fontSize: 9,
-    lineHeight: 1.3,
+    fontWeight: "bold",
+    marginBottom: 3,
   },
 
-  linkUrl: {
-    color: "#2563eb",
-    textDecoration: "underline",
+  radioOption: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginLeft: 10,
+    marginBottom: 2,
+  },
+
+  radioIcon: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginRight: 6,
+    marginTop: 2,
+    backgroundColor: "white",
+  },
+
+  radioSelected: {
+    backgroundColor: BORDER,
+  },
+
+  radioOptionLabel: {
+    flex: 1,
+    fontSize: 8,
+    lineHeight: 1.2,
   },
 
   indentLevel1: {
@@ -122,12 +177,21 @@ const styles = StyleSheet.create({
     marginLeft: 45,
   },
 
-  indentLevel4: {
-    marginLeft: 60,
+  linkContainer: {
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LITE,
   },
 
-  indentLevel5: {
-    marginLeft: 75,
+  linkText: {
+    fontSize: 9,
+    lineHeight: 1.3,
+  },
+
+  linkUrl: {
+    color: "#2563eb",
+    textDecoration: "underline",
   },
 });
 
@@ -135,7 +199,7 @@ interface ChecklistFormData {
   [key: string]: boolean | string;
 }
 
-interface LongTermCareInsurancePolicy {
+interface LongTermCareInsurancePolicyPDFProps {
   data?: ChecklistFormData & { last_update: { updatedAt: string } };
   schema?: ChecklistField[];
 }
@@ -178,35 +242,122 @@ const getFieldsByHeading = (
   );
 };
 
-const GroupField: React.FC<{
+const CheckboxField: React.FC<{
   field: ChecklistField;
+  data?: ChecklistFormData;
   schema: ChecklistField[];
   nestingLevel: number;
-}> = ({ field, schema, nestingLevel }) => {
+}> = ({ field, data, schema, nestingLevel }) => {
+  const isChecked = field.id ? Boolean(data?.[field.id]) : false;
   const childFields = getFieldsByParent(field.id, schema);
   const indentStyle =
     nestingLevel === 1
       ? styles.indentLevel1
       : nestingLevel === 2
       ? styles.indentLevel2
-      : nestingLevel === 3
+      : nestingLevel >= 3
       ? styles.indentLevel3
-      : nestingLevel === 4
-      ? styles.indentLevel4
-      : nestingLevel >= 5
-      ? styles.indentLevel5
       : {};
 
   return (
     <View>
-      <View style={[styles.groupContent, indentStyle]}>
+      <View style={[styles.checkboxContainer, indentStyle]}>
+        <View
+          style={[
+            styles.checkboxIcon,
+            ...(isChecked ? [styles.checkboxChecked] : []),
+          ]}
+        />
+        <Text style={styles.checkboxLabel}>{field.label}</Text>
+      </View>
+      {childFields.map((childField) => (
+        <FieldRenderer
+          key={childField.id}
+          field={childField}
+          data={data}
+          schema={schema}
+        />
+      ))}
+    </View>
+  );
+};
+
+const RadioField: React.FC<{
+  field: ChecklistField;
+  data?: ChecklistFormData;
+  schema: ChecklistField[];
+  nestingLevel: number;
+}> = ({ field, data, schema, nestingLevel }) => {
+  const selectedValue = field.id ? data?.[field.id] : null;
+  const childFields = getFieldsByParent(field.id, schema);
+  const indentStyle =
+    nestingLevel === 1
+      ? styles.indentLevel1
+      : nestingLevel === 2
+      ? styles.indentLevel2
+      : nestingLevel >= 3
+      ? styles.indentLevel3
+      : {};
+
+  return (
+    <View>
+      <View style={[styles.radioContainer, indentStyle]}>
+        {field.label && <Text style={styles.radioLabel}>{field.label}</Text>}
+        {field.options?.map((option, index) => (
+          <View key={index} style={styles.radioOption}>
+            <View
+              style={[
+                styles.radioIcon,
+                ...(selectedValue === option ? [styles.radioSelected] : []),
+              ]}
+            />
+            <Text style={styles.radioOptionLabel}>{option}</Text>
+          </View>
+        ))}
+      </View>
+      {childFields.map((childField) => (
+        <FieldRenderer
+          key={childField.id}
+          field={childField}
+          data={data}
+          schema={schema}
+        />
+      ))}
+    </View>
+  );
+};
+
+const GroupField: React.FC<{
+  field: ChecklistField;
+  data?: ChecklistFormData;
+  schema: ChecklistField[];
+  nestingLevel: number;
+}> = ({ field, data, schema, nestingLevel }) => {
+  const childFields = getFieldsByParent(field.id, schema);
+  const indentStyle =
+    nestingLevel === 1
+      ? styles.indentLevel1
+      : nestingLevel === 2
+      ? styles.indentLevel2
+      : nestingLevel >= 3
+      ? styles.indentLevel3
+      : {};
+
+  return (
+    <View>
+      <View style={[styles.groupTitle, indentStyle]}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <RightArrow />
-          <Text style={styles.groupContent}>{field.label}</Text>
+          <Text style={styles.groupText}>{field.label}</Text>
         </View>
       </View>
       {childFields.map((childField) => (
-        <FieldRenderer key={childField.id} field={childField} schema={schema} />
+        <FieldRenderer
+          key={childField.id}
+          field={childField}
+          data={data}
+          schema={schema}
+        />
       ))}
     </View>
   );
@@ -221,12 +372,8 @@ const LinkField: React.FC<{
       ? styles.indentLevel1
       : nestingLevel === 2
       ? styles.indentLevel2
-      : nestingLevel === 3
+      : nestingLevel >= 3
       ? styles.indentLevel3
-      : nestingLevel === 4
-      ? styles.indentLevel4
-      : nestingLevel >= 5
-      ? styles.indentLevel5
       : {};
 
   // Extract URLs from text for PDF display
@@ -253,20 +400,22 @@ const LinkField: React.FC<{
   }
 
   return (
-    <View style={[styles.linkContainer, indentStyle]}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <RightArrow />
-        <Text style={styles.linkText}>
-          {segments.map((segment, index) => (
-            <Text key={index}>
-              {segment.url ? (
-                <Text style={styles.linkUrl}>{segment.text}</Text>
-              ) : (
-                segment.text
-              )}
-            </Text>
-          ))}
-        </Text>
+    <View>
+      <View style={[styles.groupTitle, indentStyle]}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <RightArrow />
+          <Text style={styles.groupTitle}>
+            {segments.map((segment, index) => (
+              <Text key={index}>
+                {segment.url ? (
+                  <Text style={styles.linkUrl}>{segment.text}</Text>
+                ) : (
+                  segment.text
+                )}
+              </Text>
+            ))}
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -274,13 +423,41 @@ const LinkField: React.FC<{
 
 const FieldRenderer: React.FC<{
   field: ChecklistField;
+  data?: ChecklistFormData;
   schema: ChecklistField[];
-}> = ({ field, schema }) => {
+}> = ({ field, data, schema }) => {
   const nestingLevel = getNestingLevel(field.id, schema);
 
   if (field.type === "group") {
     return (
-      <GroupField field={field} schema={schema} nestingLevel={nestingLevel} />
+      <GroupField
+        field={field}
+        data={data}
+        schema={schema}
+        nestingLevel={nestingLevel}
+      />
+    );
+  }
+
+  if (field.type === "checkbox") {
+    return (
+      <CheckboxField
+        field={field}
+        data={data}
+        schema={schema}
+        nestingLevel={nestingLevel}
+      />
+    );
+  }
+
+  if (field.type === "radio") {
+    return (
+      <RadioField
+        field={field}
+        data={data}
+        schema={schema}
+        nestingLevel={nestingLevel}
+      />
     );
   }
 
@@ -292,14 +469,16 @@ const FieldRenderer: React.FC<{
 };
 
 export const LongTermCareInsurancePolicyPDF: React.FC<
-  LongTermCareInsurancePolicy
+  LongTermCareInsurancePolicyPDFProps
 > = ({ data, schema = longTermCareInsurancePolicySchema }) => {
   const headings = schema.filter((field) => field.type === "heading");
 
   return (
-    <Document title="Agensy Medicare Cheat Sheet">
+    <Document title="Agensy Long Term Care Insurance Policy Checklist">
       <Page size="A4" style={styles.page}>
-        <Text style={styles.formTitle}>Agensy Medicare Cheat Sheet</Text>
+        <Text style={styles.formTitle}>
+          Agensy Long Term Care Insurance Policy Checklist
+        </Text>
         <View style={styles.headerRow}>
           <Image src={logo} style={styles.headerLogo} />
           <View style={{ flexDirection: "column" }}>
@@ -326,7 +505,12 @@ export const LongTermCareInsurancePolicyPDF: React.FC<
             <View key={heading.id} style={styles.section}>
               <Text style={styles.sectionTitle}>{heading.label}</Text>
               {rootFields.map((field) => (
-                <FieldRenderer key={field.id} field={field} schema={schema} />
+                <FieldRenderer
+                  key={field.id}
+                  field={field}
+                  data={data}
+                  schema={schema}
+                />
               ))}
             </View>
           );

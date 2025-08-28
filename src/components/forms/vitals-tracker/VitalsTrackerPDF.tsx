@@ -100,66 +100,91 @@ const columns = [
   { key: "temperature", label: "Temp (°F)", flex: 0.9 },
   { key: "weight", label: "Weight (lbs)", flex: 1 },
   { key: "height", label: "Height (in)", flex: 1 },
-  { key: "other1", label: "Other", flex: 1.3 },
+  { key: "other", label: "Other", flex: 1.3 },
 ] as const;
 
 const getValue = (
-  data: VitalsTrackerFormData | undefined,
-  idx: number,
+  vital: { [key: string]: string | null | undefined },
   key: string
 ) => {
-  const value = (data as unknown as Record<string, string | null | undefined>)[
-    `${key}${idx}`
-  ];
-  return value ?? "";
+  return vital?.[key] || "";
 };
 
 export const VitalsTrackerPDF: React.FC<{
   data?: VitalsTrackerFormData & { last_update?: { updatedAt?: string } };
-}> = ({ data }) => (
-  <Document title="Agensy Vitals Tracker">
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.formTitle}>Agensy Vitals Tracker</Text>
-      <View style={styles.headerRow}>
-        <Image src={logo} style={styles.headerLogo} />
-        <View style={styles.headerDateBoxContainer}>
-          <Text style={styles.headerDateBox}>
-            {`Print Date: ${DateUtils.formatDateToRequiredFormat(
-              new Date().toISOString()
-            )}`}
-          </Text>
-          {data?.last_update?.updatedAt && (
+}> = ({ data }) => {
+  const vitals = data?.vitals || [];
+
+  // Filter out completely empty entries and only show rows with data
+  const nonEmptyVitals = vitals.filter(
+    (vital) =>
+      vital.date ||
+      vital.heartRate ||
+      vital.oxygen ||
+      vital.bloodPressure ||
+      vital.bloodType ||
+      vital.temperature ||
+      vital.weight ||
+      vital.height ||
+      vital.other
+  );
+
+  const totalEntries = nonEmptyVitals.length;
+
+  return (
+    <Document title="Agensy Vitals Tracker">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>Agensy Vitals Tracker</Text>
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <View style={styles.headerDateBoxContainer}>
             <Text style={styles.headerDateBox}>
-              {`Update Date: ${DateUtils.formatDateToRequiredFormat(
-                data.last_update.updatedAt
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
               )}`}
             </Text>
+            {data?.last_update?.updatedAt && (
+              <Text style={styles.headerDateBox}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Vitals ({totalEntries} entries)
+          </Text>
+          {totalEntries > 0 ? (
+            <>
+              <View style={styles.tableHeader}>
+                {columns.map((c, i) => (
+                  <Text key={i} style={[styles.th, { flex: c.flex }]}>
+                    {c.label}
+                  </Text>
+                ))}
+              </View>
+              {nonEmptyVitals.map((vital, i) => (
+                <View key={i} style={styles.tableRow}>
+                  {columns.map((c, j) => (
+                    <Text key={j} style={[styles.td, { flex: c.flex }]}>
+                      {getValue(vital, c.key)}
+                    </Text>
+                  ))}
+                </View>
+              ))}
+            </>
+          ) : (
+            <View style={styles.tableRow}>
+              <Text style={[styles.td, { flex: 9.7, textAlign: "center" }]}>
+                No vitals data available
+              </Text>
+            </View>
           )}
         </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Vitals (12 entries)</Text>
-        <View style={styles.tableHeader}>
-          {columns.map((c, i) => (
-            <Text key={i} style={[styles.th, { flex: c.flex }]}>
-              {c.label}
-            </Text>
-          ))}
-        </View>
-        {Array.from({ length: 12 }).map((_, i) => {
-          const idx = i + 1;
-          return (
-            <View key={idx} style={styles.tableRow}>
-              {columns.map((c, j) => (
-                <Text key={j} style={[styles.td, { flex: c.flex }]}>
-                  {getValue(data, idx, c.key)}
-                </Text>
-              ))}
-            </View>
-          );
-        })}
-      </View>
-    </Page>
-  </Document>
-);
+      </Page>
+    </Document>
+  );
+};

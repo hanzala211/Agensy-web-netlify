@@ -132,7 +132,7 @@ export const FieldRenderer = ({
     const childFields = getFieldsByParent(field.id, schema);
 
     return (
-      <div style={indentationStyle} className="px-2 sm:px-4 md:px-6">
+      <div className="px-2 sm:px-4 md:px-6">
         <div
           className={`${
             nestingLevel === 0
@@ -141,6 +141,7 @@ export const FieldRenderer = ({
           } mb-[10px] flex items-center gap-2 ${
             nestingLevel > 0 ? "border-l-2 border-[#e5e7eb]" : "border-none"
           }`}
+          style={indentationStyle}
         >
           <ICONS.rightSolid className="w-4 h-4 flex-shrink-0" />
           {field.label}
@@ -162,13 +163,18 @@ export const FieldRenderer = ({
     const childFields = getFieldsByParent(field.id, schema);
 
     return (
-      <div style={indentationStyle}>
-        <label className="flex items-center w-fit cursor-pointer px-1">
+      <div>
+        <label
+          className="flex items-center w-fit cursor-pointer px-1"
+          style={indentationStyle}
+        >
           <input
             type="checkbox"
             checked={field.id ? Boolean(formData[field.id]) : false}
             onChange={handleCheckboxChange}
-            className={`mr-[8px] w-3.5 h-3.5 flex-shrink-0 ${!field.parentId ? "ml-4" : ""}`}
+            className={`mr-[8px] w-3.5 h-3.5 flex-shrink-0 ${
+              !field.parentId ? "ml-4" : ""
+            }`}
           />
           <span
             className={`${
@@ -199,8 +205,13 @@ export const FieldRenderer = ({
     const childFields = getFieldsByParent(field.id, schema);
 
     return (
-      <div style={indentationStyle}>
-        <div className="font-medium mb-[6px] text-[14px]">{field.label}</div>
+      <div>
+        <div
+          className="font-medium mb-[6px] text-[14px]"
+          style={indentationStyle}
+        >
+          {field.label}
+        </div>
         <div className="ml-1 sm:ml-2 md:ml-[10px]">
           {field.options?.map((option) => (
             <div key={option}>
@@ -243,9 +254,10 @@ export const FieldRenderer = ({
     const segments = StringUtils.extractLinksFromText(field.label);
 
     return (
-      <div style={indentationStyle} className="px-2 sm:px-4 md:px-6">
+      <div className="px-2 sm:px-4 md:px-6">
         <div
           className={`font-semibold text-sm text-primaryColor pl-1 sm:pl-2 md:pl-[10px] mb-[10px] flex items-center gap-2`}
+          style={indentationStyle}
         >
           <ICONS.rightSolid className="w-4 h-4 flex-shrink-0" />
           <div className="text-[14px] leading-relaxed">
