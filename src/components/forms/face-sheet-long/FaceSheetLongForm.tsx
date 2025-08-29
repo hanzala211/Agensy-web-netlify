@@ -124,7 +124,8 @@ const defaultValues = {
 export const FaceSheetLongForm: React.FC = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData, ocrResult, setOcrResult } = useClientContext();
+  const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
+    useClientContext();
   const { clientId } = useParams();
   const postFaceSheetLongFormMutation = usePostFaceSheetLongFormMutation();
   const {
@@ -138,13 +139,18 @@ export const FaceSheetLongForm: React.FC = () => {
     control,
     handleSubmit,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     setValue,
   } = useForm<FaceSheetLongFormData>({
     resolver: zodResolver(faceSheetLongFormSchema),
     defaultValues,
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   useEffect(() => {
     refetch();
@@ -172,13 +178,21 @@ export const FaceSheetLongForm: React.FC = () => {
         "Your client's medical information has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postFaceSheetLongFormMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postFaceSheetLongFormMutation.error)
       );
     }
-  }, [postFaceSheetLongFormMutation.status]);
+  }, [postFaceSheetLongFormMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   const providersArray = useFieldArray({
     control,

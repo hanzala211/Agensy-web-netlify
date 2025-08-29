@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import {
   Modal,
@@ -6,7 +6,6 @@ import {
   Select,
   TextArea,
   PrimaryButton,
-  SecondaryButton,
   CommonLoader,
 } from "@agensy/components";
 import { documentSchema } from "@agensy/types";
@@ -14,6 +13,7 @@ import type { DocumentFormData, ConfidenceScore } from "@agensy/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StringUtils, toast } from "@agensy/utils";
 import { DOCUMENT_CATEGORY_OPTIONS } from "@agensy/constants";
+import { isHeicImage, convertHeicToJpeg } from "../../utils/heicUtils";
 
 interface AddDocumentModalProps {
   isOpen: boolean;
@@ -38,7 +38,9 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | undefined>(undefined);
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [convertedImage, setConvertedImage] = useState<string | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
   const [titleConfidence, setTitleConfidence] = useState<number | null>(null);
   const [descriptionConfidence, setDescriptionConfidence] = useState<
     number | null
@@ -66,7 +68,34 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
   useEffect(() => {
     if (file && handleAnalyze) {
-      handleAnalyze(file);
+      let fileToSubmit = file as File;
+
+      if (file && !file.type) {
+        const fileName = file.name.toLowerCase();
+        let correctMimeType = "";
+
+        if (fileName.endsWith(".heic")) {
+          correctMimeType = "image/heic";
+        } else if (fileName.endsWith(".heif")) {
+          correctMimeType = "image/heif";
+        } else if (fileName.endsWith(".pdf")) {
+          correctMimeType = "application/pdf";
+        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+          correctMimeType = "image/jpeg";
+        } else if (fileName.endsWith(".png")) {
+          correctMimeType = "image/png";
+        } else if (fileName.endsWith(".gif")) {
+          correctMimeType = "image/gif";
+        }
+
+        if (correctMimeType) {
+          fileToSubmit = new File([file], file.name, {
+            type: correctMimeType,
+            lastModified: file.lastModified,
+          });
+        }
+      }
+      handleAnalyze(fileToSubmit);
     }
   }, [file]);
 
@@ -90,27 +119,17 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
         file: undefined,
       });
       setFile(undefined);
-      if (filePreview) {
-        URL.revokeObjectURL(filePreview);
-      }
       setFilePreview(null);
+      setConvertedImage(null);
       setFileType(null);
+      setIsConverting(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     }
-  }, [isOpen, reset, filePreview]);
+  }, [isOpen, reset]);
 
-  // Cleanup object URLs on unmount
-  useEffect(() => {
-    return () => {
-      if (filePreview) {
-        URL.revokeObjectURL(filePreview);
-      }
-    };
-  }, [filePreview]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
     console.log(file);
@@ -126,37 +145,55 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     }
 
     const isValidFile = () => {
-      if (file.type === "application/pdf" || file.type.startsWith("image/")) {
+      if (file.type.startsWith("image/") || file.type === "application/pdf") {
         return true;
       }
 
       const fileName = file.name.toLowerCase();
       const validExtensions = [
-        ".pdf",
         ".jpg",
         ".jpeg",
         ".png",
         ".gif",
         ".heic",
         ".heif",
+        ".pdf",
       ];
 
       return validExtensions.some((ext) => fileName.endsWith(ext));
     };
 
     if (isValidFile()) {
-      // Clean up previous preview URL if it exists
-      if (filePreview) {
-        URL.revokeObjectURL(filePreview);
-      }
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const imageDataUrl = e.target?.result as string;
+        setFilePreview(imageDataUrl);
+        setConvertedImage(null);
+        setFileType(file.type);
+        setFile(file);
+        setValue("file", file);
 
-      setFile(file);
-      setFileType(file.type);
-      setValue("file", file);
-
-      // Create preview for the file
-      const previewUrl = URL.createObjectURL(file);
-      setFilePreview(previewUrl);
+        if (isHeicImage(file.type, file.name)) {
+          setIsConverting(true);
+          try {
+            const convertedUrl = await convertHeicToJpeg(imageDataUrl);
+            setConvertedImage(convertedUrl);
+          } catch (error) {
+            console.error("Failed to convert HEIC image:", error);
+            toast.error(
+              "Failed to convert HEIC image. Please try a different format."
+            );
+            setFile(undefined);
+            setFilePreview(null);
+            setFileType(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+          } finally {
+            setIsConverting(false);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
     } else {
       if (fileInputRef.current) fileInputRef.current.value = "";
       toast.error("Please upload a valid file (PDF or image format)");
@@ -206,7 +243,9 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     });
     setFile(undefined);
     setFilePreview(null);
+    setConvertedImage(null);
     setFileType(null);
+    setIsConverting(false);
     setTitleConfidence(null);
     setDescriptionConfidence(null);
     setCategoryConfidence(null);
@@ -217,7 +256,9 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     fileInputRef.current?.click();
   };
 
-  const isPDF = fileType === "application/pdf";
+  const isPDF = useMemo(() => {
+    return fileType === "application/pdf";
+  }, [fileType]);
 
   const renderFilePreview = () => {
     if (!filePreview) return null;
@@ -226,46 +267,55 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       <div className="space-y-3">
         <div className="bg-gray-100 rounded-lg p-4">
           {!isPDF ? (
-            <div className="relative group">
-              <img
-                src={filePreview}
-                alt="Uploaded document"
-                className="w-full h-auto max-h-80 object-contain rounded"
-              />
-              {isAnalyzing && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
-                  <div className="flex flex-col items-center space-y-3">
-                    <CommonLoader color="white" />
-                    <p className="text-white text-sm font-medium">
-                      Analyzing document...
-                    </p>
+            isConverting ? (
+              <div className="flex h-[200px] flex-col items-center justify-center py-8">
+                <CommonLoader color="black" />
+                <p className="text-sm text-gray-600 mt-2">
+                  Converting HEIC image...
+                </p>
+              </div>
+            ) : (
+              <div className="relative group">
+                <img
+                  src={convertedImage || filePreview}
+                  alt="Uploaded document"
+                  className="w-full h-auto max-h-80 object-contain rounded"
+                />
+                {isAnalyzing && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                    <div className="flex flex-col items-center space-y-3">
+                      <CommonLoader color="white" />
+                      <p className="text-white text-sm font-medium">
+                        Analyzing document...
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
-              {!isAnalyzing && (
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <button
-                    onClick={handleFileSelect}
-                    className="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <svg
-                      className="w-4 h-4 text-black"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                )}
+                {!isAnalyzing && (
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <button
+                      onClick={handleFileSelect}
+                      className="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-2"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                    <span>Change File</span>
-                  </button>
-                </div>
-              )}
-            </div>
+                      <svg
+                        className="w-4 h-4 text-black"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                      <span>Change File</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
           ) : (
             <div className="space-y-3">
               <iframe
@@ -336,11 +386,14 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
         <label className="block text-sm font-medium text-gray-700">
           Upload Document
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+        <div
+          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
+          onClick={handleFileSelect}
+        >
+          <div className="space-y-4">
+            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-8 h-8 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -354,20 +407,14 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">
-                Choose a file or drag and drop
+              <p className="text-lg font-medium text-gray-700">
+                Click to upload
               </p>
-              <p className="text-xs text-gray-500 mt-1">
-                PDF, JPG, PNG, GIF, HEIC up to 20MB
+              <p className="text-sm text-gray-500">or drag and drop</p>
+              <p className="text-xs text-gray-400 mt-2">
+                PNG, JPG, PDF, HEIC up to 20MB
               </p>
             </div>
-            <SecondaryButton
-              onClick={handleFileSelect}
-              className="mt-2"
-              type="button"
-            >
-              Browse Files
-            </SecondaryButton>
           </div>
         </div>
       </div>
@@ -441,7 +488,6 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
         </div>
       </div>
 
-      {/* Hidden file input - always accessible */}
       <input
         type="file"
         accept="application/pdf,image/*,.heic,.heif"

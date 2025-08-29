@@ -25,6 +25,7 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
     null
   );
   const [ocrResult, setOcrResult] = useState<OCRField[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
   const addClientContact = (contact: ClientContact) => {
     setSelectedClient((prev) => {
@@ -261,6 +262,8 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
         setOpenedFileData,
         ocrResult,
         setOcrResult,
+        hasUnsavedChanges,
+        setHasUnsavedChanges,
       }}
     >
       {children}

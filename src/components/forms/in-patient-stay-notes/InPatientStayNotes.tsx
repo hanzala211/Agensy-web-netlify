@@ -19,7 +19,7 @@ import { useClientContext } from "@agensy/context";
 
 export const InPatientStayNotes = () => {
   const params = useParams();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const {
     data: inPatientData,
     isFetching: isLoadingInPatient,
@@ -31,7 +31,7 @@ export const InPatientStayNotes = () => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     getValues,
   } = useForm<InPatientStayNotesFormData>({
@@ -45,6 +45,11 @@ export const InPatientStayNotes = () => {
       recommendationsNextSteps2: [{ recommendation: "" }],
     },
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const {
     fields: questionsFields1,
@@ -188,16 +193,24 @@ export const InPatientStayNotes = () => {
     if (postInPatientStayNotesMutation.status === "success") {
       toast.success(
         "In-Patient Stay Notes Successfully Updated",
-        "Your client's in-patient stay notes has been saved and is now up to date."
+        "Your client's in-patient stay notes have been saved and are now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postInPatientStayNotesMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postInPatientStayNotesMutation.error)
       );
     }
-  }, [postInPatientStayNotesMutation.status]);
+  }, [postInPatientStayNotesMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     refetch();

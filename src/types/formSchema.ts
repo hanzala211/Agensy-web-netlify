@@ -13,7 +13,7 @@ export const signUpSchema = z.object({
     .transform(trimString),
   password: z
     .string()
-    .min(12, "Password must be at least 12 characters long")
+    .min(8, "Password must be at least 8 characters long")
     .refine((val) => zxcvbn(val).score >= 3, {
       message: "Password is too weak (must score 3 or more)",
     }),
@@ -27,7 +27,7 @@ export const loginSchema = z.object({
     .min(1, "Email is required")
     .email({ message: "Invalid email address" })
     .transform(trimString),
-  password: z.string().min(12, "Password must be at least 12 characters long"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 export type LoginSchema = z.infer<typeof loginSchema>;
@@ -46,7 +46,7 @@ export const resetPasswordSchema = z
     code: z.string().min(1, "Verification code is required"),
     password: z
       .string()
-      .min(12, "Password must be at least 12 characters long")
+      .min(8, "Password must be at least 8 characters long")
       .refine((val) => zxcvbn(val).score >= 3, {
         message: "Password is too weak (must score 3 or more)",
       }),
@@ -262,21 +262,7 @@ export const accessSchema = z.object({
   email: z.string().email("Valid email is required").transform(trimString),
   phone: z.string().min(1, "Phone number is required").transform(trimString),
   role: z.string().min(1, "Role is required").transform(trimString),
-  password: z
-    .string()
-    .min(12, "Password must be at least 12 characters long")
-    .refine((val) => /[A-Z]/.test(val), {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .refine((val) => /[a-z]/.test(val), {
-      message: "Password must contain at least one lowercase letter",
-    })
-    .refine((val) => /\d/.test(val), {
-      message: "Password must contain at least one number",
-    })
-    .refine((val) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(val), {
-      message: "Password must contain at least one special character",
-    }),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 export type AccessFormData = z.infer<typeof accessSchema>;
@@ -340,21 +326,9 @@ export const passwordSchema = z
     current_password: z.string().min(1, "Current password is required"),
     new_password: z
       .string()
-      .min(12, "Password must be at least 12 characters long")
+      .min(8, "Password must be at least 8 characters long")
       .refine((val) => zxcvbn(val).score >= 3, {
         message: "Password is too weak (must score 3 or more)",
-      })
-      .refine((val) => /[A-Z]/.test(val), {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .refine((val) => /[a-z]/.test(val), {
-        message: "Password must contain at least one lowercase letter",
-      })
-      .refine((val) => /\d/.test(val), {
-        message: "Password must contain at least one number",
-      })
-      .refine((val) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(val), {
-        message: "Password must contain at least one special character",
       }),
     confirm_password: z.string().min(1, "Confirm password is required"),
   })
@@ -705,7 +679,8 @@ export type FaceSheetLongFormData = z.infer<typeof faceSheetLongFormSchema>;
 
 // Health History Form Schema
 export const healthHistoryFormSchema = z.object({
-  // Medical Info
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
   diagnoses: z
     .array(
       z.object({

@@ -23,7 +23,7 @@ const defaultValues: VitalsTrackerFormData = {
 export const VitalsTracker = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
 
   const {
     data: vitalsTrackerData,
@@ -36,13 +36,17 @@ export const VitalsTracker = () => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     getValues,
   } = useForm<VitalsTrackerFormData>({
     resolver: zodResolver(vitalsTrackerFormSchema),
     defaultValues,
   });
+
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -135,10 +139,18 @@ export const VitalsTracker = () => {
         "Your client's vitals tracker has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postVitalsTrackerMutation.status === "error") {
       toast.error("Error Occurred", String(postVitalsTrackerMutation.error));
     }
-  }, [postVitalsTrackerMutation.status]);
+  }, [postVitalsTrackerMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     if (vitalsTrackerData) {

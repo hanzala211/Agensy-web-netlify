@@ -135,6 +135,17 @@ const HealthHistoryFormPDF: React.FC<{
           </View>
         </View>
 
+        {/* Personal Information Section */}
+        {(data?.firstName || data?.lastName) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Personal Information</Text>
+            {data.firstName && (
+              <Field label="First Name">{data.firstName}</Field>
+            )}
+            {data.lastName && <Field label="Last Name">{data.lastName}</Field>}
+          </View>
+        )}
+
         {data?.diagnoses?.some((d) => d?.diagnosis) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Diagnoses</Text>

@@ -187,9 +187,8 @@ const defaultValues = {
 };
 
 export const CareRecipientQuestionaire = () => {
-  const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { clientId } = useParams();
   const {
     data: careRecipientQuestionnaire,
@@ -209,13 +208,19 @@ export const CareRecipientQuestionaire = () => {
     handleSubmit,
     getValues,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm<CareRecipientQuestionnaireData>({
     // @ts-expect-error - TODO: fix this
     resolver: zodResolver(careRecipientQuestionnaireSchema),
     defaultValues: defaultValues,
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
+
   const relativesArray = useFieldArray({
     control,
     name: "relatives",
@@ -765,15 +770,26 @@ export const CareRecipientQuestionaire = () => {
 
   useEffect(() => {
     if (postCareRecipientQuestionaireMutation.status === "success") {
-      toast.success("Care Recipient Questionaire Updated");
-      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      toast.success(
+        "Care Recipient Questionnaire Successfully Updated",
+        "Your client's care recipient questionnaire has been saved and is now up to date."
+      );
+      queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+      setHasUnsavedChanges(false);
     } else if (postCareRecipientQuestionaireMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postCareRecipientQuestionaireMutation.error)
       );
     }
-  }, [postCareRecipientQuestionaireMutation.status]);
+  }, [postCareRecipientQuestionaireMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   const onSubmit = (data: CareRecipientQuestionnaireData) => {
     console.log("Form data:", data);

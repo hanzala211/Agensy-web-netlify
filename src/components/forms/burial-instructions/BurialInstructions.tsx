@@ -60,7 +60,7 @@ const defaultValues = {
 
 export const BurialInstructions = () => {
   const params = useParams();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const {
     data: burialInstructions,
     isFetching: isFetchingBurialInstructions,
@@ -70,7 +70,7 @@ export const BurialInstructions = () => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     watch,
     getValues,
     reset,
@@ -80,6 +80,11 @@ export const BurialInstructions = () => {
   });
   const postBurialInstructionsMutation = usePostBurialInstructionsMutation();
   const queryClient = useQueryClient();
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   useEffect(() => {
     refetchBurialInstructions();
@@ -92,13 +97,21 @@ export const BurialInstructions = () => {
         "Your client's burial instructions has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postBurialInstructionsMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postBurialInstructionsMutation.error)
       );
     }
-  }, [postBurialInstructionsMutation.status]);
+  }, [postBurialInstructionsMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     if (burialInstructions) {

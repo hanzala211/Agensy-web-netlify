@@ -30,7 +30,7 @@ const defaultValues: ImportantPeopleInLifeFormData = {
 
 export const ImportantPeopleInLife = () => {
   const params = useParams();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const {
     register,
     control,
@@ -38,7 +38,7 @@ export const ImportantPeopleInLife = () => {
     reset,
     getValues,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ImportantPeopleInLifeFormData>({
     resolver: zodResolver(importantPeopleInLifeFormSchema),
     defaultValues,
@@ -59,6 +59,16 @@ export const ImportantPeopleInLife = () => {
   } = useGetImportantPeopleInLife(params.clientId!);
 
   useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
+
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
+
+  useEffect(() => {
     refetch();
   }, []);
 
@@ -69,6 +79,7 @@ export const ImportantPeopleInLife = () => {
         "Your client's important people in life has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postImportantPeopleInLifeMutation.status === "error") {
       toast.error(
         "Error Occurred",

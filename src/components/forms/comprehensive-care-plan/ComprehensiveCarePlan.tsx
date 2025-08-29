@@ -43,7 +43,7 @@ import { LegalAndFinancialCard } from "./LegalAndFinancialCard";
 import { CaregiverSupport } from "./CaregiverSupport";
 
 export const ComprehensiveCarePlan = () => {
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { clientId } = useParams();
   const queryClient = useQueryClient();
   const postComprehensiveCarePlanMutation =
@@ -66,7 +66,7 @@ export const ComprehensiveCarePlan = () => {
     setValue,
     reset,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ComprehensiveCarePlanFormData>({
     resolver: zodResolver(comprehensiveCarePlanSchema),
     defaultValues: {
@@ -387,6 +387,16 @@ export const ComprehensiveCarePlan = () => {
     },
   });
 
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
+
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
+
   const {
     fields: nextStepCareRecipientFields,
     append: appendNextStepCareRecipient,
@@ -450,6 +460,7 @@ export const ComprehensiveCarePlan = () => {
         "Your client's comprehensive care plan has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+      setHasUnsavedChanges(false);
     } else if (postComprehensiveCarePlanMutation.status === "error") {
       toast.error(
         "Error Occurred",

@@ -32,6 +32,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AnesthesiaSection } from "./AnesthesiaSection";
 
 const defaultValues: HealthHistoryFormData = {
+  firstName: "",
+  lastName: "",
   diagnoses: [
     {
       diagnosis: "",
@@ -83,7 +85,8 @@ const defaultValues: HealthHistoryFormData = {
 export const HealthHistoryForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { clientId } = useParams();
-  const { setOpenedFileData, ocrResult, setOcrResult } = useClientContext();
+  const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
+    useClientContext();
   const {
     data: healthHistoryForm,
     isFetching: isFetchingHealthHistoryForm,
@@ -94,7 +97,7 @@ export const HealthHistoryForm: React.FC = () => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     getValues,
     setValue,
@@ -102,6 +105,11 @@ export const HealthHistoryForm: React.FC = () => {
     resolver: zodResolver(healthHistoryFormSchema),
     defaultValues,
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   useEffect(() => {
     refetch();
@@ -129,10 +137,18 @@ export const HealthHistoryForm: React.FC = () => {
         "The health history information has been saved successfully."
       );
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+      setHasUnsavedChanges(false);
     } else if (postHealthHistoryMutation.status === "error") {
       toast.error("Error Occurred", String(postHealthHistoryMutation.error));
     }
-  }, [postHealthHistoryMutation.status]);
+  }, [postHealthHistoryMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   const medicationsStartedArray = useFieldArray({
     control,
@@ -200,6 +216,10 @@ export const HealthHistoryForm: React.FC = () => {
       }
     });
     const postData = {
+      client_info: {
+        first_name: data.firstName || null,
+        last_name: data.lastName || null,
+      },
       medical_info: {
         diagnoses: StringUtils.filterAndJoinWithCommas(
           data.diagnoses,
@@ -269,6 +289,8 @@ export const HealthHistoryForm: React.FC = () => {
   useEffect(() => {
     if (healthHistoryForm) {
       reset({
+        firstName: healthHistoryForm?.client_info?.first_name || "",
+        lastName: healthHistoryForm?.client_info?.last_name || "",
         healthHistoryDate: healthHistoryForm?.health_history?.date
           ? DateUtils.formatDateToRequiredFormat(
               healthHistoryForm?.health_history?.date
@@ -392,6 +414,22 @@ export const HealthHistoryForm: React.FC = () => {
   ) : (
     <div className="w-full">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* Personal Information Section */}
+        <Card title="Personal Information">
+          <div className="grid md:grid-cols-2 gap-4">
+            <Input
+              label="First Name"
+              register={register("firstName")}
+              error={errors.firstName?.message}
+            />
+            <Input
+              label="Last Name"
+              register={register("lastName")}
+              error={errors.lastName?.message}
+            />
+          </div>
+        </Card>
+
         {/* Medical Information Section */}
         <DiagnosesSection
           register={register}

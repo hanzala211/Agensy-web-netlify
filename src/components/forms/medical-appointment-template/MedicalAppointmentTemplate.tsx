@@ -71,7 +71,7 @@ const defaultValues: MedicalAppointmentTemplateData = {
 
 export const MedicalAppointmentTemplate: React.FC = () => {
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { clientId, formSlug } = useParams();
   const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
   const [isMedicationModalOpen, setIsMedicationModalOpen] = useState(false);
@@ -105,6 +105,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
       queryClient.invalidateQueries({
         queryKey: ["medical-appointment-templates", clientId],
       });
+      setHasUnsavedChanges(false);
     } else if (postMedicalAppointmentTemplateMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -117,13 +118,23 @@ export const MedicalAppointmentTemplate: React.FC = () => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     getValues,
   } = useForm<MedicalAppointmentTemplateData>({
     resolver: zodResolver(medicalAppointmentTemplateSchema),
     defaultValues,
   });
+
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
+
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   const {
     fields: diagnosesFields,

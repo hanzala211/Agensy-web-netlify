@@ -24,8 +24,11 @@ export const CarePlanChecklist = () => {
   const [formData, setFormData] = useState<ChecklistFormData>(
     generateCarePlanChecklistDefaultValues()
   );
+  const [initialFormData, setInitialFormData] = useState<ChecklistFormData>(
+    generateCarePlanChecklistDefaultValues()
+  );
   const postStartCareChecklistMutation = usePostChecklistFormsMutation();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
 
   useEffect(() => {
     refetch();
@@ -36,17 +39,23 @@ export const CarePlanChecklist = () => {
       startOfCareChecklist?.checklist_data &&
       typeof startOfCareChecklist.checklist_data === "object"
     ) {
-      setFormData((prev) => {
-        const mergedData = { ...prev };
-
-        Object.keys(startOfCareChecklist.checklist_data).forEach((key) => {
-          mergedData[key] = startOfCareChecklist.checklist_data[key];
-        });
-
-        return mergedData;
+      const mergedData = { ...generateCarePlanChecklistDefaultValues() };
+      Object.keys(startOfCareChecklist.checklist_data).forEach((key) => {
+        mergedData[key] = startOfCareChecklist.checklist_data[key];
       });
+
+      setFormData(mergedData);
+      setInitialFormData(mergedData);
     }
   }, [startOfCareChecklist]);
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    const hasChanges = Object.keys(formData).some(
+      (key) => formData[key] !== initialFormData[key]
+    );
+    setHasUnsavedChanges(hasChanges);
+  }, [formData, initialFormData, setHasUnsavedChanges]);
 
   useEffect(() => {
     if (postStartCareChecklistMutation.status === "success") {
@@ -54,13 +63,23 @@ export const CarePlanChecklist = () => {
         "Care Plan Checklist Successfully Saved",
         "The care plan checklist information has been saved successfully."
       );
+      // Update initial form data to current form data after successful save
+      setInitialFormData(formData);
+      setHasUnsavedChanges(false);
     } else if (postStartCareChecklistMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postStartCareChecklistMutation.error)
       );
     }
-  }, [postStartCareChecklistMutation.status]);
+  }, [postStartCareChecklistMutation.status, formData, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     setOpenedFileData({

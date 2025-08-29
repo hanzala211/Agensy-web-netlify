@@ -24,9 +24,12 @@ export const LongTermCareInsurancePolicy = () => {
   const [formData, setFormData] = useState<ChecklistFormData>(
     generateLongTermCareInsurancePolicyDefaultValues()
   );
+  const [initialFormData, setInitialFormData] = useState<ChecklistFormData>(
+    generateLongTermCareInsurancePolicyDefaultValues()
+  );
   const postLongTermCareInsurancePolicyMutation =
     usePostChecklistFormsMutation();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
 
   useEffect(() => {
     refetch();
@@ -37,19 +40,24 @@ export const LongTermCareInsurancePolicy = () => {
       longTermCareInsurancePolicy?.checklist_data &&
       typeof longTermCareInsurancePolicy.checklist_data === "object"
     ) {
-      setFormData((prev) => {
-        const mergedData = { ...prev };
-
-        Object.keys(longTermCareInsurancePolicy.checklist_data).forEach(
-          (key) => {
-            mergedData[key] = longTermCareInsurancePolicy.checklist_data[key];
-          }
-        );
-
-        return mergedData;
+      const mergedData = {
+        ...generateLongTermCareInsurancePolicyDefaultValues(),
+      };
+      Object.keys(longTermCareInsurancePolicy.checklist_data).forEach((key) => {
+        mergedData[key] = longTermCareInsurancePolicy.checklist_data[key];
       });
+
+      setFormData(mergedData);
+      setInitialFormData(mergedData);
     }
   }, [longTermCareInsurancePolicy]);
+
+  useEffect(() => {
+    const hasChanges = Object.keys(formData).some(
+      (key) => formData[key] !== initialFormData[key]
+    );
+    setHasUnsavedChanges(hasChanges);
+  }, [formData, initialFormData, setHasUnsavedChanges]);
 
   useEffect(() => {
     if (postLongTermCareInsurancePolicyMutation.status === "success") {
@@ -57,13 +65,25 @@ export const LongTermCareInsurancePolicy = () => {
         "Long Term Care Insurance Policy Checklist Successfully Saved",
         "The long term care insurance policy checklist information has been saved successfully."
       );
+      setInitialFormData(formData);
+      setHasUnsavedChanges(false);
     } else if (postLongTermCareInsurancePolicyMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postLongTermCareInsurancePolicyMutation.error)
       );
     }
-  }, [postLongTermCareInsurancePolicyMutation.status]);
+  }, [
+    postLongTermCareInsurancePolicyMutation.status,
+    formData,
+    setHasUnsavedChanges,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     setOpenedFileData({

@@ -21,7 +21,7 @@ const defaultValues: LabsTrackerFormData = {
 
 export const LabsTracker = () => {
   const params = useParams();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const {
     data: labsTrackerData,
     isFetching: isLoadingLabs,
@@ -32,13 +32,18 @@ export const LabsTracker = () => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     getValues,
   } = useForm<LabsTrackerFormData>({
     resolver: zodResolver(labsTrackerFormSchema),
     defaultValues,
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -54,10 +59,18 @@ export const LabsTracker = () => {
         "Your client's labs test tracker has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postLabsTracker.status === "error") {
       toast.error("Error Occurred", String(postLabsTracker.error));
     }
-  }, [postLabsTracker.status]);
+  }, [postLabsTracker.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapLabsToFormData = (labs: any[]) => {

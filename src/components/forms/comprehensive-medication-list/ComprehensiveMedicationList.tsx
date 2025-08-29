@@ -34,14 +34,14 @@ export const ComprehensiveMedicationList = () => {
   } = useGetComprehensiveMedicationList(params.clientId!);
   const postComprehensiveMedicationList = usePostComprehensiveMedicationList();
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const {
     register,
     handleSubmit,
     control,
     reset,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ComprehensiveMedicationListFormData>({
     resolver: zodResolver(comprehensiveMedicationListSchema),
     defaultValues: {
@@ -66,6 +66,11 @@ export const ComprehensiveMedicationList = () => {
     },
   });
 
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
+
   useEffect(() => {
     refetch();
   }, []);
@@ -77,13 +82,21 @@ export const ComprehensiveMedicationList = () => {
         "Your client's comprehensive medication and supplement list has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postComprehensiveMedicationList.status === "error") {
       toast.error(
         "Error Occurred",
         String(postComprehensiveMedicationList.error)
       );
     }
-  }, [postComprehensiveMedicationList.status]);
+  }, [postComprehensiveMedicationList.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   const {
     fields: allergiesFields,

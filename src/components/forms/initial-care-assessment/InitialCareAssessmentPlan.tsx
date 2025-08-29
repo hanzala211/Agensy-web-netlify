@@ -29,7 +29,7 @@ import { useClientContext } from "@agensy/context";
 export const InitialCareAssessmentPlan = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const {
     data: initialCareAssessment,
     isFetching: isLoadingData,
@@ -42,7 +42,7 @@ export const InitialCareAssessmentPlan = () => {
     watch,
     reset,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
     getValues,
   } = useForm<InitialCareAssessmentPlanFormData>({
     resolver: zodResolver(initialCareAssessmentPlanSchema),
@@ -84,6 +84,11 @@ export const InitialCareAssessmentPlan = () => {
       nextStepCarePartner: [],
     },
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   useEffect(() => {
     refetch();
@@ -128,13 +133,21 @@ export const InitialCareAssessmentPlan = () => {
         "Your client's initial care assessment plan has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postInitialCareAssessmentPlanMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postInitialCareAssessmentPlanMutation.error)
       );
     }
-  }, [postInitialCareAssessmentPlanMutation.status]);
+  }, [postInitialCareAssessmentPlanMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     if (initialCareAssessment) {

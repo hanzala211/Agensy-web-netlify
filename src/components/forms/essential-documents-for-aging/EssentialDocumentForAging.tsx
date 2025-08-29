@@ -167,7 +167,7 @@ const advanceCarePlanningDocuments: AdvanceCareDocument[] = [
 ];
 
 export const EssentialDocumentForAging = () => {
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const params = useParams();
   const {
     data: essentialDocuments,
@@ -177,11 +177,27 @@ export const EssentialDocumentForAging = () => {
   } = useGetEssentialDocumentsForAging(params.clientId!);
   const postEssentialDocumentsForAgingMutation =
     usePostEssentialDocumentsForAgingMutation();
-  const { control, handleSubmit, watch, setValue } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { isDirty },
+  } = useForm<FormData>({
     defaultValues: {
       documents: advanceCarePlanningDocuments,
     },
   });
+
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
+
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     if (getStatus === "success" && essentialDocuments?.essential_documents) {
@@ -230,6 +246,7 @@ export const EssentialDocumentForAging = () => {
   useEffect(() => {
     if (postEssentialDocumentsForAgingMutation.status === "success") {
       toast.success("Essential documents for aging updated successfully");
+      setHasUnsavedChanges(false);
     } else if (postEssentialDocumentsForAgingMutation.status === "error") {
       toast.error("Failed to update essential documents for aging");
     }

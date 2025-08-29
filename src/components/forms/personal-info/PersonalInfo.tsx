@@ -70,7 +70,7 @@ const defaultValues = {
 export const PersonalInfo = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const postPersonalInfoMutation = usePostPersonalInfoMutation();
   const {
     data: personalInfo,
@@ -81,13 +81,18 @@ export const PersonalInfo = () => {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     getValues,
     reset,
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoFormSchema),
     defaultValues,
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   const digitalAccountsArray = useFieldArray({
     control,
@@ -106,10 +111,18 @@ export const PersonalInfo = () => {
         "Your client's personal information has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
     } else if (postPersonalInfoMutation.status === "error") {
       toast.error("Error Occurred", String(postPersonalInfoMutation.error));
     }
-  }, [postPersonalInfoMutation.status]);
+  }, [postPersonalInfoMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   useEffect(() => {
     if (personalInfo) {

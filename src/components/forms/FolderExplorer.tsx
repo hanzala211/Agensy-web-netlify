@@ -52,6 +52,7 @@ import { VitalsTrackerPDF } from "./vitals-tracker/VitalsTrackerPDF";
 import { LabsTrackerPDF } from "./labs-tracker/LabsTrackerPDF";
 import { InPatientStayNotesPDF } from "./in-patient-stay-notes/InPatientStayNotesPDF";
 import { ComprehensiveMedicationListPDF } from "./comprehensive-medication-list/ComprehensiveMedicationListPDF";
+import { ConfirmationModal } from "@agensy/components";
 
 interface FolderExplorerProps {
   folders: FolderItem[];
@@ -86,9 +87,16 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   searchQuery,
   setSearchQuery,
 }) => {
-  const { setOpenedFileData, openedFileData, setOcrResult } =
-    useClientContext();
+  const {
+    setOpenedFileData,
+    openedFileData,
+    setOcrResult,
+    hasUnsavedChanges,
+    setHasUnsavedChanges,
+  } = useClientContext();
   const [isOCRModelOpen, setIsOCRModelOpen] = useState<boolean>(false);
+  const [isUnsavedChangesModalOpen, setIsUnsavedChangesModalOpen] =
+    useState<boolean>(false);
   const params = useParams();
 
   useEffect(() => {
@@ -125,11 +133,29 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
 
   const handleBackButtonClick = () => {
     if (isShowingFileContent) {
-      onFileClose?.();
-      setOpenedFileData(null);
+      if (hasUnsavedChanges) {
+        setIsUnsavedChangesModalOpen(true);
+      } else {
+        onFileClose?.();
+        setOpenedFileData(null);
+        setHasUnsavedChanges(false);
+      }
     } else {
       onBackClick?.();
     }
+  };
+
+  const handleConfirmNavigation = () => {
+    setIsUnsavedChangesModalOpen(false);
+    if (isShowingFileContent) {
+      onFileClose?.();
+      setOpenedFileData(null);
+      setHasUnsavedChanges(false);
+    }
+  };
+
+  const handleCancelNavigation = () => {
+    setIsUnsavedChangesModalOpen(false);
   };
 
   const pdfDocument = useMemo(() => {
@@ -721,6 +747,19 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           )}
         </div>
       )}
+
+      {/* Unsaved Changes Confirmation Modal */}
+      <ConfirmationModal
+        title="Unsaved Changes"
+        isModalOpen={isUnsavedChangesModalOpen}
+        onOk={handleConfirmNavigation}
+        onCancel={handleCancelNavigation}
+      >
+        <p>
+          You have unsaved changes. Are you sure you want to leave without
+          saving?
+        </p>
+      </ConfirmationModal>
     </div>
   );
 };

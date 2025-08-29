@@ -63,6 +63,8 @@ export interface ClientContextType {
   >;
   ocrResult: OCRField[];
   setOcrResult: React.Dispatch<React.SetStateAction<OCRField[]>>;
+  hasUnsavedChanges: boolean;
+  setHasUnsavedChanges: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface DocumentContextType {

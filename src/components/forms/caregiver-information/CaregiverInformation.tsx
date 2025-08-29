@@ -27,6 +27,7 @@ import {
 import { caregiverInformationFormSchema } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const CaregiverInformation = () => {
   const { clientId } = useParams();
@@ -35,7 +36,8 @@ export const CaregiverInformation = () => {
   );
   const postCaregiverInformationMutation =
     usePostCaregiverInformationMutation();
-  const { setOpenedFileData } = useClientContext();
+  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const queryClient = useQueryClient();
   const {
     data: careGiverInfo,
     isFetching: isLoadingChecklist,
@@ -49,7 +51,7 @@ export const CaregiverInformation = () => {
   const {
     register,
     handleSubmit: handleFormSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm<CaregiverInformationFormData>({
     resolver: zodResolver(caregiverInformationFormSchema),
@@ -73,6 +75,11 @@ export const CaregiverInformation = () => {
       documentation: "",
     },
   });
+
+  // Watch form changes to detect unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(isDirty);
+  }, [isDirty, setHasUnsavedChanges]);
 
   useEffect(() => {
     if (careGiverInfo) {
@@ -150,13 +157,22 @@ export const CaregiverInformation = () => {
         "Caregiver Information Successfully Updated",
         "Your client's caregiver information has been saved and is now up to date."
       );
+      queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+      setHasUnsavedChanges(false);
     } else if (postCaregiverInformationMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postCaregiverInformationMutation.error)
       );
     }
-  }, [postCaregiverInformationMutation.status]);
+  }, [postCaregiverInformationMutation.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   const onSubmit = (data: CaregiverInformationFormData) => {
     console.log(data);
