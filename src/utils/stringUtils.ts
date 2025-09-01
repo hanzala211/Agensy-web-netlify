@@ -95,24 +95,69 @@ export const mapExtractedDataToFormValues = (
       filledValues[key] = value;
     } else if (key === "diagnosis") {
       const existingDiagnoses = currentFormValues.diagnoses || [];
-      const newDiagnoses = !Array.isArray(value)
-        ? value.split(",").map((item: string) => ({
-            diagnosis: item,
-          }))
-        : value.map((item) => ({
-            diagnosis: item,
-          }));
+
+      const existingDiagnosisNames = existingDiagnoses
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((diagnosis: any) => diagnosis.diagnosis?.toLowerCase().trim())
+        .filter(Boolean);
+
+      const addedDiagnosisNames = new Set<string>();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newDiagnoses: any[] = [];
+
+      const diagnosesToProcess = !Array.isArray(value)
+        ? value.split(",").map((item: string) => item.trim())
+        : value.map((item) => item.trim());
+
+      diagnosesToProcess.forEach((item: string) => {
+        const diagnosisName = item.trim();
+        const diagnosisNameLower = diagnosisName.toLowerCase();
+
+        if (
+          diagnosisName &&
+          (existingDiagnosisNames.includes(diagnosisNameLower) ||
+            addedDiagnosisNames.has(diagnosisNameLower))
+        ) {
+          return;
+        }
+
+        addedDiagnosisNames.add(diagnosisNameLower);
+        newDiagnoses.push({ diagnosis: diagnosisName });
+      });
 
       filledValues["diagnoses"] = [...existingDiagnoses, ...newDiagnoses];
     } else if (key === "allergies") {
       const existingAllergies = currentFormValues.allergies || [];
-      const newAllergies = !Array.isArray(value)
-        ? value.split(",").map((item: string) => ({
-            allergen: item,
-          }))
-        : value.map((item) => ({
-            allergen: item,
-          }));
+
+      const existingAllergyNames = existingAllergies
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((allergy: any) => allergy.allergen?.toLowerCase().trim())
+        .filter(Boolean);
+
+      const addedAllergyNames = new Set<string>();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newAllergies: any[] = [];
+
+      const allergiesToProcess = !Array.isArray(value)
+        ? value.split(",").map((item: string) => item.trim())
+        : value.map((item) => item.trim());
+
+      allergiesToProcess.forEach((item: string) => {
+        const allergyName = item.trim();
+        const allergyNameLower = allergyName.toLowerCase();
+
+        if (
+          allergyName &&
+          (existingAllergyNames.includes(allergyNameLower) ||
+            addedAllergyNames.has(allergyNameLower))
+        ) {
+          return;
+        }
+
+        // Add to tracking set
+        addedAllergyNames.add(allergyNameLower);
+        newAllergies.push({ allergen: allergyName });
+      });
 
       filledValues["allergies"] = [...existingAllergies, ...newAllergies];
     } else if (
@@ -129,9 +174,37 @@ export const mapExtractedDataToFormValues = (
       const medicationsStarted: ClientMedications[] = [];
       const medicationsEnded: ClientMedications[] = [];
 
+      const existingMedicationNames = [
+        ...existingMedicationsStarted,
+        ...existingMedicationsEnded,
+      ]
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((medication: any) =>
+          (medication.medicationName || medication.medication_name)
+            ?.toLowerCase()
+            .trim()
+        )
+        .filter(Boolean);
+      const addedMedicationNames = new Set<string>();
+
       value.forEach((item: ClientMedications) => {
+        const medicationName = item.medication_name
+          ? item.medication_name.trim()
+          : "";
+        const medicationNameLower = medicationName.toLowerCase();
+
+        if (
+          medicationName &&
+          (existingMedicationNames.includes(medicationNameLower) ||
+            addedMedicationNames.has(medicationNameLower))
+        ) {
+          return;
+        }
+
+        addedMedicationNames.add(medicationNameLower);
+
         const medicationData = {
-          medicationName: item.medication_name ? item.medication_name : "",
+          medicationName: medicationName,
           dosage: item.dosage ? item.dosage : "",
           prescribingDoctor: item.prescribing_doctor
             ? item.prescribing_doctor
@@ -164,9 +237,35 @@ export const mapExtractedDataToFormValues = (
       const existingMedications = currentFormValues.medications || [];
       const newMedications: ClientMedications[] = [];
 
+      const existingMedicationNames = existingMedications
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((medication: any) =>
+          (medication.medicationName || medication.medication_name)
+            ?.toLowerCase()
+            .trim()
+        )
+        .filter(Boolean);
+
+      const addedMedicationNames = new Set<string>();
+
       value.forEach((item: ClientMedications) => {
+        const medicationName = item.medication_name
+          ? item.medication_name.trim()
+          : "";
+        const medicationNameLower = medicationName.toLowerCase();
+
+        if (
+          medicationName &&
+          (existingMedicationNames.includes(medicationNameLower) ||
+            addedMedicationNames.has(medicationNameLower))
+        ) {
+          return;
+        }
+
+        addedMedicationNames.add(medicationNameLower);
+
         const newMedication = {
-          medicationName: item.medication_name ? item.medication_name : "",
+          medicationName: medicationName,
           dosage: item.dosage ? item.dosage : "",
           prescribingDoctor: item.prescribing_doctor
             ? item.prescribing_doctor
@@ -191,9 +290,32 @@ export const mapExtractedDataToFormValues = (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const newProviders: any[] = [];
 
+      const existingProviderNames = existingProviders
+        .map((provider: { providerName?: string }) =>
+          provider.providerName?.toLowerCase().trim()
+        )
+        .filter(Boolean);
+
+      const addedProviderNames = new Set<string>();
+
       value.forEach((item: HealthcareProvider) => {
+        const providerName = item.provider_name
+          ? item.provider_name.trim()
+          : "";
+        const providerNameLower = providerName.toLowerCase();
+
+        if (
+          providerName &&
+          (existingProviderNames.includes(providerNameLower) ||
+            addedProviderNames.has(providerNameLower))
+        ) {
+          return;
+        }
+
+        addedProviderNames.add(providerNameLower);
+
         const newProvider = {
-          providerName: item.provider_name ? item.provider_name : "",
+          providerName: providerName,
           providerType: item.provider_type ? item.provider_type : "",
           address: item.address ? item.address : "",
           phone: item.phone ? item.phone : "",
