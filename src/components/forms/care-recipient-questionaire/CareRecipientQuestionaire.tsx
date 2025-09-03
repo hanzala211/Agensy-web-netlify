@@ -344,15 +344,16 @@ export const CareRecipientQuestionaire = () => {
           careRecipientQuestionnaire.questionnaire?.retirement_adjustment || "",
 
         // Insurance Information
-        medicareA: careRecipientQuestionnaire.insurance?.medicare_a || "",
+        medicareA: careRecipientQuestionnaire.short_form?.medicare || "",
         medicareB: careRecipientQuestionnaire.insurance?.medicare_b || "",
         medicareNumbers:
           careRecipientQuestionnaire.insurance?.medicare_numbers || "",
         medicareSupplementPlan:
           careRecipientQuestionnaire.insurance?.supplement_plan || "",
-        insuranceProvider: careRecipientQuestionnaire.insurance?.provider || "",
+        insuranceProvider:
+          careRecipientQuestionnaire.short_form?.insurance || "",
         insurancePolicyNumber:
-          careRecipientQuestionnaire.insurance?.policy_number || "",
+          careRecipientQuestionnaire.short_form?.id_number || "",
         insurancePhone: careRecipientQuestionnaire.insurance?.phone || "",
         mentalHealthCoverage:
           careRecipientQuestionnaire.insurance?.mental_health_coverage !== null
@@ -1020,16 +1021,18 @@ export const CareRecipientQuestionaire = () => {
           ? data.financialProblemsDescription
           : null,
       },
+      short_form: {
+        medicare: data.medicareA ? data.medicareA : null,
+        insurance: data.insuranceProvider ? data.insuranceProvider : null,
+        id_number: data.insurancePolicyNumber
+          ? data.insurancePolicyNumber
+          : null,
+      },
       insurance: {
-        medicare_a: data.medicareA ? data.medicareA : null,
         medicare_b: data.medicareB ? data.medicareB : null,
         medicare_numbers: data.medicareNumbers ? data.medicareNumbers : null,
         supplement_plan: data.medicareSupplementPlan
           ? data.medicareSupplementPlan
-          : null,
-        provider: data.insuranceProvider ? data.insuranceProvider : null,
-        policy_number: data.insurancePolicyNumber
-          ? data.insurancePolicyNumber
           : null,
         phone: data.insurancePhone ? data.insurancePhone : null,
         mental_health_coverage: data.mentalHealthCoverage

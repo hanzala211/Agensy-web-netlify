@@ -10,7 +10,7 @@ export const FileContentDisplay: React.FC<FileContentDisplayProps> = ({
   fileContent,
 }) => {
   return (
-    <div className="md:p-6 p-3 space-y-6">
+    <div className="md:p-6 p-2 space-y-6">
       <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
         <ICONS.fileAlt size={32} className="text-gray-600" />
         <div>
