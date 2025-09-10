@@ -2,7 +2,7 @@ import React from "react";
 import { H1, PrimaryButton } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import { COLORS, ROUTES } from "@agensy/constants";
-import { useNavigate } from "react-router-dom";
+import { type To, useLocation, useNavigate } from "react-router-dom";
 interface PageHeaderProps {
   title: string;
   buttonText?: string;
@@ -23,6 +23,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   className = "mb-6",
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div
@@ -31,7 +32,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       <H1 className="text-xl md:my-4 sm:text-2xl md:text-3xl flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         {showBackButton && (
           <button
-            onClick={() => navigate(`/${ROUTES.clients}`)}
+            onClick={() =>
+              navigate(
+                location.pathname.includes("/client")
+                  ? `/${ROUTES.clients}`
+                  : (-1 as To)
+              )
+            }
             title="Back"
             className="bg-basicBlue h-[25px] w-[25px] sm:h-[30px] sm:w-[30px] flex-shrink-0 flex items-center justify-center text-[12px] sm:text-[15px] rounded-full"
           >

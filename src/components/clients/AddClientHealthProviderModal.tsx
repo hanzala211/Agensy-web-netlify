@@ -15,7 +15,7 @@ import {
   Select,
   TextArea,
 } from "@agensy/components";
-import { SPECIALTIES } from "@agensy/constants";
+import { PROVIDER_TYPES, SPECIALTIES } from "@agensy/constants";
 import { DateUtils } from "@agensy/utils";
 
 interface AddClientHealthProviderModalProps {
@@ -128,10 +128,12 @@ export const AddClientHealthProviderModal: React.FC<
       }
     >
       <form onSubmit={handleSubmit(onSubmit)} className="pb-4 space-y-4">
-        <Input
+        <Select
           label="Provider Type"
-          register={register("provider_type")}
-          error={errors.provider_type?.message}
+          control={control}
+          data={PROVIDER_TYPES}
+          name="provider_type"
+          labelOption="Select Provider Type"
         />
 
         <Input

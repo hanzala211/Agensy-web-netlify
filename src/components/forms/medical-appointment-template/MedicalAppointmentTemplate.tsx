@@ -31,6 +31,7 @@ import {
 import {
   ICONS,
   MEDICATION_FREQUENCY_OPTIONS,
+  PROVIDER_TYPES,
   SPECIALTIES,
 } from "@agensy/constants";
 import { DateUtils, toast } from "@agensy/utils";
@@ -286,9 +287,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         referrals:
           medicalAppointmentTemplate?.medical_template?.referrals || "",
         follow_up: medicalAppointmentTemplate?.medical_template?.follow_up
-          ? DateUtils.formatDateToRequiredFormat(
-              medicalAppointmentTemplate?.medical_template.follow_up
-            )
+          ? medicalAppointmentTemplate?.medical_template.follow_up
           : "",
         report_given_to:
           medicalAppointmentTemplate?.medical_template?.report_given_to || "",
@@ -454,9 +453,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         visit_notes: data.visit_notes ? data.visit_notes : null,
         recommendations: data.recommendations ? data.recommendations : null,
         referrals: data.referrals ? data.referrals : null,
-        follow_up: data.follow_up
-          ? DateUtils.changetoISO(data.follow_up)
-          : null,
+        follow_up: data.follow_up ? data.follow_up : null,
         report_given_to: data.report_given_to ? data.report_given_to : null,
       },
       healthcare_provider: provider ? provider : null,
@@ -584,10 +581,12 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                     error={errors.healthcareProvider?.providerName?.message}
                   />
 
-                  <Input
+                  <Select
                     label="Provider Type"
-                    register={register("healthcareProvider.providerType")}
-                    error={errors.healthcareProvider?.providerType?.message}
+                    control={control}
+                    name="healthcareProvider.providerType"
+                    data={PROVIDER_TYPES}
+                    labelOption="Select Provider Type"
                   />
 
                   <Select
@@ -750,10 +749,11 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               </div>
 
               <div>
-                <DatePickerField
-                  label="Follow-up"
-                  name="follow_up"
-                  control={control}
+                <TextArea
+                  label="Follow up Notes"
+                  register={register("follow_up")}
+                  error={errors.follow_up?.message}
+                  rows={3}
                 />
               </div>
 

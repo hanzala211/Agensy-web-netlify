@@ -383,3 +383,13 @@ export const SORT_OPTIONS = [
   { label: "Newest first", value: "DESC" },
   { label: "Oldest first", value: "ASC" },
 ];
+
+export const PROVIDER_TYPES = [
+  { label: "Primary Care", value: "Primary Care" },
+  { label: "Specialist", value: "Specialist" },
+  { label: "Urgent Care", value: "Urgent Care" },
+  { label: "Hospital", value: "Hospital" },
+  { label: "Home Health", value: "Home Health" },
+  { label: "Therapist", value: "Therapist" },
+  { label: "Other", value: "Other" },
+];

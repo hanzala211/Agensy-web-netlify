@@ -12,7 +12,7 @@ import {
   PhoneNumberInput,
 } from "@agensy/components";
 import { type ComprehensiveCarePlanFormData } from "@agensy/types";
-import { ICONS, SPECIALTIES } from "@agensy/constants";
+import { ICONS, PROVIDER_TYPES, SPECIALTIES } from "@agensy/constants";
 
 interface HealthcareProvidersCardProps {
   register: UseFormRegister<ComprehensiveCarePlanFormData>;
@@ -62,10 +62,7 @@ export const HealthcareProvidersCard = ({
     >
       <div className="space-y-6">
         {healthcareProvidersFields.map((field, index) => (
-          <div
-            key={field.id}
-            className="p-4 rounded-lg border border-gray-200"
-          >
+          <div key={field.id} className="p-4 rounded-lg border border-gray-200">
             <div className="flex items-center mb-4">
               <span className="text-sm font-medium text-gray-700 mr-2">
                 Provider {index + 1}:
@@ -74,21 +71,17 @@ export const HealthcareProvidersCard = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <Input
                 label="Provider Name"
-                register={register(
-                  `healthcareProviders.${index}.providerName`
-                )}
+                register={register(`healthcareProviders.${index}.providerName`)}
                 error={
                   errors.healthcareProviders?.[index]?.providerName?.message
                 }
               />
-              <Input
+              <Select
                 label="Provider Type"
-                register={register(
-                  `healthcareProviders.${index}.providerType`
-                )}
-                error={
-                  errors.healthcareProviders?.[index]?.providerType?.message
-                }
+                control={control}
+                name={`healthcareProviders.${index}.providerType`}
+                data={PROVIDER_TYPES}
+                labelOption="Select Provider Type"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -128,4 +121,4 @@ export const HealthcareProvidersCard = ({
       </div>
     </Card>
   );
-}; 
+};
