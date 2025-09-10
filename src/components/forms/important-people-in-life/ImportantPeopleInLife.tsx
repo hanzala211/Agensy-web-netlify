@@ -3,6 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Card,
   CommonLoader,
+  DatePickerField,
+  Input,
   PrimaryButton,
   TextArea,
 } from "@agensy/components";
@@ -18,12 +20,15 @@ import {
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { toast } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useClientContext } from "@agensy/context";
 import { ICONS } from "@agensy/constants";
 
 const defaultValues: ImportantPeopleInLifeFormData = {
+  firstName: "",
+  lastName: "",
+  dateOfBirth: "",
   importantPeople: [],
   notesAndReminders: "",
 };
@@ -91,6 +96,13 @@ export const ImportantPeopleInLife = () => {
   useEffect(() => {
     if (importantPeopleInLifeData) {
       const formData = {
+        firstName: importantPeopleInLifeData.client_info.first_name,
+        lastName: importantPeopleInLifeData.client_info.last_name,
+        dateOfBirth: importantPeopleInLifeData.client_info.date_of_birth
+          ? DateUtils.formatDateToRequiredFormat(
+              importantPeopleInLifeData.client_info.date_of_birth
+            )
+          : "",
         importantPeople: [
           ...(importantPeopleInLifeData.important_people.mpoa_name
             ? [
@@ -294,6 +306,11 @@ export const ImportantPeopleInLife = () => {
 
   const onSubmit = (data: ImportantPeopleInLifeFormData) => {
     const postData: {
+      client_info: {
+        first_name: string | null;
+        last_name: string | null;
+        date_of_birth: string | null;
+      };
       emergency_contact: {
         first_name: string | null;
         last_name: string | null;
@@ -336,6 +353,13 @@ export const ImportantPeopleInLife = () => {
         additional_notes: string | null;
       };
     } = {
+      client_info: {
+        first_name: data.firstName ? data.firstName : null,
+        last_name: data.lastName ? data.lastName : null,
+        date_of_birth: data.dateOfBirth
+          ? DateUtils.changetoISO(data.dateOfBirth)
+          : null,
+      },
       emergency_contact: {
         first_name: null,
         last_name: null,
@@ -486,6 +510,27 @@ export const ImportantPeopleInLife = () => {
   return (
     <div className="bg-gray-50">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <Card title="Personal Identification">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <Input
+              label="First Name:"
+              register={register("firstName")}
+              error={errors.firstName?.message as string}
+            />
+            <Input
+              label="Last Name:"
+              register={register("lastName")}
+              error={errors.lastName?.message as string}
+            />
+            <div className="md:col-span-2">
+              <DatePickerField
+                control={control}
+                name={"dateOfBirth"}
+                label="Date of Birth:"
+              />
+            </div>
+          </div>
+        </Card>
         <Card
           title="Important People in Life"
           className="mb-6"

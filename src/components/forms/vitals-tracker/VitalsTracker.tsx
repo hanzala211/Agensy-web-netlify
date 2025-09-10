@@ -1,7 +1,8 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CommonLoader, PrimaryButton } from "@agensy/components";
+import { Card, CommonLoader, Input, PrimaryButton } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
+import { DatePickerField } from "@agensy/components";
 import {
   vitalsTrackerFormSchema,
   type OpenedFileData,
@@ -17,6 +18,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useClientContext } from "@agensy/context";
 
 const defaultValues: VitalsTrackerFormData = {
+  firstName: "",
+  lastName: "",
+  dateOfBirth: "",
   vitals: [],
 };
 
@@ -53,9 +57,18 @@ export const VitalsTracker = () => {
     name: "vitals",
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapVitalsToFormData = (vitals: any[]): VitalsTrackerFormData => {
+  const mapVitalsToFormData = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vitals: any[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    client_info: any
+  ): VitalsTrackerFormData => {
     const formData: VitalsTrackerFormData = {
+      firstName: client_info.first_name ? client_info.first_name : "",
+      lastName: client_info.last_name ? client_info.last_name : "",
+      dateOfBirth: client_info.date_of_birth
+        ? DateUtils.formatDateToRequiredFormat(client_info.date_of_birth)
+        : "",
       vitals: vitals.map((item) => ({
         date: item?.date ? DateUtils.formatDateToRequiredFormat(item.date) : "",
         heartRate: item?.heart_rate || "",
@@ -73,7 +86,10 @@ export const VitalsTracker = () => {
     return formData;
   };
 
-  const mapFormDataToVitals = (formData: VitalsTrackerFormData): Vital[] => {
+  const mapFormDataToVitals = (
+    formData: VitalsTrackerFormData
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): { client_info: Record<string, any>; vitals: Vital[] } => {
     const vitals: Vital[] = [];
 
     formData.vitals?.forEach((vital) => {
@@ -108,7 +124,16 @@ export const VitalsTracker = () => {
       }
     });
 
-    return vitals;
+    return {
+      vitals,
+      client_info: {
+        first_name: formData.firstName ? formData.firstName : null,
+        last_name: formData.lastName ? formData.lastName : null,
+        date_of_birth: formData.dateOfBirth
+          ? DateUtils.changetoISO(formData.dateOfBirth)
+          : null,
+      },
+    };
   };
 
   const handleAddRow = () => {
@@ -154,7 +179,10 @@ export const VitalsTracker = () => {
 
   useEffect(() => {
     if (vitalsTrackerData) {
-      const formData = mapVitalsToFormData(vitalsTrackerData.vitals_tracker);
+      const formData = mapVitalsToFormData(
+        vitalsTrackerData.vitals_tracker,
+        vitalsTrackerData.client_info
+      );
       reset(formData);
       setOpenedFileData({
         ...getValues(),
@@ -174,9 +202,7 @@ export const VitalsTracker = () => {
     console.log(postData);
     postVitalsTrackerMutation.mutate({
       clientId: params.clientId!,
-      data: {
-        vitals: postData,
-      },
+      data: postData,
     });
   };
 
@@ -241,6 +267,27 @@ export const VitalsTracker = () => {
   return (
     <div className="bg-gray-50 w-full">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <Card title="Personal Information">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <Input
+              label="First Name:"
+              register={register("firstName")}
+              error={errors.firstName?.message as string}
+            />
+            <Input
+              label="Last Name:"
+              register={register("lastName")}
+              error={errors.lastName?.message as string}
+            />
+            <div className="md:col-span-2">
+              <DatePickerField
+                control={control}
+                name={"dateOfBirth"}
+                label="Date of Birth:"
+              />
+            </div>
+          </div>
+        </Card>
         <Card
           title="Vitals Tracker"
           buttonText={<ICONS.plus size={16} />}

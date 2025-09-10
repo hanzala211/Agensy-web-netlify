@@ -89,6 +89,10 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: BORDER_LITE,
   },
+  sectionContent: {
+    padding: 4,
+    fontSize: 8.5,
+  },
 });
 
 const columns = [
@@ -106,7 +110,7 @@ const getValue = (
   key: string
 ) => {
   if (!data?.labs || !data.labs[idx]) return "";
-  
+
   const lab = data.labs[idx];
   switch (key) {
     case "date":
@@ -129,19 +133,25 @@ const getValue = (
 // Helper function to check if a row has any data
 const hasRowData = (data: LabsTrackerFormData | undefined, idx: number) => {
   if (!data?.labs || !data.labs[idx]) return false;
-  
+
   const lab = data.labs[idx];
-  return lab.date || lab.doctorName || lab.type || lab.providerCompanyUsed || lab.purpose || lab.results;
+  return (
+    lab.date ||
+    lab.doctorName ||
+    lab.type ||
+    lab.providerCompanyUsed ||
+    lab.purpose ||
+    lab.results
+  );
 };
 
 export const LabsTrackerPDF: React.FC<{
   data?: LabsTrackerFormData & { last_update?: { updatedAt?: string } };
 }> = ({ data }) => {
   // Filter rows that have data
-  const rowsWithData = data?.labs ? 
-    data.labs
-      .map((_, index) => index)
-      .filter((idx) => hasRowData(data, idx)) : [];
+  const rowsWithData = data?.labs
+    ? data.labs.map((_, index) => index).filter((idx) => hasRowData(data, idx))
+    : [];
 
   return (
     <Document title="Agensy Labs Tracker">
@@ -163,6 +173,16 @@ export const LabsTrackerPDF: React.FC<{
               </Text>
             )}
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Text style={styles.sectionContent}>
+            {`${data?.firstName} ${data?.lastName}`}
+          </Text>
+          <Text style={styles.sectionContent}>
+            {`Date of Birth: ${data?.dateOfBirth}`}
+          </Text>
         </View>
 
         {/* Only show the section if there are rows with data */}

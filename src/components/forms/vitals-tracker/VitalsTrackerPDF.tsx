@@ -89,6 +89,10 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: BORDER_LITE,
   },
+  sectionContent: {
+    padding: 4,
+    fontSize: 8.5,
+  },
 });
 
 const columns = [
@@ -151,6 +155,16 @@ export const VitalsTrackerPDF: React.FC<{
               </Text>
             )}
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Text style={styles.sectionContent}>
+            {`${data?.firstName} ${data?.lastName}`}
+          </Text>
+          <Text
+            style={styles.sectionContent}
+          >{`Date of Birth: ${data?.dateOfBirth}`}</Text>
         </View>
 
         <View style={styles.section}>

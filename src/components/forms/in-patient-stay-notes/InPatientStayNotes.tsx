@@ -6,7 +6,13 @@ import {
   type OpenedFileData,
 } from "@agensy/types";
 import { InPatientStayNotesCol } from "./InPatientStayNotesCol";
-import { CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  Card,
+  CommonLoader,
+  DatePickerField,
+  Input,
+  PrimaryButton,
+} from "@agensy/components";
 import { useParams } from "react-router-dom";
 import {
   useGetInPatientStayNotes,
@@ -37,6 +43,9 @@ export const InPatientStayNotes = () => {
   } = useForm<InPatientStayNotesFormData>({
     resolver: zodResolver(inPatientStayNotesFormSchema),
     defaultValues: {
+      firstName: "",
+      lastName: "",
+      dateOfBirth: "",
       questionsForProvider1: [{ question: "" }],
       updatesFromProvider1: [{ update: "" }],
       recommendationsNextSteps1: [{ recommendation: "" }],
@@ -108,6 +117,13 @@ export const InPatientStayNotes = () => {
   useEffect(() => {
     if (inPatientData && inPatientData?.in_patient_stay_notes) {
       const formData = {
+        firstName: inPatientData.client_info?.first_name || "",
+        lastName: inPatientData.client_info?.last_name || "",
+        dateOfBirth: inPatientData.client_info?.date_of_birth
+          ? DateUtils.formatDateToRequiredFormat(
+              inPatientData.client_info?.date_of_birth
+            )
+          : "",
         date1: inPatientData.in_patient_stay_notes?.[0]?.date
           ? DateUtils.formatDateToRequiredFormat(
               inPatientData.in_patient_stay_notes?.[0]?.date
@@ -296,6 +312,13 @@ export const InPatientStayNotes = () => {
 
     const postData = {
       in_patient_stay_notes: [firstItem, secondItem],
+      client_info: {
+        first_name: data.firstName ? data.firstName : null,
+        last_name: data.lastName ? data.lastName : null,
+        date_of_birth: data.dateOfBirth
+          ? DateUtils.changetoISO(data.dateOfBirth)
+          : null,
+      },
     };
     postInPatientStayNotesMutation.mutate({
       clientId: params.clientId!,
@@ -312,6 +335,27 @@ export const InPatientStayNotes = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <Card title="Personal Information">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <Input
+            label="First Name:"
+            register={register("firstName")}
+            error={errors.firstName?.message as string}
+          />
+          <Input
+            label="Last Name:"
+            register={register("lastName")}
+            error={errors.lastName?.message as string}
+          />
+          <div className="md:col-span-2">
+            <DatePickerField
+              control={control}
+              name={"dateOfBirth"}
+              label="Date of Birth:"
+            />
+          </div>
+        </div>
+      </Card>
       <InPatientStayNotesCol
         register={register}
         control={control}

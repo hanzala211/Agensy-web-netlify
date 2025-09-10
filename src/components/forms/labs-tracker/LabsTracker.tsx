@@ -1,6 +1,12 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  Card,
+  CommonLoader,
+  Input,
+  DatePickerField,
+  PrimaryButton,
+} from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import {
   labsTrackerFormSchema,
@@ -16,6 +22,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useClientContext } from "@agensy/context";
 
 const defaultValues: LabsTrackerFormData = {
+  firstName: "",
+  lastName: "",
+  dateOfBirth: "",
   labs: [],
 };
 
@@ -73,9 +82,16 @@ export const LabsTracker = () => {
   }, [setHasUnsavedChanges]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapLabsToFormData = (labs: any[]) => {
+  const mapLabsToFormData = (labs: any[], client_info: any) => {
     if (!labs || labs.length === 0) {
-      return { labs: [] };
+      return {
+        labs: [],
+        firstName: client_info.first_name,
+        lastName: client_info.last_name,
+        dateOfBirth: client_info.date_of_birth
+          ? DateUtils.formatDateToRequiredFormat(client_info.date_of_birth)
+          : "",
+      };
     }
 
     const mappedLabs = labs.map((item) => ({
@@ -88,7 +104,14 @@ export const LabsTracker = () => {
       id: item?.id ?? "",
     }));
 
-    return { labs: mappedLabs };
+    return {
+      labs: mappedLabs,
+      firstName: client_info.first_name,
+      lastName: client_info.last_name,
+      dateOfBirth: client_info.date_of_birth
+        ? DateUtils.formatDateToRequiredFormat(client_info.date_of_birth)
+        : "",
+    };
   };
 
   const mapFormDataToVitals = (formData: LabsTrackerFormData) => {
@@ -145,7 +168,8 @@ export const LabsTracker = () => {
   useEffect(() => {
     if (labsTrackerData) {
       const formData = mapLabsToFormData(
-        labsTrackerData?.labs_tests_imaging_tracker
+        labsTrackerData?.labs_tests_imaging_tracker,
+        labsTrackerData?.client_info
       );
       reset(formData);
 
@@ -164,7 +188,16 @@ export const LabsTracker = () => {
 
   const onSubmit = (data: LabsTrackerFormData) => {
     postLabsTracker.mutate({
-      data: { labs_tests_imaging_trackers: mapFormDataToVitals(data) },
+      data: {
+        labs_tests_imaging_trackers: mapFormDataToVitals(data),
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+        },
+      },
       clientId: params.clientId!,
     });
   };
@@ -179,6 +212,27 @@ export const LabsTracker = () => {
   return (
     <div className="bg-gray-50 w-full">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <Card title="Personal Information">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <Input
+              label="First Name:"
+              register={register("firstName")}
+              error={errors.firstName?.message as string}
+            />
+            <Input
+              label="Last Name:"
+              register={register("lastName")}
+              error={errors.lastName?.message as string}
+            />
+            <div className="md:col-span-2">
+              <DatePickerField
+                control={control}
+                name={"dateOfBirth"}
+                label="Date of Birth:"
+              />
+            </div>
+          </div>
+        </Card>
         <Card
           title="Labs Tracker"
           className="mb-6"

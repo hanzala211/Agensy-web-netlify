@@ -2652,6 +2652,9 @@ export const importantPersonSchema = z.object({
 export type ImportantPersonData = z.infer<typeof importantPersonSchema>;
 
 export const importantPeopleInLifeFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().optional(),
   importantPeople: z.array(importantPersonSchema).optional(),
   notesAndReminders: z.string().optional(),
 });
@@ -2661,6 +2664,9 @@ export type ImportantPeopleInLifeFormData = z.infer<
 >;
 
 export const vitalsTrackerFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().optional(),
   vitals: z
     .array(
       z.object({
@@ -2682,6 +2688,9 @@ export const vitalsTrackerFormSchema = z.object({
 export type VitalsTrackerFormData = z.infer<typeof vitalsTrackerFormSchema>;
 
 export const labsTrackerFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().optional(),
   labs: z
     .array(
       z.object({
@@ -2700,6 +2709,9 @@ export const labsTrackerFormSchema = z.object({
 export type LabsTrackerFormData = z.infer<typeof labsTrackerFormSchema>;
 
 export const inPatientStayNotesFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().optional(),
   date1: z.string().optional(),
   facilityName1: z.string().optional(),
   medicalProvider1: z.string().optional(),

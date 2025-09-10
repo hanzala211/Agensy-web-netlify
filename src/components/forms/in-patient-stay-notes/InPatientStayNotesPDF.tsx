@@ -94,6 +94,10 @@ const styles = StyleSheet.create({
     fontSize: 9,
     marginBottom: 2,
   },
+  sectionContent: {
+    padding: 4,
+    fontSize: 8.5,
+  },
 });
 
 const Field = ({
@@ -207,6 +211,16 @@ export const InPatientStayNotesPDF: React.FC<{
               </Text>
             )}
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Text style={styles.sectionContent}>
+            {`${data?.firstName} ${data?.lastName}`}
+          </Text>
+          <Text
+            style={styles.sectionContent}
+          >{`Date of Birth: ${data?.dateOfBirth}`}</Text>
         </View>
 
         {/* Entry 1 Section - only show if it has data */}

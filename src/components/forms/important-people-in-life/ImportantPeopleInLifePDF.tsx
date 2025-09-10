@@ -176,6 +176,15 @@ export const ImportantPeopleInLifePDF: React.FC<{
           </View>
         </View>
 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Field label="First Name">{data?.firstName}</Field>
+          <Field label="Last Name">{data?.lastName}</Field>
+          {data?.dateOfBirth && (
+            <Field label="Date of Birth">{data.dateOfBirth}</Field>
+          )}
+        </View>
+
         {/* Render grouped sections */}
         {Object.entries(groupedPeople).map(([type, people]) => (
           <View key={type} style={styles.section}>
