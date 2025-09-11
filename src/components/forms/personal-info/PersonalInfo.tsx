@@ -389,6 +389,8 @@ export const PersonalInfo = () => {
     });
   };
 
+  /// Restrict access to Personal Info & Password Organizer (financial/credential form).
+
   if (isLoadingPersonalInfo)
     return (
       <div className="flex justify-center items-center h-screen">

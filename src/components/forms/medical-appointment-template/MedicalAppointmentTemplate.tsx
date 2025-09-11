@@ -78,6 +78,16 @@ export const MedicalAppointmentTemplate: React.FC = () => {
   const [isMedicationModalOpen, setIsMedicationModalOpen] = useState(false);
   const [isDiagnosisModalOpen, setIsDiagnosisModalOpen] = useState(false);
   const [isAllergyModalOpen, setIsAllergyModalOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [originalProviderData, setOriginalProviderData] = useState<any>(null);
+  const [isProviderFromExisting, setIsProviderFromExisting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [originalMedicationsData, setOriginalMedicationsData] = useState<any[]>(
+    []
+  );
+  const [isMedicationFromExisting, setIsMedicationFromExisting] = useState<
+    boolean[]
+  >([]);
 
   const clientData = queryClient.getQueryData(["client", clientId]) as Client;
 
@@ -294,6 +304,22 @@ export const MedicalAppointmentTemplate: React.FC = () => {
       };
 
       reset(formattedData);
+
+      if (medicalAppointmentTemplate?.healthcare_provider_template) {
+        setIsProviderFromExisting(false);
+      }
+
+      // Set medication tracking for template data
+      if (medicalAppointmentTemplate?.client_medications_template) {
+        const medicationFlags =
+          medicalAppointmentTemplate.client_medications_template.map(
+            () => false
+          );
+        setIsMedicationFromExisting(medicationFlags);
+        setOriginalMedicationsData(
+          medicalAppointmentTemplate.client_medications_template
+        );
+      }
     }
   }, [medicalAppointmentTemplate]);
 
@@ -334,19 +360,48 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         return medication;
       });
 
-    medications?.forEach((item) => {
-      if (item.client_medication_id) {
-        // @ts-expect-error // fix this
+    medications?.forEach((item, index) => {
+      const isFromExisting = isMedicationFromExisting[index];
+      const originalData = originalMedicationsData[index];
+
+      const hasMedicationChanged = originalData
+        ? (item.medication_name || "") !==
+            (originalData.medication_name || "") ||
+          (item.dosage || "") !== (originalData.dosage || "") ||
+          (item.frequency || "") !== (originalData.frequency || "") ||
+          (item.notes || "") !== (originalData.notes || "") ||
+          (item.prescribing_doctor || "") !==
+            (originalData.prescribing_doctor || "") ||
+          (item.start_date || "") !== (originalData.start_date || "") ||
+          (item.end_date || "") !== (originalData.end_date || "")
+        : false;
+
+      if (isFromExisting && hasMedicationChanged) {
+        if (item.id) {
+          item.client_medication_id = item.id;
+        }
+        // @ts-expect-error - TODO: fix this
         delete item.id;
-      } else {
-        // @ts-expect-error // fix this
+      } else if (isFromExisting && !hasMedicationChanged) {
+        // @ts-expect-error - TODO: fix this
         delete item.client_medication_id;
-      }
-      if (!item.id && !item.client_medication_id) {
-        // @ts-expect-error // fix this
-        delete item.id;
-        // @ts-expect-error // fix this
-        delete item.client_medication_id;
+      } else if (!isFromExisting) {
+        if (item.client_medication_id) {
+          // @ts-expect-error - TODO: fix this
+          delete item.id;
+        } else if (item.id) {
+          // @ts-expect-error - TODO: fix this
+          delete item.client_medication_id;
+        } else {
+          // @ts-expect-error - TODO: fix this
+          delete item.client_medication_id;
+          // @ts-expect-error // fix this
+          delete item.id;
+        }
+        if (item.client_medication_id === null) {
+          // @ts-expect-error - TODO: fix this
+          delete item.client_medication_id;
+        }
       }
     });
 
@@ -380,23 +435,52 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         }
       : null;
 
-    if (provider?.healthcare_provider_id) {
-      // @ts-expect-error // fix this
-      delete provider.id;
-    } else {
-      // @ts-expect-error // fix this
-      delete provider?.healthcare_provider_id;
-    }
-    if (!provider?.healthcare_provider_id && !provider?.id) {
-      // @ts-expect-error // fix this
-      delete provider?.healthcare_provider_id;
-      // @ts-expect-error // fix this
-      delete provider.id;
-    }
+    const hasProviderChanged =
+      originalProviderData && data.healthcareProvider
+        ? (data.healthcareProvider.providerName || "") !==
+            (originalProviderData.providerName || "") ||
+          (data.healthcareProvider.address || "") !==
+            (originalProviderData.address || "") ||
+          (data.healthcareProvider.phone || "") !==
+            (originalProviderData.phone || "") ||
+          (data.healthcareProvider.notes || "") !==
+            (originalProviderData.notes || "") ||
+          (data.healthcareProvider.follow_up || "") !==
+            (originalProviderData.follow_up || "") ||
+          (data.healthcareProvider.specialty || "") !==
+            (originalProviderData.specialty || "") ||
+          (data.healthcareProvider.providerType || "") !==
+            (originalProviderData.providerType || "")
+        : false;
 
-    if (provider?.healthcare_provider_id === null) {
-      // @ts-expect-error // fix this
-      delete provider?.healthcare_provider_id;
+    if (provider) {
+      if (isProviderFromExisting && hasProviderChanged) {
+        if (provider.id) {
+          provider.healthcare_provider_id = provider.id;
+        }
+        // @ts-expect-error - TODO: fix this
+        delete provider.id;
+      } else if (isProviderFromExisting && !hasProviderChanged) {
+        // @ts-expect-error - TODO: fix this
+        delete provider.healthcare_provider_id;
+      } else if (!isProviderFromExisting) {
+        if (provider?.healthcare_provider_id) {
+          // @ts-expect-error - TODO: fix this
+          delete provider.id;
+        } else if (provider?.id) {
+          // @ts-expect-error - TODO: fix this
+          delete provider?.healthcare_provider_id;
+        } else {
+          // @ts-expect-error - TODO: fix this
+          delete provider?.healthcare_provider_id;
+          // @ts-expect-error // fix this
+          delete provider.id;
+        }
+        if (provider?.healthcare_provider_id === null) {
+          // @ts-expect-error - TODO: fix this
+          delete provider?.healthcare_provider_id;
+        }
+      }
     }
 
     const postData = {
@@ -467,6 +551,22 @@ export const MedicalAppointmentTemplate: React.FC = () => {
   };
 
   const handleProviderSelect = (provider: HealthcareProvider) => {
+    // Store original provider data for comparison
+    setOriginalProviderData({
+      providerName: provider.provider_name || "",
+      address: provider.address || "",
+      phone: provider.phone || "",
+      notes: provider.notes || "",
+      follow_up: provider.follow_up
+        ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
+        : "",
+      specialty: provider.specialty || "",
+      providerType: provider.provider_type || "",
+    });
+
+    // Mark that provider is from existing providers
+    setIsProviderFromExisting(true);
+
     reset({
       ...getValues(),
       healthcareProvider: {
@@ -478,12 +578,33 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
           : "",
         specialty: provider.specialty || "",
+        providerType: provider.provider_type || "",
         id: provider.id ? String(provider.id) : "",
+        provider_id: provider.id ? String(provider.id) : "",
       },
     });
   };
 
   const handleMedicationSelect = (medication: ClientMedications) => {
+    // Store original medication data for comparison
+    const originalMedicationData = {
+      medication_name: medication.medication_name || "",
+      dosage: medication.dosage || "",
+      frequency: medication.frequency || "",
+      notes: medication.notes || "",
+      prescribing_doctor: medication.prescribing_doctor || "",
+      start_date: medication.start_date
+        ? DateUtils.formatDateToRequiredFormat(medication.start_date)
+        : "",
+      end_date: medication.end_date
+        ? DateUtils.formatDateToRequiredFormat(medication.end_date)
+        : "",
+    };
+
+    // Update tracking arrays
+    setOriginalMedicationsData((prev) => [...prev, originalMedicationData]);
+    setIsMedicationFromExisting((prev) => [...prev, true]);
+
     appendMedication({
       medication_name: medication.medication_name || "",
       dosage: medication.dosage || "",
@@ -497,6 +618,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         ? DateUtils.formatDateToRequiredFormat(medication.end_date)
         : "",
       id: medication.id ? (medication.id as string) : "",
+      client_medication_id: medication.id ? (medication.id as string) : "",
     });
   };
 
@@ -905,7 +1027,11 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         <Card
           title="Medications"
           buttonText={<ICONS.plus size={16} />}
-          onButtonClick={() =>
+          onButtonClick={() => {
+            // Track that this is a new medication (not from existing)
+            setIsMedicationFromExisting((prev) => [...prev, false]);
+            setOriginalMedicationsData((prev) => [...prev, null]);
+
             appendMedication({
               medication_name: "",
               dosage: "",
@@ -914,8 +1040,8 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               prescribing_doctor: "",
               start_date: "",
               end_date: "",
-            })
-          }
+            });
+          }}
           secondaryButtonText={
             <p>
               <span className="lg:inline hidden">
@@ -998,7 +1124,16 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                   <div className="flex justify-end mt-3">
                     <TertiaryButton
                       type="button"
-                      onClick={() => removeMedication(index)}
+                      onClick={() => {
+                        // Remove from tracking arrays
+                        setIsMedicationFromExisting((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                        setOriginalMedicationsData((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                        removeMedication(index);
+                      }}
                       className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
                     >
                       <ICONS.delete />

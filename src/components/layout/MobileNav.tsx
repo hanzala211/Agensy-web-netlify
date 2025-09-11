@@ -58,7 +58,7 @@ export const MobileNav: React.FC = () => {
         {
           id: "clients",
           icon: ICONS.users,
-          label: "Clients",
+          label: "Care Recipients",
           path: ROUTES.clients,
           isActiveFn: (path: string) => path.includes(ROUTES.clients),
         },

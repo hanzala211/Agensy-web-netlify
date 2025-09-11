@@ -18,6 +18,7 @@ export const PERMISSIONS = {
     APP_ACTIONS.DeleteDocs,
     APP_ACTIONS.EditClientMedicalInfo,
     APP_ACTIONS.ClientAppointmentInfoEdit,
+    /// Restrict access to Personal Info & Password Organizer (financial/credential form).
   ],
   family_member: [""],
 };
