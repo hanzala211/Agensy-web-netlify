@@ -21,7 +21,8 @@ import {
 import { useEffect } from "react";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
+import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
 
 export const InPatientStayNotes = () => {
   const params = useParams();
@@ -31,6 +32,7 @@ export const InPatientStayNotes = () => {
     isFetching: isLoadingInPatient,
     refetch,
   } = useGetInPatientStayNotes(params.clientId!);
+  const { userData } = useAuthContext();
   const queryClient = useQueryClient();
   const postInPatientStayNotesMutation = usePostInPatientStayNotes();
   const {
@@ -54,7 +56,8 @@ export const InPatientStayNotes = () => {
       recommendationsNextSteps2: [{ recommendation: "" }],
     },
   });
-
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
@@ -398,16 +401,18 @@ export const InPatientStayNotes = () => {
         updatesFieldName="updatesFromProvider2"
         recommendationsFieldName="recommendationsNextSteps2"
       />
-      <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-        <PrimaryButton
-          type="submit"
-          isLoading={postInPatientStayNotesMutation.isPending}
-          disabled={postInPatientStayNotesMutation.isPending}
-          className="sm:!w-fit w-full md:text-base text-sm"
-        >
-          Save In-Patient Stay Notes
-        </PrimaryButton>
-      </div>
+      {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+          <PrimaryButton
+            type="submit"
+            isLoading={postInPatientStayNotesMutation.isPending}
+            disabled={postInPatientStayNotesMutation.isPending}
+            className="sm:!w-fit w-full md:text-base text-sm"
+          >
+            Save In-Patient Stay Notes
+          </PrimaryButton>
+        </div>
+      )}
     </form>
   );
 };

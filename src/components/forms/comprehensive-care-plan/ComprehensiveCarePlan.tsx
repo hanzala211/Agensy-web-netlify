@@ -24,7 +24,7 @@ import {
   type HealthcareProvider,
   type OpenedFileData,
 } from "@agensy/types";
-import { ICONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import { useParams } from "react-router-dom";
 import {
   useGetComprehensiveCarePlan,
@@ -34,7 +34,7 @@ import { DateUtils } from "@agensy/utils";
 import { useEffect } from "react";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { HomeSafetyCard } from "./HomeSafetyCard";
 import { MemoryAndReasoning } from "./MemoryAndReasoning";
 import { GeriatricDepression } from "./GeriatricDepression";
@@ -45,6 +45,7 @@ import { CaregiverSupport } from "./CaregiverSupport";
 export const ComprehensiveCarePlan = () => {
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { clientId } = useParams();
+  const { userData } = useAuthContext();
   const queryClient = useQueryClient();
   const postComprehensiveCarePlanMutation =
     usePostComprehensiveCarePlanMutation();
@@ -53,7 +54,8 @@ export const ComprehensiveCarePlan = () => {
     refetch,
     isFetching: isLoadingCarePlan,
   } = useGetComprehensiveCarePlan(clientId!);
-
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   useEffect(() => {
     refetch();
   }, []);
@@ -3063,18 +3065,20 @@ export const ComprehensiveCarePlan = () => {
         </div>
       </Card>
 
-      <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-        <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-          <PrimaryButton
-            type="submit"
-            isLoading={postComprehensiveCarePlanMutation.isPending}
-            disabled={postComprehensiveCarePlanMutation.isPending}
-            className="sm:!w-fit w-full md:text-base text-sm"
-          >
-            Save Comprehensive Care Plan
-          </PrimaryButton>
+      {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+            <PrimaryButton
+              type="submit"
+              isLoading={postComprehensiveCarePlanMutation.isPending}
+              disabled={postComprehensiveCarePlanMutation.isPending}
+              className="sm:!w-fit w-full md:text-base text-sm"
+            >
+              Save Comprehensive Care Plan
+            </PrimaryButton>
+          </div>
         </div>
-      </div>
+      )}
     </form>
   );
 };

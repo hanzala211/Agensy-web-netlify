@@ -30,9 +30,11 @@ import {
   ADVANCE_DIRECTIVE_OPTIONS,
   RELATIONSHIP_TO_CLIENT,
   CODE_STATUS_OPTIONS,
+  PERMISSIONS,
+  APP_ACTIONS,
 } from "@agensy/constants";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { useQueryClient } from "@tanstack/react-query";
 
 const defaultValues = {
@@ -78,6 +80,7 @@ const defaultValues = {
 export const FaceSheetShortForm: React.FC = () => {
   const { clientId } = useParams();
   const queryClient = useQueryClient();
+  const { userData } = useAuthContext();
   const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
     useClientContext();
   const {
@@ -98,7 +101,8 @@ export const FaceSheetShortForm: React.FC = () => {
     resolver: zodResolver(faceSheetShortFormSchema),
     defaultValues,
   });
-
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
@@ -517,18 +521,20 @@ export const FaceSheetShortForm: React.FC = () => {
         />
 
         {/* Form Actions */}
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              isLoading={postFaceSheetShortFormMutation.isPending}
-              disabled={postFaceSheetShortFormMutation.isPending}
-              type="submit"
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Face Sheet Short Form
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                isLoading={postFaceSheetShortFormMutation.isPending}
+                disabled={postFaceSheetShortFormMutation.isPending}
+                type="submit"
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Face Sheet Short Form
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

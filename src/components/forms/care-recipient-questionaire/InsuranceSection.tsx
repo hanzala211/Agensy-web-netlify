@@ -5,7 +5,13 @@ import type {
   FieldValues,
   Path,
 } from "react-hook-form";
-import { Input, Card, PhoneNumberInput, RadioInput } from "@agensy/components";
+import {
+  Input,
+  Card,
+  PhoneNumberInput,
+  RadioInput,
+  DatePickerField,
+} from "@agensy/components";
 
 interface InsuranceSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
@@ -24,15 +30,15 @@ export const InsuranceSection = <T extends FieldValues>({
         {/* Medicare Section */}
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Input
+            <DatePickerField
               label="Medicare A"
-              register={register("medicareA" as Path<T>)}
-              error={errors.medicareA?.message as string}
+              control={control}
+              name={"medicareA" as Path<T>}
             />
-            <Input
+            <DatePickerField
               label="Medicare B"
-              register={register("medicareB" as Path<T>)}
-              error={errors.medicareB?.message as string}
+              control={control}
+              name={"medicareB" as Path<T>}
             />
             <Input
               label="Medicare #s"

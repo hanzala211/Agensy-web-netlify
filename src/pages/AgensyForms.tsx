@@ -30,7 +30,7 @@ import type {
   MedicalAppointmentTemplateData,
 } from "@agensy/types";
 import { useNavigate, useParams } from "react-router-dom";
-import { ROUTES } from "@agensy/constants";
+import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
 import { MedicalAppointmentTemplate } from "@agensy/components";
 import {
   useCreateNewMedicalTemplateMutation,
@@ -38,8 +38,9 @@ import {
 } from "@agensy/api";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuthContext } from "@agensy/context";
 
-const rootFolders: FolderItem[] = [
+const getRootFolders = (userPermissions: string[]): FolderItem[] => [
   {
     id: "start-of-care",
     slug: "start-of-care",
@@ -205,12 +206,17 @@ const rootFolders: FolderItem[] = [
     name: "Records & Trackers",
     type: "folder",
     children: [
-      {
-        id: "personal-info",
-        name: "Personal Information & Password Organizer",
-        type: "file",
-        slug: "personal-info",
-      },
+      // Only show personal-info if user does NOT have ViewPersonalInfo permission
+      ...(!userPermissions.includes(APP_ACTIONS.ViewPersonalInfo)
+        ? []
+        : [
+            {
+              id: "personal-info",
+              name: "Personal Information & Password Organizer",
+              type: "file" as const,
+              slug: "personal-info",
+            },
+          ]),
       {
         id: "important-people-in-life",
         name: "Trusted Network Directory",
@@ -411,6 +417,9 @@ export const AgensyForms: React.FC = () => {
     useGetAllMedicalAppointmentTemplates(params.clientId as string);
   const createNewMedicalTemplateMutation =
     useCreateNewMedicalTemplateMutation();
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (createNewMedicalTemplateMutation.status === "success") {
@@ -452,6 +461,8 @@ export const AgensyForms: React.FC = () => {
   };
 
   const getCurrentFolders = (): FolderItem[] => {
+    const rootFolders = getRootFolders(userPermissions);
+
     if (currentPath.length === 0) {
       const updatedRootFolders = rootFolders.map((folder) => {
         if (folder.id === "medical") {
@@ -584,6 +595,7 @@ export const AgensyForms: React.FC = () => {
         (t) => t.id === slug
       );
       if (dynamicTemplate) {
+        const rootFolders = getRootFolders(userPermissions);
         const medicalFolder = rootFolders.find(
           (folder) => folder.id === "medical"
         );
@@ -634,6 +646,7 @@ export const AgensyForms: React.FC = () => {
 
   useEffect(() => {
     const { folderSlug, formSlug } = params;
+    const rootFolders = getRootFolders(userPermissions);
 
     if (formSlug) {
       const result = findFileBySlug(rootFolders, formSlug);
@@ -656,6 +669,7 @@ export const AgensyForms: React.FC = () => {
     params.formSlug,
     medicalAppointmentTemplates,
     searchQuery,
+    userPermissions,
   ]);
 
   useEffect(() => {
@@ -708,6 +722,7 @@ export const AgensyForms: React.FC = () => {
       return result;
     };
 
+    const rootFolders = getRootFolders(userPermissions);
     const folder = findFolderById(rootFolders, folderId);
     if (folder && folder.type === "folder") {
       navigate(
@@ -736,6 +751,7 @@ export const AgensyForms: React.FC = () => {
       return result;
     };
 
+    const rootFolders = getRootFolders(userPermissions);
     const file = findFileById(rootFolders, fileId);
     if (file && file.type === "file") {
       if (params.folderSlug) {
@@ -794,7 +810,7 @@ export const AgensyForms: React.FC = () => {
       } else {
         const parentPath = currentPath.slice(0, -1);
         const parentFolderName = parentPath[parentPath.length - 1];
-        const parentFolder = rootFolders.find(
+        const parentFolder = getRootFolders(userPermissions).find(
           (f) => f.name === parentFolderName
         );
         if (parentFolder) {
@@ -832,7 +848,10 @@ export const AgensyForms: React.FC = () => {
         return result;
       };
 
-      const targetFolder = findFolderByName(rootFolders, targetFolderName);
+      const targetFolder = findFolderByName(
+        getRootFolders(userPermissions),
+        targetFolderName
+      );
       if (targetFolder) {
         navigate(
           `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/${targetFolder.slug}`

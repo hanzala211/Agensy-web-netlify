@@ -8,5 +8,9 @@ export const APP_ACTIONS = {
   AddClient: "AddClient",
   AccessControl: "AccessControl",
   ClientAppointmentInfoEdit: "ClientAppointmentInfoEdit",
+  ClientAppointmentAdd: "ClientAppointmentAdd",
   ChangeClientStatus: "ChangeClientStatus",
+  EditAgensyForms: "EditAgensyForms",
+  ViewPersonalInfo: "ViewPersonalInfo",
+  OCRAccess: "OCRAccess",
 };

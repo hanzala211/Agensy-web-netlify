@@ -14,12 +14,13 @@ import { FinancialAccountsSection } from "./FinancialAccountsSection";
 import { UtilitiesSubscriptionsSection } from "./UtilitiesSubscriptionsSection";
 import { CommonQuestionsSection } from "./CommonQuestionsSection";
 import { NotesBackupContactsSection } from "./NotesBackupContactsSection";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { useGetPersonalInfo, usePostPersonalInfoMutation } from "@agensy/api";
 import { useEffect } from "react";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
+import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
 
 const defaultValues = {
   firstName: "",
@@ -88,7 +89,9 @@ export const PersonalInfo = () => {
     resolver: zodResolver(personalInfoFormSchema),
     defaultValues,
   });
-
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
@@ -390,6 +393,9 @@ export const PersonalInfo = () => {
   };
 
   /// Restrict access to Personal Info & Password Organizer (financial/credential form).
+  if (!userPermissions.includes(APP_ACTIONS.ViewPersonalInfo)) {
+    return <Navigate to="/" />;
+  }
 
   if (isLoadingPersonalInfo)
     return (
@@ -435,18 +441,20 @@ export const PersonalInfo = () => {
           errors={errors}
         />
 
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              type="submit"
-              isLoading={postPersonalInfoMutation.isPending}
-              disabled={postPersonalInfoMutation.isPending}
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Personal Information
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                type="submit"
+                isLoading={postPersonalInfoMutation.isPending}
+                disabled={postPersonalInfoMutation.isPending}
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Personal Information
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

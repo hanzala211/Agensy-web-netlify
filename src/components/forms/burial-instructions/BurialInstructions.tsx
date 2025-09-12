@@ -12,14 +12,14 @@ import { ServiceDetailsSection } from "./ServiceDetailsSection";
 import { KeyContactsSection } from "./KeyContactsSection";
 import { DocumentsAndNotesSection } from "./DocumentsAndNotesSection";
 import { useEffect } from "react";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import {
   useGetBurialInstructions,
   usePostBurialInstructionsMutation,
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
 import { DateUtils, toast } from "@agensy/utils";
-import { BURIAL_TYPES } from "@agensy/constants";
+import { APP_ACTIONS, BURIAL_TYPES, PERMISSIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
 const defaultValues = {
@@ -60,6 +60,7 @@ const defaultValues = {
 
 export const BurialInstructions = () => {
   const params = useParams();
+  const { userData } = useAuthContext();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const {
     data: burialInstructions,
@@ -80,7 +81,8 @@ export const BurialInstructions = () => {
   });
   const postBurialInstructionsMutation = usePostBurialInstructionsMutation();
   const queryClient = useQueryClient();
-
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
@@ -317,19 +319,21 @@ export const BurialInstructions = () => {
 
         <DocumentsAndNotesSection register={register} errors={errors} />
 
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              disabled={postBurialInstructionsMutation.isPending}
-              isLoading={postBurialInstructionsMutation.isPending}
-              type="submit"
-              className="sm:!w-fit w-full md:text-base text-sm"
-              onClick={handleSubmit(onSubmit)}
-            >
-              Save Burial Instructions
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                disabled={postBurialInstructionsMutation.isPending}
+                isLoading={postBurialInstructionsMutation.isPending}
+                type="submit"
+                className="sm:!w-fit w-full md:text-base text-sm"
+                onClick={handleSubmit(onSubmit)}
+              >
+                Save Burial Instructions
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

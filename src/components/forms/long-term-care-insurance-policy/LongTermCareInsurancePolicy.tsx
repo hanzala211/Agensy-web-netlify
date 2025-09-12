@@ -5,7 +5,7 @@ import {
   generateLongTermCareInsurancePolicyDefaultValues,
 } from "@agensy/config";
 import { Card, CommonLoader, PrimaryButton } from "@agensy/components";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import type { ChecklistFormData, OpenedFileData } from "@agensy/types";
 import {
   useGetChecklistForms,
@@ -13,6 +13,7 @@ import {
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
+import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
 
 export const LongTermCareInsurancePolicy = () => {
   const params = useParams();
@@ -30,7 +31,9 @@ export const LongTermCareInsurancePolicy = () => {
   const postLongTermCareInsurancePolicyMutation =
     usePostChecklistFormsMutation();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
-
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   useEffect(() => {
     refetch();
   }, []);
@@ -171,18 +174,20 @@ export const LongTermCareInsurancePolicy = () => {
             );
           })}
         </div>
-        <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              type="submit"
-              isLoading={postLongTermCareInsurancePolicyMutation.isPending}
-              disabled={postLongTermCareInsurancePolicyMutation.isPending}
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Long Term Care Insurance Policy Checklist
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                type="submit"
+                isLoading={postLongTermCareInsurancePolicyMutation.isPending}
+                disabled={postLongTermCareInsurancePolicyMutation.isPending}
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Long Term Care Insurance Policy Checklist
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

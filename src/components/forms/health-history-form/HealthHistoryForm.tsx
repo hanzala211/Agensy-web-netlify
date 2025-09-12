@@ -20,14 +20,14 @@ import {
 } from "@agensy/types";
 
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
-import { ICONS, ROUTES } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, PERMISSIONS, ROUTES } from "@agensy/constants";
 import { DiagnosesSection } from "../face-sheet-short/DiagnosesSection";
 import { useParams } from "react-router-dom";
 import {
   useGetHealthHistoryForm,
   usePostHealthHistoryFormMutation,
 } from "@agensy/api";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnesthesiaSection } from "./AnesthesiaSection";
 
@@ -87,6 +87,9 @@ export const HealthHistoryForm: React.FC = () => {
   const { clientId } = useParams();
   const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
     useClientContext();
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const {
     data: healthHistoryForm,
     isFetching: isFetchingHealthHistoryForm,
@@ -785,18 +788,20 @@ export const HealthHistoryForm: React.FC = () => {
         </div>
 
         {/* Form Actions */}
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              isLoading={postHealthHistoryMutation.isPending}
-              disabled={postHealthHistoryMutation.isPending}
-              type="submit"
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Health History
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                isLoading={postHealthHistoryMutation.isPending}
+                disabled={postHealthHistoryMutation.isPending}
+                type="submit"
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Health History
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

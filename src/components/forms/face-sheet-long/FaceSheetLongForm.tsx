@@ -48,8 +48,10 @@ import {
   RELATIONSHIP_TO_CLIENT,
   RACE_OPTIONS,
   COGNITIVE_STATUS,
+  PERMISSIONS,
+  APP_ACTIONS,
 } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { useQueryClient } from "@tanstack/react-query";
 
 const defaultValues = {
@@ -123,6 +125,7 @@ const defaultValues = {
 
 export const FaceSheetLongForm: React.FC = () => {
   const params = useParams();
+  const { userData } = useAuthContext();
   const queryClient = useQueryClient();
   const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
     useClientContext();
@@ -146,7 +149,8 @@ export const FaceSheetLongForm: React.FC = () => {
     resolver: zodResolver(faceSheetLongFormSchema),
     defaultValues,
   });
-
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
@@ -892,18 +896,20 @@ export const FaceSheetLongForm: React.FC = () => {
           surgicalHistoryArray={surgicalHistoryArray}
         />
         {/* Form Actions */}
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              isLoading={postFaceSheetLongFormMutation.isPending}
-              disabled={postFaceSheetLongFormMutation.isPending}
-              type="submit"
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Face Sheet Long Form
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                isLoading={postFaceSheetLongFormMutation.isPending}
+                disabled={postFaceSheetLongFormMutation.isPending}
+                type="submit"
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Face Sheet Long Form
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

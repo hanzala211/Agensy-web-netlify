@@ -8,7 +8,7 @@ import {
   DatePickerField,
   CommonLoader,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import {
   comprehensiveMedicationListSchema,
   type ClientMedications,
@@ -23,10 +23,13 @@ import {
 import { useEffect } from "react";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 
 export const ComprehensiveMedicationList = () => {
   const params = useParams();
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const {
     data: comprehensiveMedicationList,
     isFetching: isLoadingChecklist,
@@ -116,6 +119,8 @@ export const ComprehensiveMedicationList = () => {
     name: "medications",
   });
 
+  console.log(errors);
+
   useEffect(() => {
     if (comprehensiveMedicationList) {
       const formData = {
@@ -154,7 +159,8 @@ export const ComprehensiveMedicationList = () => {
                   startDate: item.start_date
                     ? DateUtils.formatDateToRequiredFormat(item.start_date)
                     : "",
-                  id: item.id || "",
+                  medicationId: item.client_medication_id || "",
+                  usedToTreat: item.purpose || "",
                 })
               )
             : [],
@@ -181,7 +187,7 @@ export const ComprehensiveMedicationList = () => {
         medication_name: item.medicationName ? item.medicationName : null,
         dosage: item.dosage ? item.dosage : null,
         prescribing_doctor: item.prescriber ? item.prescriber : null,
-        id: item?.id,
+        client_medication_id: item?.medicationId,
         frequency: item.frequency ? item.frequency : null,
         side_effects: item.sideEffects ? item.sideEffects : null,
         start_date: item.startDate
@@ -190,10 +196,10 @@ export const ComprehensiveMedicationList = () => {
         end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
         pharmacy: item.pharmacy ? item.pharmacy : null,
       };
-      if (item.id) {
+      if (item.medicationId) {
         return medication;
       } else {
-        delete medication.id;
+        delete medication.client_medication_id;
         return medication;
       }
     });
@@ -396,18 +402,20 @@ export const ComprehensiveMedicationList = () => {
       </Card>
 
       {/* Submit Button */}
-      <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-        <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-          <PrimaryButton
-            type="submit"
-            className="sm:!w-fit w-full md:text-base text-sm"
-            isLoading={postComprehensiveMedicationList.isPending}
-            disabled={postComprehensiveMedicationList.isPending}
-          >
-            Save Comprehensive Medication and Supplement List
-          </PrimaryButton>
+      {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+            <PrimaryButton
+              type="submit"
+              className="sm:!w-fit w-full md:text-base text-sm"
+              isLoading={postComprehensiveMedicationList.isPending}
+              disabled={postComprehensiveMedicationList.isPending}
+            >
+              Save Comprehensive Medication and Supplement List
+            </PrimaryButton>
+          </div>
         </div>
-      </div>
+      )}
     </form>
   );
 };

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CommonLoader, PrimaryButton } from "@agensy/components";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { InfoSection } from "./InfoSection";
 import { InsuranceSection } from "./InsuranceSection";
 import { RelativesSection } from "./RelativesSection";
@@ -32,7 +32,11 @@ import {
   usePostCareRecipientQuestionaireMutation,
 } from "@agensy/api";
 import { DateUtils, toast } from "@agensy/utils";
-import { RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
+import {
+  APP_ACTIONS,
+  PERMISSIONS,
+  RELATIONSHIP_TO_CLIENT,
+} from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { MedicationsSection } from "./MedicationsSection";
 
@@ -188,6 +192,7 @@ const defaultValues = {
 
 export const CareRecipientQuestionaire = () => {
   const queryClient = useQueryClient();
+  const { userData } = useAuthContext();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { clientId } = useParams();
   const {
@@ -197,6 +202,8 @@ export const CareRecipientQuestionaire = () => {
   } = useGetCareRecipientQuestionnaire(clientId!);
   const postCareRecipientQuestionaireMutation =
     usePostCareRecipientQuestionaireMutation();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     refetch();
@@ -344,10 +351,17 @@ export const CareRecipientQuestionaire = () => {
           careRecipientQuestionnaire.questionnaire?.retirement_adjustment || "",
 
         // Insurance Information
-        medicareA: careRecipientQuestionnaire.short_form?.medicare || "",
-        medicareB: careRecipientQuestionnaire.insurance?.medicare_b || "",
-        medicareNumbers:
-          careRecipientQuestionnaire.insurance?.medicare_numbers || "",
+        medicareA: careRecipientQuestionnaire.insurance?.medicare_a
+          ? DateUtils.formatDateToRequiredFormat(
+              careRecipientQuestionnaire.insurance?.medicare_a || ""
+            )
+          : "",
+        medicareB: careRecipientQuestionnaire.insurance?.medicare_b
+          ? DateUtils.formatDateToRequiredFormat(
+              careRecipientQuestionnaire.insurance?.medicare_b || ""
+            )
+          : "",
+        medicareNumbers: careRecipientQuestionnaire.short_form?.medicare || "",
         medicareSupplementPlan:
           careRecipientQuestionnaire.insurance?.supplement_plan || "",
         insuranceProvider:
@@ -1022,15 +1036,19 @@ export const CareRecipientQuestionaire = () => {
           : null,
       },
       short_form: {
-        medicare: data.medicareA ? data.medicareA : null,
+        medicare: data.medicareNumbers ? data.medicareNumbers : null,
         insurance: data.insuranceProvider ? data.insuranceProvider : null,
         id_number: data.insurancePolicyNumber
           ? data.insurancePolicyNumber
           : null,
       },
       insurance: {
-        medicare_b: data.medicareB ? data.medicareB : null,
-        medicare_numbers: data.medicareNumbers ? data.medicareNumbers : null,
+        medicare_a: data.medicareA
+          ? DateUtils.changetoISO(data.medicareA)
+          : null,
+        medicare_b: data.medicareB
+          ? DateUtils.changetoISO(data.medicareB)
+          : null,
         supplement_plan: data.medicareSupplementPlan
           ? data.medicareSupplementPlan
           : null,
@@ -1332,18 +1350,20 @@ export const CareRecipientQuestionaire = () => {
         />
         <OtherPertinentInformationSection register={register} errors={errors} />
         <SummarySection register={register} errors={errors} />
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              isLoading={postCareRecipientQuestionaireMutation.isPending}
-              disabled={postCareRecipientQuestionaireMutation.isPending}
-              type="submit"
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Care Recipient Questionaire
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                isLoading={postCareRecipientQuestionaireMutation.isPending}
+                disabled={postCareRecipientQuestionaireMutation.isPending}
+                type="submit"
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Care Recipient Questionaire
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

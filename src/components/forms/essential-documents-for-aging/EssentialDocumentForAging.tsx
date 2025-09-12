@@ -8,8 +8,8 @@ import {
   DatePickerField,
   PrimaryButton,
 } from "@agensy/components";
-import { ROUTES } from "@agensy/constants";
-import { useClientContext } from "@agensy/context";
+import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { DateUtils, toast } from "@agensy/utils";
 import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -168,6 +168,7 @@ const advanceCarePlanningDocuments: AdvanceCareDocument[] = [
 
 export const EssentialDocumentForAging = () => {
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const { userData } = useAuthContext();
   const params = useParams();
   const {
     data: essentialDocuments,
@@ -188,7 +189,8 @@ export const EssentialDocumentForAging = () => {
       documents: advanceCarePlanningDocuments,
     },
   });
-
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -389,18 +391,20 @@ export const EssentialDocumentForAging = () => {
           </div>
 
           {/* Form Actions */}
-          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-              <PrimaryButton
-                isLoading={postEssentialDocumentsForAgingMutation.isPending}
-                disabled={postEssentialDocumentsForAgingMutation.isPending}
-                type="submit"
-                className="sm:!w-fit w-full md:text-base text-sm"
-              >
-                Save Essential Document for Aging
-              </PrimaryButton>
+          {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+            <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+              <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+                <PrimaryButton
+                  isLoading={postEssentialDocumentsForAgingMutation.isPending}
+                  disabled={postEssentialDocumentsForAgingMutation.isPending}
+                  type="submit"
+                  className="sm:!w-fit w-full md:text-base text-sm"
+                >
+                  Save Essential Document for Aging
+                </PrimaryButton>
+              </div>
             </div>
-          </div>
+          )}
         </form>
       )}
     </div>

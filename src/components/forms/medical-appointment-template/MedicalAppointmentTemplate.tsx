@@ -29,14 +29,16 @@ import {
   usePostMedicalAppointmentTemplateMutation,
 } from "@agensy/api";
 import {
+    APP_ACTIONS,
   ICONS,
   MEDICATION_FREQUENCY_OPTIONS,
+  PERMISSIONS,
   PROVIDER_TYPES,
   SPECIALTIES,
 } from "@agensy/constants";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 
 const defaultValues: MedicalAppointmentTemplateData = {
   firstName: "",
@@ -88,7 +90,9 @@ export const MedicalAppointmentTemplate: React.FC = () => {
   const [isMedicationFromExisting, setIsMedicationFromExisting] = useState<
     boolean[]
   >([]);
-
+  const {userData} = useAuthContext()
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const clientData = queryClient.getQueryData(["client", clientId]) as Client;
 
   const {
@@ -1144,7 +1148,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
             ))}
           </div>
         </Card>
-
+{userPermissions.includes(APP_ACTIONS.EditAgensyForms) &&
         <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
             <PrimaryButton
@@ -1156,7 +1160,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               Save Medical Appointment Template
             </PrimaryButton>
           </div>
-        </div>
+        </div>}
       </form>
 
       <HealthcareProviderSelectionModal

@@ -14,7 +14,7 @@ import {
   TimeInput,
   TextArea,
 } from "@agensy/components";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import type {
   ChecklistFormData,
   OpenedFileData,
@@ -28,8 +28,10 @@ import { caregiverInformationFormSchema } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
 
 export const CaregiverInformation = () => {
+  const { userData } = useAuthContext();
   const { clientId } = useParams();
   const [formData, setFormData] = useState<ChecklistFormData>(
     generateCaregiverInformationDefaultValues()
@@ -43,7 +45,8 @@ export const CaregiverInformation = () => {
     isFetching: isLoadingChecklist,
     refetch,
   } = useGetCaregiverInformation(clientId!);
-
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   useEffect(() => {
     refetch();
   }, []);
@@ -177,7 +180,7 @@ export const CaregiverInformation = () => {
   const onSubmit = (data: CaregiverInformationFormData) => {
     console.log(data);
     const postData = {
-      name: data.name ? data.name : null, 
+      name: data.name ? data.name : null,
       nickname_preferred_name: data.nickname_preferred_name
         ? data.nickname_preferred_name
         : null,
@@ -422,18 +425,20 @@ export const CaregiverInformation = () => {
             );
           })}
         </div>
-        <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              type="submit"
-              isLoading={postCaregiverInformationMutation.isPending}
-              disabled={postCaregiverInformationMutation.isPending}
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Caregiver Information
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                type="submit"
+                isLoading={postCaregiverInformationMutation.isPending}
+                disabled={postCaregiverInformationMutation.isPending}
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Caregiver Information
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

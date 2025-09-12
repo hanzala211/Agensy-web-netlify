@@ -7,7 +7,7 @@ import {
   DatePickerField,
   PrimaryButton,
 } from "@agensy/components";
-import { ICONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import {
   labsTrackerFormSchema,
   type LabsTrackerFormData,
@@ -19,7 +19,7 @@ import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 
 const defaultValues: LabsTrackerFormData = {
   firstName: "",
@@ -48,7 +48,9 @@ export const LabsTracker = () => {
     resolver: zodResolver(labsTrackerFormSchema),
     defaultValues,
   });
-
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
@@ -265,18 +267,20 @@ export const LabsTracker = () => {
           </div>
         </Card>
 
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              type="submit"
-              isLoading={postLabsTracker.isPending}
-              disabled={postLabsTracker.isPending}
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Labs Tracker
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                type="submit"
+                isLoading={postLabsTracker.isPending}
+                disabled={postLabsTracker.isPending}
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Labs Tracker
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

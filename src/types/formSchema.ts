@@ -2802,6 +2802,7 @@ export const comprehensiveMedicationListSchema = z.object({
         endDate: z.string().optional(),
         sideEffects: z.string().optional(),
         id: z.string().optional().nullable().nullish(),
+        medicationId: z.string().optional().nullable().nullish(),
       })
     )
     .optional(),

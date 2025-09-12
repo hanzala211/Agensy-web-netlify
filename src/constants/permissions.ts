@@ -12,13 +12,18 @@ export const PERMISSIONS = {
     APP_ACTIONS.ClientAppointmentInfoEdit,
     APP_ACTIONS.ChangeClientStatus,
     APP_ACTIONS.AddDocs,
+    APP_ACTIONS.ClientAppointmentAdd,
+    APP_ACTIONS.EditAgensyForms,
+    APP_ACTIONS.ViewPersonalInfo,
+    APP_ACTIONS.OCRAccess,
   ],
   caregiver: [
+    APP_ACTIONS.OCRAccess,
     APP_ACTIONS.AddDocs,
-    APP_ACTIONS.DeleteDocs,
     APP_ACTIONS.EditClientMedicalInfo,
     APP_ACTIONS.ClientAppointmentInfoEdit,
-    /// Restrict access to Personal Info & Password Organizer (financial/credential form).
+    APP_ACTIONS.ClientAppointmentAdd,
+    APP_ACTIONS.EditAgensyForms,
   ],
-  family_member: [""],
+  family_member: [APP_ACTIONS.AddDocs],
 };

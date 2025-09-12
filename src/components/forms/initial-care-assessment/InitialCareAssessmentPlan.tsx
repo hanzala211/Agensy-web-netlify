@@ -15,7 +15,7 @@ import {
   type InitialCareAssessmentPlanFormData,
   type OpenedFileData,
 } from "@agensy/types";
-import { ICONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import { DateUtils, toast } from "@agensy/utils";
 import { useParams } from "react-router-dom";
 import {
@@ -24,7 +24,7 @@ import {
 } from "@agensy/api";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 
 export const InitialCareAssessmentPlan = () => {
   const params = useParams();
@@ -35,6 +35,9 @@ export const InitialCareAssessmentPlan = () => {
     isFetching: isLoadingData,
     refetch,
   } = useGetInitialCareAssessmentPlan(params.clientId!);
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const {
     register,
     control,
@@ -871,18 +874,20 @@ export const InitialCareAssessmentPlan = () => {
         </div>
       </Card>
 
-      <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-        <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-          <PrimaryButton
-            isLoading={postInitialCareAssessmentPlanMutation.isPending}
-            disabled={postInitialCareAssessmentPlanMutation.isPending}
-            type="submit"
-            className="sm:!w-fit w-full md:text-base text-sm"
-          >
-            Save Initial Care Assessment Plan
-          </PrimaryButton>
+      {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+            <PrimaryButton
+              isLoading={postInitialCareAssessmentPlanMutation.isPending}
+              disabled={postInitialCareAssessmentPlanMutation.isPending}
+              type="submit"
+              className="sm:!w-fit w-full md:text-base text-sm"
+            >
+              Save Initial Care Assessment Plan
+            </PrimaryButton>
+          </div>
         </div>
-      </div>
+      )}
     </form>
   );
 };

@@ -83,9 +83,7 @@ export const AppointmentsManager: React.FC = () => {
         showBackButton={false}
         buttonText="Add Appointment"
         buttonAriaLabel="Add Appointment"
-        showButton={userPermissions.includes(
-          APP_ACTIONS.ClientAppointmentInfoEdit
-        )}
+        showButton={userPermissions.includes(APP_ACTIONS.ClientAppointmentAdd)}
         onButtonClick={() => setIsAddAppointmentModalOpen(true)}
       />
       <AddAppointmentModal

@@ -5,7 +5,7 @@ import {
   generateChecklistDefaultValues,
 } from "@agensy/config";
 import { Card, CommonLoader, PrimaryButton } from "@agensy/components";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import type { ChecklistFormData, OpenedFileData } from "@agensy/types";
 import {
   useGetChecklistForms,
@@ -13,6 +13,7 @@ import {
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
+import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
 
 export const StartofCareChecklist = () => {
   const params = useParams();
@@ -27,8 +28,11 @@ export const StartofCareChecklist = () => {
   const [initialFormData, setInitialFormData] = useState<ChecklistFormData>(
     generateChecklistDefaultValues()
   );
+  const { userData } = useAuthContext();
   const postStartCareChecklistMutation = usePostChecklistFormsMutation();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     refetch();
@@ -172,18 +176,20 @@ export const StartofCareChecklist = () => {
             );
           })}
         </div>
-        <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              type="submit"
-              isLoading={postStartCareChecklistMutation.isPending}
-              disabled={postStartCareChecklistMutation.isPending}
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Start of Care Checklist
-            </PrimaryButton>
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                type="submit"
+                isLoading={postStartCareChecklistMutation.isPending}
+                disabled={postStartCareChecklistMutation.isPending}
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Start of Care Checklist
+              </PrimaryButton>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

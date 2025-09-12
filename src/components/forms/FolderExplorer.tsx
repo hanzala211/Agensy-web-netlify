@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from "react";
-import { ICONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type {
   BurialInstructionsFormData,
@@ -25,7 +25,7 @@ import {
   StatefulInput,
   TertiaryButton,
 } from "@agensy/components";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useParams } from "react-router-dom";
 import FaceSheetLongFormPDF from "./face-sheet-long/FaceSheetLongFormPDF";
@@ -98,7 +98,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   const [isUnsavedChangesModalOpen, setIsUnsavedChangesModalOpen] =
     useState<boolean>(false);
   const params = useParams();
-
+  const { userData } = useAuthContext();
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   useEffect(() => {
     if (searchQuery) {
       console.log("Search query:", searchQuery);
@@ -602,20 +604,21 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                     <span className="truncate">{fileContent?.name}</span>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                    {showOCRButton && (
-                      <TertiaryButton
-                        onClick={() => setIsOCRModelOpen(true)}
-                        aria_label="Upload OCR"
-                        className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent text-sm"
-                      >
-                        <span className="flex items-center gap-2 whitespace-nowrap">
-                          <span className="hidden sm:inline">
-                            Scan Document
+                    {showOCRButton &&
+                      userPermissions.includes(APP_ACTIONS.OCRAccess) && (
+                        <TertiaryButton
+                          onClick={() => setIsOCRModelOpen(true)}
+                          aria_label="Upload OCR"
+                          className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent text-sm"
+                        >
+                          <span className="flex items-center gap-2 whitespace-nowrap">
+                            <span className="hidden sm:inline">
+                              Scan Document
+                            </span>
+                            <span className="sm:hidden">Scan</span>
                           </span>
-                          <span className="sm:hidden">Scan</span>
-                        </span>
-                      </TertiaryButton>
-                    )}
+                        </TertiaryButton>
+                      )}
                     <OCRModel
                       onSubmitProp={(data) => setOcrResult(data)}
                       isOpen={isOCRModelOpen}

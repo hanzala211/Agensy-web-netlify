@@ -4,7 +4,14 @@ import {
   ConfirmationModal,
   TertiaryButton,
 } from "@agensy/components";
-import { COLORS, DOCUMENT_CATEGORY_OPTIONS, ICONS } from "@agensy/constants";
+import {
+  APP_ACTIONS,
+  COLORS,
+  DOCUMENT_CATEGORY_OPTIONS,
+  ICONS,
+  PERMISSIONS,
+} from "@agensy/constants";
+import { useAuthContext } from "@agensy/context";
 import type { Document } from "@agensy/types";
 import { DateUtils, StringUtils } from "@agensy/utils";
 import { useState } from "react";
@@ -28,7 +35,10 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   showClientName = false,
   showActions = true,
 }) => {
+  const { userData } = useAuthContext();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const userPermissions =
+    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const formatFileSize = (bytes: number): string => {
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(2)} MB`;
@@ -115,18 +125,19 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
             >
               <ICONS.eyeOn size={16} />
             </TertiaryButton>
-            {showActions && (
-              <TertiaryButton
-                aria_label="Delete document"
-                className={`hover:bg-red-50 hover:text-red-500 hover:border-red-300 ${
-                  isDeleting ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                onClick={() => setIsDeleteModalOpen(true)}
-                disabled={isDeleting}
-              >
-                <ICONS.delete size={16} />
-              </TertiaryButton>
-            )}
+            {showActions &&
+              userPermissions.includes(APP_ACTIONS.DeleteDocs) && (
+                <TertiaryButton
+                  aria_label="Delete document"
+                  className={`hover:bg-red-50 hover:text-red-500 hover:border-red-300 ${
+                    isDeleting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  disabled={isDeleting}
+                >
+                  <ICONS.delete size={16} />
+                </TertiaryButton>
+              )}
           </div>
         </div>
       </div>
