@@ -14,9 +14,11 @@ import {
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
 import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const CarePlanChecklist = () => {
   const params = useParams();
+  const queryClient = useQueryClient();
   const { userData } = useAuthContext();
   const {
     data: startOfCareChecklist,
@@ -33,6 +35,13 @@ export const CarePlanChecklist = () => {
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const userPermissions =
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+
+  const clientData = queryClient.getQueryData(["client", params.clientId]) as
+    | { first_name?: string; last_name?: string; date_of_birth?: string }
+    | undefined;
+  const clientFirstName = clientData?.first_name || "";
+  const clientLastName = clientData?.last_name || "";
+  const clientDateOfBirth = clientData?.date_of_birth || "";
   useEffect(() => {
     refetch();
   }, []);
@@ -52,7 +61,6 @@ export const CarePlanChecklist = () => {
     }
   }, [startOfCareChecklist]);
 
-  // Watch form changes to detect unsaved changes
   useEffect(() => {
     const hasChanges = Object.keys(formData).some(
       (key) => formData[key] !== initialFormData[key]
@@ -87,9 +95,19 @@ export const CarePlanChecklist = () => {
   useEffect(() => {
     setOpenedFileData({
       ...formData,
+      firstName: clientFirstName,
+      lastName: clientLastName,
+      dateOfBirth: clientDateOfBirth,
       last_update: { updatedAt: startOfCareChecklist?.updatedAt },
     } as unknown as OpenedFileData);
-  }, [formData]);
+  }, [
+    formData,
+    clientFirstName,
+    clientLastName,
+    clientDateOfBirth,
+    setOpenedFileData,
+    startOfCareChecklist?.updatedAt,
+  ]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

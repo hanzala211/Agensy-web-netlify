@@ -14,6 +14,7 @@ import { DateUtils, toast } from "@agensy/utils";
 import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AdvanceCareDocument {
   id?: string;
@@ -170,6 +171,7 @@ export const EssentialDocumentForAging = () => {
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { userData } = useAuthContext();
   const params = useParams();
+  const queryClient = useQueryClient();
   const {
     data: essentialDocuments,
     isFetching: isFetchingEssentialDocuments,
@@ -191,6 +193,14 @@ export const EssentialDocumentForAging = () => {
   });
   const userPermissions =
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+
+  // Extract client data from query cache
+  const clientData = queryClient.getQueryData(["client", params.clientId]) as
+    | { first_name?: string; last_name?: string; date_of_birth?: string }
+    | undefined;
+  const clientFirstName = clientData?.first_name || "";
+  const clientLastName = clientData?.last_name || "";
+  const clientDateOfBirth = clientData?.date_of_birth || "";
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -238,6 +248,9 @@ export const EssentialDocumentForAging = () => {
     if (essentialDocuments?.essential_documents) {
       setOpenedFileData({
         essential_documents: essentialDocuments?.essential_documents,
+        firstName: clientFirstName,
+        lastName: clientLastName,
+        dateOfBirth: clientDateOfBirth,
         last_update: {
           updatedAt: essentialDocuments?.last_update?.updatedAt,
         },

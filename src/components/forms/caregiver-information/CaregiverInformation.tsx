@@ -47,6 +47,15 @@ export const CaregiverInformation = () => {
   } = useGetCaregiverInformation(clientId!);
   const userPermissions =
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+
+  // Extract client data from query cache
+  const clientData = queryClient.getQueryData(["client", clientId]) as
+    | { first_name?: string; last_name?: string; date_of_birth?: string }
+    | undefined;
+  const clientFirstName = clientData?.first_name || "";
+  const clientLastName = clientData?.last_name || "";
+  const clientDateOfBirth = clientData?.date_of_birth || "";
+
   useEffect(() => {
     refetch();
   }, []);
@@ -150,6 +159,9 @@ export const CaregiverInformation = () => {
   useEffect(() => {
     setOpenedFileData({
       ...formData,
+      firstName: clientFirstName,
+      lastName: clientLastName,
+      dateOfBirth: clientDateOfBirth,
       last_update: { updatedAt: careGiverInfo?.last_update?.updatedAt },
     } as unknown as OpenedFileData);
   }, [formData]);

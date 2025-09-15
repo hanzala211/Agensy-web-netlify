@@ -2712,62 +2712,35 @@ export const inPatientStayNotesFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   dateOfBirth: z.string().optional(),
-  date1: z.string().optional(),
-  facilityName1: z.string().optional(),
-  medicalProvider1: z.string().optional(),
-  specialty1: z.string().optional(),
-  id1: z.string().optional().nullable().nullish(),
-
-  questionsForProvider1: z
+  inPatientStayNotes: z
     .array(
       z.object({
-        question: z.string().optional(),
-      })
-    )
-    .optional(),
-
-  updatesFromProvider1: z
-    .array(
-      z.object({
-        update: z.string().optional(),
-      })
-    )
-    .optional(),
-
-  recommendationsNextSteps1: z
-    .array(
-      z.object({
-        recommendation: z.string().optional(),
-      })
-    )
-    .optional(),
-
-  date2: z.string().optional(),
-  facilityName2: z.string().optional(),
-  medicalProvider2: z.string().optional(),
-  specialty2: z.string().optional(),
-  id2: z.string().optional().nullable().nullish(),
-
-  questionsForProvider2: z
-    .array(
-      z.object({
-        question: z.string().optional(),
-      })
-    )
-    .optional(),
-
-  updatesFromProvider2: z
-    .array(
-      z.object({
-        update: z.string().optional(),
-      })
-    )
-    .optional(),
-
-  recommendationsNextSteps2: z
-    .array(
-      z.object({
-        recommendation: z.string().optional(),
+        id: z.string().optional().nullable().nullish(),
+        date: z.string().optional(),
+        facilityName: z.string().optional(),
+        medicalProvider: z.string().optional(),
+        specialty: z.string().optional(),
+        questionsForProvider: z
+          .array(
+            z.object({
+              question: z.string().optional(),
+            })
+          )
+          .optional(),
+        updatesFromProvider: z
+          .array(
+            z.object({
+              update: z.string().optional(),
+            })
+          )
+          .optional(),
+        recommendationsNextSteps: z
+          .array(
+            z.object({
+              recommendation: z.string().optional(),
+            })
+          )
+          .optional(),
       })
     )
     .optional(),

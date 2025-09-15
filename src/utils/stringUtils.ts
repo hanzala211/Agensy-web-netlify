@@ -92,7 +92,8 @@ export const mapExtractedDataToFormValues = (
       key !== "allergies" &&
       key !== "diagnosis"
     ) {
-      filledValues[key] = value;
+      const existingValue = currentFormValues[key];
+      filledValues[key] = existingValue ? existingValue : value;
     } else if (key === "diagnosis") {
       const existingDiagnoses = currentFormValues.diagnoses || [];
 

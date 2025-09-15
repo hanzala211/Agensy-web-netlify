@@ -167,6 +167,18 @@ export const VitalsTracker = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+      const formData = mapVitalsToFormData(
+        postVitalsTrackerMutation.data.vitals_tracker,
+        postVitalsTrackerMutation.data.client_info
+      );
+      reset(formData);
+      setOpenedFileData({
+        ...formData,
+        last_update: {
+          updatedAt:
+            postVitalsTrackerMutation.data?.last_update?.updatedAt || "",
+        },
+      } as unknown as OpenedFileData);
     } else if (postVitalsTrackerMutation.status === "error") {
       toast.error("Error Occurred", String(postVitalsTrackerMutation.error));
     }
@@ -201,7 +213,6 @@ export const VitalsTracker = () => {
 
   const onSubmit = (data: VitalsTrackerFormData) => {
     const postData = mapFormDataToVitals(data);
-    console.log(postData);
     postVitalsTrackerMutation.mutate({
       clientId: params.clientId!,
       data: postData,

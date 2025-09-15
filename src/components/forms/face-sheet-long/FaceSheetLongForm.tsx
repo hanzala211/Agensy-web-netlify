@@ -167,10 +167,10 @@ export const FaceSheetLongForm: React.FC = () => {
         defaultValues,
         getValues()
       );
-      console.log(mappedValues);
       Object.entries(mappedValues).forEach(([key, value]) => {
         setValue(key as keyof FaceSheetLongFormData, value);
       });
+      setHasUnsavedChanges(true);
       setOcrResult([]);
     }
   }, [ocrResult]);

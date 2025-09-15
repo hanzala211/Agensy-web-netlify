@@ -119,8 +119,6 @@ export const ComprehensiveMedicationList = () => {
     name: "medications",
   });
 
-  console.log(errors);
-
   useEffect(() => {
     if (comprehensiveMedicationList) {
       const formData = {
@@ -137,7 +135,7 @@ export const ComprehensiveMedicationList = () => {
               .map((item: string) => ({
                 allergen: item.trim(),
               }))
-          : "",
+          : [],
         medications:
           comprehensiveMedicationList?.medications &&
           comprehensiveMedicationList?.medications.length > 0

@@ -14,9 +14,11 @@ import {
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
 import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const MoveIn = () => {
   const params = useParams();
+  const queryClient = useQueryClient();
   const {
     data: startOfCareChecklist,
     isFetching: isLoadingChecklist,
@@ -33,6 +35,14 @@ export const MoveIn = () => {
   const { userData } = useAuthContext();
   const userPermissions =
     PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+
+  // Extract client data from query cache
+  const clientData = queryClient.getQueryData(["client", params.clientId]) as
+    | { first_name?: string; last_name?: string; date_of_birth?: string }
+    | undefined;
+  const clientFirstName = clientData?.first_name || "";
+  const clientLastName = clientData?.last_name || "";
+  const clientDateOfBirth = clientData?.date_of_birth || "";
   useEffect(() => {
     refetch();
   }, []);
@@ -87,6 +97,9 @@ export const MoveIn = () => {
   useEffect(() => {
     setOpenedFileData({
       ...formData,
+      firstName: clientFirstName,
+      lastName: clientLastName,
+      dateOfBirth: clientDateOfBirth,
       last_update: { updatedAt: startOfCareChecklist?.updatedAt },
     } as unknown as OpenedFileData);
   }, [formData]);

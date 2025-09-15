@@ -5,7 +5,7 @@ import {
   type InPatientStayNotesFormData,
   type OpenedFileData,
 } from "@agensy/types";
-import { InPatientStayNotesCol } from "./InPatientStayNotesCol";
+import { InPatientStayNotesCard } from "./InPatientStayNotesCard";
 import {
   Card,
   CommonLoader,
@@ -13,6 +13,7 @@ import {
   Input,
   PrimaryButton,
 } from "@agensy/components";
+import { ICONS } from "@agensy/constants";
 import { useParams } from "react-router-dom";
 import {
   useGetInPatientStayNotes,
@@ -48,12 +49,7 @@ export const InPatientStayNotes = () => {
       firstName: "",
       lastName: "",
       dateOfBirth: "",
-      questionsForProvider1: [{ question: "" }],
-      updatesFromProvider1: [{ update: "" }],
-      recommendationsNextSteps1: [{ recommendation: "" }],
-      questionsForProvider2: [{ question: "" }],
-      updatesFromProvider2: [{ update: "" }],
-      recommendationsNextSteps2: [{ recommendation: "" }],
+      inPatientStayNotes: [],
     },
   });
   const userPermissions =
@@ -62,143 +58,61 @@ export const InPatientStayNotes = () => {
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
-
   const {
-    fields: questionsFields1,
-    append: appendQuestion1,
-    remove: removeQuestion1,
+    fields: inPatientStayNotesFields,
+    append: appendInPatientStayNote,
+    remove: removeInPatientStayNote,
   } = useFieldArray({
     control,
-    name: "questionsForProvider1",
+    name: "inPatientStayNotes",
   });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapPatientDataToFormData = (inPatientData: any) => {
+    const mappedInPatientStayNotes = inPatientData.in_patient_stay_notes.map(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (note: any) => ({
+        id: note?.id || "",
+        date: note?.date ? DateUtils.formatDateToRequiredFormat(note.date) : "",
+        facilityName: note?.facility_name || "",
+        medicalProvider: note?.medical_provider || "",
+        specialty: note?.specialty || "",
+        questionsForProvider: note?.questions_for_provider
+          ? note.questions_for_provider.split(", ").map((question: string) => ({
+              question: question.trim(),
+            }))
+          : [],
+        updatesFromProvider: note?.updates_from_provider
+          ? note.updates_from_provider.split(", ").map((update: string) => ({
+              update: update.trim(),
+            }))
+          : [],
+        recommendationsNextSteps: note?.recommendations_next_steps
+          ? note.recommendations_next_steps
+              .split(", ")
+              .map((recommendation: string) => ({
+                recommendation: recommendation.trim(),
+              }))
+          : [],
+      })
+    );
 
-  const {
-    fields: updatesFields1,
-    append: appendUpdate1,
-    remove: removeUpdate1,
-  } = useFieldArray({
-    control,
-    name: "updatesFromProvider1",
-  });
-
-  const {
-    fields: recommendationsFields1,
-    append: appendRecommendation1,
-    remove: removeRecommendation1,
-  } = useFieldArray({
-    control,
-    name: "recommendationsNextSteps1",
-  });
-
-  const {
-    fields: questionsFields2,
-    append: appendQuestion2,
-    remove: removeQuestion2,
-  } = useFieldArray({
-    control,
-    name: "questionsForProvider2",
-  });
-
-  const {
-    fields: updatesFields2,
-    append: appendUpdate2,
-    remove: removeUpdate2,
-  } = useFieldArray({
-    control,
-    name: "updatesFromProvider2",
-  });
-
-  const {
-    fields: recommendationsFields2,
-    append: appendRecommendation2,
-    remove: removeRecommendation2,
-  } = useFieldArray({
-    control,
-    name: "recommendationsNextSteps2",
-  });
+    const formData = {
+      firstName: inPatientData.client_info?.first_name || "",
+      lastName: inPatientData.client_info?.last_name || "",
+      dateOfBirth: inPatientData.client_info?.date_of_birth
+        ? DateUtils.formatDateToRequiredFormat(
+            inPatientData.client_info?.date_of_birth
+          )
+        : "",
+      inPatientStayNotes: mappedInPatientStayNotes,
+    };
+    return formData;
+  };
 
   useEffect(() => {
     if (inPatientData && inPatientData?.in_patient_stay_notes) {
-      const formData = {
-        firstName: inPatientData.client_info?.first_name || "",
-        lastName: inPatientData.client_info?.last_name || "",
-        dateOfBirth: inPatientData.client_info?.date_of_birth
-          ? DateUtils.formatDateToRequiredFormat(
-              inPatientData.client_info?.date_of_birth
-            )
-          : "",
-        date1: inPatientData.in_patient_stay_notes?.[0]?.date
-          ? DateUtils.formatDateToRequiredFormat(
-              inPatientData.in_patient_stay_notes?.[0]?.date
-            )
-          : "",
-        id1: inPatientData.in_patient_stay_notes?.[0]?.id || "",
-        facilityName1:
-          inPatientData.in_patient_stay_notes?.[0]?.facility_name || "",
-        medicalProvider1:
-          inPatientData.in_patient_stay_notes?.[0]?.medical_provider || "",
-        specialty1: inPatientData.in_patient_stay_notes?.[0]?.specialty || "",
-        questionsForProvider1: inPatientData.in_patient_stay_notes?.[0]
-          ?.questions_for_provider
-          ? inPatientData.in_patient_stay_notes?.[0]?.questions_for_provider
-              .split(", ")
-              .map((question: string) => ({
-                question: question.trim(),
-              }))
-          : [],
-        updatesFromProvider1: inPatientData.in_patient_stay_notes?.[0]
-          ?.updates_from_provider
-          ? inPatientData.in_patient_stay_notes?.[0]?.updates_from_provider
-              .split(", ")
-              .map((update: string) => ({
-                update: update.trim(),
-              }))
-          : [],
-        recommendationsNextSteps1: inPatientData.in_patient_stay_notes?.[0]
-          ?.recommendations_next_steps
-          ? inPatientData.in_patient_stay_notes?.[0]?.recommendations_next_steps
-              .split(", ")
-              .map((recommendation: string) => ({
-                recommendation: recommendation.trim(),
-              }))
-          : [],
-        date2: inPatientData.in_patient_stay_notes?.[1]?.date
-          ? DateUtils.formatDateToRequiredFormat(
-              inPatientData.in_patient_stay_notes?.[1]?.date
-            )
-          : "",
-        id2: inPatientData.in_patient_stay_notes?.[1]?.id || "",
-        facilityName2:
-          inPatientData.in_patient_stay_notes?.[1]?.facility_name || "",
-        medicalProvider2:
-          inPatientData.in_patient_stay_notes?.[1]?.medical_provider || "",
-        specialty2: inPatientData.in_patient_stay_notes?.[1]?.specialty || "",
-        questionsForProvider2: inPatientData.in_patient_stay_notes?.[1]
-          ?.questions_for_provider
-          ? inPatientData.in_patient_stay_notes?.[1]?.questions_for_provider
-              .split(", ")
-              .map((question: string) => ({
-                question: question.trim(),
-              }))
-          : [],
-        updatesFromProvider2: inPatientData.in_patient_stay_notes?.[1]
-          ?.updates_from_provider
-          ? inPatientData.in_patient_stay_notes?.[1]?.updates_from_provider
-              .split(", ")
-              .map((update: string) => ({
-                update: update.trim(),
-              }))
-          : [],
-        recommendationsNextSteps2: inPatientData.in_patient_stay_notes?.[1]
-          ?.recommendations_next_steps
-          ? inPatientData.in_patient_stay_notes?.[1]?.recommendations_next_steps
-              .split(", ")
-              .map((recommendation: string) => ({
-                recommendation: recommendation.trim(),
-              }))
-          : [],
-      };
-      reset(formData);
+      const formData = mapPatientDataToFormData(inPatientData);
+      reset(formData as unknown as InPatientStayNotesFormData);
       setOpenedFileData({
         ...getValues(),
         last_update: {
@@ -216,6 +130,17 @@ export const InPatientStayNotes = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+      const formData = mapPatientDataToFormData(
+        postInPatientStayNotesMutation.data
+      );
+      reset(formData as unknown as InPatientStayNotesFormData);
+      setOpenedFileData({
+        ...formData,
+        last_update: {
+          updatedAt:
+            postInPatientStayNotesMutation.data?.last_update?.updatedAt || "",
+        },
+      } as unknown as OpenedFileData);
     } else if (postInPatientStayNotesMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -237,84 +162,55 @@ export const InPatientStayNotes = () => {
 
   const onSubmit = (data: InPatientStayNotesFormData) => {
     console.log("Form data:", data);
-    const firstItem = {
-      id: data.id1 ? data.id1 : null,
-      date: data.date1 ? DateUtils.changetoISO(data.date1) : null,
-      facility_name: data.facilityName1 ? data.facilityName1 : null,
-      medical_provider: data.medicalProvider1 ? data.medicalProvider1 : null,
-      specialty: data.specialty1 ? data.specialty1 : null,
-      questions_for_provider:
-        data.questionsForProvider1 && data.questionsForProvider1.length > 0
-          ? data.questionsForProvider1.map((item) => item.question).join(", ")
-              .length > 0
-            ? data.questionsForProvider1.map((item) => item.question).join(", ")
-            : null
-          : null,
-      updates_from_provider:
-        data.updatesFromProvider1 && data.updatesFromProvider1.length > 0
-          ? data.updatesFromProvider1.map((item) => item.update).join(", ")
-              .length > 0
-            ? data.updatesFromProvider1.map((item) => item.update).join(", ")
-            : null
-          : null,
-      recommendations_next_steps:
-        data.recommendationsNextSteps1 &&
-        data.recommendationsNextSteps1.length > 0
-          ? data.recommendationsNextSteps1
-              .map((item) => item.recommendation)
-              .join(", ").length > 0
-            ? data.recommendationsNextSteps1
-                .map((item) => item.recommendation)
-                .join(", ")
-            : null
-          : null,
-    };
 
-    if (!firstItem.id) {
-      // @ts-expect-error - TODO: fix this
-      delete firstItem.id;
-    }
+    const mappedInPatientStayNotes =
+      data.inPatientStayNotes?.map((note) => {
+        const item = {
+          id: note.id ? note.id : null,
+          date: note.date ? DateUtils.changetoISO(note.date) : null,
+          facility_name: note.facilityName ? note.facilityName : null,
+          medical_provider: note.medicalProvider ? note.medicalProvider : null,
+          specialty: note.specialty ? note.specialty : null,
+          questions_for_provider:
+            note.questionsForProvider && note.questionsForProvider.length > 0
+              ? note.questionsForProvider
+                  .map((item) => item.question)
+                  .join(", ").length > 0
+                ? note.questionsForProvider
+                    .map((item) => item.question)
+                    .join(", ")
+                : null
+              : null,
+          updates_from_provider:
+            note.updatesFromProvider && note.updatesFromProvider.length > 0
+              ? note.updatesFromProvider.map((item) => item.update).join(", ")
+                  .length > 0
+                ? note.updatesFromProvider.map((item) => item.update).join(", ")
+                : null
+              : null,
+          recommendations_next_steps:
+            note.recommendationsNextSteps &&
+            note.recommendationsNextSteps.length > 0
+              ? note.recommendationsNextSteps
+                  .map((item) => item.recommendation)
+                  .join(", ").length > 0
+                ? note.recommendationsNextSteps
+                    .map((item) => item.recommendation)
+                    .join(", ")
+                : null
+              : null,
+        };
 
-    const secondItem = {
-      id: data.id2 ? data.id2 : null,
-      date: data.date2 ? DateUtils.changetoISO(data.date2) : null,
-      facility_name: data.facilityName2 ? data.facilityName2 : null,
-      medical_provider: data.medicalProvider2 ? data.medicalProvider2 : null,
-      specialty: data.specialty2 ? data.specialty2 : null,
-      questions_for_provider:
-        data.questionsForProvider2 && data.questionsForProvider2.length > 0
-          ? data.questionsForProvider2.map((item) => item.question).join(", ")
-              .length > 0
-            ? data.questionsForProvider2.map((item) => item.question).join(", ")
-            : null
-          : null,
-      recommendations_next_steps:
-        data.recommendationsNextSteps2 &&
-        data.recommendationsNextSteps2.length > 0
-          ? data.recommendationsNextSteps2
-              .map((item) => item.recommendation)
-              .join(", ").length > 0
-            ? data.recommendationsNextSteps2
-                .map((item) => item.recommendation)
-                .join(", ")
-            : null
-          : null,
-      updates_from_provider:
-        data.updatesFromProvider2 && data.updatesFromProvider2.length > 0
-          ? data.updatesFromProvider2.map((item) => item.update).join(", ")
-              .length > 0
-            ? data.updatesFromProvider2.map((item) => item.update).join(", ")
-            : null
-          : null,
-    };
+        if (!item.id) {
+          // @ts-expect-error - TODO: fix this
+          delete item.id;
+        }
 
-    if (!secondItem.id) {
-      // @ts-expect-error - TODO: fix this
-      delete secondItem.id;
-    }
+        return item;
+      }) || [];
 
     const postData = {
-      in_patient_stay_notes: [firstItem, secondItem],
+      in_patient_stay_notes: mappedInPatientStayNotes,
       client_info: {
         first_name: data.firstName ? data.firstName : null,
         last_name: data.lastName ? data.lastName : null,
@@ -336,83 +232,92 @@ export const InPatientStayNotes = () => {
       </div>
     );
 
+  const addNewInPatientStayNote = () => {
+    appendInPatientStayNote({
+      id: "",
+      date: "",
+      facilityName: "",
+      medicalProvider: "",
+      specialty: "",
+      questionsForProvider: [],
+      updatesFromProvider: [],
+      recommendationsNextSteps: [],
+    });
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <Card title="Personal Information">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Input
-            label="First Name:"
-            register={register("firstName")}
-            error={errors.firstName?.message as string}
-          />
-          <Input
-            label="Last Name:"
-            register={register("lastName")}
-            error={errors.lastName?.message as string}
-          />
-          <div className="md:col-span-2">
-            <DatePickerField
-              control={control}
-              name={"dateOfBirth"}
-              label="Date of Birth:"
+    <div className="bg-gray-50 w-full">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <Card title="Personal Information">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <Input
+              label="First Name:"
+              register={register("firstName")}
+              error={errors.firstName?.message as string}
             />
+            <Input
+              label="Last Name:"
+              register={register("lastName")}
+              error={errors.lastName?.message as string}
+            />
+            <div className="md:col-span-2">
+              <DatePickerField
+                control={control}
+                name={"dateOfBirth"}
+                label="Date of Birth:"
+              />
+            </div>
           </div>
-        </div>
-      </Card>
-      <InPatientStayNotesCol
-        register={register}
-        control={control}
-        errors={errors}
-        questionsFields={questionsFields1}
-        updatesFields={updatesFields1}
-        recommendationsFields={recommendationsFields1}
-        appendQuestion={appendQuestion1}
-        appendUpdate={appendUpdate1}
-        appendRecommendation={appendRecommendation1}
-        removeQuestion={removeQuestion1}
-        removeUpdate={removeUpdate1}
-        removeRecommendation={removeRecommendation1}
-        facilityFieldName="facilityName1"
-        medicalProviderFieldName="medicalProvider1"
-        specialtyFieldName="specialty1"
-        dateField="date1"
-        questionsFieldName="questionsForProvider1"
-        updatesFieldName="updatesFromProvider1"
-        recommendationsFieldName="recommendationsNextSteps1"
-      />
-      <InPatientStayNotesCol
-        register={register}
-        control={control}
-        errors={errors}
-        questionsFields={questionsFields2}
-        updatesFields={updatesFields2}
-        recommendationsFields={recommendationsFields2}
-        appendQuestion={appendQuestion2}
-        appendUpdate={appendUpdate2}
-        appendRecommendation={appendRecommendation2}
-        removeQuestion={removeQuestion2}
-        removeUpdate={removeUpdate2}
-        removeRecommendation={removeRecommendation2}
-        facilityFieldName="facilityName2"
-        medicalProviderFieldName="medicalProvider2"
-        specialtyFieldName="specialty2"
-        dateField="date2"
-        questionsFieldName="questionsForProvider2"
-        updatesFieldName="updatesFromProvider2"
-        recommendationsFieldName="recommendationsNextSteps2"
-      />
-      {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
-        <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-          <PrimaryButton
-            type="submit"
-            isLoading={postInPatientStayNotesMutation.isPending}
-            disabled={postInPatientStayNotesMutation.isPending}
-            className="sm:!w-fit w-full md:text-base text-sm"
-          >
-            Save In-Patient Stay Notes
-          </PrimaryButton>
-        </div>
-      )}
-    </form>
+        </Card>
+
+        <Card
+          title="In-Patient Stay Notes"
+          className="mb-6"
+          buttonText={<ICONS.plus size={16} />}
+          onButtonClick={addNewInPatientStayNote}
+          ariaLabel="Add New In-Patient Stay Note"
+          showButton={true}
+        >
+          <div className="space-y-6">
+            {inPatientStayNotesFields.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>No in-patient stay notes added yet.</p>
+                <p className="text-sm">
+                  Click the + button above to add your first in-patient stay
+                  note.
+                </p>
+              </div>
+            ) : (
+              inPatientStayNotesFields.map((field, index) => (
+                <InPatientStayNotesCard
+                  key={field.id}
+                  index={index}
+                  register={register}
+                  control={control}
+                  errors={errors}
+                  onRemove={() => removeInPatientStayNote(index)}
+                  canRemove={inPatientStayNotesFields.length > 1}
+                />
+              ))
+            )}
+          </div>
+        </Card>
+
+        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                type="submit"
+                isLoading={postInPatientStayNotesMutation.isPending}
+                disabled={postInPatientStayNotesMutation.isPending}
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save In-Patient Stay Notes
+              </PrimaryButton>
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
   );
 };

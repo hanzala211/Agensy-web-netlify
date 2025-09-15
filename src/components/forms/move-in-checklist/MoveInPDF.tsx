@@ -186,6 +186,30 @@ const styles = StyleSheet.create({
     color: "#2563eb",
     textDecoration: "underline",
   },
+
+  personalInfoSection: {
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginBottom: 10,
+  },
+
+  personalInfoTitle: {
+    backgroundColor: HEADER_BG,
+    color: BORDER,
+    fontWeight: "bold",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+    fontSize: 12,
+  },
+
+  personalInfoContent: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    fontSize: 10,
+    lineHeight: 1.3,
+  },
 });
 
 interface ChecklistFormData {
@@ -193,7 +217,12 @@ interface ChecklistFormData {
 }
 
 interface MoveInPDFProps {
-  data?: ChecklistFormData & { last_update: { updatedAt: string } };
+  data?: ChecklistFormData & { 
+    firstName?: string;
+    lastName?: string;
+    dateOfBirth?: string;
+    last_update: { updatedAt: string } 
+  };
   schema?: ChecklistField[];
 }
 
@@ -488,6 +517,25 @@ export const MoveInPDF: React.FC<MoveInPDFProps> = ({
             )}
           </View>
         </View>
+
+        {/* Personal Information Section */}
+        {(data?.firstName || data?.lastName || data?.dateOfBirth) && (
+          <View style={styles.personalInfoSection}>
+            <Text style={styles.personalInfoTitle}>Personal Information</Text>
+            <View style={styles.personalInfoContent}>
+              {(data?.firstName || data?.lastName) && (
+                <Text>
+                  {`${data?.firstName || ""} ${data?.lastName || ""}`.trim()}
+                </Text>
+              )}
+              {data?.dateOfBirth && (
+                <Text style={{ marginTop: 4 }}>
+                  {`Date of Birth: ${DateUtils.formatDateToRequiredFormat(data.dateOfBirth)}`}
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
 
         {headings.map((heading) => {
           const headingFields = getFieldsByHeading(heading.headingId, schema);

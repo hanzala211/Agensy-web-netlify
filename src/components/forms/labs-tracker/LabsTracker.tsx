@@ -62,27 +62,6 @@ export const LabsTracker = () => {
   });
 
   const postLabsTracker = usePostLabsTracker();
-
-  useEffect(() => {
-    if (postLabsTracker.status === "success") {
-      toast.success(
-        "Labs Tests Tracker Successfully Updated",
-        "Your client's labs test tracker has been saved and is now up to date."
-      );
-      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
-      setHasUnsavedChanges(false);
-    } else if (postLabsTracker.status === "error") {
-      toast.error("Error Occurred", String(postLabsTracker.error));
-    }
-  }, [postLabsTracker.status, setHasUnsavedChanges]);
-
-  // Cleanup unsaved changes when component unmounts
-  useEffect(() => {
-    return () => {
-      setHasUnsavedChanges(false);
-    };
-  }, [setHasUnsavedChanges]);
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapLabsToFormData = (labs: any[], client_info: any) => {
     if (!labs || labs.length === 0) {
@@ -115,6 +94,37 @@ export const LabsTracker = () => {
         : "",
     };
   };
+
+  useEffect(() => {
+    if (postLabsTracker.status === "success") {
+      toast.success(
+        "Labs Tests Tracker Successfully Updated",
+        "Your client's labs test tracker has been saved and is now up to date."
+      );
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      setHasUnsavedChanges(false);
+      const formData = mapLabsToFormData(
+        postLabsTracker.data.labs_tests_imaging_tracker,
+        postLabsTracker.data.client_info
+      );
+      reset(formData);
+      setOpenedFileData({
+        ...formData,
+        last_update: {
+          updatedAt: postLabsTracker.data?.last_update?.updatedAt || "",
+        },
+      } as unknown as OpenedFileData);
+    } else if (postLabsTracker.status === "error") {
+      toast.error("Error Occurred", String(postLabsTracker.error));
+    }
+  }, [postLabsTracker.status, setHasUnsavedChanges]);
+
+  // Cleanup unsaved changes when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasUnsavedChanges(false);
+    };
+  }, [setHasUnsavedChanges]);
 
   const mapFormDataToVitals = (formData: LabsTrackerFormData) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

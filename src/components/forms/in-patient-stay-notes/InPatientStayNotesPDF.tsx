@@ -171,25 +171,8 @@ const NotesLists: React.FC<{
 export const InPatientStayNotesPDF: React.FC<{
   data?: InPatientStayNotesFormData & { last_update?: { updatedAt?: string } };
 }> = ({ data }) => {
-  // Check if Entry 1 has any data
-  const hasEntry1Data =
-    data?.date1 ||
-    data?.facilityName1 ||
-    data?.medicalProvider1 ||
-    data?.specialty1 ||
-    data?.questionsForProvider1?.some((q) => q?.question?.trim()) ||
-    data?.updatesFromProvider1?.some((u) => u?.update?.trim()) ||
-    data?.recommendationsNextSteps1?.some((r) => r?.recommendation?.trim());
-
-  // Check if Entry 2 has any data
-  const hasEntry2Data =
-    data?.date2 ||
-    data?.facilityName2 ||
-    data?.medicalProvider2 ||
-    data?.specialty2 ||
-    data?.questionsForProvider2?.some((q) => q?.question?.trim()) ||
-    data?.updatesFromProvider2?.some((u) => u?.update?.trim()) ||
-    data?.recommendationsNextSteps2?.some((r) => r?.recommendation?.trim());
+  // Get the in-patient stay notes array
+  const inPatientStayNotes = data?.inPatientStayNotes || [];
 
   return (
     <Document title="Agensy In-Patient Stay Notes">
@@ -223,48 +206,53 @@ export const InPatientStayNotesPDF: React.FC<{
           >{`Date of Birth: ${data?.dateOfBirth}`}</Text>
         </View>
 
-        {/* Entry 1 Section - only show if it has data */}
-        {hasEntry1Data && (
+        {/* In-Patient Stay Notes - render each note */}
+        {inPatientStayNotes.length === 0 ? (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Entry 1</Text>
-            {data?.date1 && <Field label="Date">{data.date1}</Field>}
-            {data?.facilityName1 && (
-              <Field label="Facility Name">{data.facilityName1}</Field>
-            )}
-            {data?.medicalProvider1 && (
-              <Field label="Medical Provider">{data.medicalProvider1}</Field>
-            )}
-            {data?.specialty1 && (
-              <Field label="Specialty">{data.specialty1}</Field>
-            )}
-            <NotesLists
-              questions={data?.questionsForProvider1}
-              updates={data?.updatesFromProvider1}
-              recommendations={data?.recommendationsNextSteps1}
-            />
+            <Text style={styles.sectionTitle}>In-Patient Stay Notes</Text>
+            <Text style={styles.sectionContent}>
+              No in-patient stay notes available.
+            </Text>
           </View>
-        )}
+        ) : (
+          inPatientStayNotes.map((note, index) => {
+            // Check if this note has any data
+            const hasNoteData =
+              note?.date ||
+              note?.facilityName ||
+              note?.medicalProvider ||
+              note?.specialty ||
+              note?.questionsForProvider?.some((q) => q?.question?.trim()) ||
+              note?.updatesFromProvider?.some((u) => u?.update?.trim()) ||
+              note?.recommendationsNextSteps?.some((r) =>
+                r?.recommendation?.trim()
+              );
 
-        {/* Entry 2 Section - only show if it has data */}
-        {hasEntry2Data && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Entry 2</Text>
-            {data?.date2 && <Field label="Date">{data.date2}</Field>}
-            {data?.facilityName2 && (
-              <Field label="Facility Name">{data.facilityName2}</Field>
-            )}
-            {data?.medicalProvider2 && (
-              <Field label="Medical Provider">{data.medicalProvider2}</Field>
-            )}
-            {data?.specialty2 && (
-              <Field label="Specialty">{data.specialty2}</Field>
-            )}
-            <NotesLists
-              questions={data?.questionsForProvider2}
-              updates={data?.updatesFromProvider2}
-              recommendations={data?.recommendationsNextSteps2}
-            />
-          </View>
+            if (!hasNoteData) return null;
+
+            return (
+              <View key={note.id || index} style={styles.section}>
+                <Text style={styles.sectionTitle}>
+                  In-Patient Stay Note {index + 1}
+                </Text>
+                {note?.date && <Field label="Date">{note.date}</Field>}
+                {note?.facilityName && (
+                  <Field label="Facility Name">{note.facilityName}</Field>
+                )}
+                {note?.medicalProvider && (
+                  <Field label="Medical Provider">{note.medicalProvider}</Field>
+                )}
+                {note?.specialty && (
+                  <Field label="Specialty">{note.specialty}</Field>
+                )}
+                <NotesLists
+                  questions={note?.questionsForProvider}
+                  updates={note?.updatesFromProvider}
+                  recommendations={note?.recommendationsNextSteps}
+                />
+              </View>
+            );
+          })
         )}
       </Page>
     </Document>

@@ -79,6 +79,205 @@ export const ImportantPeopleInLife = () => {
     refetch();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapValuestoFormData = (importantPeopleInLifeData: any) => {
+    return {
+      firstName: importantPeopleInLifeData.client_info.first_name,
+      lastName: importantPeopleInLifeData.client_info.last_name,
+      dateOfBirth: importantPeopleInLifeData.client_info.date_of_birth
+        ? DateUtils.formatDateToRequiredFormat(
+            importantPeopleInLifeData.client_info.date_of_birth
+          )
+        : "",
+      importantPeople: [
+        ...(importantPeopleInLifeData.important_people.mpoa_name
+          ? [
+              {
+                type: "medical_poa",
+                name: importantPeopleInLifeData.important_people.mpoa_name,
+                phone:
+                  importantPeopleInLifeData.important_people.mpoa_phone || "",
+                relationship:
+                  importantPeopleInLifeData.important_people
+                    .mpoa_relationship || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.fpoa_name
+          ? [
+              {
+                type: "financial_poa",
+                name: importantPeopleInLifeData.important_people.fpoa_name,
+                phone:
+                  importantPeopleInLifeData.important_people.fpoa_phone || "",
+                relationship:
+                  importantPeopleInLifeData.important_people
+                    .fpoa_relationship || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.lawyer_name
+          ? [
+              {
+                type: "lawyer",
+                name: importantPeopleInLifeData.important_people.lawyer_name,
+                phone:
+                  importantPeopleInLifeData.important_people.lawyer_phone || "",
+                firm:
+                  importantPeopleInLifeData.important_people.lawyer_firm || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.accountant_name
+          ? [
+              {
+                type: "accountant",
+                name: importantPeopleInLifeData.important_people
+                  .accountant_name,
+                phone:
+                  importantPeopleInLifeData.important_people.accountant_phone ||
+                  "",
+                firm:
+                  importantPeopleInLifeData.important_people.accountant_firm ||
+                  "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.financial_advisor_name
+          ? [
+              {
+                type: "financial_advisor",
+                name: importantPeopleInLifeData.important_people
+                  .financial_advisor_name,
+                phone:
+                  importantPeopleInLifeData.important_people
+                    .financial_advisor_phone || "",
+                firm:
+                  importantPeopleInLifeData.important_people
+                    .financial_advisor_firm || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.trust_officer_name
+          ? [
+              {
+                type: "trust_officer",
+                name: importantPeopleInLifeData.important_people
+                  .trust_officer_name,
+                phone:
+                  importantPeopleInLifeData.important_people
+                    .trust_officer_phone || "",
+                agency:
+                  importantPeopleInLifeData.important_people
+                    .trust_officer_agency || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.emergency_contact_name
+          ? [
+              {
+                type: "emergency_contact_2",
+                name: importantPeopleInLifeData.important_people
+                  .emergency_contact_name,
+                phone:
+                  importantPeopleInLifeData.important_people
+                    .emergency_contact_phone || "",
+                relationship:
+                  importantPeopleInLifeData.important_people
+                    .emergency_contact_relationship || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.neighbor_name
+          ? [
+              {
+                type: "neighbor",
+                name: importantPeopleInLifeData.important_people.neighbor_name,
+                phone:
+                  importantPeopleInLifeData.important_people.neighbor_phone ||
+                  "",
+                address:
+                  importantPeopleInLifeData.important_people.neighbor_address ||
+                  "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.closest_friend_name
+          ? [
+              {
+                type: "close_friend",
+                name: importantPeopleInLifeData.important_people
+                  .closest_friend_name,
+                phone:
+                  importantPeopleInLifeData.important_people
+                    .closest_friend_phone || "",
+                relationship:
+                  importantPeopleInLifeData.important_people
+                    .closest_friend_relationship || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.faith_contact_name
+          ? [
+              {
+                type: "faith_contact",
+                name: importantPeopleInLifeData.important_people
+                  .faith_contact_name,
+                phone:
+                  importantPeopleInLifeData.important_people
+                    .faith_contact_phone || "",
+                affiliation:
+                  importantPeopleInLifeData.important_people
+                    .faith_contact_affiliation || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.important_people.club_group_name
+          ? [
+              {
+                type: "club_group",
+                name: importantPeopleInLifeData.important_people
+                  .club_group_name,
+                phone:
+                  importantPeopleInLifeData.important_people
+                    .club_group_contact || "",
+              },
+            ]
+          : []),
+
+        ...(importantPeopleInLifeData.emergency_contact.first_name ||
+        importantPeopleInLifeData.emergency_contact.last_name
+          ? [
+              {
+                type: "emergency_contact_1",
+                name: `${
+                  importantPeopleInLifeData.emergency_contact.first_name || ""
+                } ${
+                  importantPeopleInLifeData.emergency_contact.last_name || ""
+                }`.trim(),
+                phone: importantPeopleInLifeData.emergency_contact.phone || "",
+                relationship:
+                  importantPeopleInLifeData.emergency_contact.relationship ||
+                  "",
+              },
+            ]
+          : []),
+      ],
+      notesAndReminders:
+        importantPeopleInLifeData.important_people.additional_notes || "",
+    };
+  };
+
   useEffect(() => {
     if (postImportantPeopleInLifeMutation.status === "success") {
       toast.success(
@@ -87,6 +286,10 @@ export const ImportantPeopleInLife = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+      const formData = mapValuestoFormData(
+        postImportantPeopleInLifeMutation.data
+      );
+      reset(formData as unknown as ImportantPeopleInLifeFormData);
     } else if (postImportantPeopleInLifeMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -97,206 +300,8 @@ export const ImportantPeopleInLife = () => {
 
   useEffect(() => {
     if (importantPeopleInLifeData) {
-      const formData = {
-        firstName: importantPeopleInLifeData.client_info.first_name,
-        lastName: importantPeopleInLifeData.client_info.last_name,
-        dateOfBirth: importantPeopleInLifeData.client_info.date_of_birth
-          ? DateUtils.formatDateToRequiredFormat(
-              importantPeopleInLifeData.client_info.date_of_birth
-            )
-          : "",
-        importantPeople: [
-          ...(importantPeopleInLifeData.important_people.mpoa_name
-            ? [
-                {
-                  type: "medical_poa",
-                  name: importantPeopleInLifeData.important_people.mpoa_name,
-                  phone:
-                    importantPeopleInLifeData.important_people.mpoa_phone || "",
-                  relationship:
-                    importantPeopleInLifeData.important_people
-                      .mpoa_relationship || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.fpoa_name
-            ? [
-                {
-                  type: "financial_poa",
-                  name: importantPeopleInLifeData.important_people.fpoa_name,
-                  phone:
-                    importantPeopleInLifeData.important_people.fpoa_phone || "",
-                  relationship:
-                    importantPeopleInLifeData.important_people
-                      .fpoa_relationship || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.lawyer_name
-            ? [
-                {
-                  type: "lawyer",
-                  name: importantPeopleInLifeData.important_people.lawyer_name,
-                  phone:
-                    importantPeopleInLifeData.important_people.lawyer_phone ||
-                    "",
-                  firm:
-                    importantPeopleInLifeData.important_people.lawyer_firm ||
-                    "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.accountant_name
-            ? [
-                {
-                  type: "accountant",
-                  name: importantPeopleInLifeData.important_people
-                    .accountant_name,
-                  phone:
-                    importantPeopleInLifeData.important_people
-                      .accountant_phone || "",
-                  firm:
-                    importantPeopleInLifeData.important_people
-                      .accountant_firm || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.financial_advisor_name
-            ? [
-                {
-                  type: "financial_advisor",
-                  name: importantPeopleInLifeData.important_people
-                    .financial_advisor_name,
-                  phone:
-                    importantPeopleInLifeData.important_people
-                      .financial_advisor_phone || "",
-                  firm:
-                    importantPeopleInLifeData.important_people
-                      .financial_advisor_firm || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.trust_officer_name
-            ? [
-                {
-                  type: "trust_officer",
-                  name: importantPeopleInLifeData.important_people
-                    .trust_officer_name,
-                  phone:
-                    importantPeopleInLifeData.important_people
-                      .trust_officer_phone || "",
-                  agency:
-                    importantPeopleInLifeData.important_people
-                      .trust_officer_agency || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.emergency_contact_name
-            ? [
-                {
-                  type: "emergency_contact_2",
-                  name: importantPeopleInLifeData.important_people
-                    .emergency_contact_name,
-                  phone:
-                    importantPeopleInLifeData.important_people
-                      .emergency_contact_phone || "",
-                  relationship:
-                    importantPeopleInLifeData.important_people
-                      .emergency_contact_relationship || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.neighbor_name
-            ? [
-                {
-                  type: "neighbor",
-                  name: importantPeopleInLifeData.important_people
-                    .neighbor_name,
-                  phone:
-                    importantPeopleInLifeData.important_people.neighbor_phone ||
-                    "",
-                  address:
-                    importantPeopleInLifeData.important_people
-                      .neighbor_address || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.closest_friend_name
-            ? [
-                {
-                  type: "close_friend",
-                  name: importantPeopleInLifeData.important_people
-                    .closest_friend_name,
-                  phone:
-                    importantPeopleInLifeData.important_people
-                      .closest_friend_phone || "",
-                  relationship:
-                    importantPeopleInLifeData.important_people
-                      .closest_friend_relationship || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.faith_contact_name
-            ? [
-                {
-                  type: "faith_contact",
-                  name: importantPeopleInLifeData.important_people
-                    .faith_contact_name,
-                  phone:
-                    importantPeopleInLifeData.important_people
-                      .faith_contact_phone || "",
-                  affiliation:
-                    importantPeopleInLifeData.important_people
-                      .faith_contact_affiliation || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.important_people.club_group_name
-            ? [
-                {
-                  type: "club_group",
-                  name: importantPeopleInLifeData.important_people
-                    .club_group_name,
-                  phone:
-                    importantPeopleInLifeData.important_people
-                      .club_group_contact || "",
-                },
-              ]
-            : []),
-
-          ...(importantPeopleInLifeData.emergency_contact.first_name ||
-          importantPeopleInLifeData.emergency_contact.last_name
-            ? [
-                {
-                  type: "emergency_contact_1",
-                  name: `${
-                    importantPeopleInLifeData.emergency_contact.first_name || ""
-                  } ${
-                    importantPeopleInLifeData.emergency_contact.last_name || ""
-                  }`.trim(),
-                  phone:
-                    importantPeopleInLifeData.emergency_contact.phone || "",
-                  relationship:
-                    importantPeopleInLifeData.emergency_contact.relationship ||
-                    "",
-                },
-              ]
-            : []),
-        ],
-        notesAndReminders:
-          importantPeopleInLifeData.important_people.additional_notes || "",
-      };
-      reset(formData);
+      const formData = mapValuestoFormData(importantPeopleInLifeData);
+      reset(formData as unknown as ImportantPeopleInLifeFormData);
       setOpenedFileData({
         ...getValues(),
         last_update: {

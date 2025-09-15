@@ -229,6 +229,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update: { updatedAt: string };
                   }
                 }
@@ -250,6 +253,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                       in_place: boolean;
                       notes?: string | null;
                     }[];
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update?: { updatedAt: string };
                   }
                 }
@@ -291,6 +297,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update: { updatedAt: string };
                   }
                 }
@@ -306,6 +315,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update: { updatedAt: string };
                   }
                 }
@@ -321,6 +333,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update: { updatedAt: string };
                   }
                 }
@@ -336,6 +351,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update: { updatedAt: string };
                   }
                 }
@@ -366,6 +384,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update: { updatedAt: string };
                   }
                 }
@@ -381,6 +402,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   openedFileData as unknown as {
                     [key: string]: boolean | string;
                   } & {
+                    firstName?: string;
+                    lastName?: string;
+                    dateOfBirth?: string;
                     last_update: { updatedAt: string };
                   }
                 }

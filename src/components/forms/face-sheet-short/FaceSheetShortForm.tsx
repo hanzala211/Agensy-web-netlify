@@ -115,12 +115,12 @@ export const FaceSheetShortForm: React.FC = () => {
         defaultValues,
         getValues()
       );
-      console.log(mappedValues, "mappedValues");
 
       Object.entries(mappedValues).forEach(([key, value]) => {
         setValue(key as keyof FaceSheetShortFormData, value);
       });
       setOcrResult([]);
+      setHasUnsavedChanges(true);
     }
   }, [ocrResult]);
 

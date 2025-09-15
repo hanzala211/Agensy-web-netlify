@@ -125,10 +125,10 @@ export const HealthHistoryForm: React.FC = () => {
         defaultValues,
         getValues()
       );
-      console.log(mappedValues);
       Object.entries(mappedValues).forEach(([key, value]) => {
         setValue(key as keyof HealthHistoryFormData, value);
       });
+      setHasUnsavedChanges(true);
       setOcrResult([]);
     }
   }, [ocrResult]);
