@@ -732,28 +732,33 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                {isCreatingMedicalTemplate ? (
-                  <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
-                    <CommonLoader size={16} />
-                    <span className="text-sm text-gray-600">
-                      Creating Template...
-                    </span>
-                  </div>
-                ) : (
-                  <TertiaryButton
-                    onClick={onAddMedicalAppointmentTemplate}
-                    className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent text-sm"
-                  >
-                    <span className="flex items-center gap-2 whitespace-nowrap">
-                      <span className="hidden sm:inline">
-                        Add Medical Appointment Template
+              {handleFilterPermission(
+                selectedClient?.id as string,
+                APP_ACTIONS.EditAgensyForms
+              ) && (
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+                  {isCreatingMedicalTemplate ? (
+                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                      <CommonLoader size={16} />
+                      <span className="text-sm text-gray-600">
+                        Creating Template...
                       </span>
-                      <span className="sm:hidden">Add Template</span>
-                    </span>
-                  </TertiaryButton>
-                )}
-              </div>
+                    </div>
+                  ) : (
+                    <TertiaryButton
+                      onClick={onAddMedicalAppointmentTemplate}
+                      className="hover:bg-blue-50 !border-gray-500 shadow-none hover:text-blue-500 hover:!border-blue-300 bg-transparent text-sm"
+                    >
+                      <span className="flex items-center gap-2 whitespace-nowrap">
+                        <span className="hidden sm:inline">
+                          Add Medical Appointment Template
+                        </span>
+                        <span className="sm:hidden">Add Template</span>
+                      </span>
+                    </TertiaryButton>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
