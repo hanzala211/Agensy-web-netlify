@@ -497,21 +497,6 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
             className={`${getConfidenceColor(categoryConfidence)}`}
           />
 
-          <Input
-            label="Title"
-            register={register("title", { required: true })}
-            error={errors.title?.message}
-            inputClassname={`${getConfidenceColor(titleConfidence)}`}
-          />
-
-          <TextArea
-            label="Description"
-            register={register("description")}
-            error={errors.description?.message}
-            rows={3}
-            className={`${getConfidenceColor(descriptionConfidence)}`}
-          />
-
           {showPrimaryUser && (
             <Select
               control={control}
@@ -530,6 +515,21 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
               showButton={false}
             />
           )}
+
+          <Input
+            label="Title"
+            register={register("title", { required: true })}
+            error={errors.title?.message}
+            inputClassname={`${getConfidenceColor(titleConfidence)}`}
+          />
+
+          <TextArea
+            label="Description"
+            register={register("description")}
+            error={errors.description?.message}
+            rows={3}
+            className={`${getConfidenceColor(descriptionConfidence)}`}
+          />
         </div>
       </div>
 
