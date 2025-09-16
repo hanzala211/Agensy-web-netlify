@@ -246,12 +246,22 @@ export const medicalHistorySchema = z.object({
 
 export type MedicalHistoryFormData = z.infer<typeof medicalHistorySchema>;
 
-export const documentSchema = z.object({
-  documentType: z.string().min(1, "Category is required").transform(trimString),
-  title: z.string().min(1, "Title is required").transform(trimString),
-  description: z.string().optional(),
-  file: z.instanceof(File, { message: "File is required" }),
-});
+export const documentSchema = z
+  .object({
+    documentType: z
+      .string()
+      .min(1, "Category is required")
+      .transform(trimString),
+    title: z.string().min(1, "Title is required").transform(trimString),
+    description: z.string().optional(),
+    file: z.instanceof(File, { message: "File is required" }),
+    primaryUserId: z.string().optional(),
+    showPrimaryUser: z.boolean().optional(),
+  })
+  .refine((data) => (data.showPrimaryUser ? data.primaryUserId : true), {
+    message: "Family admin is required",
+    path: ["primaryUserId"],
+  });
 
 export type DocumentFormData = z.infer<typeof documentSchema>;
 

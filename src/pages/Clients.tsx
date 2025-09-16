@@ -9,11 +9,9 @@ import {
   EmptyStateCard,
 } from "@agensy/components";
 import {
-  APP_ACTIONS,
   CLIENTS_FILTERS,
   CLIENTS_SORT_OPTIONS,
   ICONS,
-  PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
 import type { Client, ClientFormData } from "@agensy/types";
@@ -21,10 +19,9 @@ import { useNavigate } from "react-router-dom";
 import { useAddClientMutation } from "@agensy/api";
 import { DateUtils, toast } from "@agensy/utils";
 import { useClientManager } from "@agensy/hooks";
-import { useAuthContext, useClientContext } from "@agensy/context";
+import { useClientContext } from "@agensy/context";
 
 export const Clients: React.FC = () => {
-  const { userData } = useAuthContext();
   const {
     clients,
     isLoading,
@@ -48,8 +45,6 @@ export const Clients: React.FC = () => {
   const [isAddClientModalOpen, setIsAddClientModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     loadClients();
@@ -108,16 +103,13 @@ export const Clients: React.FC = () => {
   };
 
   const handleEmptyStateClick = () => {
-    if (userPermissions.includes(APP_ACTIONS.AddClient)) {
-      setIsAddClientModalOpen(true);
-    }
+    setIsAddClientModalOpen(true);
   };
   return (
     <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
       <PageHeader
         title="Care Recipients"
         buttonText="Add Care Recipient"
-        showButton={userPermissions.includes(APP_ACTIONS.AddClient)}
         buttonAriaLabel="Add new care recipient"
         onButtonClick={() => setIsAddClientModalOpen(true)}
       />
@@ -155,14 +147,12 @@ export const Clients: React.FC = () => {
             label="Client"
             ICON={ICONS.plus}
             onClick={handleEmptyStateClick}
-            showText={userPermissions.includes(APP_ACTIONS.AddClient)}
           />
         ) : (
           <EmptyStateCard
             label="Client"
             ICON={ICONS.plus}
             onClick={handleEmptyStateClick}
-            showText={userPermissions.includes(APP_ACTIONS.AddClient)}
           />
         )}
       </div>

@@ -8,8 +8,8 @@ import {
   PageHeader,
   TabLink,
 } from "@agensy/components";
-import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
-import { useAppointmentsContext, useAuthContext } from "@agensy/context";
+import { ROUTES } from "@agensy/constants";
+import { useAppointmentsContext } from "@agensy/context";
 import type { AppointmentFormData } from "@agensy/types";
 import { DateUtils, toast } from "@agensy/utils";
 import type React from "react";
@@ -18,7 +18,6 @@ import { Outlet } from "react-router-dom";
 
 export const AppointmentsManager: React.FC = () => {
   const { setAppointments } = useAppointmentsContext();
-  const { userData } = useAuthContext();
   const {
     addAppointment,
     isAddAppointmentModalOpen,
@@ -30,8 +29,6 @@ export const AppointmentsManager: React.FC = () => {
     isLoading: isLoadingAppointments,
     refetch: loadAppointments,
   } = useGetClientAppointmentQuery();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     loadAppointments();
@@ -83,7 +80,6 @@ export const AppointmentsManager: React.FC = () => {
         showBackButton={false}
         buttonText="Add Appointment"
         buttonAriaLabel="Add Appointment"
-        showButton={userPermissions.includes(APP_ACTIONS.ClientAppointmentAdd)}
         onButtonClick={() => setIsAddAppointmentModalOpen(true)}
       />
       <AddAppointmentModal

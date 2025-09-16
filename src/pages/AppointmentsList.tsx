@@ -11,7 +11,6 @@ import {
   APPOINTMENT_SORT_OPTIONS,
   APPOINTMENT_TYPE_FILTERS,
   ICONS,
-  PERMISSIONS,
 } from "@agensy/constants";
 import type { Appointment, Client } from "@agensy/types";
 import { useAppointmentManager, useCalendarState } from "@agensy/hooks";
@@ -31,7 +30,7 @@ export const AppointmentsList: React.FC = () => {
     deleteClientAppointmentMutation,
     editClientAppointmentMutation,
   } = useCalendarState(appointments as Appointment[]);
-  const { clients, userData } = useAuthContext();
+  const { clients, handleFilterPermission } = useAuthContext();
   const {
     searchTerm,
     setSearchTerm,
@@ -55,8 +54,6 @@ export const AppointmentsList: React.FC = () => {
     appointments: appointments as Appointment[],
     initialItemsPerPage: 4,
   });
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (deleteClientAppointmentMutation.status === "success") {
@@ -103,15 +100,8 @@ export const AppointmentsList: React.FC = () => {
           <EmptyStateCard
             ICON={ICONS.plus}
             label="Appointments"
-            showText={userPermissions.includes(
-              APP_ACTIONS.ClientAppointmentInfoEdit
-            )}
             onClick={() => {
-              if (
-                userPermissions.includes(APP_ACTIONS.ClientAppointmentInfoEdit)
-              ) {
-                setIsAddAppointmentModalOpen(true);
-              }
+              setIsAddAppointmentModalOpen(true);
             }}
           />
         ) : (
@@ -122,7 +112,8 @@ export const AppointmentsList: React.FC = () => {
               onEdit={handleOpenEditModal}
               onDelete={handleDelete}
               isDeleting={deleteClientAppointmentMutation.isPending}
-              showActions={userPermissions.includes(
+              showActions={handleFilterPermission(
+                appointment.client_id,
                 APP_ACTIONS.ClientAppointmentInfoEdit
               )}
             />

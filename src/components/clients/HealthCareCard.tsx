@@ -4,7 +4,7 @@ import {
   EmptyStateCard,
   HealthcareItem,
 } from "@agensy/components";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import React, { useEffect, useMemo, useState } from "react";
 import { useUpdateClientHealthcareMutation } from "@agensy/api";
@@ -13,14 +13,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@agensy/utils";
 
 export const HealthCareCard: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const updateClientHealthcareMutation = useUpdateClientHealthcareMutation();
   const { selectedClient } = useClientContext();
   const [isEditHealthcareModalOpen, setIsEditHealthcareModalOpen] =
     useState<boolean>(false);
   const queryClient = useQueryClient();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (updateClientHealthcareMutation.isSuccess) {
@@ -76,7 +74,10 @@ export const HealthCareCard: React.FC = () => {
         buttonText={<ICONS.edit />}
         onButtonClick={() => setIsEditHealthcareModalOpen(true)}
         ariaLabel="Edit Healthcare Information"
-        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
+        showButton={handleFilterPermission(
+          selectedClient?.id as string,
+          APP_ACTIONS.EditClientMedicalInfo
+        )}
       >
         {selectedClient?.preferred_hospital ||
         selectedClient?.pharmacy_name ||
@@ -131,12 +132,18 @@ export const HealthCareCard: React.FC = () => {
             ICON={ICONS.edit}
             label="Healthcare Information"
             onClick={() => {
-              if (userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)) {
+              if (
+                handleFilterPermission(
+                  selectedClient?.id as string,
+                  APP_ACTIONS.EditClientMedicalInfo
+                )
+              ) {
                 setIsEditHealthcareModalOpen(true);
               }
             }}
             isEdit={true}
-            showText={userPermissions.includes(
+            showText={handleFilterPermission(
+              selectedClient?.id as string,
               APP_ACTIONS.EditClientMedicalInfo
             )}
           />

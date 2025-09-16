@@ -8,7 +8,7 @@ import {
   DatePickerField,
   PrimaryButton,
 } from "@agensy/components";
-import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
+import { APP_ACTIONS, ROUTES } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { DateUtils, toast } from "@agensy/utils";
 import { useEffect } from "react";
@@ -169,7 +169,7 @@ const advanceCarePlanningDocuments: AdvanceCareDocument[] = [
 
 export const EssentialDocumentForAging = () => {
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const params = useParams();
   const queryClient = useQueryClient();
   const {
@@ -191,8 +191,6 @@ export const EssentialDocumentForAging = () => {
       documents: advanceCarePlanningDocuments,
     },
   });
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   // Extract client data from query cache
   const clientData = queryClient.getQueryData(["client", params.clientId]) as
@@ -404,7 +402,10 @@ export const EssentialDocumentForAging = () => {
           </div>
 
           {/* Form Actions */}
-          {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+          {handleFilterPermission(
+            params.clientId as string,
+            APP_ACTIONS.EditAgensyForms
+          ) && (
             <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
               <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
                 <PrimaryButton

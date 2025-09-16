@@ -28,10 +28,10 @@ import { caregiverInformationFormSchema } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS } from "@agensy/constants";
 
 export const CaregiverInformation = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const { clientId } = useParams();
   const [formData, setFormData] = useState<ChecklistFormData>(
     generateCaregiverInformationDefaultValues()
@@ -45,8 +45,6 @@ export const CaregiverInformation = () => {
     isFetching: isLoadingChecklist,
     refetch,
   } = useGetCaregiverInformation(clientId!);
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   // Extract client data from query cache
   const clientData = queryClient.getQueryData(["client", clientId]) as
@@ -437,7 +435,10 @@ export const CaregiverInformation = () => {
             );
           })}
         </div>
-        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        {handleFilterPermission(
+          clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
           <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
               <PrimaryButton

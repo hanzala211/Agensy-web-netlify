@@ -1,7 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CommonLoader, Input, PrimaryButton } from "@agensy/components";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { DatePickerField } from "@agensy/components";
 import {
   vitalsTrackerFormSchema,
@@ -26,11 +26,9 @@ const defaultValues: VitalsTrackerFormData = {
 
 export const VitalsTracker = () => {
   const params = useParams();
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const queryClient = useQueryClient();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const {
     data: vitalsTrackerData,
     isFetching: isLoadingVitals,
@@ -320,7 +318,10 @@ export const VitalsTracker = () => {
           />
         </Card>
 
-        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        {handleFilterPermission(
+          params.clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
           <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
               <PrimaryButton

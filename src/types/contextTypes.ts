@@ -31,6 +31,8 @@ export interface AuthContextType {
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
   loadAuth: () => void;
   accessUsers: IUser[];
+  filterClientRole: (clientId: string) => string;
+  handleFilterPermission: (clientId: string, appAction: string) => boolean;
 }
 
 export interface ClientContextType {

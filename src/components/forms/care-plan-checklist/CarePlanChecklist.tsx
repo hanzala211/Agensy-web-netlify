@@ -13,13 +13,13 @@ import {
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
 import { toast } from "@agensy/utils";
-import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const CarePlanChecklist = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const {
     data: startOfCareChecklist,
     isFetching: isLoadingChecklist,
@@ -33,8 +33,6 @@ export const CarePlanChecklist = () => {
   );
   const postStartCareChecklistMutation = usePostChecklistFormsMutation();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   const clientData = queryClient.getQueryData(["client", params.clientId]) as
     | { first_name?: string; last_name?: string; date_of_birth?: string }
@@ -193,7 +191,10 @@ export const CarePlanChecklist = () => {
             );
           })}
         </div>
-        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        {handleFilterPermission(
+          params.clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
           <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
               <PrimaryButton

@@ -70,7 +70,7 @@ export const EditAccessModal: React.FC<EditAccessModalProps> = ({
         last_name: editData.last_name,
         relation: editData.relation,
         phone: editData.phone,
-        role: editData.role,
+        role: editData.UserRoles?.role,
       });
     }
   }, [editData, reset]);

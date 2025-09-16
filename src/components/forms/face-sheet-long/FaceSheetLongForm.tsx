@@ -48,7 +48,6 @@ import {
   RELATIONSHIP_TO_CLIENT,
   RACE_OPTIONS,
   COGNITIVE_STATUS,
-  PERMISSIONS,
   APP_ACTIONS,
 } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -125,7 +124,7 @@ const defaultValues = {
 
 export const FaceSheetLongForm: React.FC = () => {
   const params = useParams();
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const queryClient = useQueryClient();
   const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
     useClientContext();
@@ -149,8 +148,6 @@ export const FaceSheetLongForm: React.FC = () => {
     resolver: zodResolver(faceSheetLongFormSchema),
     defaultValues,
   });
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
@@ -896,7 +893,10 @@ export const FaceSheetLongForm: React.FC = () => {
           surgicalHistoryArray={surgicalHistoryArray}
         />
         {/* Form Actions */}
-        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        {handleFilterPermission(
+          clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
           <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
               <PrimaryButton

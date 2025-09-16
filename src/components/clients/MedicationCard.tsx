@@ -1,7 +1,7 @@
 import { EmptyStateCard } from "@agensy/components";
 import { MedicationItem } from "./MedicationItem";
 import { Card } from "@agensy/components";
-import { ICONS, PERMISSIONS, APP_ACTIONS } from "@agensy/constants";
+import { ICONS, APP_ACTIONS } from "@agensy/constants";
 import type { ClientMedications, MedicationFormData } from "@agensy/types";
 import React, { useEffect, useState } from "react";
 import AddMedicationModal from "./AddMedicationModal";
@@ -14,7 +14,7 @@ import { useAuthContext, useClientContext } from "@agensy/context";
 import { DateUtils, toast } from "@agensy/utils";
 
 export const MedicationCard: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const addClientMedicationMutation = useAddClientMedicationMutation();
   const editClientMedicationMutation = useEditClientMedicationMutation();
   const deleteClientMedicationMutation = useDeleteClientMedicationMutation();
@@ -28,8 +28,6 @@ export const MedicationCard: React.FC = () => {
     useState<boolean>(false);
   const [selectedEditMedication, setSelectedEditMedication] =
     useState<ClientMedications | null>(null);
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (!isAddMedicationModalOpen) {
@@ -118,7 +116,10 @@ export const MedicationCard: React.FC = () => {
         buttonText={<ICONS.plus size={16} />}
         ariaLabel="Add New Medication"
         onButtonClick={() => setIsAddMedicationModalOpen(true)}
-        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
+        showButton={handleFilterPermission(
+          selectedClient?.id as string,
+          APP_ACTIONS.EditClientMedicalInfo
+        )}
       >
         <div className="flex flex-col gap-5">
           {selectedClient?.medications?.map((medication: ClientMedications) => (
@@ -133,7 +134,8 @@ export const MedicationCard: React.FC = () => {
                 });
               }}
               isDeleting={deleteClientMedicationMutation.isPending}
-              showActions={userPermissions.includes(
+              showActions={handleFilterPermission(
+                selectedClient?.id as string,
                 APP_ACTIONS.EditClientMedicalInfo
               )}
             />
@@ -145,12 +147,16 @@ export const MedicationCard: React.FC = () => {
               label="Medications"
               onClick={() => {
                 if (
-                  userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)
+                  handleFilterPermission(
+                    selectedClient?.id as string,
+                    APP_ACTIONS.EditClientMedicalInfo
+                  )
                 ) {
                   setIsAddMedicationModalOpen(true);
                 }
               }}
-              showText={userPermissions.includes(
+              showText={handleFilterPermission(
+                selectedClient?.id as string,
                 APP_ACTIONS.EditClientMedicalInfo
               )}
             />

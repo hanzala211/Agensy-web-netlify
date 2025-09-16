@@ -20,7 +20,6 @@ import {
   useGetGeneralDocumentsQuery,
 } from "@agensy/api";
 import { useAuthContext, useDocumentContext } from "@agensy/context";
-import { PERMISSIONS } from "@agensy/constants";
 import { toast } from "@agensy/utils";
 import { useNavigate } from "react-router-dom";
 import { useDocumentManager } from "@agensy/hooks";
@@ -58,9 +57,7 @@ export const DocumentsManager: React.FC = () => {
   });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { userData } = useAuthContext();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+  const { handleFilterPermission, userData } = useAuthContext();
 
   useEffect(() => {
     loadGeneralDocuments();
@@ -148,11 +145,8 @@ export const DocumentsManager: React.FC = () => {
       <div className="mt-8 space-y-7 ">
         {!paginatedDocuments || paginatedDocuments.length === 0 ? (
           <EmptyStateCard
-            showText={userPermissions.includes(APP_ACTIONS.AddDocs)}
             onClick={() => {
-              if (userPermissions.includes(APP_ACTIONS.AddDocs)) {
-                setIsAddDocumentModalOpen(true);
-              }
+              setIsAddDocumentModalOpen(true);
             }}
             ICON={ICONS.plus}
             label={"Documents"}
@@ -170,7 +164,14 @@ export const DocumentsManager: React.FC = () => {
               onPreview={() => navigate(`${doc.id}`)}
               showLabel={true}
               showClientName={doc.client_id ? true : false}
-              showActions={userPermissions.includes(APP_ACTIONS.DeleteDocs)}
+              showActions={
+                doc.client_id !== null
+                  ? handleFilterPermission(
+                      doc.client_id,
+                      APP_ACTIONS.DeleteDocs
+                    )
+                  : userData?.id === doc.primary_user_id
+              }
             />
           ))
         )}

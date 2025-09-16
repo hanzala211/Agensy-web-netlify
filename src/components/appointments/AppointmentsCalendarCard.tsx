@@ -1,6 +1,6 @@
 import { AddAppointmentModal, AppointmentCard } from "@agensy/components";
 import { EmptyStateCard } from "@agensy/components";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import type { Appointment } from "@agensy/types";
 import React from "react";
 import { useCalendarState } from "@agensy/hooks";
@@ -33,9 +33,7 @@ export const AppointmentsCalendarCard: React.FC<
     handleDelete,
     deleteClientAppointmentMutation,
   } = useCalendarState(selectedAppointments);
-  const { userData } = useAuthContext();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+  const { handleFilterPermission } = useAuthContext();
 
   return (
     <React.Fragment>
@@ -48,17 +46,8 @@ export const AppointmentsCalendarCard: React.FC<
             <EmptyStateCard
               ICON={ICONS.plus}
               label="Appointments"
-              showText={userPermissions.includes(
-                APP_ACTIONS.ClientAppointmentInfoEdit
-              )}
               onClick={() => {
-                if (
-                  userPermissions.includes(
-                    APP_ACTIONS.ClientAppointmentInfoEdit
-                  )
-                ) {
-                  setIsAddAppointmentModalOpen(true);
-                }
+                setIsAddAppointmentModalOpen(true);
               }}
             />
           ) : (
@@ -69,7 +58,8 @@ export const AppointmentsCalendarCard: React.FC<
                 onEdit={handleOpenEditModal}
                 onDelete={handleDelete}
                 isDeleting={deleteClientAppointmentMutation.isPending}
-                showActions={userPermissions.includes(
+                showActions={handleFilterPermission(
+                  appointment.client_id,
                   APP_ACTIONS.ClientAppointmentInfoEdit
                 )}
               />

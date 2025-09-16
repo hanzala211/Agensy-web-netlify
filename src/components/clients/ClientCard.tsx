@@ -3,7 +3,7 @@ import type { Client } from "@agensy/types";
 import { DateUtils, toast, StringUtils } from "@agensy/utils";
 import { useUpdateClientStatusMutation } from "@agensy/api";
 import { BorderedCard, ConfirmationModal } from "@agensy/components";
-import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS } from "@agensy/constants";
 import { useAuthContext } from "@agensy/context";
 
 interface ClientCardProps {
@@ -21,11 +21,9 @@ export const ClientCard: React.FC<ClientCardProps> = ({
   showStatus = true,
   showActions = true,
 }) => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const updateClientStatusMutation = useUpdateClientStatusMutation();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (updateClientStatusMutation.status === "success") {
@@ -104,7 +102,10 @@ export const ClientCard: React.FC<ClientCardProps> = ({
             {showStatus ? "View Profile" : "View Appointments"}
           </button>
           {showActions &&
-            userPermissions.includes(APP_ACTIONS.ChangeClientStatus) && (
+            handleFilterPermission(
+              client.id as string,
+              APP_ACTIONS.ChangeClientStatus
+            ) && (
               <button
                 className={`text-sm ${
                   updateClientStatusMutation.isPending

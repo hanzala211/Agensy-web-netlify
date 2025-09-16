@@ -3,7 +3,6 @@ import {
   DOCUMENT_CATEGORY_OPTIONS,
   DOCUMENT_SORT_OPTIONS,
   ICONS,
-  PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
 import {
@@ -30,7 +29,7 @@ import { useDocumentManager } from "@agensy/hooks";
 const itemsPerPage = 3;
 
 export const ClientDocuments: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const addDocumentMutation = useAddDocumentMutation();
   const deleteDocumentMutation = useDeleteDocumentMutation();
   const { selectedClient, addClientDocument, deleteClientDocument } =
@@ -55,8 +54,6 @@ export const ClientDocuments: React.FC = () => {
     useState<boolean>(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const clientDocumentAnalyzeMutation = useAnalyzeDocumentMutation();
   const [analyzedDocRes, setAnalyzedDocRes] = useState<ConfidenceScore | null>(
     null
@@ -143,7 +140,7 @@ export const ClientDocuments: React.FC = () => {
   return (
     <div className="w-full px-4">
       <SearchFilterBar
-        showButton={userPermissions.includes(APP_ACTIONS.AddDocs)}
+        showButton={true}
         searchPlaceholder="Search documents..."
         searchValue={searchTerm}
         setSearchValue={setSearchTerm}
@@ -165,13 +162,10 @@ export const ClientDocuments: React.FC = () => {
         {!paginatedDocuments || paginatedDocuments.length === 0 ? (
           <EmptyStateCard
             onClick={() => {
-              if (userPermissions.includes(APP_ACTIONS.AddDocs)) {
-                setIsAddDocumentModalOpen(true);
-              }
+              setIsAddDocumentModalOpen(true);
             }}
             ICON={ICONS.plus}
             label="Documents"
-            showText={userPermissions.includes(APP_ACTIONS.AddDocs)}
           />
         ) : (
           paginatedDocuments.map((doc) => (
@@ -185,7 +179,10 @@ export const ClientDocuments: React.FC = () => {
                   `/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.clientDocuments}/${doc.id}`
                 )
               }
-              showActions={userPermissions.includes(APP_ACTIONS.DeleteDocs)}
+              showActions={handleFilterPermission(
+                selectedClient?.id as string,
+                APP_ACTIONS.DeleteDocs
+              )}
             />
           ))
         )}

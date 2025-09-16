@@ -1,6 +1,6 @@
 import { useUpdateClientMutation } from "@agensy/api";
 import { AddClientModal, Card, InfoItem } from "@agensy/components";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import type { ClientFormData } from "@agensy/types";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
@@ -8,13 +8,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 
 export const PersonalInfoCard: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const updateClientMutation = useUpdateClientMutation();
   const { selectedClient } = useClientContext();
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const queryClient = useQueryClient();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (updateClientMutation.status === "success") {
@@ -61,7 +59,10 @@ export const PersonalInfoCard: React.FC = () => {
         buttonText={<ICONS.edit />}
         onButtonClick={() => setIsEditModalOpen(true)}
         ariaLabel="Edit Client Profile"
-        showButton={userPermissions.includes(APP_ACTIONS.EditClientBasicInfo)}
+        showButton={handleFilterPermission(
+          selectedClient?.id as string,
+          APP_ACTIONS.EditClientBasicInfo
+        )}
       >
         <div className="space-y-6">
           {selectedClient?.address && (

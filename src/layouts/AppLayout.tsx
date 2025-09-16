@@ -1,24 +1,19 @@
 import { Sidebar, MobileNav } from "@agensy/components";
-import { Navigate, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { ROUTES } from "@agensy/constants";
 import { useAuthContext } from "@agensy/context";
-import { useEffect } from "react";
 
 export const AppLayout: React.FC = () => {
   const { userData } = useAuthContext();
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  useEffect(() => {
-    const isSubscriptionPage = location.pathname.includes(
-      ROUTES.profileSubscription
-    );
-    if (userData?.subscription_status === "inactive" && !isSubscriptionPage) {
-      navigate(`${ROUTES.settings}`);
-    }
-  }, [userData, location.pathname]);
-
-
+  //   useEffect(() => {
+  //     const isSubscriptionPage = location.pathname.includes(
+  //       ROUTES.profileSubscription
+  //     );
+  //     if (userData?.subscription_status === "inactive" && !isSubscriptionPage) {
+  //       navigate(`${ROUTES.settings}`);
+  //     }
+  //   }, [userData, location.pathname]);
 
   if (!userData) return <Navigate to={`${ROUTES.auth}/${ROUTES.login}`} />;
 

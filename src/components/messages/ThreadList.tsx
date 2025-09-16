@@ -3,7 +3,7 @@ import type { Thread } from "@agensy/types";
 import { BorderedCard } from "../common/BorderedCard";
 import { DateUtils, StringUtils } from "@agensy/utils";
 import { AntdTag, CardSkeleton } from "@agensy/components";
-import { ICONS, USER_ROLES } from "@agensy/constants";
+import { ICONS } from "@agensy/constants";
 import { useAuthContext, useMessagesContext } from "@agensy/context";
 
 interface ThreadListProps {
@@ -103,11 +103,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                           <div className="grid 2xl:grid-cols-[1.8fr_1.3fr] xl:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_1fr] grid-cols-[1fr_2fr] items-start sm:items-center">
                             <h4 className="font-medium text-sm sm:text-base md:max-w-[300px] 2xl:max-w-xs max-w-[10rem] text-[14px] line-clamp-4">
                               {user
-                                ? `${user.first_name} ${user.last_name} (${
-                                    USER_ROLES.find(
-                                      (role) => role.value === user?.role
-                                    )?.label || "Unknown"
-                                  })`
+                                ? `${user.first_name} ${user.last_name}`
                                 : "Unknown User"}
                             </h4>
                             {thread?.has_unread_messages && (

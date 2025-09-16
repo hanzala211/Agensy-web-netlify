@@ -88,11 +88,13 @@ export const Select = <T extends FieldValues>({
                       border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
                   >
                     {labelOption && <option value="">{labelOption}</option>}
-                    {data.map((item, index) => (
-                      <option key={index} value={item.value}>
-                        {item.label}
-                      </option>
-                    ))}
+                    {data
+                      .filter((item) => item && item.value !== undefined)
+                      .map((item, index) => (
+                        <option key={index} value={item.value || ""}>
+                          {item.label}
+                        </option>
+                      ))}
                     {showButton && (
                       <option value="add-new-one">{buttonLabel}</option>
                     )}

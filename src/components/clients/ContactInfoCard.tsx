@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import {
   AddContactModal,
@@ -17,7 +17,7 @@ import {
 import { useAddContactMutation } from "@agensy/api";
 
 export const ContactInfoCard: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const {
     selectedClient,
     addClientContact,
@@ -31,8 +31,6 @@ export const ContactInfoCard: React.FC = () => {
     useState<ClientContact | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (!isContactModalOpen) {
@@ -121,7 +119,10 @@ export const ContactInfoCard: React.FC = () => {
         buttonText={<ICONS.plus size={16} />}
         onButtonClick={() => setIsContactModalOpen(true)}
         ariaLabel="Add Contact"
-        showButton={userPermissions.includes(APP_ACTIONS.EditClientBasicInfo)}
+        showButton={handleFilterPermission(
+          selectedClient?.id as string,
+          APP_ACTIONS.EditClientBasicInfo
+        )}
       >
         <div className="space-y-6">
           {selectedClient?.contacts && selectedClient?.contacts.length > 0 ? (
@@ -140,7 +141,8 @@ export const ContactInfoCard: React.FC = () => {
                   type={item.contact_type}
                   onDelete={() => setIsDeleteModalOpen(true)}
                   isDeleting={deleteContactMutation.isPending}
-                  showActions={userPermissions.includes(
+                  showActions={handleFilterPermission(
+                    selectedClient?.id as string,
                     APP_ACTIONS.EditClientBasicInfo
                   )}
                 >
@@ -168,11 +170,17 @@ export const ContactInfoCard: React.FC = () => {
               ICON={ICONS.plus}
               label="Contact"
               onClick={() => {
-                if (userPermissions.includes(APP_ACTIONS.EditClientBasicInfo)) {
+                if (
+                  handleFilterPermission(
+                    selectedClient?.id as string,
+                    APP_ACTIONS.EditClientBasicInfo
+                  )
+                ) {
                   setIsContactModalOpen(true);
                 }
               }}
-              showText={userPermissions.includes(
+              showText={handleFilterPermission(
+                selectedClient?.id as string,
                 APP_ACTIONS.EditClientBasicInfo
               )}
             />

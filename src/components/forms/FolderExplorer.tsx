@@ -1,5 +1,4 @@
 import React, { useMemo, useEffect, useState } from "react";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
 import { FileContentDisplay } from "./FileContentDisplay";
 import type {
   BurialInstructionsFormData,
@@ -33,6 +32,7 @@ import FaceSheetShortFormPDF from "./face-sheet-short/FaceSheetShortFormPDF";
 import HealthHistoryFormPDF from "./health-history-form/HealthHistoryFormPDF";
 import { StartofCareChecklistPDF } from "./start-of-care-checklist/StartofCareChecklistPDF";
 import { checklistSchema } from "@agensy/config";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import EssentialDocumentsForAgingPDF from "./essential-documents-for-aging/EssentialDocumentsForAgingPDF";
 import CareRecipientQuestionairePDF from "./care-recipient-questionaire/CareRecipientQuestionairePDF";
 import { HospitalizationChecklistPDF } from "./hospitalization-checklist/HospitalizationChecklistPDF";
@@ -93,14 +93,13 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
     setOcrResult,
     hasUnsavedChanges,
     setHasUnsavedChanges,
+    selectedClient,
   } = useClientContext();
   const [isOCRModelOpen, setIsOCRModelOpen] = useState<boolean>(false);
   const [isUnsavedChangesModalOpen, setIsUnsavedChangesModalOpen] =
     useState<boolean>(false);
   const params = useParams();
-  const { userData } = useAuthContext();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+  const { handleFilterPermission } = useAuthContext();
   useEffect(() => {
     if (searchQuery) {
       console.log("Search query:", searchQuery);
@@ -629,7 +628,10 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                   </div>
                   <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                     {showOCRButton &&
-                      userPermissions.includes(APP_ACTIONS.OCRAccess) && (
+                      handleFilterPermission(
+                        selectedClient?.id as string,
+                        APP_ACTIONS.OCRAccess
+                      ) && (
                         <TertiaryButton
                           onClick={() => setIsOCRModelOpen(true)}
                           aria_label="Upload OCR"

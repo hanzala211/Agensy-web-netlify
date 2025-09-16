@@ -16,7 +16,7 @@ import type {
   Client,
   HealthcareProvider,
 } from "@agensy/types";
-import { APPOINTMENT_TYPES } from "@agensy/constants";
+import { APP_ACTIONS, APPOINTMENT_TYPES } from "@agensy/constants";
 import { useAuthContext } from "@agensy/context";
 import { DateUtils } from "@agensy/utils";
 
@@ -35,6 +35,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   isLoading = false,
   editData,
 }) => {
+  const { handleFilterPermission } = useAuthContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const { clients } = useAuthContext();
 
@@ -59,11 +60,36 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     },
   });
 
+  const selectedClientId = watch("clientId");
   const healthCares = useMemo(() => {
+    const selectedClient = clients?.find(
+      (client: Client) => client.id === selectedClientId
+    );
+    return selectedClient?.healthcareProviders || [];
+  }, [clients, selectedClientId]);
+
+  const clientArray = (): { label: string; value: string }[] => {
+    if (!clients) {
+      return [];
+    }
     return clients
-      ?.filter((client: Client) => client.id === watch("clientId"))
-      ?.map((client: Client) => client.healthcareProviders);
-  }, [clients, watch("clientId")]);
+      .map((item: Client) => {
+        const userPermissions = handleFilterPermission(
+          item.id as string,
+          APP_ACTIONS.ClientAppointmentAdd
+        );
+        if (userPermissions) {
+          return {
+            label: `${item.first_name} ${item.last_name}`,
+            value: item.id || "",
+          };
+        }
+        return null;
+      })
+      .filter(
+        (item): item is { label: string; value: string } => item !== null
+      );
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -150,12 +176,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
           control={control}
           name="clientId"
           label="Care Recipient"
-          data={
-            clients?.map((client: Client) => ({
-              label: `${client.first_name} ${client.last_name}`,
-              value: client.id as string,
-            })) || []
-          }
+          data={clientArray()}
           labelOption="Select Care Recipient"
         />
 
@@ -164,10 +185,15 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
           name="healthcare_provider_id"
           label="Healthcare Provider"
           data={
-            healthCares?.flat()?.map((item: HealthcareProvider) => ({
-              label: `${item.provider_name}`,
-              value: item.id as string,
-            })) || []
+            healthCares
+              ?.filter(
+                (item: HealthcareProvider) =>
+                  item && item.id && item.provider_name
+              )
+              ?.map((item: HealthcareProvider) => ({
+                label: `${item.provider_name}`,
+                value: item.id as string,
+              })) || []
           }
           labelOption="Select Healthcare Provider"
         />

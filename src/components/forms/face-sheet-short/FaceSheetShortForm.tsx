@@ -30,7 +30,6 @@ import {
   ADVANCE_DIRECTIVE_OPTIONS,
   RELATIONSHIP_TO_CLIENT,
   CODE_STATUS_OPTIONS,
-  PERMISSIONS,
   APP_ACTIONS,
 } from "@agensy/constants";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
@@ -80,7 +79,7 @@ const defaultValues = {
 export const FaceSheetShortForm: React.FC = () => {
   const { clientId } = useParams();
   const queryClient = useQueryClient();
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
     useClientContext();
   const {
@@ -101,9 +100,7 @@ export const FaceSheetShortForm: React.FC = () => {
     resolver: zodResolver(faceSheetShortFormSchema),
     defaultValues,
   });
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
-  // Watch form changes to detect unsaved changes
+
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -521,7 +518,10 @@ export const FaceSheetShortForm: React.FC = () => {
         />
 
         {/* Form Actions */}
-        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        {handleFilterPermission(
+          clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
           <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
               <PrimaryButton

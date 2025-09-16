@@ -8,7 +8,9 @@ import {
   PrimaryButton,
   ClientProviderInfoStep,
 } from "@agensy/components";
-import { DateUtils } from "@agensy/utils";
+import { DateUtils, toast } from "@agensy/utils";
+import { useAuthContext } from "@agensy/context";
+import { useNavigate } from "react-router-dom";
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -29,7 +31,9 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   isButtonLoading = false,
   editClient,
 }) => {
+  const { userData } = useAuthContext();
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -108,6 +112,14 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   };
 
   const onSubmit = (data: ClientFormData) => {
+    if (userData?.subscription_status === "inactive") {
+      toast.error(
+        "Subscription Error!",
+        "Please upgrade your subscription to add a care recipient."
+      );
+      navigate("/settings/billing");
+      return;
+    }
     const postData = {
       firstName: data.firstName,
       lastName: data.lastName,

@@ -18,7 +18,7 @@ const MessagesContext = createContext<MessagesContextType | undefined>(
 export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { userData, accessUsers } = useAuthContext();
+  const { userData } = useAuthContext();
   const location = useLocation();
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [showThreadList, setShowThreadList] = useState<boolean>(true);
@@ -79,9 +79,9 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             });
           }
 
-          const role = accessUsers.find(
-            (user) => user.id === data.message.sender_id
-          )?.role;
+          //   const role = accessUsers.find(
+          //     (user) => user.id === data.message.sender_id
+          //   )?.role;
 
           const newThread: Thread = {
             id: data.threadId,
@@ -96,7 +96,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             last_message_time: data.message.createdAt,
             last_message_sender_id: data.message.sender_id,
             participants: [
-              { ...data.message.sender, role } as IUser,
+              { ...data.message.sender } as IUser,
               userData as IUser,
             ],
             client: null,

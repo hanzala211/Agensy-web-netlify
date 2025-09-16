@@ -9,11 +9,12 @@ import {
   CommonLoader,
 } from "@agensy/components";
 import { documentSchema } from "@agensy/types";
-import type { DocumentFormData, ConfidenceScore } from "@agensy/types";
+import type { DocumentFormData, ConfidenceScore, IUser } from "@agensy/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StringUtils, toast } from "@agensy/utils";
 import { DOCUMENT_CATEGORY_OPTIONS } from "@agensy/constants";
 import { isHeicImage, convertHeicToJpeg } from "../../utils/heicUtils";
+import { useAuthContext } from "@agensy/context";
 
 interface AddDocumentModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ interface AddDocumentModalProps {
   handleAnalyze?: (file: File) => void;
   isAnalyzing?: boolean;
   analyzedDocRes?: ConfidenceScore | null;
+  showPrimaryUser?: boolean; // When true, shows primary user dropdown and makes primaryUserId required
 }
 
 export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
@@ -33,7 +35,9 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   handleAnalyze,
   isAnalyzing,
   analyzedDocRes,
+  showPrimaryUser = false,
 }) => {
+  const { accessUsers, userData } = useAuthContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | undefined>(undefined);
@@ -62,6 +66,8 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       title: "",
       description: "",
       file: undefined,
+      primaryUserId: "",
+      showPrimaryUser: showPrimaryUser,
     },
     resolver: zodResolver(documentSchema),
   });
@@ -117,6 +123,8 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
         title: "",
         description: "",
         file: undefined,
+        primaryUserId: "",
+        showPrimaryUser: showPrimaryUser,
       });
       setFile(undefined);
       setFilePreview(null);
@@ -240,6 +248,8 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       title: "",
       description: "",
       file: undefined,
+      primaryUserId: "",
+      showPrimaryUser: showPrimaryUser,
     });
     setFile(undefined);
     setFilePreview(null);
@@ -259,6 +269,22 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   const isPDF = useMemo(() => {
     return fileType === "application/pdf";
   }, [fileType]);
+
+  const primaryUsers = useMemo(() => {
+    const filteredUsers = accessUsers.filter((user: IUser) => {
+      return user.UserRoles?.some((role) => role.role === "primary_user");
+    });
+
+    // Add current user if they exist and have primary_user role
+    if (
+      userData &&
+      userData.Roles?.some((role) => role.role === "primary_user")
+    ) {
+      return [userData, ...filteredUsers];
+    }
+
+    return filteredUsers;
+  }, [accessUsers, userData]);
 
   const renderFilePreview = () => {
     if (!filePreview) return null;
@@ -485,6 +511,25 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
             rows={3}
             className={`${getConfidenceColor(descriptionConfidence)}`}
           />
+
+          {showPrimaryUser && (
+            <Select
+              control={control}
+              name="primaryUserId"
+              label="Family Admin"
+              data={primaryUsers.map((user: IUser) => ({
+                label:
+                  user.id === userData?.id
+                    ? `${user.first_name} ${user.last_name} (You)`
+                    : `${user.first_name} ${user.last_name}`,
+                value: user.id as string,
+              }))}
+              aria_label="Select family admin"
+              labelOption="Select family admin"
+              buttonLabel="Add Family Admin"
+              showButton={false}
+            />
+          )}
         </div>
       </div>
 
@@ -498,6 +543,11 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <input type="submit" ref={inputRef} className="hidden" />
+        <input
+          type="hidden"
+          {...register("showPrimaryUser")}
+          value={showPrimaryUser.toString()}
+        />
       </form>
     </Modal>
   );

@@ -8,7 +8,7 @@ import {
   DatePickerField,
   CommonLoader,
 } from "@agensy/components";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import {
   comprehensiveMedicationListSchema,
   type ClientMedications,
@@ -27,9 +27,7 @@ import { useAuthContext, useClientContext } from "@agensy/context";
 
 export const ComprehensiveMedicationList = () => {
   const params = useParams();
-  const { userData } = useAuthContext();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+  const { handleFilterPermission } = useAuthContext();
   const {
     data: comprehensiveMedicationList,
     isFetching: isLoadingChecklist,
@@ -400,7 +398,10 @@ export const ComprehensiveMedicationList = () => {
       </Card>
 
       {/* Submit Button */}
-      {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+      {handleFilterPermission(
+        params.clientId as string,
+        APP_ACTIONS.EditAgensyForms
+      ) && (
         <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
             <PrimaryButton

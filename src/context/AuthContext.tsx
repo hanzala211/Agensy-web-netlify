@@ -16,6 +16,7 @@ import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useClientManager } from "@agensy/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSocketContext } from "@agensy/context";
+import { PERMISSIONS } from "@agensy/constants";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -32,7 +33,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     loadAuth();
-  }, []);
+  }, [clients]);
 
   useEffect(() => {
     if (userData) {
@@ -91,6 +92,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setUserData(data);
   };
 
+  const filterClientRole = (clientId: string) => {
+    return userData?.Roles?.find((r) => r.client_id === clientId)?.role || "";
+  };
+
+  const handleFilterPermission = (clientId: string, appAction: string) => {
+    const userPermissions =
+      PERMISSIONS[filterClientRole(clientId) as keyof typeof PERMISSIONS] || [];
+    return userPermissions.includes(appAction);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -107,6 +118,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setFile,
         loadAuth,
         accessUsers,
+        filterClientRole,
+        handleFilterPermission,
       }}
     >
       {children}

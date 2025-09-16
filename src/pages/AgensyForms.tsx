@@ -417,9 +417,11 @@ export const AgensyForms: React.FC = () => {
     useGetAllMedicalAppointmentTemplates(params.clientId as string);
   const createNewMedicalTemplateMutation =
     useCreateNewMedicalTemplateMutation();
-  const { userData } = useAuthContext();
+  const { filterClientRole } = useAuthContext();
   const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+    PERMISSIONS[
+      filterClientRole(params.clientId as string) as keyof typeof PERMISSIONS
+    ] || [];
 
   useEffect(() => {
     if (createNewMedicalTemplateMutation.status === "success") {

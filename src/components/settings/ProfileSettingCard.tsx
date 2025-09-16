@@ -1,8 +1,7 @@
 import { ICONS } from "@agensy/constants";
 import { Card, EditProfileSettingsModal } from "@agensy/components";
-import { USER_ROLES } from "@agensy/constants";
 import { useAuthContext } from "@agensy/context";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "@agensy/utils";
 import {
   useUpdateProfileAvatarMutation,
@@ -20,9 +19,9 @@ export const ProfileSettingCard: React.FC = () => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] =
     useState<boolean>(false);
 
-  const userRole = useMemo(() => {
-    return USER_ROLES.find((role) => role.value === userData?.role)?.label;
-  }, [userData?.role]);
+  //   const userRole = useMemo(() => {
+  //     return USER_ROLES.find((role) => role.value === userData?.role)?.label;
+  //   }, [userData?.role]);
 
   const handleImageClick = () => {
     if (!updateUserAvatarMutation.isPending) fileInputRef.current?.click();
@@ -171,13 +170,6 @@ export const ProfileSettingCard: React.FC = () => {
                 <p className="text-darkGray">
                   {userData?.phone || "Not provided"}
                 </p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm text-gray-600">Role</label>
-              <div className="flex items-center gap-3 p-2 bg-lightGray rounded-xl">
-                <ICONS.users size={18} className="text-gray-500" />
-                <p className="text-darkGray">{userRole || "Not specified"}</p>
               </div>
             </div>
           </div>

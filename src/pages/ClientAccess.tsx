@@ -12,7 +12,6 @@ import {
   ACCESS_SORT_OPTIONS,
   APP_ACTIONS,
   ICONS,
-  PERMISSIONS,
   ROUTES,
 } from "@agensy/constants";
 import type {
@@ -51,9 +50,7 @@ export const ClientAccess: React.FC = () => {
   const [isEditAccessModalOpen, setIsEditAccessModalOpen] =
     useState<boolean>(false);
   const [editData, setEditData] = useState<AccessInfo | null>(null);
-  const { userData } = useAuthContext();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
+  const { handleFilterPermission } = useAuthContext();
 
   useEffect(() => {
     if (addClientAccessMutation.status === "success") {
@@ -119,7 +116,8 @@ export const ClientAccess: React.FC = () => {
 
     if (filterBy !== "all") {
       filtered = filtered.filter(
-        (access) => access.role.toLowerCase().replace(" ", "_") === filterBy
+        (access) =>
+          access.UserRoles.role.toLowerCase().replace(" ", "_") === filterBy
       );
     }
 
@@ -136,7 +134,7 @@ export const ClientAccess: React.FC = () => {
           return nameDescB.localeCompare(nameDescA);
         }
         case "role":
-          return (a.role || "").localeCompare(b.role || "");
+          return (a.UserRoles.role || "").localeCompare(b.UserRoles.role || "");
         case "relationship":
           return (a.relation || "").localeCompare(b.relation || "");
         case "newest": {
@@ -200,7 +198,12 @@ export const ClientAccess: React.FC = () => {
     });
   };
 
-  if (!userPermissions.includes(APP_ACTIONS.AccessControl))
+  if (
+    !handleFilterPermission(
+      selectedClient?.id as string,
+      APP_ACTIONS.AccessControl
+    )
+  )
     return (
       <Navigate
         to={`/${ROUTES.clients}/${params.clientId}/${ROUTES.clientOverview}`}
@@ -230,11 +233,19 @@ export const ClientAccess: React.FC = () => {
         {!paginatedAccess || paginatedAccess.length === 0 ? (
           <EmptyStateCard
             onClick={() => {
-              if (userPermissions.includes(APP_ACTIONS.AccessControl)) {
+              if (
+                handleFilterPermission(
+                  selectedClient?.id as string,
+                  APP_ACTIONS.AccessControl
+                )
+              ) {
                 setIsAddAccessModalOpen(true);
               }
             }}
-            showText={userPermissions.includes(APP_ACTIONS.AccessControl)}
+            showText={handleFilterPermission(
+              selectedClient?.id as string,
+              APP_ACTIONS.AccessControl
+            )}
             ICON={ICONS.plus}
             label="Contacts"
           />

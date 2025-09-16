@@ -3,8 +3,7 @@ import {
   useAnalyzeGeneralDocumentMutation,
 } from "@agensy/api";
 import { AddDocumentModal, PageHeader } from "@agensy/components";
-import { APP_ACTIONS, PERMISSIONS } from "@agensy/constants";
-import { useAuthContext, useDocumentContext } from "@agensy/context";
+import { useDocumentContext } from "@agensy/context";
 import type {
   ConfidenceScore,
   Document,
@@ -16,14 +15,11 @@ import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 export const Documents: React.FC = () => {
-  const { userData } = useAuthContext();
   const params = useParams();
   const addGeneralDocumentMutation = useAddGeneralDocumentMutation();
   const { isAddDocumentModalOpen, setIsAddDocumentModalOpen } =
     useDocumentContext();
   const queryClient = useQueryClient();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const generalDocumentAnalyzeMutation = useAnalyzeGeneralDocumentMutation();
   const [analyzedDocRes, setAnalyzedDocRes] = useState<ConfidenceScore | null>(
     null
@@ -53,6 +49,7 @@ export const Documents: React.FC = () => {
     formData.append("description", data.description ? data.description : "");
     formData.append("file", data.file);
     formData.append("category", data.documentType as string);
+    formData.append("primary_user_id", data.primaryUserId as string);
     addGeneralDocumentMutation.mutate(formData);
   };
 
@@ -72,11 +69,7 @@ export const Documents: React.FC = () => {
     <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
       <PageHeader
         title="Documents"
-        showButton={
-          params.documentId || !userPermissions.includes(APP_ACTIONS.AddDocs)
-            ? false
-            : true
-        }
+        showButton={params.documentId ? false : true}
         buttonText="Add Document"
         showBackButton={params.documentId ? true : false}
         onButtonClick={() => setIsAddDocumentModalOpen(true)}
@@ -92,6 +85,7 @@ export const Documents: React.FC = () => {
         handleAnalyze={handleAnalyze}
         isAnalyzing={generalDocumentAnalyzeMutation.isPending}
         analyzedDocRes={analyzedDocRes}
+        showPrimaryUser={true}
       />
     </div>
   );

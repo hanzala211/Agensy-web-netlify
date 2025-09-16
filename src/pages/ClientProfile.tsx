@@ -5,14 +5,14 @@ import {
   PageHeader,
   PersonalInfoBar,
 } from "@agensy/components";
-import { APP_ACTIONS, PERMISSIONS, ROUTES } from "@agensy/constants";
+import { APP_ACTIONS, ROUTES } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { DateUtils } from "@agensy/utils";
 import React, { useEffect } from "react";
 import { useNavigate, Outlet, useParams, useLocation } from "react-router-dom";
 
 export const ClientProfile: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const location = useLocation();
   const params = useParams();
   const { selectedClient, setSelectedClient } = useClientContext();
@@ -23,9 +23,6 @@ export const ClientProfile: React.FC = () => {
     status: loadClientStatus,
   } = useGetSingleClientQuery(params.clientId as string);
   const navigate = useNavigate();
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
-
   useEffect(() => {
     loadClient();
   }, []);
@@ -114,7 +111,10 @@ export const ClientProfile: React.FC = () => {
           >
             Logs
           </TabLink>
-          {userPermissions.includes(APP_ACTIONS.AccessControl) && (
+          {handleFilterPermission(
+            params.clientId as string,
+            APP_ACTIONS.AccessControl
+          ) && (
             <TabLink
               to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.access}`}
               className="min-w-[100px] sm:min-w-0"

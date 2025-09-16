@@ -3,8 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useAddClientMutation = () => {
   return useMutation({
-    mutationFn: async (data: unknown) =>
-      await ClientService.addClient(data),
+    mutationFn: async (data: unknown) => await ClientService.addClient(data),
   });
 };
 

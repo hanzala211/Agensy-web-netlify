@@ -9,7 +9,7 @@ import {
   EmptyStateCard,
   HealthcareProviderItem,
 } from "@agensy/components";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import type {
   ClientHealthProviderFormData,
@@ -19,7 +19,7 @@ import { DateUtils, toast } from "@agensy/utils";
 import React, { useEffect, useState } from "react";
 
 export const HealthCareProviderCard: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const addHealthCareProviderMutation = useAddHealthCareMutation();
   const updateHealthCareProviderMutation = useUpdateHealthCareMutation();
   const deleteHealthCareProviderMutation = useDeleteHealthCareMutation();
@@ -33,8 +33,6 @@ export const HealthCareProviderCard: React.FC = () => {
     useState<boolean>(false);
   const [selectedEditHealthCareProvider, setSelectedEditHealthCareProvider] =
     useState<HealthcareProvider | null>(null);
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addHealthCareProviderMutation.status === "success") {
@@ -127,7 +125,10 @@ export const HealthCareProviderCard: React.FC = () => {
         buttonText={<ICONS.plus size={16} />}
         onButtonClick={() => setIsHealthCareModalOpen(true)}
         ariaLabel="Add New HealthCare Provider"
-        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
+        showButton={handleFilterPermission(
+          selectedClient?.id as string,
+          APP_ACTIONS.EditClientMedicalInfo
+        )}
       >
         <div className="flex flex-col gap-6">
           {selectedClient?.healthcareProviders &&
@@ -139,7 +140,8 @@ export const HealthCareProviderCard: React.FC = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 isDeleting={deleteHealthCareProviderMutation.isPending}
-                showActions={userPermissions.includes(
+                showActions={handleFilterPermission(
+                  selectedClient?.id as string,
                   APP_ACTIONS.EditClientMedicalInfo
                 )}
               />
@@ -148,12 +150,16 @@ export const HealthCareProviderCard: React.FC = () => {
             <EmptyStateCard
               ICON={ICONS.plus}
               label="Healthcare Providers"
-              showText={userPermissions.includes(
+              showText={handleFilterPermission(
+                selectedClient?.id as string,
                 APP_ACTIONS.EditClientMedicalInfo
               )}
               onClick={() => {
                 if (
-                  userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)
+                  handleFilterPermission(
+                    selectedClient?.id as string,
+                    APP_ACTIONS.EditClientMedicalInfo
+                  )
                 ) {
                   setIsHealthCareModalOpen(true);
                 }

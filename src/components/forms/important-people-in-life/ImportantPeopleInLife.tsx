@@ -23,7 +23,7 @@ import { useEffect } from "react";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 
 const defaultValues: ImportantPeopleInLifeFormData = {
   firstName: "",
@@ -36,7 +36,7 @@ const defaultValues: ImportantPeopleInLifeFormData = {
 export const ImportantPeopleInLife = () => {
   const params = useParams();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const {
     register,
     control,
@@ -49,8 +49,6 @@ export const ImportantPeopleInLife = () => {
     resolver: zodResolver(importantPeopleInLifeFormSchema),
     defaultValues,
   });
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
   const { fields, append, remove } = useFieldArray({
     control,
     name: "importantPeople",
@@ -579,7 +577,10 @@ export const ImportantPeopleInLife = () => {
           />
         </Card>
 
-        {userPermissions.includes(APP_ACTIONS.EditAgensyForms) && (
+        {handleFilterPermission(
+          params.clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
           <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
               <PrimaryButton

@@ -14,8 +14,19 @@ export interface IUser extends BaseSchema {
   last_name: string;
   phone?: string;
   avatar?: string;
-  role?: string;
   subscription_status?: "active" | "inactive";
+  Roles?: {
+    client_id: string;
+    role: string;
+    primary_user: {
+      email: string;
+      subscription_status: string;
+    };
+  }[];
+  UserRoles?: {
+    client_id: string;
+    role: string;
+  }[];
 }
 
 export interface Client extends BaseSchema {
@@ -151,7 +162,7 @@ export interface AccessInfo extends BaseSchema {
   email: string;
   phone: string;
   cognito_id: string;
-  role: "family_member" | "caregiver" | "primary_user";
+  UserRoles: { role: "family_member" | "caregiver" | "primary_user" };
 }
 
 export interface Template extends BaseSchema {

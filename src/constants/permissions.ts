@@ -19,6 +19,7 @@ export const PERMISSIONS = {
   ],
   caregiver: [
     APP_ACTIONS.OCRAccess,
+    APP_ACTIONS.EditClientNotes,
     APP_ACTIONS.AddDocs,
     APP_ACTIONS.EditClientMedicalInfo,
     APP_ACTIONS.ClientAppointmentInfoEdit,

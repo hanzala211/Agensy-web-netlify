@@ -5,7 +5,7 @@ import {
   InfoItem,
   Card,
 } from "@agensy/components";
-import { APP_ACTIONS, ICONS, PERMISSIONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import React, { useEffect, useState } from "react";
 import {
@@ -16,15 +16,13 @@ import type { MedicalHistoryFormData } from "@agensy/types";
 import ItemList from "./ItemList";
 
 export const MedicalHistoryCard: React.FC = () => {
-  const { userData } = useAuthContext();
+  const { handleFilterPermission } = useAuthContext();
   const addClientMedicalHistoryMutation = useAddClientMedicalHistoryMutation();
   const updateClientMedicalHistoryMutation =
     useUpdateClientMedicalHistoryMutation();
   const { selectedClient, addClientMedicalHistory } = useClientContext();
   const [isAddMedicalHistoryModalOpen, setIsAddMedicalHistoryModalOpen] =
     useState<boolean>(false);
-  const userPermissions =
-    PERMISSIONS[userData?.role as keyof typeof PERMISSIONS] || [];
 
   useEffect(() => {
     if (addClientMedicalHistoryMutation.status === "success") {
@@ -74,7 +72,9 @@ export const MedicalHistoryCard: React.FC = () => {
           : null,
       cognitive_status: data.cognitive_status
         ? data.cognitive_status === "Other"
-          ? data.cognitive_status_text ? data.cognitive_status_text : null
+          ? data.cognitive_status_text
+            ? data.cognitive_status_text
+            : null
           : data.cognitive_status
         : null,
       notes: data.notes ? data.notes : null,
@@ -110,7 +110,10 @@ export const MedicalHistoryCard: React.FC = () => {
             ? "Edit Client Medical History"
             : "Add Client Medical History"
         }
-        showButton={userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)}
+        showButton={handleFilterPermission(
+          selectedClient?.id as string,
+          APP_ACTIONS.EditClientMedicalInfo
+        )}
       >
         {selectedClient?.medical?.diagnoses ||
         selectedClient?.medical?.allergies ||
@@ -192,11 +195,17 @@ export const MedicalHistoryCard: React.FC = () => {
             ICON={ICONS.plus}
             label="Medical History"
             onClick={() => {
-              if (userPermissions.includes(APP_ACTIONS.EditClientMedicalInfo)) {
+              if (
+                handleFilterPermission(
+                  selectedClient?.id as string,
+                  APP_ACTIONS.EditClientMedicalInfo
+                )
+              ) {
                 setIsAddMedicalHistoryModalOpen(true);
               }
             }}
-            showText={userPermissions.includes(
+            showText={handleFilterPermission(
+              selectedClient?.id as string,
               APP_ACTIONS.EditClientMedicalInfo
             )}
           />
