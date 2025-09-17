@@ -16,7 +16,12 @@ import type {
   Client,
   HealthcareProvider,
 } from "@agensy/types";
-import { APP_ACTIONS, APPOINTMENT_TYPES } from "@agensy/constants";
+import {
+  APP_ACTIONS,
+  APPOINTMENT_TYPES,
+  ROLES,
+  SUBSCRIPTION_STATUSES,
+} from "@agensy/constants";
 import { useAuthContext } from "@agensy/context";
 import { DateUtils } from "@agensy/utils";
 
@@ -73,6 +78,11 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
       return [];
     }
     return clients
+      .filter(
+        (item) =>
+          item.Users.find((user) => user.UserRoles.role === ROLES.PRIMARY_USER)
+            ?.subscription_status === SUBSCRIPTION_STATUSES.ACTIVE
+      )
       .map((item: Client) => {
         const userPermissions = handleFilterPermission(
           item.id as string,

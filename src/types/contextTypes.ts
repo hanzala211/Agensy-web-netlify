@@ -33,6 +33,7 @@ export interface AuthContextType {
   accessUsers: IUser[];
   filterClientRole: (clientId: string) => string;
   handleFilterPermission: (clientId: string, appAction: string) => boolean;
+  isPrimaryUserSubscriptionActive: (clientId: string) => boolean;
 }
 
 export interface ClientContextType {

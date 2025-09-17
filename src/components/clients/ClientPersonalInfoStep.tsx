@@ -1,18 +1,21 @@
 import React from "react";
 import type { Control, UseFormRegister, FieldErrors } from "react-hook-form";
-import type { ClientFormData } from "@agensy/types";
+import type { ClientFormData, IUser } from "@agensy/types";
 import {
   MARITAL_STATUS_OPTIONS,
   LIVING_SITUATION_OPTIONS,
   GENDER_OPTIONS,
 } from "@agensy/constants";
 import { DatePickerField, Select, Input } from "@agensy/components";
+import { useAuthContext } from "@agensy/context";
 
 interface ClientPersonalInfoStepProps {
   register: UseFormRegister<ClientFormData>;
   control: Control<ClientFormData>;
   errors: FieldErrors<ClientFormData>;
   showLabel?: boolean;
+  hasAdminRole?: boolean;
+  familyAdmins: IUser[];
 }
 
 export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
@@ -20,7 +23,10 @@ export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
   control,
   errors,
   showLabel = true,
+  hasAdminRole = false,
+  familyAdmins,
 }) => {
+  const { userData } = useAuthContext();
   return (
     <div className="space-y-3">
       {showLabel && (
@@ -73,6 +79,27 @@ export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
             data={LIVING_SITUATION_OPTIONS}
             labelOption="Select living situation"
           />
+          {hasAdminRole && (
+            <Select
+              control={control}
+              name="familyAdminId"
+              label="Family Admin"
+              data={(() => {
+                const dropdownData = familyAdmins.map((user: IUser) => ({
+                  label:
+                    user.id === userData?.id
+                      ? `${user.first_name} ${user.last_name} (You)`
+                      : `${user.first_name} ${user.last_name}`,
+                  value: user.id as string,
+                }));
+                return dropdownData;
+              })()}
+              aria_label="Select family admin"
+              labelOption="Select family admin"
+              buttonLabel="Add Family Admin"
+              showButton={false}
+            />
+          )}
           <div className="md:col-span-2">
             <Input
               label="Address"

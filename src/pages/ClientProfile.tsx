@@ -5,14 +5,21 @@ import {
   PageHeader,
   PersonalInfoBar,
 } from "@agensy/components";
-import { APP_ACTIONS, ROUTES } from "@agensy/constants";
+import { APP_ACTIONS, ROLE_MAP, ROUTES } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { DateUtils } from "@agensy/utils";
 import React, { useEffect } from "react";
-import { useNavigate, Outlet, useParams, useLocation } from "react-router-dom";
+import {
+  useNavigate,
+  Outlet,
+  useParams,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 
 export const ClientProfile: React.FC = () => {
-  const { handleFilterPermission } = useAuthContext();
+  const { handleFilterPermission, userData, isPrimaryUserSubscriptionActive } =
+    useAuthContext();
   const location = useLocation();
   const params = useParams();
   const { selectedClient, setSelectedClient } = useClientContext();
@@ -36,6 +43,14 @@ export const ClientProfile: React.FC = () => {
   }, [loadClientStatus, client]);
 
   if (isClientLoading) return <ClientProfileSkeleton />;
+
+  const formatRoleToProperStr = (str: string) => {
+    return ROLE_MAP[str] || str;
+  };
+
+  if (!isPrimaryUserSubscriptionActive(params.clientId as string)) {
+    return <Navigate to="/clients" />;
+  }
 
   return (
     <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
@@ -72,6 +87,11 @@ export const ClientProfile: React.FC = () => {
               }`
             : "No primary contact") as string
         }
+        thirdLabel="Role"
+        thirdValue={formatRoleToProperStr(
+          selectedClient?.Users.find((item) => item.id === userData?.id)
+            ?.UserRoles.role || "System Admin"
+        )}
       />
       <div className="border-[1px] border-mediumGray px-2 sm:px-5 rounded-xl mt-4">
         <div className="flex flex-wrap lg:flex-nowrap border-b border-mediumGray w-full">

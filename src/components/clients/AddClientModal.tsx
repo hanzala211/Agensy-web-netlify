@@ -1,7 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useRef } from "react";
-import { clientSchema, type Client, type ClientFormData } from "@agensy/types";
+import React, { useEffect, useRef, useMemo } from "react";
+import {
+  clientSchema,
+  type Client,
+  type ClientFormData,
+  type IUser,
+} from "@agensy/types";
 import {
   Modal,
   ClientPersonalInfoStep,
@@ -11,6 +16,7 @@ import {
 import { DateUtils, toast } from "@agensy/utils";
 import { useAuthContext } from "@agensy/context";
 import { useNavigate } from "react-router-dom";
+import { ROLES, SUBSCRIPTION_STATUSES } from "@agensy/constants";
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -31,7 +37,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   isButtonLoading = false,
   editClient,
 }) => {
-  const { userData } = useAuthContext();
+  const { userData, accessUsers } = useAuthContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const {
@@ -56,8 +62,30 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
       city: "",
       state: "",
       zipCode: "",
+      familyAdminId: "",
+      showFamilyAdmin: false,
     },
   });
+
+  const hasAdminRole =
+    userData?.Roles?.some((role) => role.role === ROLES.ADMIN) ||
+    userData?.UserRoles?.some((role) => role.role === ROLES.ADMIN);
+
+  const familyAdmins = useMemo(() => {
+    const filteredUsers =
+      accessUsers?.filter((user: IUser) => {
+        return user.Roles?.some((role) => role.role === ROLES.PRIMARY_USER);
+      }) || [];
+
+    if (
+      userData &&
+      userData.Roles?.some((role) => role.role === ROLES.PRIMARY_USER)
+    ) {
+      return [userData, ...filteredUsers];
+    }
+
+    return filteredUsers;
+  }, [accessUsers, userData]);
 
   useEffect(() => {
     if (editClient) {
@@ -81,12 +109,15 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
         livingSituation: editClient.living_situation
           ? editClient.living_situation
           : "",
+        familyAdminId: "",
+        showFamilyAdmin: hasAdminRole,
       });
       setValue("isEdit", true);
     } else {
       setValue("isEdit", false);
+      setValue("showFamilyAdmin", hasAdminRole);
     }
-  }, [editClient, reset, isOpen]);
+  }, [editClient, reset, isOpen, hasAdminRole, setValue]);
 
   useEffect(() => {
     if (!isOpen && !editClient) {
@@ -102,6 +133,8 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
         state: "",
         zipCode: "",
         livingSituation: "",
+        familyAdminId: "",
+        showFamilyAdmin: hasAdminRole,
       });
     }
   }, [isOpen, reset, editClient]);
@@ -112,7 +145,11 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   };
 
   const onSubmit = (data: ClientFormData) => {
-    if (userData?.subscription_status === "inactive") {
+    if (
+      (userData?.subscription_status === SUBSCRIPTION_STATUSES.INACTIVE ||
+        userData?.subscription_status === SUBSCRIPTION_STATUSES.CANCELLED) &&
+      userData.Roles?.some((item) => item.role !== ROLES.ADMIN)
+    ) {
       toast.error(
         "Subscription Error!",
         "Please upgrade your subscription to add a care recipient."
@@ -143,6 +180,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
       preferred_hospital: data.preferred_hospital
         ? data.preferred_hospital
         : null,
+      familyAdminId: data.familyAdminId ? data.familyAdminId : null,
     };
     if (onSubmitProp) {
       onSubmitProp(postData as unknown as ClientFormData);
@@ -169,9 +207,11 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
       <form onSubmit={handleSubmit(onSubmit)} id="clientForm" className="pb-4">
         <ClientPersonalInfoStep
           register={register}
+          hasAdminRole={hasAdminRole && !editClient}
           control={control}
           errors={errors}
           showLabel={editClient ? false : true}
+          familyAdmins={familyAdmins}
         />
         {!editClient && (
           <ClientProviderInfoStep

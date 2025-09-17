@@ -6,15 +6,6 @@ import { useAuthContext } from "@agensy/context";
 export const AppLayout: React.FC = () => {
   const { userData } = useAuthContext();
 
-  //   useEffect(() => {
-  //     const isSubscriptionPage = location.pathname.includes(
-  //       ROUTES.profileSubscription
-  //     );
-  //     if (userData?.subscription_status === "inactive" && !isSubscriptionPage) {
-  //       navigate(`${ROUTES.settings}`);
-  //     }
-  //   }, [userData, location.pathname]);
-
   if (!userData) return <Navigate to={`${ROUTES.auth}/${ROUTES.login}`} />;
 
   return (

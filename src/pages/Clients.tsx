@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useAddClientMutation } from "@agensy/api";
 import { DateUtils, toast } from "@agensy/utils";
 import { useClientManager } from "@agensy/hooks";
-import { useClientContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 
 export const Clients: React.FC = () => {
   const {
@@ -42,6 +42,7 @@ export const Clients: React.FC = () => {
   } = useClientManager({ initialItemPerPage: 5 });
   const addClientMutation = useAddClientMutation();
   const { setSelectedClient } = useClientContext();
+  const { isPrimaryUserSubscriptionActive } = useAuthContext();
   const [isAddClientModalOpen, setIsAddClientModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
@@ -98,7 +99,13 @@ export const Clients: React.FC = () => {
       preferred_hospital: data.preferred_hospital
         ? data.preferred_hospital
         : null,
+      primary_user_id: data.familyAdminId ? data.familyAdminId : null,
     };
+    // @ts-expect-error // TODO type error
+    if (!postData.primary_user_id) {
+      // @ts-expect-error // TODO type error
+      delete postData.primary_user_id;
+    }
     addClientMutation.mutate(postData);
   };
 
@@ -140,6 +147,9 @@ export const Clients: React.FC = () => {
                 handleViewProfile(client?.id?.toString() || "")
               }
               loadClients={loadClients}
+              isPrimaryUserSubscribed={isPrimaryUserSubscriptionActive(
+                client.id?.toString() || ""
+              )}
             />
           ))
         ) : error ? (

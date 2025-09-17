@@ -3,6 +3,8 @@ import { SubscriptionCard, BillingHistoryCard } from "@agensy/components";
 import { useAuthContext } from "@agensy/context";
 import { useCancelSubscriptionMutation } from "@agensy/api";
 import { toast } from "@agensy/utils";
+import { Navigate } from "react-router-dom";
+import { ROLES, SUBSCRIPTION_STATUSES } from "@agensy/constants";
 
 export const Subscription: React.FC = () => {
   const { userData, loadAuth } = useAuthContext();
@@ -20,6 +22,14 @@ export const Subscription: React.FC = () => {
   const handleCancelSubscription = () => {
     cancelSubscription.mutate();
   };
+
+  const isAdmin =
+    userData?.Roles?.find((item) => item.role === ROLES.ADMIN)?.role ===
+    ROLES.ADMIN;
+
+  if (isAdmin) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <div className="mx-auto md:px-4 py-12">
@@ -47,7 +57,10 @@ export const Subscription: React.FC = () => {
             "User Role Management",
           ]}
           buttonText="Choose Plan"
-          isFeatured={userData?.subscription_status === "inactive"}
+          isFeatured={
+            userData?.subscription_status === SUBSCRIPTION_STATUSES.INACTIVE ||
+            userData?.subscription_status === SUBSCRIPTION_STATUSES.CANCELLED
+          }
         />
         <SubscriptionCard
           title="Standard Plan"

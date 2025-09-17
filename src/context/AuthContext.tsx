@@ -16,7 +16,7 @@ import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useClientManager } from "@agensy/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSocketContext } from "@agensy/context";
-import { PERMISSIONS } from "@agensy/constants";
+import { PERMISSIONS, ROLES, SUBSCRIPTION_STATUSES } from "@agensy/constants";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -30,28 +30,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [accessUsers, setAccessUsers] = useState<IUser[]>([]);
   const queryClient = useQueryClient();
   const { connectSocket } = useSocketContext();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     loadAuth();
-  }, [clients]);
+  }, [clients, isLoggingOut]);
 
   useEffect(() => {
     if (userData) {
       loadClients();
       loadAllUsers();
       connectSocket();
+      setIsLoggingOut(false);
     }
   }, [userData]);
 
   const loadAuth = async () => {
+    if (isLoggingOut) {
+      setIsAuthLoading(false);
+      return;
+    }
+
     try {
       const cognitoUser = await getCurrentUser();
-      if (cognitoUser) {
+      if (cognitoUser && !isLoggingOut) {
         const apiRes = await AuthService.me();
-        setUserData({ ...apiRes });
+        if (!isLoggingOut) {
+          setUserData({ ...apiRes });
+        }
       }
     } catch {
-      signOut();
+      if (!isLoggingOut) {
+        signOut();
+      }
     } finally {
       setIsAuthLoading(false);
     }
@@ -69,6 +80,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const handleLogout = () => {
+    setIsLoggingOut(true);
+
     signOut();
     setUserData(null);
     queryClient.removeQueries();
@@ -102,6 +115,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return userPermissions.includes(appAction);
   };
 
+  const isPrimaryUserSubscriptionActive = (clientId: string) => {
+    return (
+      userData?.Roles?.find((r) => r.client_id === clientId)?.primary_user
+        ?.subscription_status === SUBSCRIPTION_STATUSES.ACTIVE ||
+      userData?.Roles?.find((r) => r.client_id === clientId)?.role ===
+        ROLES.ADMIN
+    );
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -120,6 +142,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         accessUsers,
         filterClientRole,
         handleFilterPermission,
+        isPrimaryUserSubscriptionActive,
       }}
     >
       {children}

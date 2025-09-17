@@ -14,7 +14,7 @@ export interface IUser extends BaseSchema {
   last_name: string;
   phone?: string;
   avatar?: string;
-  subscription_status?: "active" | "inactive";
+  subscription_status?: "active" | "inactive" | "canceled";
   Roles?: {
     client_id: string;
     role: string;
@@ -162,7 +162,8 @@ export interface AccessInfo extends BaseSchema {
   email: string;
   phone: string;
   cognito_id: string;
-  UserRoles: { role: "family_member" | "caregiver" | "primary_user" };
+  UserRoles: { role: "family_member" | "caregiver" | "primary_user" | "admin" };
+  subscription_status?: "active" | "inactive" | "canceled";
 }
 
 export interface Template extends BaseSchema {
@@ -218,7 +219,7 @@ export interface Thread extends BaseSchema {
 }
 
 export interface BillingHistory extends BaseSchema {
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "canceled";
   current_period_start: string;
   current_period_end: string;
   cancel_at_period_end: boolean;

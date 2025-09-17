@@ -43,6 +43,21 @@ export const getSingleClient = async (id: string) => {
   }
 };
 
+export const deleteSingleClient = async (id: string) => {
+  try {
+    const client = await sendRequest({
+      method: "DELETE",
+      url: `/clients/${id}`,
+    });
+    return {
+      ...client.data.data,
+    };
+  } catch (error) {
+    console.log(`Client Service [getSingleClient] error: ${error}`);
+    throw error;
+  }
+};
+
 export const updateClient = async (data: { id: string; data: unknown }) => {
   try {
     const response = await sendRequest({

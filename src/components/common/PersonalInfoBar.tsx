@@ -5,6 +5,8 @@ interface PersonalInfoBarProps {
   leftValue: string;
   rightLabel: string;
   rightValue: string;
+  thirdValue?: string;
+  thirdLabel?: string;
 }
 
 export const PersonalInfoBar: React.FC<PersonalInfoBarProps> = ({
@@ -12,6 +14,8 @@ export const PersonalInfoBar: React.FC<PersonalInfoBarProps> = ({
   leftValue,
   rightLabel,
   rightValue,
+  thirdLabel = "",
+  thirdValue = "",
 }) => {
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center place-items-center mt-4 w-full justify-between md:justify-start">
@@ -24,6 +28,15 @@ export const PersonalInfoBar: React.FC<PersonalInfoBarProps> = ({
         {rightLabel}:{" "}
         <span className="text-darkGray font-bold">{rightValue}</span>
       </p>
+      {thirdLabel && (
+        <>
+          <div className="bg-mediumGray md:w-fit w-full border-mediumGray p-[1px] md:py-5" />
+          <p>
+            {thirdLabel}:{" "}
+            <span className="text-darkGray font-bold">{thirdValue}</span>
+          </p>
+        </>
+      )}
     </div>
   );
 };

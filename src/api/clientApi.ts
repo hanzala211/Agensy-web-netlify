@@ -33,6 +33,13 @@ export const useUpdateClientMutation = () => {
   });
 };
 
+export const useDeleteClientMutation = () => {
+  return useMutation({
+    mutationFn: async (id: string) =>
+      await ClientService.deleteSingleClient(id),
+  });
+};
+
 export const useUpdateClientStatusMutation = () => {
   return useMutation({
     mutationFn: async (data: { id: string; status: boolean }) =>

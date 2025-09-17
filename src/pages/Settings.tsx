@@ -1,8 +1,13 @@
 import { PageHeader, TabLink } from "@agensy/components";
-import { ROUTES } from "@agensy/constants";
+import { ROLES, ROUTES } from "@agensy/constants";
+import { useAuthContext } from "@agensy/context";
 import { Outlet } from "react-router-dom";
 
 export const Settings = () => {
+  const { userData } = useAuthContext();
+  const isNotAdmin =
+    userData?.Roles?.find((item) => item.role === ROLES.ADMIN)?.role !==
+    ROLES.ADMIN;
   return (
     <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
       <PageHeader
@@ -17,9 +22,11 @@ export const Settings = () => {
           <TabLink to={`${ROUTES.settings}`} end>
             Profile
           </TabLink>
-          <TabLink to={`${ROUTES.settings}/${ROUTES.profileSubscription}`}>
-            Billing
-          </TabLink>
+          {isNotAdmin && (
+            <TabLink to={`${ROUTES.settings}/${ROUTES.profileSubscription}`}>
+              Billing
+            </TabLink>
+          )}
         </div>
       </div>
       <div className={`mt-4`}>

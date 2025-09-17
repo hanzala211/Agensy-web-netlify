@@ -77,33 +77,40 @@ export const hospitalSchema = z.object({
 
 export type HospitalFormData = z.infer<typeof hospitalSchema>;
 
-export const clientSchema = z.object({
-  firstName: z
-    .string()
-    .min(2, { message: "First name is required" })
-    .transform(trimString),
-  lastName: z
-    .string()
-    .min(2, { message: "Last name is required" })
-    .transform(trimString),
-  preferredName: z.string().optional(),
-  dateOfBirth: z.string().optional(),
-  gender: z.string().optional(),
-  maritalStatus: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  livingSituation: z.string().optional(),
-  pharmacy_name: z.string().optional(),
-  pharmacy_address: z.string().optional(),
-  pharmacy_phone: z.string().optional(),
-  pharmacy_fax: z.string().optional(),
-  preferred_hospital: z.string().optional(),
-  hospital_address: z.string().optional(),
-  hospital_phone: z.string().optional(),
-  isEdit: z.boolean().optional(),
-});
+export const clientSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, { message: "First name is required" })
+      .transform(trimString),
+    lastName: z
+      .string()
+      .min(2, { message: "Last name is required" })
+      .transform(trimString),
+    preferredName: z.string().optional(),
+    dateOfBirth: z.string().optional(),
+    gender: z.string().optional(),
+    maritalStatus: z.string().optional(),
+    address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+    livingSituation: z.string().optional(),
+    pharmacy_name: z.string().optional(),
+    pharmacy_address: z.string().optional(),
+    pharmacy_phone: z.string().optional(),
+    pharmacy_fax: z.string().optional(),
+    preferred_hospital: z.string().optional(),
+    hospital_address: z.string().optional(),
+    hospital_phone: z.string().optional(),
+    isEdit: z.boolean().optional(),
+    familyAdminId: z.string().optional(),
+    showFamilyAdmin: z.boolean().optional(),
+  })
+  .refine((data) => (data.showFamilyAdmin ? data.familyAdminId : true), {
+    message: "Family admin is required",
+    path: ["familyAdminId"],
+  });
 
 export type ClientFormData = z.infer<typeof clientSchema>;
 

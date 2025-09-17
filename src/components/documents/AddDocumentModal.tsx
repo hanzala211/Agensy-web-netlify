@@ -12,7 +12,11 @@ import { documentSchema } from "@agensy/types";
 import type { DocumentFormData, ConfidenceScore, IUser } from "@agensy/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StringUtils, toast } from "@agensy/utils";
-import { DOCUMENT_CATEGORY_OPTIONS } from "@agensy/constants";
+import {
+  DOCUMENT_CATEGORY_OPTIONS,
+  ROLES,
+  SUBSCRIPTION_STATUSES,
+} from "@agensy/constants";
 import { isHeicImage, convertHeicToJpeg } from "../../utils/heicUtils";
 import { useAuthContext } from "@agensy/context";
 
@@ -272,18 +276,23 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
   const primaryUsers = useMemo(() => {
     const filteredUsers = accessUsers.filter((user: IUser) => {
-      return user.UserRoles?.some((role) => role.role === "primary_user");
+      return user.UserRoles?.some((role) => role.role === ROLES.PRIMARY_USER);
     });
+
+    const subscribedUsers = filteredUsers.filter(
+      (item) => item.subscription_status === SUBSCRIPTION_STATUSES.ACTIVE
+    );
 
     // Add current user if they exist and have primary_user role
     if (
       userData &&
-      userData.Roles?.some((role) => role.role === "primary_user")
+      userData.Roles?.some((role) => role.role === ROLES.PRIMARY_USER) &&
+      userData.subscription_status === SUBSCRIPTION_STATUSES.ACTIVE
     ) {
-      return [userData, ...filteredUsers];
+      return [userData, ...subscribedUsers];
     }
 
-    return filteredUsers;
+    return subscribedUsers;
   }, [accessUsers, userData]);
 
   const renderFilePreview = () => {

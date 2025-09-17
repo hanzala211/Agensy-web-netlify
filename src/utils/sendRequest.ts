@@ -2,7 +2,6 @@ import { getJwtToken } from "./authCognito";
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
-// Remove empty query params (undefined, null, empty string) recursively
 const removeEmptyValues = (value: unknown): unknown => {
   if (value === undefined || value === null) return undefined;
   if (typeof value === "string" && value.trim() === "") return undefined;
@@ -45,7 +44,6 @@ export const sendRequest = async (
     headers,
   };
 
-  // Clean query params to avoid sending empty values
   if (requestConfig.params) {
     const cleaned = removeEmptyValues(requestConfig.params);
     requestConfig.params = cleaned as AxiosRequestConfig["params"];

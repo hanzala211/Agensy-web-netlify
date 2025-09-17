@@ -87,7 +87,7 @@ export const ACCESS_ROLE_OPTIONS = [
 
 export const ACCESS_ROLE_FILTERS = [
   { label: "All Roles", value: "all" },
-  { label: "Primary User", value: "primary_user" },
+  { label: "Family Admin", value: "primary_user" },
   { label: "Family Member", value: "family_member" },
   { label: "Caregiver", value: "caregiver" },
 ];
@@ -141,7 +141,7 @@ export const APPOINTMENT_TYPES = [
 ];
 
 export const USER_ROLES = [
-  { label: "Primary User", value: "primary_user" },
+  { label: "Family Admin", value: "primary_user" },
   ...ACCESS_ROLE_OPTIONS,
 ];
 

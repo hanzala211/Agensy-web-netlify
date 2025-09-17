@@ -9,6 +9,7 @@ import {
   COLORS,
   ACCESS_ROLE_OPTIONS,
   RELATIONSHIP_TO_CLIENT,
+  ROLES,
 } from "@agensy/constants";
 import type { AccessInfo } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
@@ -39,7 +40,7 @@ export const AccessCard: React.FC<AccessCardProps> = ({
   const role = useMemo(
     () =>
       ACCESS_ROLE_OPTIONS.find((item) => item.value === access.UserRoles.role)
-        ?.label || "Primary User",
+        ?.label || "Family Admin",
     [access.UserRoles.role]
   );
 
@@ -85,7 +86,7 @@ export const AccessCard: React.FC<AccessCardProps> = ({
             </div>
 
             <div className="space-y-2">
-              {access.UserRoles.role !== "primary_user" && (
+              {access.UserRoles.role !== ROLES.PRIMARY_USER && (
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <span className="text-sm font-medium text-gray-700 sm:min-w-[100px] flex-shrink-0">
                     Assigned by:
@@ -113,9 +114,9 @@ export const AccessCard: React.FC<AccessCardProps> = ({
           <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
             <AntdTag
               color={
-                access.UserRoles.role === "family_member"
+                access.UserRoles.role === ROLES.FAMILY_MEMBER
                   ? "green"
-                  : access.UserRoles.role === "caregiver"
+                  : access.UserRoles.role === ROLES.CAREGIVER
                   ? "orange"
                   : COLORS.temporaryBlue
               }
