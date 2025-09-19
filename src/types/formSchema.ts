@@ -140,9 +140,7 @@ export const medicationSchema = z
   .object({
     medication_name: z
       .string()
-      .min(1, { message: "Medication name is required" })
-      .max(35, { message: "Medication name must be less than 35 characters" })
-      .transform(trimString),
+      .min(1, { message: "Medication name is required" }).transform(trimString),
     dosage: z.string().optional(),
     frequency: z.string().optional(),
     purpose: z

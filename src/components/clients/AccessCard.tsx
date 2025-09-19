@@ -124,25 +124,26 @@ export const AccessCard: React.FC<AccessCardProps> = ({
               {role}
             </AntdTag>
           </div>
-          {userData?.cognito_id !== access?.cognito_id && (
-            <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
-              <ActionButtons
-                onDelete={() => setIsDeleteModalOpen(true)}
-                isDeleting={isDeleting}
-                deleteLabel={`Remove contact ${access.first_name} ${access.last_name}`}
-                editLabel={`Edit contact ${access.first_name} ${access.last_name}`}
-                onEdit={onEdit}
-              />
-              <ConfirmationModal
-                title="Delete User"
-                isModalOpen={isDeleteModalOpen}
-                onOk={handleDeleteUser}
-                onCancel={() => setIsDeleteModalOpen(false)}
-              >
-                <p>Are you sure you want to delete this user?</p>
-              </ConfirmationModal>
-            </div>
-          )}
+          {userData?.cognito_id !== access?.cognito_id &&
+            access.UserRoles.role !== ROLES.PRIMARY_USER && (
+              <div className="flex gap-2 items-start lg:self-stretch lg:justify-end">
+                <ActionButtons
+                  onDelete={() => setIsDeleteModalOpen(true)}
+                  isDeleting={isDeleting}
+                  deleteLabel={`Remove contact ${access.first_name} ${access.last_name}`}
+                  editLabel={`Edit contact ${access.first_name} ${access.last_name}`}
+                  onEdit={onEdit}
+                />
+                <ConfirmationModal
+                  title="Delete User"
+                  isModalOpen={isDeleteModalOpen}
+                  onOk={handleDeleteUser}
+                  onCancel={() => setIsDeleteModalOpen(false)}
+                >
+                  <p>Are you sure you want to delete this user?</p>
+                </ConfirmationModal>
+              </div>
+            )}
         </div>
       </div>
     </BorderedCard>
