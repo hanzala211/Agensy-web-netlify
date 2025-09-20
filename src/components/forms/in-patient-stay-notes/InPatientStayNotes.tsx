@@ -42,7 +42,6 @@ export const InPatientStayNotes = () => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    getValues,
   } = useForm<InPatientStayNotesFormData>({
     resolver: zodResolver(inPatientStayNotesFormSchema),
     defaultValues: {
@@ -52,7 +51,6 @@ export const InPatientStayNotes = () => {
       inPatientStayNotes: [],
     },
   });
-  // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -66,7 +64,10 @@ export const InPatientStayNotes = () => {
   });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapPatientDataToFormData = (inPatientData: any) => {
-    const mappedInPatientStayNotes = inPatientData.in_patient_stay_notes.map(
+    // Fix: Add proper null/undefined check
+    const mappedInPatientStayNotes = (
+      inPatientData.in_patient_stay_notes || []
+    ).map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (note: any) => ({
         id: note?.id || "",
@@ -108,14 +109,22 @@ export const InPatientStayNotes = () => {
   };
 
   useEffect(() => {
-    if (inPatientData && inPatientData?.in_patient_stay_notes) {
+    if (inPatientData) {
       const formData = mapPatientDataToFormData(inPatientData);
       reset(formData as unknown as InPatientStayNotesFormData);
+
       setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: inPatientData?.last_update?.updatedAt || "",
-        },
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
+        dateOfBirth: formData.dateOfBirth || "",
+        inPatientStayNotes: JSON.parse(
+          JSON.stringify(formData.inPatientStayNotes || [])
+        ),
+        last_update: JSON.parse(
+          JSON.stringify({
+            updatedAt: inPatientData?.last_update?.updatedAt || "",
+          })
+        ),
       } as unknown as OpenedFileData);
     }
   }, [inPatientData?.in_patient_stay_notes]);
@@ -124,7 +133,7 @@ export const InPatientStayNotes = () => {
     if (postInPatientStayNotesMutation.status === "success") {
       toast.success(
         "In-Patient Stay Notes Successfully Updated",
-        "Your client's in-patient stay notes have been saved and are now up to date."
+        "Your care recipient's in-patient stay notes have been saved and are now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
@@ -132,12 +141,22 @@ export const InPatientStayNotes = () => {
         postInPatientStayNotesMutation.data
       );
       reset(formData as unknown as InPatientStayNotesFormData);
+
       setOpenedFileData({
-        ...formData,
-        last_update: {
-          updatedAt:
-            postInPatientStayNotesMutation.data?.last_update?.updatedAt || "",
-        },
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
+        dateOfBirth: formData.dateOfBirth || "",
+        inPatientStayNotes: JSON.parse(
+          JSON.stringify(formData.inPatientStayNotes || [])
+        ),
+        last_update: JSON.parse(
+          JSON.stringify({
+            updatedAt:
+              postInPatientStayNotesMutation.data?.last_update?.updatedAt ||
+              inPatientData?.last_update?.updatedAt ||
+              "",
+          })
+        ),
       } as unknown as OpenedFileData);
     } else if (postInPatientStayNotesMutation.status === "error") {
       toast.error(
@@ -147,7 +166,6 @@ export const InPatientStayNotes = () => {
     }
   }, [postInPatientStayNotesMutation.status, setHasUnsavedChanges]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);

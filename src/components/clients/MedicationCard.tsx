@@ -12,8 +12,11 @@ import {
 } from "@agensy/api";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { DateUtils, toast } from "@agensy/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 
 export const MedicationCard: React.FC = () => {
+  const params = useParams();
   const { handleFilterPermission } = useAuthContext();
   const addClientMedicationMutation = useAddClientMedicationMutation();
   const editClientMedicationMutation = useEditClientMedicationMutation();
@@ -28,6 +31,7 @@ export const MedicationCard: React.FC = () => {
     useState<boolean>(false);
   const [selectedEditMedication, setSelectedEditMedication] =
     useState<ClientMedications | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isAddMedicationModalOpen) {
@@ -40,6 +44,7 @@ export const MedicationCard: React.FC = () => {
       setIsAddMedicationModalOpen(false);
       addClientMedication(addClientMedicationMutation.data);
       toast.success("Medication added successfully");
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
     } else if (addClientMedicationMutation.status === "error") {
       toast.error("Failed to add medication");
     }
@@ -50,6 +55,7 @@ export const MedicationCard: React.FC = () => {
       setIsAddMedicationModalOpen(false);
       updateClientMedication(editClientMedicationMutation.data);
       toast.success("Medication updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
     } else if (editClientMedicationMutation.status === "error") {
       toast.error("Failed to update medication");
     }
@@ -61,6 +67,7 @@ export const MedicationCard: React.FC = () => {
       deleteClientMedication(
         deleteClientMedicationMutation.variables.medicationId
       );
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
     } else if (deleteClientMedicationMutation.status === "error") {
       toast.error("Failed to delete medication");
     }

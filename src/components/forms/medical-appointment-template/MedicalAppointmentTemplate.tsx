@@ -71,6 +71,21 @@ const defaultValues: MedicalAppointmentTemplateData = {
   report_given_to: "",
 };
 
+// Add this helper function at the top of the component (after the imports)
+const createSafeOpenedFileData = (
+  formData: MedicalAppointmentTemplateData,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const MedicalAppointmentTemplate: React.FC = () => {
   const queryClient = useQueryClient();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
@@ -118,6 +133,17 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         queryKey: ["medical-appointment-templates", clientId],
       });
       setHasUnsavedChanges(false);
+
+      // Update openedFileData with latest form values
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          new Date().toISOString()
+        ) as unknown as Record<
+          string,
+          string | string[] | Record<string, string | number>
+        >
+      );
     } else if (postMedicalAppointmentTemplateMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -140,7 +166,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
 
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   useEffect(() => {
     return () => {
@@ -326,12 +352,15 @@ export const MedicalAppointmentTemplate: React.FC = () => {
 
   useEffect(() => {
     if (Object.keys(getValues()).length > 0) {
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: medicalAppointmentTemplate?.last_update?.updatedAt || "",
-        },
-      } as unknown as Record<string, string | string[] | Record<string, string | number>>);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          medicalAppointmentTemplate?.last_update?.updatedAt
+        ) as unknown as Record<
+          string,
+          string | string[] | Record<string, string | number>
+        >
+      );
     }
   }, [Object.keys(getValues()).length]);
 

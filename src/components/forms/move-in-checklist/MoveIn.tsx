@@ -16,6 +16,26 @@ import { toast } from "@agensy/utils";
 import { APP_ACTIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
+const createSafeOpenedFileData = (
+  formData: ChecklistFormData,
+  clientFirstName: string,
+  clientLastName: string,
+  clientDateOfBirth: string,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    firstName: clientFirstName || "",
+    lastName: clientLastName || "",
+    dateOfBirth: clientDateOfBirth || "",
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const MoveIn = () => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -66,7 +86,7 @@ export const MoveIn = () => {
       (key) => formData[key] !== initialFormData[key]
     );
     setHasUnsavedChanges(hasChanges);
-  }, [formData, initialFormData, setHasUnsavedChanges]);
+  }, [formData, initialFormData]);
 
   useEffect(() => {
     if (postStartCareChecklistMutation.status === "success") {
@@ -77,13 +97,24 @@ export const MoveIn = () => {
       // Update initial form data to current form data after successful save
       setInitialFormData(formData);
       setHasUnsavedChanges(false);
+
+      // Update openedFileData with latest form values
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postStartCareChecklistMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postStartCareChecklistMutation.error)
       );
     }
-  }, [postStartCareChecklistMutation.status, formData, setHasUnsavedChanges]);
+  }, [postStartCareChecklistMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {
@@ -93,13 +124,15 @@ export const MoveIn = () => {
   }, [setHasUnsavedChanges]);
 
   useEffect(() => {
-    setOpenedFileData({
-      ...formData,
-      firstName: clientFirstName,
-      lastName: clientLastName,
-      dateOfBirth: clientDateOfBirth,
-      last_update: { updatedAt: startOfCareChecklist?.updatedAt },
-    } as unknown as OpenedFileData);
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        clientFirstName,
+        clientLastName,
+        clientDateOfBirth,
+        startOfCareChecklist?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [formData]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

@@ -33,6 +33,24 @@ const defaultValues: ImportantPeopleInLifeFormData = {
   notesAndReminders: "",
 };
 
+const createSafeOpenedFileData = (
+  formData: ImportantPeopleInLifeFormData,
+  lastUpdate?: string
+) => {
+  return {
+    firstName: formData.firstName || "",
+    lastName: formData.lastName || "",
+    dateOfBirth: formData.dateOfBirth || "",
+    importantPeople: JSON.parse(JSON.stringify(formData.importantPeople || [])),
+    notesAndReminders: formData.notesAndReminders || "",
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || "",
+      })
+    ),
+  };
+};
+
 export const ImportantPeopleInLife = () => {
   const params = useParams();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
@@ -42,7 +60,6 @@ export const ImportantPeopleInLife = () => {
     control,
     handleSubmit,
     reset,
-    getValues,
     watch,
     formState: { errors, isDirty },
   } = useForm<ImportantPeopleInLifeFormData>({
@@ -88,13 +105,12 @@ export const ImportantPeopleInLife = () => {
           )
         : "",
       importantPeople: [
-        ...(importantPeopleInLifeData.important_people.mpoa_name
+        ...(importantPeopleInLifeData.short_form.mpoa
           ? [
               {
                 type: "medical_poa",
-                name: importantPeopleInLifeData.important_people.mpoa_name,
-                phone:
-                  importantPeopleInLifeData.important_people.mpoa_phone || "",
+                name: importantPeopleInLifeData.short_form.mpoa,
+                phone: importantPeopleInLifeData.short_form.mpoa_phone || "",
                 relationship:
                   importantPeopleInLifeData.important_people
                     .mpoa_relationship || "",
@@ -102,13 +118,12 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.fpoa_name
+        ...(importantPeopleInLifeData.short_form.dpoa
           ? [
               {
                 type: "financial_poa",
-                name: importantPeopleInLifeData.important_people.fpoa_name,
-                phone:
-                  importantPeopleInLifeData.important_people.fpoa_phone || "",
+                name: importantPeopleInLifeData.short_form.dpoa,
+                phone: importantPeopleInLifeData.short_form.dpoa_phone || "",
                 relationship:
                   importantPeopleInLifeData.important_people
                     .fpoa_relationship || "",
@@ -277,6 +292,20 @@ export const ImportantPeopleInLife = () => {
   };
 
   useEffect(() => {
+    if (importantPeopleInLifeData) {
+      const formData = mapValuestoFormData(importantPeopleInLifeData);
+      reset(formData as unknown as ImportantPeopleInLifeFormData);
+
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          importantPeopleInLifeData?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
+    }
+  }, [importantPeopleInLifeData]);
+
+  useEffect(() => {
     if (postImportantPeopleInLifeMutation.status === "success") {
       toast.success(
         "Important People in Life Successfully Updated",
@@ -288,6 +317,13 @@ export const ImportantPeopleInLife = () => {
         postImportantPeopleInLifeMutation.data
       );
       reset(formData as unknown as ImportantPeopleInLifeFormData);
+
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          postImportantPeopleInLifeMutation.data?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     } else if (postImportantPeopleInLifeMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -295,19 +331,6 @@ export const ImportantPeopleInLife = () => {
       );
     }
   }, [postImportantPeopleInLifeMutation.status]);
-
-  useEffect(() => {
-    if (importantPeopleInLifeData) {
-      const formData = mapValuestoFormData(importantPeopleInLifeData);
-      reset(formData as unknown as ImportantPeopleInLifeFormData);
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: importantPeopleInLifeData?.last_update?.updatedAt || "",
-        },
-      } as unknown as OpenedFileData);
-    }
-  }, [importantPeopleInLifeData]);
 
   const onSubmit = (data: ImportantPeopleInLifeFormData) => {
     const postData: {
@@ -322,12 +345,14 @@ export const ImportantPeopleInLife = () => {
         phone: string | null;
         relationship: string | null;
       };
-      important_people: {
-        mpoa_name: string | null;
+      short_form: {
+        mpoa: string | null;
         mpoa_phone: string | null;
+        dpoa: string | null;
+        dpoa_phone: string | null;
+      };
+      important_people: {
         mpoa_relationship: string | null;
-        fpoa_name: string | null;
-        fpoa_phone: string | null;
         fpoa_relationship: string | null;
         lawyer_name: string | null;
         lawyer_phone: string | null;
@@ -371,12 +396,14 @@ export const ImportantPeopleInLife = () => {
         phone: null,
         relationship: null,
       },
-      important_people: {
-        mpoa_name: null,
+      short_form: {
+        mpoa: null,
         mpoa_phone: null,
+        dpoa: null,
+        dpoa_phone: null,
+      },
+      important_people: {
         mpoa_relationship: null,
-        fpoa_name: null,
-        fpoa_phone: null,
         fpoa_relationship: null,
         lawyer_name: null,
         lawyer_phone: null,
@@ -411,14 +438,14 @@ export const ImportantPeopleInLife = () => {
     data.importantPeople?.forEach((person) => {
       switch (person.type) {
         case "medical_poa":
-          postData.important_people.mpoa_name = person.name || null;
-          postData.important_people.mpoa_phone = person.phone || null;
+          postData.short_form.mpoa = person.name || null;
+          postData.short_form.mpoa_phone = person.phone || null;
           postData.important_people.mpoa_relationship =
             person.relationship || null;
           break;
         case "financial_poa":
-          postData.important_people.fpoa_name = person.name || null;
-          postData.important_people.fpoa_phone = person.phone || null;
+          postData.short_form.dpoa = person.name || null;
+          postData.short_form.dpoa_phone = person.phone || null;
           postData.important_people.fpoa_relationship =
             person.relationship || null;
           break;

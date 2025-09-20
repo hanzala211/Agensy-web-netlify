@@ -53,7 +53,7 @@ export const useClientManager = ({
               new Date(a.date_of_birth).getTime()
             );
           case "living":
-            return a.living_situation.localeCompare(b.living_situation);
+            return a?.living_situation?.localeCompare(b.living_situation);
           default:
             return 0;
         }

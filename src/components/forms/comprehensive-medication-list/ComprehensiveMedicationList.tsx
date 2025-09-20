@@ -14,6 +14,7 @@ import {
   type ClientMedications,
   type ComprehensiveMedicationListFormData,
   type OpenedFileData,
+  type Client,
 } from "@agensy/types";
 import { useParams } from "react-router-dom";
 import {
@@ -24,6 +25,7 @@ import { useEffect } from "react";
 import { DateUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
+import { AntdBadge } from "@agensy/components";
 
 export const ComprehensiveMedicationList = () => {
   const params = useParams();
@@ -36,6 +38,17 @@ export const ComprehensiveMedicationList = () => {
   const postComprehensiveMedicationList = usePostComprehensiveMedicationList();
   const queryClient = useQueryClient();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+
+  const clientData = queryClient.getQueryData(["client", params.clientId]) as
+    | Client
+    | undefined;
+  const clientMedications = clientData?.medications || [];
+
+  const isMedicationStopped = (medicationId: string) => {
+    if (!medicationId) return false;
+    return !clientMedications.some((med) => med.id === medicationId);
+  };
+
   const {
     register,
     handleSubmit,
@@ -62,12 +75,12 @@ export const ComprehensiveMedicationList = () => {
           startDate: "",
           endDate: "",
           sideEffects: "",
+          medicationId: "",
         },
       ],
     },
   });
 
-  // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -75,6 +88,24 @@ export const ComprehensiveMedicationList = () => {
   useEffect(() => {
     refetch();
   }, []);
+
+  const createSafeOpenedFileData = (
+    formData: ComprehensiveMedicationListFormData,
+    lastUpdate?: string
+  ) => {
+    return {
+      firstName: formData.firstName || "",
+      lastName: formData.lastName || "",
+      dateOfBirth: formData.dateOfBirth || "",
+      allergies: JSON.parse(JSON.stringify(formData.allergies || [])),
+      medications: JSON.parse(JSON.stringify(formData.medications || [])),
+      last_update: JSON.parse(
+        JSON.stringify({
+          updatedAt: lastUpdate || "",
+        })
+      ),
+    };
+  };
 
   useEffect(() => {
     if (postComprehensiveMedicationList.status === "success") {
@@ -84,6 +115,14 @@ export const ComprehensiveMedicationList = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+
+      const formData = getValues();
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          comprehensiveMedicationList?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     } else if (postComprehensiveMedicationList.status === "error") {
       toast.error(
         "Error Occurred",
@@ -92,7 +131,6 @@ export const ComprehensiveMedicationList = () => {
     }
   }, [postComprehensiveMedicationList.status, setHasUnsavedChanges]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -162,12 +200,14 @@ export const ComprehensiveMedicationList = () => {
             : [],
       };
       reset(formData);
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: comprehensiveMedicationList?.last_update?.updatedAt || "",
-        },
-      } as unknown as OpenedFileData);
+
+      // Use the helper function
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          comprehensiveMedicationList?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     }
   }, [comprehensiveMedicationList]);
 
@@ -308,6 +348,7 @@ export const ComprehensiveMedicationList = () => {
             startDate: "",
             endDate: "",
             sideEffects: "",
+            medicationId: "",
           })
         }
         ariaLabel="Add Medication"
@@ -319,10 +360,13 @@ export const ComprehensiveMedicationList = () => {
               key={field.id}
               className="p-4 rounded-lg border border-gray-200"
             >
-              <div className="flex items-center mb-4">
+              <div className="flex items-center justify-between mb-4">
                 <span className="text-sm font-medium text-gray-700 mr-2">
                   Medication {index + 1}:
                 </span>
+                {isMedicationStopped(field.medicationId || "") && (
+                  <AntdBadge status="error" size="small" text="Stopped" />
+                )}
               </div>
 
               {/* First row of fields */}

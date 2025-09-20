@@ -67,7 +67,28 @@ export const StartofCareChecklist = () => {
       (key) => formData[key] !== initialFormData[key]
     );
     setHasUnsavedChanges(hasChanges);
-  }, [formData, initialFormData, setHasUnsavedChanges]);
+  }, [formData, initialFormData]);
+
+  // Add this helper function at the top of the component
+  const createSafeOpenedFileData = (
+    formData: ChecklistFormData,
+    clientFirstName: string,
+    clientLastName: string,
+    clientDateOfBirth: string,
+    lastUpdate?: string
+  ) => {
+    return {
+      ...formData,
+      firstName: clientFirstName || "",
+      lastName: clientLastName || "",
+      dateOfBirth: clientDateOfBirth || "",
+      last_update: JSON.parse(
+        JSON.stringify({
+          updatedAt: lastUpdate || "",
+        })
+      ),
+    };
+  };
 
   useEffect(() => {
     if (postStartCareChecklistMutation.status === "success") {
@@ -78,13 +99,24 @@ export const StartofCareChecklist = () => {
       // Update initial form data to current form data after successful save
       setInitialFormData(formData);
       setHasUnsavedChanges(false);
+
+      // Use the helper function for success case
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          startOfCareChecklist?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     } else if (postStartCareChecklistMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postStartCareChecklistMutation.error)
       );
     }
-  }, [postStartCareChecklistMutation.status, formData, setHasUnsavedChanges]);
+  }, [postStartCareChecklistMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {
@@ -94,13 +126,16 @@ export const StartofCareChecklist = () => {
   }, [setHasUnsavedChanges]);
 
   useEffect(() => {
-    setOpenedFileData({
-      ...formData,
-      firstName: clientFirstName,
-      lastName: clientLastName,
-      dateOfBirth: clientDateOfBirth,
-      last_update: { updatedAt: startOfCareChecklist?.updatedAt },
-    } as unknown as OpenedFileData);
+    // Use the helper function
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        clientFirstName,
+        clientLastName,
+        clientDateOfBirth,
+        startOfCareChecklist?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [formData]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

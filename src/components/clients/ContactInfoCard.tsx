@@ -121,7 +121,7 @@ export const ContactInfoCard: React.FC = () => {
         ariaLabel="Add Contact"
         showButton={handleFilterPermission(
           selectedClient?.id as string,
-          APP_ACTIONS.EditClientBasicInfo
+          APP_ACTIONS.ClientContactAccess
         )}
       >
         <div className="space-y-6">
@@ -143,7 +143,7 @@ export const ContactInfoCard: React.FC = () => {
                   isDeleting={deleteContactMutation.isPending}
                   showActions={handleFilterPermission(
                     selectedClient?.id as string,
-                    APP_ACTIONS.EditClientBasicInfo
+                    APP_ACTIONS.ClientContactAccess
                   )}
                 >
                   <div>
@@ -173,7 +173,7 @@ export const ContactInfoCard: React.FC = () => {
                 if (
                   handleFilterPermission(
                     selectedClient?.id as string,
-                    APP_ACTIONS.EditClientBasicInfo
+                    APP_ACTIONS.ClientContactAccess
                   )
                 ) {
                   setIsContactModalOpen(true);
@@ -181,7 +181,7 @@ export const ContactInfoCard: React.FC = () => {
               }}
               showText={handleFilterPermission(
                 selectedClient?.id as string,
-                APP_ACTIONS.EditClientBasicInfo
+                APP_ACTIONS.ClientContactAccess
               )}
             />
           )}

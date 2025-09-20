@@ -167,6 +167,27 @@ const advanceCarePlanningDocuments: AdvanceCareDocument[] = [
   },
 ];
 
+const createSafeOpenedFileData = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  essentialDocuments: any,
+  clientFirstName: string,
+  clientLastName: string,
+  clientDateOfBirth: string,
+  lastUpdate?: string
+) => {
+  return {
+    essential_documents: JSON.parse(JSON.stringify(essentialDocuments || [])),
+    firstName: clientFirstName || "",
+    lastName: clientLastName || "",
+    dateOfBirth: clientDateOfBirth || "",
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const EssentialDocumentForAging = () => {
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { handleFilterPermission } = useAuthContext();
@@ -201,7 +222,7 @@ export const EssentialDocumentForAging = () => {
   const clientDateOfBirth = clientData?.date_of_birth || "";
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   useEffect(() => {
     return () => {
@@ -244,15 +265,15 @@ export const EssentialDocumentForAging = () => {
 
   useEffect(() => {
     if (essentialDocuments?.essential_documents) {
-      setOpenedFileData({
-        essential_documents: essentialDocuments?.essential_documents,
-        firstName: clientFirstName,
-        lastName: clientLastName,
-        dateOfBirth: clientDateOfBirth,
-        last_update: {
-          updatedAt: essentialDocuments?.last_update?.updatedAt,
-        },
-      });
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          essentialDocuments?.essential_documents,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          essentialDocuments?.last_update?.updatedAt
+        )
+      );
     }
   }, [essentialDocuments]);
 
@@ -260,6 +281,17 @@ export const EssentialDocumentForAging = () => {
     if (postEssentialDocumentsForAgingMutation.status === "success") {
       toast.success("Essential documents for aging updated successfully");
       setHasUnsavedChanges(false);
+
+      // Update openedFileData with latest form values
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          essentialDocuments?.essential_documents,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          new Date().toISOString()
+        )
+      );
     } else if (postEssentialDocumentsForAgingMutation.status === "error") {
       toast.error("Failed to update essential documents for aging");
     }

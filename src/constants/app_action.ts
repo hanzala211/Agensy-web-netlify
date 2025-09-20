@@ -13,4 +13,5 @@ export const APP_ACTIONS = {
   EditAgensyForms: "EditAgensyForms",
   ViewPersonalInfo: "ViewPersonalInfo",
   OCRAccess: "OCRAccess",
+  ClientContactAccess: "ClientContactAccess",
 };

@@ -122,6 +122,21 @@ const defaultValues = {
   mentalStatusText: "",
 };
 
+// Add this helper function at the top of the component (after the imports)
+const createSafeOpenedFileData = (
+  formData: FaceSheetLongFormData,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const FaceSheetLongForm: React.FC = () => {
   const params = useParams();
   const { handleFilterPermission } = useAuthContext();
@@ -151,7 +166,7 @@ export const FaceSheetLongForm: React.FC = () => {
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   useEffect(() => {
     refetch();
@@ -180,13 +195,19 @@ export const FaceSheetLongForm: React.FC = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postFaceSheetLongFormMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postFaceSheetLongFormMutation.error)
       );
     }
-  }, [postFaceSheetLongFormMutation.status, setHasUnsavedChanges]);
+  }, [postFaceSheetLongFormMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {
@@ -500,10 +521,12 @@ export const FaceSheetLongForm: React.FC = () => {
       dietaryRestrictionsArray.replace(formData.dietaryRestrictions);
       medicalConditionsArray.replace(formData.medicalConditions);
     }
-    setOpenedFileData({
-      ...getValues(),
-      last_update: { updatedAt: faceSheetLongData?.last_update?.updatedAt },
-    } as unknown as OpenedFileData);
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        getValues(),
+        faceSheetLongData?.last_update?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [faceSheetLongData]);
 
   const onSubmit = (data: FaceSheetLongFormData) => {

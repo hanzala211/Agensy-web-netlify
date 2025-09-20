@@ -43,7 +43,6 @@ export const LabsTracker = () => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    getValues,
   } = useForm<LabsTrackerFormData>({
     resolver: zodResolver(labsTrackerFormSchema),
     defaultValues,
@@ -106,11 +105,20 @@ export const LabsTracker = () => {
         postLabsTracker.data.client_info
       );
       reset(formData);
+
       setOpenedFileData({
-        ...formData,
-        last_update: {
-          updatedAt: postLabsTracker.data?.last_update?.updatedAt || "",
-        },
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
+        dateOfBirth: formData.dateOfBirth || "",
+        labs: JSON.parse(JSON.stringify(formData.labs || [])),
+        last_update: JSON.parse(
+          JSON.stringify({
+            updatedAt:
+              postLabsTracker.data?.last_update?.updatedAt ||
+              labsTrackerData?.last_update?.updatedAt ||
+              "",
+          })
+        ),
       } as unknown as OpenedFileData);
     } else if (postLabsTracker.status === "error") {
       toast.error("Error Occurred", String(postLabsTracker.error));
@@ -184,14 +192,18 @@ export const LabsTracker = () => {
       reset(formData);
 
       setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: labsTrackerData?.last_update?.updatedAt || "",
-        },
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
+        dateOfBirth: formData.dateOfBirth || "",
+        labs: JSON.parse(JSON.stringify(formData.labs || [])),
+        last_update: JSON.parse(
+          JSON.stringify({
+            updatedAt: labsTrackerData?.last_update?.updatedAt || "",
+          })
+        ),
       } as unknown as OpenedFileData);
     }
   }, [labsTrackerData]);
-
   useEffect(() => {
     refetch();
   }, []);

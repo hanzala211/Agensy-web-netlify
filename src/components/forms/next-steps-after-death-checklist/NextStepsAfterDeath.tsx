@@ -16,6 +16,26 @@ import { toast } from "@agensy/utils";
 import { APP_ACTIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
+const createSafeOpenedFileData = (
+  formData: ChecklistFormData,
+  clientFirstName: string,
+  clientLastName: string,
+  clientDateOfBirth: string,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    firstName: clientFirstName || "",
+    lastName: clientLastName || "",
+    dateOfBirth: clientDateOfBirth || "",
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const NextStepsAfterDeath = () => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -66,7 +86,7 @@ export const NextStepsAfterDeath = () => {
       (key) => formData[key] !== initialFormData[key]
     );
     setHasUnsavedChanges(hasChanges);
-  }, [formData, initialFormData, setHasUnsavedChanges]);
+  }, [formData, initialFormData]);
 
   useEffect(() => {
     if (postStartCareChecklistMutation.status === "success") {
@@ -74,23 +94,27 @@ export const NextStepsAfterDeath = () => {
         "Next Steps After Death Checklist Successfully Saved",
         "The next steps after death checklist information has been saved successfully."
       );
-      // Update initial form data to current form data after successful save
       setInitialFormData(formData);
       setHasUnsavedChanges(false);
+
+      // Update openedFileData with latest form values
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postStartCareChecklistMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postStartCareChecklistMutation.error)
       );
     }
-  }, [
-    postStartCareChecklistMutation.status,
-    postStartCareChecklistMutation.error,
-    formData,
-    setHasUnsavedChanges,
-  ]);
+  }, [postStartCareChecklistMutation.status]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -98,13 +122,15 @@ export const NextStepsAfterDeath = () => {
   }, [setHasUnsavedChanges]);
 
   useEffect(() => {
-    setOpenedFileData({
-      ...formData,
-      firstName: clientFirstName,
-      lastName: clientLastName,
-      dateOfBirth: clientDateOfBirth,
-      last_update: { updatedAt: startOfCareChecklist?.updatedAt },
-    } as unknown as OpenedFileData);
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        clientFirstName,
+        clientLastName,
+        clientDateOfBirth,
+        startOfCareChecklist?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [
     formData,
     clientFirstName,
@@ -126,7 +152,6 @@ export const NextStepsAfterDeath = () => {
     });
   };
 
-  // Group items by headingId
   const groupedItems = checklistSchema.reduce((acc, field) => {
     const headingId = field.headingId || "default";
     if (!acc[headingId]) {
@@ -136,14 +161,12 @@ export const NextStepsAfterDeath = () => {
     return acc;
   }, {} as Record<string, typeof checklistSchema>);
 
-  // Get heading label for each group
   const getHeadingLabel = (headingId: string) => {
     const headingField = checklistSchema.find(
       (field) => field.id === headingId && field.type === "heading"
     );
     if (headingField) return headingField.label;
 
-    // If no heading found, use the group label
     const groupField = checklistSchema.find(
       (field) =>
         field.headingId === headingId &&
@@ -153,7 +176,6 @@ export const NextStepsAfterDeath = () => {
     return groupField?.label || `Section ${headingId}`;
   };
 
-  // Get root fields for each heading group (parentId === null, excluding headings)
   const getRootFieldsForGroup = (headingId: string) => {
     return (
       groupedItems[headingId]?.filter(
@@ -174,7 +196,6 @@ export const NextStepsAfterDeath = () => {
             const rootFields = getRootFieldsForGroup(headingId);
             const headingLabel = getHeadingLabel(headingId);
 
-            // Skip if no root fields (like standalone headings)
             if (rootFields.length === 0) return null;
 
             return (

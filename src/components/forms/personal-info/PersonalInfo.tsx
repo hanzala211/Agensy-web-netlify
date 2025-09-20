@@ -68,6 +68,63 @@ const defaultValues = {
   socialSecurityQuestion: "",
 };
 
+// Add this helper function at the top of the component
+const createSafeOpenedFileData = (
+  formData: PersonalInfoFormData,
+  lastUpdate?: string
+) => {
+  return {
+    firstName: formData.firstName || "",
+    lastName: formData.lastName || "",
+    dateOfBirth: formData.dateOfBirth || "",
+    socialSecurityNumber: formData.socialSecurityNumber || "",
+    driversLicenseNumber: formData.driversLicenseNumber || "",
+    driversLicenseState: formData.driversLicenseState || "",
+    passportNumber: formData.passportNumber || "",
+    passportExpirationDate: formData.passportExpirationDate || "",
+    emergencyContactFirstName: formData.emergencyContactFirstName || "",
+    emergencyContactLastName: formData.emergencyContactLastName || "",
+    emergencyContactPhone: formData.emergencyContactPhone || "",
+    emergencyContactRelationship: formData.emergencyContactRelationship || "",
+    healthInsuranceProvider: formData.healthInsuranceProvider || "",
+    healthInsurancePolicyNumber: formData.healthInsurancePolicyNumber || "",
+    bankName: formData.bankName || "",
+    bankAccountNumberPartial: formData.bankAccountNumberPartial || "",
+    bankAccountType: formData.bankAccountType || "",
+    bankOnlineLoginInfo: formData.bankOnlineLoginInfo || "",
+    creditCardIssuer: formData.creditCardIssuer || "",
+    creditCardLastFourDigits: formData.creditCardLastFourDigits || "",
+    creditCardOnlineLoginInfo: formData.creditCardOnlineLoginInfo || "",
+    electricityProvider: formData.electricityProvider || "",
+    electricityUsername: formData.electricityUsername || "",
+    electricityPassword: formData.electricityPassword || "",
+    internetProvider: formData.internetProvider || "",
+    internetUsername: formData.internetUsername || "",
+    internetPassword: formData.internetPassword || "",
+    phoneProvider: formData.phoneProvider || "",
+    phoneUsername: formData.phoneUsername || "",
+    phonePassword: formData.phonePassword || "",
+    streamingServices: formData.streamingServices || "",
+    streamingUsername: formData.streamingUsername || "",
+    streamingPassword: formData.streamingPassword || "",
+    socialSecurityQuestion: formData.socialSecurityQuestion || "",
+    mothersMaidenName: formData.mothersMaidenName || "",
+    bankingHistoryInstitutions: formData.bankingHistoryInstitutions || "",
+    monthlyCarMortgagePayment: formData.monthlyCarMortgagePayment || "",
+    previousStreetNames: formData.previousStreetNames || "",
+    creditCardInstitutions: formData.creditCardInstitutions || "",
+    trustedPersonName: formData.trustedPersonName || "",
+    trustedPersonPhone: formData.trustedPersonPhone || "",
+    additionalNotes: formData.additionalNotes || "",
+    digitalAccounts: JSON.parse(JSON.stringify(formData.digitalAccounts || [])),
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || "",
+      })
+    ),
+  };
+};
+
 export const PersonalInfo = () => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -93,7 +150,7 @@ export const PersonalInfo = () => {
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   const digitalAccountsArray = useFieldArray({
     control,
@@ -113,10 +170,19 @@ export const PersonalInfo = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+
+      // Use the helper function for success case too
+      const formData = getValues();
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          personalInfo?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     } else if (postPersonalInfoMutation.status === "error") {
       toast.error("Error Occurred", String(postPersonalInfoMutation.error));
     }
-  }, [postPersonalInfoMutation.status, setHasUnsavedChanges]);
+  }, [postPersonalInfoMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {
@@ -243,12 +309,14 @@ export const PersonalInfo = () => {
       };
       reset(formData);
       digitalAccountsArray.replace(formData.digitalAccounts);
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: personalInfo?.last_update?.updatedAt || "",
-        },
-      } as unknown as OpenedFileData);
+
+      // Use the helper function
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          personalInfo?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     }
   }, [personalInfo]);
 

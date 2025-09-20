@@ -76,6 +76,21 @@ const defaultValues = {
   emergencyContactEmail: "",
 };
 
+// Add this helper function at the top of the component (after the imports)
+const createSafeOpenedFileData = (
+  formData: FaceSheetShortFormData,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const FaceSheetShortForm: React.FC = () => {
   const { clientId } = useParams();
   const queryClient = useQueryClient();
@@ -103,7 +118,7 @@ export const FaceSheetShortForm: React.FC = () => {
 
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   useEffect(() => {
     if (ocrResult && ocrResult.length > 0) {
@@ -158,13 +173,19 @@ export const FaceSheetShortForm: React.FC = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
       setHasUnsavedChanges(false);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postFaceSheetShortFormMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postFaceSheetShortFormMutation.error)
       );
     }
-  }, [postFaceSheetShortFormMutation.status, setHasUnsavedChanges]);
+  }, [postFaceSheetShortFormMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {
@@ -296,10 +317,12 @@ export const FaceSheetShortForm: React.FC = () => {
       allergiesArray.replace(formData.allergies);
       surgicalHistoryArray.replace(formData.surgicalHistory);
     }
-    setOpenedFileData({
-      ...getValues(),
-      last_update: { updatedAt: faceSheetShortForm?.last_update?.updatedAt },
-    } as unknown as OpenedFileData);
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        getValues(),
+        faceSheetShortForm?.last_update?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [faceSheetShortForm]);
 
   const onSubmit = (data: FaceSheetShortFormData) => {

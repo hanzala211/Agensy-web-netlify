@@ -42,6 +42,69 @@ import { NutritionalHealth } from "./NutritionalHealth";
 import { LegalAndFinancialCard } from "./LegalAndFinancialCard";
 import { CaregiverSupport } from "./CaregiverSupport";
 
+// Helper function to create safe form data for PDF rendering
+const createFormDataForPDF = (
+  formData: ComprehensiveCarePlanFormData,
+  lastUpdate?: string
+) => {
+  return {
+    firstName: formData.firstName || "",
+    lastName: formData.lastName || "",
+    dateOfBirth: formData.dateOfBirth || "",
+    preferredHospital: formData.preferredHospital || "",
+    pharmacyName: formData.pharmacyName || "",
+    dateOfAssessment: formData.dateOfAssessment || "",
+    dateOfCarePlan: formData.dateOfCarePlan || "",
+    personCompletingAssessment: formData.personCompletingAssessment || "",
+    presentForAssessment: formData.presentForAssessment || "",
+    goalsForAssessment: JSON.parse(
+      JSON.stringify(formData.goalsForAssessment || [])
+    ),
+    nextStepCareRecipient: JSON.parse(
+      JSON.stringify(formData.nextStepCareRecipient || [])
+    ),
+    nextStepCarePartner: JSON.parse(
+      JSON.stringify(formData.nextStepCarePartner || [])
+    ),
+    focusedRecommendations: JSON.parse(
+      JSON.stringify(formData.focusedRecommendations || [])
+    ),
+    initialRequest: formData.initialRequest || "",
+    careRecipientGoals: formData.careRecipientGoals || "",
+    demographicAndHistoricInformation:
+      formData.demographicAndHistoricInformation || "",
+    medicalHistory: formData.medicalHistory || "",
+    medications: JSON.parse(JSON.stringify(formData.medications || [])),
+    allergies: JSON.parse(JSON.stringify(formData.allergies || [])),
+    healthcareProviders: JSON.parse(
+      JSON.stringify(formData.healthcareProviders || [])
+    ),
+    functionalAdls: JSON.parse(JSON.stringify(formData.functionalAdls || {})),
+    functionalIadls: JSON.parse(JSON.stringify(formData.functionalIadls || {})),
+    homeSafety: JSON.parse(JSON.stringify(formData.homeSafety || {})),
+    memoryAndReasoning: JSON.parse(
+      JSON.stringify(formData.memoryAndReasoning || {})
+    ),
+    geriatricDepression: JSON.parse(
+      JSON.stringify(formData.geriatricDepression || {})
+    ),
+    nutritionalHealth: JSON.parse(
+      JSON.stringify(formData.nutritionalHealth || {})
+    ),
+    legalAndFinancial: JSON.parse(
+      JSON.stringify(formData.legalAndFinancial || {})
+    ),
+    careGiverSupport: JSON.parse(
+      JSON.stringify(formData.careGiverSupport || {})
+    ),
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const ComprehensiveCarePlan = () => {
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
   const { clientId } = useParams();
@@ -389,7 +452,7 @@ export const ComprehensiveCarePlan = () => {
 
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   useEffect(() => {
     return () => {
@@ -461,6 +524,12 @@ export const ComprehensiveCarePlan = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
       setHasUnsavedChanges(false);
+      setOpenedFileData(
+        createFormDataForPDF(
+          getValues(),
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postComprehensiveCarePlanMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -1780,12 +1849,12 @@ export const ComprehensiveCarePlan = () => {
                 }))
             : [],
       });
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: comprehensiveCarePlan?.last_update?.updatedAt,
-        },
-      } as unknown as OpenedFileData);
+      setOpenedFileData(
+        createFormDataForPDF(
+          getValues(),
+          comprehensiveCarePlan?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     }
   }, [comprehensiveCarePlan]);
 

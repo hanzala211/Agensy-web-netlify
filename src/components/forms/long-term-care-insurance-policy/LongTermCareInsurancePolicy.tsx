@@ -16,6 +16,26 @@ import { toast } from "@agensy/utils";
 import { APP_ACTIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
+const createSafeOpenedFileData = (
+  formData: ChecklistFormData,
+  clientFirstName: string,
+  clientLastName: string,
+  clientDateOfBirth: string,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    firstName: clientFirstName || "",
+    lastName: clientLastName || "",
+    dateOfBirth: clientDateOfBirth || "",
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const LongTermCareInsurancePolicy = () => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -68,7 +88,7 @@ export const LongTermCareInsurancePolicy = () => {
       (key) => formData[key] !== initialFormData[key]
     );
     setHasUnsavedChanges(hasChanges);
-  }, [formData, initialFormData, setHasUnsavedChanges]);
+  }, [formData, initialFormData]);
 
   useEffect(() => {
     if (postLongTermCareInsurancePolicyMutation.status === "success") {
@@ -78,17 +98,24 @@ export const LongTermCareInsurancePolicy = () => {
       );
       setInitialFormData(formData);
       setHasUnsavedChanges(false);
+
+      // Update openedFileData with latest form values
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postLongTermCareInsurancePolicyMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postLongTermCareInsurancePolicyMutation.error)
       );
     }
-  }, [
-    postLongTermCareInsurancePolicyMutation.status,
-    formData,
-    setHasUnsavedChanges,
-  ]);
+  }, [postLongTermCareInsurancePolicyMutation.status]);
 
   useEffect(() => {
     return () => {
@@ -97,13 +124,15 @@ export const LongTermCareInsurancePolicy = () => {
   }, [setHasUnsavedChanges]);
 
   useEffect(() => {
-    setOpenedFileData({
-      ...formData,
-      firstName: clientFirstName,
-      lastName: clientLastName,
-      dateOfBirth: clientDateOfBirth,
-      last_update: { updatedAt: longTermCareInsurancePolicy?.updatedAt },
-    } as unknown as OpenedFileData);
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        clientFirstName,
+        clientLastName,
+        clientDateOfBirth,
+        longTermCareInsurancePolicy?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [formData]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

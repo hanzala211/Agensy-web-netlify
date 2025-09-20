@@ -16,6 +16,27 @@ import { toast } from "@agensy/utils";
 import { APP_ACTIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
+// Add this helper function at the top of the component (after the imports)
+const createSafeOpenedFileData = (
+  formData: ChecklistFormData,
+  clientFirstName: string,
+  clientLastName: string,
+  clientDateOfBirth: string,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    firstName: clientFirstName || "",
+    lastName: clientLastName || "",
+    dateOfBirth: clientDateOfBirth || "",
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const CarePlanChecklist = () => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -64,7 +85,7 @@ export const CarePlanChecklist = () => {
       (key) => formData[key] !== initialFormData[key]
     );
     setHasUnsavedChanges(hasChanges);
-  }, [formData, initialFormData, setHasUnsavedChanges]);
+  }, [formData, initialFormData]);
 
   useEffect(() => {
     if (postStartCareChecklistMutation.status === "success") {
@@ -75,13 +96,24 @@ export const CarePlanChecklist = () => {
       // Update initial form data to current form data after successful save
       setInitialFormData(formData);
       setHasUnsavedChanges(false);
+
+      // Update openedFileData with latest form values
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postStartCareChecklistMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postStartCareChecklistMutation.error)
       );
     }
-  }, [postStartCareChecklistMutation.status, formData, setHasUnsavedChanges]);
+  }, [postStartCareChecklistMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {
@@ -91,13 +123,15 @@ export const CarePlanChecklist = () => {
   }, [setHasUnsavedChanges]);
 
   useEffect(() => {
-    setOpenedFileData({
-      ...formData,
-      firstName: clientFirstName,
-      lastName: clientLastName,
-      dateOfBirth: clientDateOfBirth,
-      last_update: { updatedAt: startOfCareChecklist?.updatedAt },
-    } as unknown as OpenedFileData);
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        clientFirstName,
+        clientLastName,
+        clientDateOfBirth,
+        startOfCareChecklist?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [
     formData,
     clientFirstName,

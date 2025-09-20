@@ -16,6 +16,26 @@ import { toast } from "@agensy/utils";
 import { APP_ACTIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
+const createSafeOpenedFileData = (
+  formData: ChecklistFormData,
+  clientFirstName: string,
+  clientLastName: string,
+  clientDateOfBirth: string,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    firstName: clientFirstName || "",
+    lastName: clientLastName || "",
+    dateOfBirth: clientDateOfBirth || "",
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const HospitalizationChecklist = () => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -34,7 +54,6 @@ export const HospitalizationChecklist = () => {
   const postStartCareChecklistMutation = usePostChecklistFormsMutation();
   const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
 
-  // Extract client data from query cache
   const clientData = queryClient.getQueryData(["client", params.clientId]) as
     | { first_name?: string; last_name?: string; date_of_birth?: string }
     | undefined;
@@ -60,13 +79,12 @@ export const HospitalizationChecklist = () => {
     }
   }, [startOfCareChecklist]);
 
-  // Watch form changes to detect unsaved changes
   useEffect(() => {
     const hasChanges = Object.keys(formData).some(
       (key) => formData[key] !== initialFormData[key]
     );
     setHasUnsavedChanges(hasChanges);
-  }, [formData, initialFormData, setHasUnsavedChanges]);
+  }, [formData, initialFormData]);
 
   useEffect(() => {
     if (postStartCareChecklistMutation.status === "success") {
@@ -74,18 +92,26 @@ export const HospitalizationChecklist = () => {
         "Hospitalization Checklist Successfully Saved",
         "The hospitalization checklist information has been saved successfully."
       );
-      // Update initial form data to current form data after successful save
       setInitialFormData(formData);
       setHasUnsavedChanges(false);
+
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postStartCareChecklistMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postStartCareChecklistMutation.error)
       );
     }
-  }, [postStartCareChecklistMutation.status, formData, setHasUnsavedChanges]);
+  }, [postStartCareChecklistMutation.status]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -93,13 +119,15 @@ export const HospitalizationChecklist = () => {
   }, [setHasUnsavedChanges]);
 
   useEffect(() => {
-    setOpenedFileData({
-      ...formData,
-      firstName: clientFirstName,
-      lastName: clientLastName,
-      dateOfBirth: clientDateOfBirth,
-      last_update: { updatedAt: startOfCareChecklist?.updatedAt },
-    } as unknown as OpenedFileData);
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        clientFirstName,
+        clientLastName,
+        clientDateOfBirth,
+        startOfCareChecklist?.updatedAt
+      ) as unknown as OpenedFileData
+    );
   }, [formData]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -185,7 +213,10 @@ export const HospitalizationChecklist = () => {
             );
           })}
         </div>
-        {handleFilterPermission(params.clientId as string, APP_ACTIONS.EditAgensyForms) && (
+        {handleFilterPermission(
+          params.clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
           <div className="bg-basicWhite/90 mt-4 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
               <PrimaryButton

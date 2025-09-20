@@ -140,7 +140,8 @@ export const medicationSchema = z
   .object({
     medication_name: z
       .string()
-      .min(1, { message: "Medication name is required" }).transform(trimString),
+      .min(1, { message: "Medication name is required" })
+      .transform(trimString),
     dosage: z.string().optional(),
     frequency: z.string().optional(),
     purpose: z

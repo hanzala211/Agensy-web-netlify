@@ -17,6 +17,7 @@ import type {
   PersonalInfoFormData,
   VitalsTrackerFormData,
   ComprehensiveMedicationListFormData,
+  CaregiverInformationFormData,
 } from "@agensy/types";
 import {
   CommonLoader,
@@ -398,9 +399,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
             return (
               <CaregiverInformationPDF
                 data={
-                  openedFileData as unknown as {
-                    [key: string]: boolean | string;
-                  } & {
+                  openedFileData as unknown as CaregiverInformationFormData & {
                     firstName?: string;
                     lastName?: string;
                     dateOfBirth?: string;
@@ -452,10 +451,13 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           break;
         case "personal-info":
           if (openedFileData && typeof openedFileData === "object") {
+            // Clone the data object to force a new instance
+            const clonedData = JSON.parse(JSON.stringify(openedFileData));
+
             return (
               <PersonalInfoPDF
                 data={
-                  openedFileData as unknown as PersonalInfoFormData & {
+                  clonedData as unknown as PersonalInfoFormData & {
                     last_update: { updatedAt: string };
                   }
                 }
@@ -491,10 +493,12 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           break;
         case "labs-test-tracker":
           if (openedFileData && typeof openedFileData === "object") {
+            const clonedData = JSON.parse(JSON.stringify(openedFileData));
+
             return (
               <LabsTrackerPDF
                 data={
-                  openedFileData as unknown as LabsTrackerFormData & {
+                  clonedData as unknown as LabsTrackerFormData & {
                     last_update: { updatedAt: string };
                   }
                 }
@@ -504,10 +508,13 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           break;
         case "in-patient-stay-notes":
           if (openedFileData && typeof openedFileData === "object") {
+            // Clone the data object to force a new instance
+            const clonedData = JSON.parse(JSON.stringify(openedFileData));
+
             return (
               <InPatientStayNotesPDF
                 data={
-                  openedFileData as unknown as InPatientStayNotesFormData & {
+                  clonedData as unknown as InPatientStayNotesFormData & {
                     last_update: { updatedAt: string };
                   }
                 }
@@ -657,6 +664,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                         <PDFDownloadLink
                           document={pdfDocument}
                           fileName={`${fileContent?.name}.pdf`}
+                          key={`pdf-${
+                            JSON.stringify(openedFileData).length
+                          }-${Date.now()}`}
                         >
                           <TertiaryButton
                             aria_label="Download PDF"

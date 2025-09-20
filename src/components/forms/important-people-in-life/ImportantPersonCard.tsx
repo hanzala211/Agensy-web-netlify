@@ -1,4 +1,9 @@
-import { Input, Select, TertiaryButton } from "@agensy/components";
+import {
+  Input,
+  Select,
+  TertiaryButton,
+  PhoneNumberInput,
+} from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import type { ImportantPeopleInLifeFormData } from "@agensy/types";
 import type {
@@ -184,7 +189,14 @@ export const ImportantPersonCard = ({
                 errorMessage = "";
             }
 
-            return (
+            return field === "phone" ? (
+              <PhoneNumberInput
+                key={field}
+                label={getFieldLabel(field)}
+                control={control}
+                name={fieldPath as `importantPeople.${number}.phone`}
+              />
+            ) : (
               <Input
                 key={field}
                 label={getFieldLabel(field)}

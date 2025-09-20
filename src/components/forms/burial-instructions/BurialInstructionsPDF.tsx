@@ -216,6 +216,7 @@ const BurialInstructionsPDF: React.FC<{
           data?.lastName ||
           data?.dateOfBirth ||
           data?.timeOfDeath ||
+          data?.dateOfDeath ||
           data?.countyThatIssuedDeathCertificate ||
           data?.numberOfDeathCertificatesOrdered) && (
           <View style={styles.section}>
@@ -230,6 +231,9 @@ const BurialInstructionsPDF: React.FC<{
             )}
             {data?.timeOfDeath && (
               <Field label="Time of Death">{data.timeOfDeath}</Field>
+            )}
+            {data?.dateOfDeath && (
+              <Field label="Date of Death">{data.dateOfDeath}</Field>
             )}
             {data?.countyThatIssuedDeathCertificate && (
               <Field label="County That Issued Death Certificate">

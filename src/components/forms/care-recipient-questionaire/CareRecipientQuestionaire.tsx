@@ -35,6 +35,7 @@ import { DateUtils, toast } from "@agensy/utils";
 import { APP_ACTIONS, RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { MedicationsSection } from "./MedicationsSection";
+import type { OpenedFileData } from "@agensy/types";
 
 const defaultValues = {
   formFillerName: "",
@@ -186,6 +187,21 @@ const defaultValues = {
   areasAcceptingHelp: "",
 };
 
+// Add this helper function at the top of the component (after the imports)
+const createSafeOpenedFileData = (
+  formData: CareRecipientQuestionnaireData,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const CareRecipientQuestionaire = () => {
   const queryClient = useQueryClient();
   const { handleFilterPermission } = useAuthContext();
@@ -220,7 +236,7 @@ export const CareRecipientQuestionaire = () => {
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   const relativesArray = useFieldArray({
     control,
@@ -768,12 +784,12 @@ export const CareRecipientQuestionaire = () => {
       relativesArray.replace(formData.relatives);
       friendsNeighborsArray.replace(formData.friendsNeighbors);
       medicationsArray.replace(formData.medications);
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: careRecipientQuestionnaire?.last_update?.updatedAt || "",
-        },
-      } as unknown as Record<string, string | string[] | Record<string, string | number>>);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          careRecipientQuestionnaire?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     }
   }, [careRecipientQuestionnaire]);
 
@@ -785,13 +801,19 @@ export const CareRecipientQuestionaire = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
       setHasUnsavedChanges(false);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postCareRecipientQuestionaireMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postCareRecipientQuestionaireMutation.error)
       );
     }
-  }, [postCareRecipientQuestionaireMutation.status, setHasUnsavedChanges]);
+  }, [postCareRecipientQuestionaireMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {

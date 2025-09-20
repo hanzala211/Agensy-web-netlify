@@ -26,6 +26,20 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 
+const createSafeOpenedFileData = (
+  formData: InitialCareAssessmentPlanFormData,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const InitialCareAssessmentPlan = () => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -89,7 +103,7 @@ export const InitialCareAssessmentPlan = () => {
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   useEffect(() => {
     refetch();
@@ -135,13 +149,19 @@ export const InitialCareAssessmentPlan = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postInitialCareAssessmentPlanMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postInitialCareAssessmentPlanMutation.error)
       );
     }
-  }, [postInitialCareAssessmentPlanMutation.status, setHasUnsavedChanges]);
+  }, [postInitialCareAssessmentPlanMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {
@@ -279,12 +299,12 @@ export const InitialCareAssessmentPlan = () => {
             )
           : [],
       });
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: initialCareAssessment?.last_update?.updatedAt,
-        },
-      } as unknown as OpenedFileData);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          initialCareAssessment?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     }
   }, [initialCareAssessment]);
 

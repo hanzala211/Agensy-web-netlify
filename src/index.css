@@ -319,4 +319,9 @@ body {
 input[type="checkbox"] {
   width: 16px !important;
   height: 16px !important;
+  accent-color: #4285f4 !important;
+}
+
+input[type="radio"] {
+  accent-color: #4285f4 !important;
 }

@@ -157,6 +157,23 @@ export const VitalsTracker = () => {
     }
   };
 
+  const createSafeOpenedFileData = (
+    formData: VitalsTrackerFormData,
+    lastUpdate?: string
+  ) => {
+    return {
+      firstName: formData.firstName || "",
+      lastName: formData.lastName || "",
+      dateOfBirth: formData.dateOfBirth || "",
+      vitals: JSON.parse(JSON.stringify(formData.vitals || [])),
+      last_update: JSON.parse(
+        JSON.stringify({
+          updatedAt: lastUpdate || "",
+        })
+      ),
+    };
+  };
+
   useEffect(() => {
     if (postVitalsTrackerMutation.status === "success") {
       toast.success(
@@ -170,19 +187,18 @@ export const VitalsTracker = () => {
         postVitalsTrackerMutation.data.client_info
       );
       reset(formData);
-      setOpenedFileData({
-        ...formData,
-        last_update: {
-          updatedAt:
-            postVitalsTrackerMutation.data?.last_update?.updatedAt || "",
-        },
-      } as unknown as OpenedFileData);
+
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          postVitalsTrackerMutation.data?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     } else if (postVitalsTrackerMutation.status === "error") {
       toast.error("Error Occurred", String(postVitalsTrackerMutation.error));
     }
   }, [postVitalsTrackerMutation.status, setHasUnsavedChanges]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -196,12 +212,14 @@ export const VitalsTracker = () => {
         vitalsTrackerData.client_info
       );
       reset(formData);
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: vitalsTrackerData?.last_update?.updatedAt || "",
-        },
-      } as unknown as OpenedFileData);
+
+      // Use the helper function
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          vitalsTrackerData?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     }
   }, [vitalsTrackerData]);
 

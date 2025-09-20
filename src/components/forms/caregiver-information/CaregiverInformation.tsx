@@ -63,6 +63,7 @@ export const CaregiverInformation = () => {
     handleSubmit: handleFormSubmit,
     formState: { errors, isDirty },
     reset,
+    getValues,
   } = useForm<CaregiverInformationFormData>({
     resolver: zodResolver(caregiverInformationFormSchema),
     defaultValues: {
@@ -89,7 +90,7 @@ export const CaregiverInformation = () => {
   // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
-  }, [isDirty, setHasUnsavedChanges]);
+  }, [isDirty]);
 
   useEffect(() => {
     if (careGiverInfo) {
@@ -154,14 +155,40 @@ export const CaregiverInformation = () => {
     }
   }, [careGiverInfo, careGiverInfo?.form_data]);
 
-  useEffect(() => {
-    setOpenedFileData({
+  const createSafeOpenedFileData = (
+    formData: ChecklistFormData,
+    clientFirstName: string,
+    clientLastName: string,
+    clientDateOfBirth: string,
+    lastUpdate?: string,
+    formValues?: CaregiverInformationFormData
+  ) => {
+    return {
       ...formData,
-      firstName: clientFirstName,
-      lastName: clientLastName,
-      dateOfBirth: clientDateOfBirth,
-      last_update: { updatedAt: careGiverInfo?.last_update?.updatedAt },
-    } as unknown as OpenedFileData);
+      // Include the actual form values for PDF generation
+      ...(formValues || {}),
+      firstName: clientFirstName || "",
+      lastName: clientLastName || "",
+      dateOfBirth: clientDateOfBirth || "",
+      last_update: JSON.parse(
+        JSON.stringify({
+          updatedAt: lastUpdate || new Date().toISOString(),
+        })
+      ),
+    };
+  };
+
+  useEffect(() => {
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        clientFirstName,
+        clientLastName,
+        clientDateOfBirth,
+        careGiverInfo?.last_update?.updatedAt,
+        getValues()
+      ) as unknown as OpenedFileData
+    );
   }, [formData]);
 
   useEffect(() => {
@@ -172,13 +199,25 @@ export const CaregiverInformation = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
       setHasUnsavedChanges(false);
+
+      // Update openedFileData with latest form values
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          clientFirstName,
+          clientLastName,
+          clientDateOfBirth,
+          new Date().toISOString(),
+          getValues()
+        ) as unknown as OpenedFileData
+      );
     } else if (postCaregiverInformationMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postCaregiverInformationMutation.error)
       );
     }
-  }, [postCaregiverInformationMutation.status, setHasUnsavedChanges]);
+  }, [postCaregiverInformationMutation.status]);
 
   // Cleanup unsaved changes when component unmounts
   useEffect(() => {

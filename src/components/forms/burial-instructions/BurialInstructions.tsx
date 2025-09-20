@@ -58,6 +58,20 @@ const defaultValues = {
   obituaryWishes: "",
 };
 
+const createSafeOpenedFileData = (
+  formData: BurialInstructionsFormData,
+  lastUpdate?: string
+) => {
+  return {
+    ...formData,
+    last_update: JSON.parse(
+      JSON.stringify({
+        updatedAt: lastUpdate || new Date().toISOString(),
+      })
+    ),
+  };
+};
+
 export const BurialInstructions = () => {
   const params = useParams();
   const { handleFilterPermission } = useAuthContext();
@@ -82,7 +96,6 @@ export const BurialInstructions = () => {
   const postBurialInstructionsMutation = usePostBurialInstructionsMutation();
   const queryClient = useQueryClient();
 
-  // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -99,15 +112,21 @@ export const BurialInstructions = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setHasUnsavedChanges(false);
+
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          getValues(),
+          new Date().toISOString()
+        ) as unknown as OpenedFileData
+      );
     } else if (postBurialInstructionsMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postBurialInstructionsMutation.error)
       );
     }
-  }, [postBurialInstructionsMutation.status, setHasUnsavedChanges]);
+  }, [postBurialInstructionsMutation.status]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -192,12 +211,12 @@ export const BurialInstructions = () => {
           burialInstructions.burial_instructions.obituary_wishes || "",
       };
       reset(formData);
-      setOpenedFileData({
-        ...getValues(),
-        last_update: {
-          updatedAt: burialInstructions?.last_update?.updatedAt || "",
-        },
-      } as unknown as OpenedFileData);
+      setOpenedFileData(
+        createSafeOpenedFileData(
+          formData,
+          burialInstructions?.last_update?.updatedAt
+        ) as unknown as OpenedFileData
+      );
     }
   }, [burialInstructions, reset]);
 

@@ -146,15 +146,17 @@ export const FieldRenderer = ({
           <ICONS.rightSolid className="w-4 h-4 flex-shrink-0" />
           {field.label}
         </div>
-        {childFields.map((childField) => (
-          <FieldRenderer
-            key={childField.id}
-            field={childField}
-            formData={formData}
-            setFormData={setFormData}
-            schema={schema}
-          />
-        ))}
+        <div style={{ marginLeft: `${(nestingLevel + 1) * 12}px` }}>
+          {childFields.map((childField) => (
+            <FieldRenderer
+              key={childField.id}
+              field={childField}
+              formData={formData}
+              setFormData={setFormData}
+              schema={schema}
+            />
+          ))}
+        </div>
       </div>
     );
   }
@@ -186,17 +188,19 @@ export const FieldRenderer = ({
             {field.label}
           </span>
         </label>
-        {field.id &&
-          formData[field.id] &&
-          childFields.map((childField) => (
-            <FieldRenderer
-              key={childField.id}
-              field={childField}
-              formData={formData}
-              setFormData={setFormData}
-              schema={schema}
-            />
-          ))}
+        {field.id && formData[field.id] && childFields.length > 0 && (
+          <div style={{ marginLeft: `${(nestingLevel + 1) * 12}px` }}>
+            {childFields.map((childField) => (
+              <FieldRenderer
+                key={childField.id}
+                field={childField}
+                formData={formData}
+                setFormData={setFormData}
+                schema={schema}
+              />
+            ))}
+          </div>
+        )}
       </div>
     );
   }
@@ -235,13 +239,17 @@ export const FieldRenderer = ({
                       childField.parentOption === option
                   )
                   .map((childField) => (
-                    <FieldRenderer
+                    <div
                       key={childField.id}
-                      field={childField}
-                      formData={formData}
-                      setFormData={setFormData}
-                      schema={schema}
-                    />
+                      style={{ marginLeft: `${(nestingLevel + 1) * 12}px` }}
+                    >
+                      <FieldRenderer
+                        field={childField}
+                        formData={formData}
+                        setFormData={setFormData}
+                        schema={schema}
+                      />
+                    </div>
                   ))}
             </div>
           ))}
