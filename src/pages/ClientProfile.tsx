@@ -1,4 +1,7 @@
-import { useGetSingleClientQuery } from "@agensy/api";
+import {
+  useGetCareRecipientQuestionnaire,
+  useGetSingleClientQuery,
+} from "@agensy/api";
 import {
   TabLink,
   ClientProfileSkeleton,
@@ -30,8 +33,13 @@ export const ClientProfile: React.FC = () => {
     status: loadClientStatus,
   } = useGetSingleClientQuery(params.clientId as string);
   const navigate = useNavigate();
+  const careRecipientQuestionnaire = useGetCareRecipientQuestionnaire(
+    params.clientId!
+  );
+
   useEffect(() => {
     loadClient();
+    careRecipientQuestionnaire.refetch();
   }, []);
 
   useEffect(() => {

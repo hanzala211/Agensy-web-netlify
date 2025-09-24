@@ -23,9 +23,7 @@ export const Subscription: React.FC = () => {
     cancelSubscription.mutate();
   };
 
-  const isAdmin =
-    userData?.Roles?.find((item) => item.role === ROLES.ADMIN)?.role ===
-    ROLES.ADMIN;
+  const isAdmin = userData?.role === ROLES.ADMIN;
 
   if (isAdmin) {
     return <Navigate to="/" />;

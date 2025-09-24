@@ -119,8 +119,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return (
       userData?.Roles?.find((r) => r.client_id === clientId)?.primary_user
         ?.subscription_status === SUBSCRIPTION_STATUSES.ACTIVE ||
-      userData?.Roles?.find((r) => r.client_id === clientId)?.role ===
-        ROLES.ADMIN
+      userData?.role === ROLES.ADMIN
     );
   };
 

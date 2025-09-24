@@ -56,6 +56,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   const [categoryConfidence, setCategoryConfidence] = useState<number | null>(
     null
   );
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const {
     register,
@@ -135,6 +136,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       setConvertedImage(null);
       setFileType(null);
       setIsConverting(false);
+      setIsDragOver(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -260,6 +262,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     setConvertedImage(null);
     setFileType(null);
     setIsConverting(false);
+    setIsDragOver(false);
     setTitleConfidence(null);
     setDescriptionConfidence(null);
     setCategoryConfidence(null);
@@ -268,6 +271,39 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const syntheticEvent = {
+        target: { files: [file] },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+      handleFileChange(syntheticEvent);
+    }
   };
 
   const isPDF = useMemo(() => {
@@ -283,7 +319,6 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
       (item) => item.subscription_status === SUBSCRIPTION_STATUSES.ACTIVE
     );
 
-    // Add current user if they exist and have primary_user role
     if (
       userData &&
       userData.Roles?.some((role) => role.role === ROLES.PRIMARY_USER) &&
@@ -422,8 +457,16 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
           Upload Document
         </label>
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+            isDragOver
+              ? "border-blue-500 bg-blue-100"
+              : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+          }`}
           onClick={handleFileSelect}
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           <div className="space-y-4">
             <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
@@ -443,9 +486,11 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
             </div>
             <div>
               <p className="text-lg font-medium text-gray-700">
-                Click to upload
+                {isDragOver ? "Drop file here" : "Click to upload"}
               </p>
-              <p className="text-sm text-gray-500">or drag and drop</p>
+              <p className="text-sm text-gray-500">
+                {isDragOver ? "Release to upload" : "or drag and drop"}
+              </p>
               <p className="text-xs text-gray-400 mt-2">
                 PNG, JPG, PDF, HEIC up to 20MB
               </p>

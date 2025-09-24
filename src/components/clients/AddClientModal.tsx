@@ -13,10 +13,9 @@ import {
   PrimaryButton,
   ClientProviderInfoStep,
 } from "@agensy/components";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils } from "@agensy/utils";
 import { useAuthContext } from "@agensy/context";
-import { useNavigate } from "react-router-dom";
-import { ROLES, SUBSCRIPTION_STATUSES } from "@agensy/constants";
+import { ROLES } from "@agensy/constants";
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -39,7 +38,6 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
 }) => {
   const { userData, accessUsers } = useAuthContext();
   const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -67,9 +65,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
     },
   });
 
-  const hasAdminRole =
-    userData?.Roles?.some((role) => role.role === ROLES.ADMIN) ||
-    userData?.UserRoles?.some((role) => role.role === ROLES.ADMIN);
+  const hasAdminRole = userData?.role === ROLES.ADMIN;
 
   const familyAdmins = useMemo(() => {
     const filteredUsers =
@@ -145,18 +141,6 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
   };
 
   const onSubmit = (data: ClientFormData) => {
-    if (
-      (userData?.subscription_status === SUBSCRIPTION_STATUSES.INACTIVE ||
-        userData?.subscription_status === SUBSCRIPTION_STATUSES.CANCELLED) &&
-      userData.Roles?.some((item) => item.role !== ROLES.ADMIN)
-    ) {
-      toast.error(
-        "Subscription Error!",
-        "Please upgrade your subscription to add a care recipient."
-      );
-      navigate("/settings/billing");
-      return;
-    }
     const postData = {
       firstName: data.firstName,
       lastName: data.lastName,

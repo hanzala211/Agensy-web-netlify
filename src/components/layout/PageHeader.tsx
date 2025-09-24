@@ -11,6 +11,7 @@ interface PageHeaderProps {
   showButton?: boolean;
   showBackButton?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
@@ -21,6 +22,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   showButton = true,
   showBackButton,
   className = "mb-6",
+  disabled,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +54,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           className="mt-4 md:mt-0 md:w-auto"
           onClick={onButtonClick}
           aria_label={buttonAriaLabel}
+          disabled={disabled}
         >
           {buttonText}
         </PrimaryButton>

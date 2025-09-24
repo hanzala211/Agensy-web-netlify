@@ -5,6 +5,7 @@ export type BaseSchema = {
 };
 
 export interface IUser extends BaseSchema {
+  role?: string;
   active: boolean;
   cognito_id: string;
   email: string;

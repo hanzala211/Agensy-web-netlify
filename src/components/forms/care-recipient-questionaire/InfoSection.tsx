@@ -13,7 +13,11 @@ import {
   TextArea,
   Select,
 } from "@agensy/components";
-import { FILLING_FOR_OPTIONS, MARITAL_STATUS_OPTIONS } from "@agensy/constants";
+import {
+  FILLING_FOR_OPTIONS,
+  MARITAL_STATUS_OPTIONS,
+  STATES,
+} from "@agensy/constants";
 
 interface InfoSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
@@ -85,10 +89,12 @@ export const InfoSection = <T extends FieldValues>({
               register={register("careRecipientCity" as Path<T>)}
               error={errors.careRecipientCity?.message as string}
             />
-            <Input
+            <Select
               label="State"
-              register={register("careRecipientState" as Path<T>)}
-              error={errors.careRecipientState?.message as string}
+              control={control}
+              name={"careRecipientState" as Path<T>}
+              data={STATES}
+              labelOption="Select state"
             />
             <Input
               label="Zip"

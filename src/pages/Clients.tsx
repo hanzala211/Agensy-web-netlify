@@ -12,7 +12,9 @@ import {
   CLIENTS_FILTERS,
   CLIENTS_SORT_OPTIONS,
   ICONS,
+  ROLES,
   ROUTES,
+  SUBSCRIPTION_STATUSES,
 } from "@agensy/constants";
 import type { Client, ClientFormData } from "@agensy/types";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +44,7 @@ export const Clients: React.FC = () => {
   } = useClientManager({ initialItemPerPage: 5 });
   const addClientMutation = useAddClientMutation();
   const { setSelectedClient } = useClientContext();
-  const { isPrimaryUserSubscriptionActive } = useAuthContext();
+  const { isPrimaryUserSubscriptionActive, userData } = useAuthContext();
   const [isAddClientModalOpen, setIsAddClientModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
@@ -110,6 +112,18 @@ export const Clients: React.FC = () => {
   };
 
   const handleEmptyStateClick = () => {
+    if (
+      (userData?.subscription_status === SUBSCRIPTION_STATUSES.INACTIVE ||
+        userData?.subscription_status === SUBSCRIPTION_STATUSES.CANCELLED) &&
+      userData?.role !== ROLES.ADMIN
+    ) {
+      toast.error(
+        "Subscription Error!",
+        "Please upgrade your subscription to add a care recipient."
+      );
+      navigate("/settings/billing");
+      return;
+    }
     setIsAddClientModalOpen(true);
   };
   return (
@@ -118,7 +132,22 @@ export const Clients: React.FC = () => {
         title="Care Recipients"
         buttonText="Add Care Recipient"
         buttonAriaLabel="Add new care recipient"
-        onButtonClick={() => setIsAddClientModalOpen(true)}
+        onButtonClick={() => {
+          if (
+            (userData?.subscription_status === SUBSCRIPTION_STATUSES.INACTIVE ||
+              userData?.subscription_status ===
+                SUBSCRIPTION_STATUSES.CANCELLED) &&
+            userData?.role !== ROLES.ADMIN
+          ) {
+            toast.error(
+              "Subscription Error!",
+              "Please upgrade your subscription to add a care recipient."
+            );
+            navigate("/settings/billing");
+            return;
+          }
+          setIsAddClientModalOpen(true);
+        }}
       />
 
       <SearchFilterBar

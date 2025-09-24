@@ -799,7 +799,7 @@ export const HealthHistoryForm: React.FC = () => {
 
         <div className="bg-basicWhite/90 my-4 backdrop-blur-sm rounded-2xl !p-6 border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
           <a
-            href={`/${ROUTES.clients}/${clientId}/${ROUTES.agensyFormsFolders}/checklists/essential-document-for-aging`}
+            href={`/${ROUTES.clients}/${clientId}/${ROUTES.agensyFormsFolders}/guides-checklists/essential-document-for-aging`}
             className="text-blue-500 hover:text-blue-600 transition-colors"
           >
             Essential Document for Aging

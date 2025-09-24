@@ -5,6 +5,7 @@ import {
   MARITAL_STATUS_OPTIONS,
   LIVING_SITUATION_OPTIONS,
   GENDER_OPTIONS,
+  STATES,
 } from "@agensy/constants";
 import { DatePickerField, Select, Input } from "@agensy/components";
 import { useAuthContext } from "@agensy/context";
@@ -114,10 +115,12 @@ export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
             error={errors.city?.message}
           />
 
-          <Input
+          <Select
             label="State"
-            register={register("state")}
-            error={errors.state?.message}
+            control={control}
+            name="state"
+            data={STATES}
+            labelOption="Select state"
           />
 
           <Input

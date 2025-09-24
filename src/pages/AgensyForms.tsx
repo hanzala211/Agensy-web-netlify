@@ -42,31 +42,11 @@ import { useAuthContext } from "@agensy/context";
 
 const getRootFolders = (userPermissions: string[]): FolderItem[] => [
   {
-    id: "start-of-care",
-    slug: "start-of-care",
-    name: "Start of Care",
-    type: "folder",
-    children: [
-      {
-        id: "start-of-care-checklist",
-        name: "Start of Care Checklist",
-        type: "file",
-        slug: "start-of-care-checklist",
-      },
-    ],
-  },
-  {
     id: "assessment",
     slug: "assessment",
-    name: "Assessment",
+    name: "Assessments",
     type: "folder",
     children: [
-      {
-        id: "comprehensive-care-plan-assessment",
-        name: "Comprehensive Care Plan Assessment",
-        type: "file",
-        slug: "comprehensive-care-plan-assessment",
-      },
       {
         id: "care-recipient-questionnaire",
         name: "Care Recipient Questionnaire",
@@ -75,25 +55,32 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
       },
       {
         id: "initial-assessment",
-        name: "Initial Assessment",
+        name: "Initial Care Plan Assessment",
         type: "file",
         slug: "initial-assessment",
       },
+      {
+        id: "comprehensive-care-plan-assessment",
+        name: "Comprehensive Care Plan Assessment",
+        type: "file",
+        slug: "comprehensive-care-plan-assessment",
+      },
     ],
   },
+
   {
-    id: "medical",
-    slug: "medical",
-    name: "Medical",
+    id: "essential-health-information",
+    slug: "essential-health-information",
+    name: "Essential Health Information",
     type: "folder",
     children: [
       {
-        id: "medical-appointment-templates",
-        slug: "medical-appointment-templates",
-        name: "Medical Appointment Templates",
-        type: "folder",
-        children: [],
+        id: "start-of-care-checklist",
+        name: "Start of Care Checklist",
+        type: "file",
+        slug: "start-of-care-checklist",
       },
+
       {
         id: "face-sheet-short",
         name: "Face Sheet Short",
@@ -112,56 +99,94 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
         type: "file",
         slug: "health-history-form-medical",
       },
+      {
+        id: "vitals-tracker",
+        name: "Vitals Tracker",
+        type: "file",
+        slug: "vitals-tracker",
+      },
+      {
+        id: "labs-test-tracker",
+        name: "Labs Tests & Imaging Tracker",
+        type: "file",
+        slug: "labs-test-tracker",
+      },
+      {
+        id: "in-patient-stay-notes",
+        name: "In-Patient Stay Notes",
+        type: "file",
+        slug: "in-patient-stay-notes",
+      },
+      {
+        id: "comprehensive-medication-list",
+        name: "Comprehensive Medication List",
+        type: "file",
+        slug: "comprehensive-medication-list",
+      },
     ],
   },
   {
-    id: "long-term-care-planning",
-    slug: "long-term-care-planning",
-    name: "Long Term Care Planning",
+    id: "essential-documents-for-aging",
+    slug: "essential-documents-for-aging",
+    name: "Essential Documents for Aging",
     type: "folder",
     children: [
+      // Only show personal-info if user does NOT have ViewPersonalInfo permission
+      ...(!userPermissions.includes(APP_ACTIONS.ViewPersonalInfo)
+        ? []
+        : [
+            {
+              id: "personal-info",
+              name: "Personal Information & Password Organizer",
+              type: "file" as const,
+              slug: "personal-info",
+            },
+          ]),
+      {
+        id: "important-people-in-life",
+        name: "Trusted Network Directory",
+        type: "file",
+        slug: "important-people-in-life",
+      },
+      {
+        id: "burial-instructions",
+        name: "Burial Instructions",
+        type: "file",
+        slug: "burial-instructions",
+      },
+    ],
+  },
+  {
+    id: "guides-checklists",
+    slug: "guides-checklists",
+    name: "Guides & Checklists",
+    type: "folder",
+    children: [
+      {
+        id: "medical-appointment-templates",
+        slug: "medical-appointment-templates",
+        name: "Medical Appointment Templates",
+        type: "folder",
+        children: [],
+      },
       {
         id: "long-term-care-insurance-policy",
         name: "Long Term Care Insurance Policy",
         type: "file",
         slug: "long-term-care-insurance-policy",
       },
-    ],
-  },
-  {
-    id: "caregiver",
-    slug: "caregiver",
-    name: "Caregiver",
-    type: "folder",
-    children: [
       {
         id: "caregiver-information",
-        name: "Caregiver Information",
+        name: "Caregiver Information Sheet",
         type: "file",
         slug: "caregiver-information",
       },
-    ],
-  },
-  {
-    id: "care-plans",
-    slug: "care-plans",
-    name: "Care Plans",
-    type: "folder",
-    children: [
       {
         id: "care-plan-checklists",
         name: "When to call a Care Plan",
         type: "file",
         slug: "care-plan-checklists",
       },
-    ],
-  },
-  {
-    id: "checklists",
-    slug: "checklists",
-    name: "Checklists",
-    type: "folder",
-    children: [
       {
         id: "move-in-checklist",
         name: "Move in",
@@ -192,61 +217,6 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
         type: "file",
         slug: "medicare-cheat-sheet",
       },
-      {
-        id: "burial-instructions",
-        name: "Burial & End of Life Instructions",
-        type: "file",
-        slug: "burial-instructions",
-      },
-    ],
-  },
-  {
-    id: "records-trackers",
-    slug: "records-trackers",
-    name: "Records & Trackers",
-    type: "folder",
-    children: [
-      // Only show personal-info if user does NOT have ViewPersonalInfo permission
-      ...(!userPermissions.includes(APP_ACTIONS.ViewPersonalInfo)
-        ? []
-        : [
-            {
-              id: "personal-info",
-              name: "Personal Information & Password Organizer",
-              type: "file" as const,
-              slug: "personal-info",
-            },
-          ]),
-      {
-        id: "important-people-in-life",
-        name: "Trusted Network Directory",
-        type: "file",
-        slug: "important-people-in-life",
-      },
-      {
-        id: "vitals-tracker",
-        name: "Vitals Tracker",
-        type: "file",
-        slug: "vitals-tracker",
-      },
-      {
-        id: "labs-test-tracker",
-        name: "Labs Test Tracker",
-        type: "file",
-        slug: "labs-test-tracker",
-      },
-      {
-        id: "in-patient-stay-notes",
-        name: "In-Patient Stay Notes",
-        type: "file",
-        slug: "in-patient-stay-notes",
-      },
-      {
-        id: "comprehensive-medication-list",
-        name: "Comprehensive Medication and Supplement List",
-        type: "file",
-        slug: "comprehensive-medication-list",
-      },
     ],
   },
 ];
@@ -276,7 +246,7 @@ const fileMap: Record<string, FolderData> = {
   },
   "initial-assessment": {
     id: "initial-assessment",
-    name: "Initial Assessment",
+    name: "Initial Care Plan Assessment",
     description: "Initial assessment form for new care recipients",
     content: <InitialCareAssessmentPlan />,
   },
@@ -318,7 +288,7 @@ const fileMap: Record<string, FolderData> = {
   // Caregiver files
   "caregiver-information": {
     id: "caregiver-information",
-    name: "Caregiver Information",
+    name: "Caregiver Information Sheet",
     description: "Information and documentation for caregivers",
     content: <CaregiverInformation />,
   },
@@ -356,7 +326,7 @@ const fileMap: Record<string, FolderData> = {
   },
   "burial-instructions": {
     id: "burial-instructions",
-    name: "Burial & End of Life Instructions",
+    name: "Burial Instructions",
     description: "Instructions for burial and end of life",
     content: <BurialInstructions />,
   },
@@ -380,7 +350,7 @@ const fileMap: Record<string, FolderData> = {
   },
   "labs-test-tracker": {
     id: "labs-test-tracker",
-    name: "Labs Test Tracker",
+    name: "Labs Tests & Imaging Tracker",
     description: "Labs Test Tracker",
     content: <LabsTracker />,
   },
@@ -392,7 +362,7 @@ const fileMap: Record<string, FolderData> = {
   },
   "comprehensive-medication-list": {
     id: "comprehensive-medication-list",
-    name: "Comprehensive Medication and Supplement List",
+    name: "Comprehensive Medication List",
     description: "Comprehensive Medication and Supplement List",
     content: <ComprehensiveMedicationList />,
   },
@@ -410,6 +380,7 @@ export const AgensyForms: React.FC = () => {
         data: MedicalAppointmentTemplateData | null;
       }>
     >([]);
+  const [showLabel, setShowLabel] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
   const queryClient = useQueryClient();
@@ -424,6 +395,15 @@ export const AgensyForms: React.FC = () => {
     ] || [];
 
   useEffect(() => {
+    const careData: { questionnaire: { id: string } } =
+      queryClient.getQueryData([
+        "care-recipient-questionnaire",
+        params.clientId,
+      ]) as unknown as { questionnaire: { id: string } };
+    setShowLabel(careData?.questionnaire?.id === null);
+  }, []);
+
+  useEffect(() => {
     if (createNewMedicalTemplateMutation.status === "success") {
       toast.success(
         "Medical Appointment Template Created",
@@ -433,7 +413,7 @@ export const AgensyForms: React.FC = () => {
         queryKey: ["medical-appointment-templates", params.clientId],
       });
       navigate(
-        `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/medical/medical-appointment-template_${createNewMedicalTemplateMutation.data.id}`
+        `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/guides-checklists/medical-appointment-template_${createNewMedicalTemplateMutation.data.id}`
       );
     } else if (createNewMedicalTemplateMutation.status === "error") {
       toast.error(
@@ -467,7 +447,7 @@ export const AgensyForms: React.FC = () => {
 
     if (currentPath.length === 0) {
       const updatedRootFolders = rootFolders.map((folder) => {
-        if (folder.id === "medical") {
+        if (folder.id === "guides-checklists") {
           const staticFiles =
             folder.children?.filter((item) => item.type === "file") || [];
           const medicalAppointmentTemplatesFolder = folder.children?.find(
@@ -477,11 +457,11 @@ export const AgensyForms: React.FC = () => {
           if (medicalAppointmentTemplatesFolder) {
             const dynamicTemplates = getDynamicMedicalTemplates();
             const allMedicalItems = [
-              ...staticFiles,
               {
                 ...medicalAppointmentTemplatesFolder,
                 children: dynamicTemplates,
               },
+              ...staticFiles,
             ];
 
             return {
@@ -501,7 +481,7 @@ export const AgensyForms: React.FC = () => {
       if (!foundAll) return;
       const folder = currentLevel.find((item) => item.name === pathItem);
       if (folder && folder.children) {
-        if (folder.id === "medical") {
+        if (folder.id === "guides-checklists") {
           const staticFiles =
             folder.children?.filter((item) => item.type === "file") || [];
           const medicalAppointmentTemplatesFolder = folder.children?.find(
@@ -512,11 +492,11 @@ export const AgensyForms: React.FC = () => {
             const dynamicTemplates = getDynamicMedicalTemplates();
 
             const allMedicalItems = [
-              ...staticFiles,
               {
                 ...medicalAppointmentTemplatesFolder,
                 children: dynamicTemplates,
               },
+              ...staticFiles,
             ];
 
             if (
@@ -599,7 +579,7 @@ export const AgensyForms: React.FC = () => {
       if (dynamicTemplate) {
         const rootFolders = getRootFolders(userPermissions);
         const medicalFolder = rootFolders.find(
-          (folder) => folder.id === "medical"
+          (folder) => folder.id === "guides-checklists"
         );
         if (medicalFolder) {
           return {
@@ -888,6 +868,7 @@ export const AgensyForms: React.FC = () => {
           isCreatingMedicalTemplate={createNewMedicalTemplateMutation.isPending}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          showLabel={showLabel}
         />
       </div>
     </div>

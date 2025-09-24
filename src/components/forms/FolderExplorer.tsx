@@ -27,7 +27,7 @@ import {
 } from "@agensy/components";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import FaceSheetLongFormPDF from "./face-sheet-long/FaceSheetLongFormPDF";
 import FaceSheetShortFormPDF from "./face-sheet-short/FaceSheetShortFormPDF";
 import HealthHistoryFormPDF from "./health-history-form/HealthHistoryFormPDF";
@@ -70,6 +70,7 @@ interface FolderExplorerProps {
   isCreatingMedicalTemplate?: boolean;
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
+  showLabel: boolean;
 }
 
 export const FolderExplorer: React.FC<FolderExplorerProps> = ({
@@ -87,6 +88,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   isCreatingMedicalTemplate = false,
   searchQuery,
   setSearchQuery,
+  showLabel,
 }) => {
   const {
     setOpenedFileData,
@@ -100,6 +102,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   const [isUnsavedChangesModalOpen, setIsUnsavedChangesModalOpen] =
     useState<boolean>(false);
   const params = useParams();
+  const navigate = useNavigate();
   const { handleFilterPermission } = useAuthContext();
   useEffect(() => {
     if (searchQuery) {
@@ -144,6 +147,14 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
       }
     } else {
       onBackClick?.();
+    }
+  };
+
+  const handleCareRecipientQuestionnaireClick = () => {
+    if (params.clientId) {
+      navigate(
+        `/clients/${params.clientId}/agensy-forms/assessment/care-recipient-questionnaire`
+      );
     }
   };
 
@@ -612,7 +623,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   return (
     <div className="!p-0 overflow-hidden border-2 border-gray-200 rounded-lg w-full">
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b">
-        <div className="flex items-start justify-between sm:flex-row flex-col gap-3">
+        <div className="flex items-center justify-between sm:flex-row flex-col gap-3">
           <div
             className={`flex items-center sm:gap-3 ${
               isShowingFileContent ? "w-full" : "w-fit"
@@ -694,6 +705,29 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           </div>
           {!isShowingFileContent && currentPath.length > 0 && (
             <div className="text-sm text-gray-500">{folders.length} items</div>
+          )}
+          {!isShowingFileContent && currentPath.length === 0 && showLabel && (
+            <div className="text-sm text-gray-700">
+              <span className="hidden sm:inline font-[600]">
+                Start with{" "}
+                <button
+                  onClick={handleCareRecipientQuestionnaireClick}
+                  className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                >
+                  Care Recipient Questionnaire
+                </button>{" "}
+                for initial setup
+              </span>
+              <span className="sm:hidden">
+                Start with{" "}
+                <button
+                  onClick={handleCareRecipientQuestionnaireClick}
+                  className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                >
+                  Care Recipient Questionnaire
+                </button>
+              </span>
+            </div>
           )}
         </div>
         {!isShowingFileContent && currentPath.length > 0 && (
