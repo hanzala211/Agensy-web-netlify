@@ -531,6 +531,45 @@ const FaceSheetLongFormPDF: React.FC<{
           )}
         </View>
       )}
+
+      {(data.homeHealthAgency ||
+        data.homeHealthAddress ||
+        data.homeHealthPhone ||
+        data.homeHealthFax ||
+        data.homeHealthSchedule ||
+        data.homeHealthPrescribingDoctor ||
+        data.homeHealthStartDate ||
+        data.homeHealthDischargeDate) && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Home Health Agency</Text>
+          {data.homeHealthAgency && (
+            <Field label="Agency">{data.homeHealthAgency}</Field>
+          )}
+          {data.homeHealthAddress && (
+            <Field label="Address">{data.homeHealthAddress}</Field>
+          )}
+          {data.homeHealthPhone && (
+            <Field label="Phone">{data.homeHealthPhone}</Field>
+          )}
+          {data.homeHealthFax && (
+            <Field label="Fax">{data.homeHealthFax}</Field>
+          )}
+          {data.homeHealthSchedule && (
+            <Field label="Schedule">{data.homeHealthSchedule}</Field>
+          )}
+          {data.homeHealthPrescribingDoctor && (
+            <Field label="Prescribing Doctor">
+              {data.homeHealthPrescribingDoctor}
+            </Field>
+          )}
+          {data.homeHealthStartDate && (
+            <Field label="Start Date">{data.homeHealthStartDate}</Field>
+          )}
+          {data.homeHealthDischargeDate && (
+            <Field label="Discharge Date">{data.homeHealthDischargeDate}</Field>
+          )}
+        </View>
+      )}
       {(data.mentalStatus ||
         data.cognitiveScreeningScore ||
         data.cognitiveScreeningDate ||

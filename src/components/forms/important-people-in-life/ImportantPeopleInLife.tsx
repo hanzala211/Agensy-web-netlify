@@ -105,33 +105,39 @@ export const ImportantPeopleInLife = () => {
           )
         : "",
       importantPeople: [
-        ...(importantPeopleInLifeData.short_form.mpoa
+        ...(importantPeopleInLifeData?.short_form?.mpoa ||
+        importantPeopleInLifeData?.short_form?.mpoa_phone ||
+        importantPeopleInLifeData?.important_people?.mpoa_relationship
           ? [
               {
                 type: "medical_poa",
-                name: importantPeopleInLifeData.short_form.mpoa,
-                phone: importantPeopleInLifeData.short_form.mpoa_phone || "",
+                name: importantPeopleInLifeData?.short_form?.mpoa,
+                phone: importantPeopleInLifeData?.short_form?.mpoa_phone || "",
                 relationship:
-                  importantPeopleInLifeData.important_people
-                    .mpoa_relationship || "",
+                  importantPeopleInLifeData?.important_people
+                    ?.mpoa_relationship || "",
               },
             ]
           : []),
 
-        ...(importantPeopleInLifeData.short_form.dpoa
+        ...(importantPeopleInLifeData?.short_form?.dpoa ||
+        importantPeopleInLifeData.short_form?.dpoa_phone ||
+        importantPeopleInLifeData?.important_people?.fpoa_relationship
           ? [
               {
                 type: "financial_poa",
-                name: importantPeopleInLifeData.short_form.dpoa,
-                phone: importantPeopleInLifeData.short_form.dpoa_phone || "",
+                name: importantPeopleInLifeData.short_form?.dpoa,
+                phone: importantPeopleInLifeData.short_form?.dpoa_phone || "",
                 relationship:
-                  importantPeopleInLifeData.important_people
-                    .fpoa_relationship || "",
+                  importantPeopleInLifeData?.important_people
+                    ?.fpoa_relationship || "",
               },
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.lawyer_name
+        ...(importantPeopleInLifeData.important_people.lawyer_name ||
+        importantPeopleInLifeData.important_people.lawyer_phone ||
+        importantPeopleInLifeData.important_people.lawyer_firm
           ? [
               {
                 type: "lawyer",
@@ -144,7 +150,9 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.accountant_name
+        ...(importantPeopleInLifeData.important_people.accountant_name ||
+        importantPeopleInLifeData.important_people.accountant_phone ||
+        importantPeopleInLifeData.important_people.accountant_firm
           ? [
               {
                 type: "accountant",
@@ -160,7 +168,9 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.financial_advisor_name
+        ...(importantPeopleInLifeData.important_people.financial_advisor_name ||
+        importantPeopleInLifeData.important_people.financial_advisor_phone ||
+        importantPeopleInLifeData.important_people.financial_advisor_firm
           ? [
               {
                 type: "financial_advisor",
@@ -176,7 +186,9 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.trust_officer_name
+        ...(importantPeopleInLifeData.important_people.trust_officer_name ||
+        importantPeopleInLifeData.important_people.trust_officer_phone ||
+        importantPeopleInLifeData.important_people.trust_officer_agency
           ? [
               {
                 type: "trust_officer",
@@ -192,7 +204,10 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.emergency_contact_name
+        ...(importantPeopleInLifeData.important_people.emergency_contact_name ||
+        importantPeopleInLifeData.important_people.emergency_contact_phone ||
+        importantPeopleInLifeData.important_people
+          .emergency_contact_relationship
           ? [
               {
                 type: "emergency_contact_2",
@@ -208,7 +223,9 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.neighbor_name
+        ...(importantPeopleInLifeData.important_people.neighbor_name ||
+        importantPeopleInLifeData.important_people.neighbor_phone ||
+        importantPeopleInLifeData.important_people.neighbor_address
           ? [
               {
                 type: "neighbor",
@@ -223,7 +240,9 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.closest_friend_name
+        ...(importantPeopleInLifeData.important_people.closest_friend_name ||
+        importantPeopleInLifeData.important_people.closest_friend_phone ||
+        importantPeopleInLifeData.important_people.closest_friend_relationship
           ? [
               {
                 type: "close_friend",
@@ -239,7 +258,9 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.faith_contact_name
+        ...(importantPeopleInLifeData.important_people.faith_contact_name ||
+        importantPeopleInLifeData.important_people.faith_contact_name ||
+        importantPeopleInLifeData.important_people.faith_contact_affiliation
           ? [
               {
                 type: "faith_contact",
@@ -255,7 +276,8 @@ export const ImportantPeopleInLife = () => {
             ]
           : []),
 
-        ...(importantPeopleInLifeData.important_people.club_group_name
+        ...(importantPeopleInLifeData.important_people.club_group_name ||
+        importantPeopleInLifeData.important_people.club_group_contact
           ? [
               {
                 type: "club_group",
@@ -269,7 +291,9 @@ export const ImportantPeopleInLife = () => {
           : []),
 
         ...(importantPeopleInLifeData.emergency_contact.first_name ||
-        importantPeopleInLifeData.emergency_contact.last_name
+        importantPeopleInLifeData.emergency_contact.last_name ||
+        importantPeopleInLifeData.emergency_contact.phone ||
+        importantPeopleInLifeData.emergency_contact.relationship
           ? [
               {
                 type: "emergency_contact_1",
@@ -520,8 +544,29 @@ export const ImportantPeopleInLife = () => {
   };
 
   const addNewPerson = () => {
+    const allImportantPeople = watch("importantPeople") || [];
+    const selectedTypes = allImportantPeople.map((person) => person.type);
+
+    const PERSON_TYPES = [
+      "medical_poa",
+      "financial_poa",
+      "lawyer",
+      "accountant",
+      "financial_advisor",
+      "trust_officer",
+      "emergency_contact_1",
+      "emergency_contact_2",
+      "neighbor",
+      "close_friend",
+      "faith_contact",
+      "club_group",
+    ];
+
+    const firstAvailableType =
+      PERSON_TYPES.find((type) => !selectedTypes.includes(type)) || "";
+
     append({
-      type: "",
+      type: firstAvailableType,
       name: "",
       phone: "",
       relationship: "",

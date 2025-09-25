@@ -31,6 +31,9 @@ export const ContactInfoCard: React.FC = () => {
     useState<ClientContact | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [contactToDelete, setContactToDelete] = useState<ClientContact | null>(
+    null
+  );
 
   useEffect(() => {
     if (!isContactModalOpen) {
@@ -104,12 +107,20 @@ export const ContactInfoCard: React.FC = () => {
     }, 100);
   };
 
-  const handleDeleteContact = (contactId: string) => {
-    setIsDeleteModalOpen(false);
-    deleteContactMutation.mutate({
-      contactId,
-      clientId: selectedClient?.id as string,
-    });
+  const handleDeleteContact = () => {
+    if (contactToDelete) {
+      setIsDeleteModalOpen(false);
+      deleteContactMutation.mutate({
+        contactId: contactToDelete.id as string,
+        clientId: selectedClient?.id as string,
+      });
+      setContactToDelete(null);
+    }
+  };
+
+  const handleDeleteClick = (contact: ClientContact) => {
+    setContactToDelete(contact);
+    setIsDeleteModalOpen(true);
   };
 
   return (
@@ -139,7 +150,7 @@ export const ContactInfoCard: React.FC = () => {
                     item.contact_type
                   )}`}
                   type={item.contact_type}
-                  onDelete={() => setIsDeleteModalOpen(true)}
+                  onDelete={() => handleDeleteClick(item)}
                   isDeleting={deleteContactMutation.isPending}
                   showActions={handleFilterPermission(
                     selectedClient?.id as string,
@@ -155,14 +166,6 @@ export const ContactInfoCard: React.FC = () => {
                     </p>
                     <p>{item.phone}</p>
                   </div>
-                  <ConfirmationModal
-                    title="Delete Contact"
-                    isModalOpen={isDeleteModalOpen}
-                    onOk={() => handleDeleteContact(item.id as string)}
-                    onCancel={() => setIsDeleteModalOpen(false)}
-                  >
-                    <p>Are you sure you want to delete this contact?</p>
-                  </ConfirmationModal>
                 </ContactItem>
               ))
           ) : (
@@ -196,6 +199,23 @@ export const ContactInfoCard: React.FC = () => {
         }
         editContact={selectedEditContact}
       />
+      <ConfirmationModal
+        title="Delete Contact"
+        isModalOpen={isDeleteModalOpen}
+        onOk={handleDeleteContact}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setContactToDelete(null);
+        }}
+      >
+        <p>
+          Are you sure you want to delete{" "}
+          {contactToDelete
+            ? `${contactToDelete.first_name} ${contactToDelete.last_name}`
+            : "this contact"}
+          ?
+        </p>
+      </ConfirmationModal>
     </React.Fragment>
   );
 };

@@ -44,6 +44,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
   const [fileType, setFileType] = useState<string | null>(null);
   const [selectedDocumentType, setSelectedDocumentType] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -151,6 +152,39 @@ export const OCRModel: React.FC<OCRModelProps> = ({
     fileInputRef.current?.click();
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const syntheticEvent = {
+        target: { files: [file] },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+      handleImageUpload(syntheticEvent);
+    }
+  };
+
   const handleNextClick = () => {
     if (!selectedFile) {
       toast.error("Please select a file first");
@@ -248,6 +282,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       setIsConverting(false);
       setSelectedDocumentType("");
       setSelectedFile(null);
+      setIsDragOver(false);
     }, 500);
     onClose();
     toast.success(
@@ -266,6 +301,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       setIsConverting(false);
       setSelectedDocumentType("");
       setSelectedFile(null);
+      setIsDragOver(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }, 500);
     onClose();
@@ -347,8 +383,16 @@ export const OCRModel: React.FC<OCRModelProps> = ({
           Upload Document
         </label>
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+            isDragOver
+              ? "border-blue-500 bg-blue-100"
+              : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+          }`}
           onClick={handleFileSelect}
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           <div className="space-y-4">
             <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
@@ -356,11 +400,13 @@ export const OCRModel: React.FC<OCRModelProps> = ({
             </div>
             <div>
               <p className="text-lg font-medium text-gray-700">
-                Click to upload
+                {isDragOver ? "Drop file here" : "Click to upload"}
               </p>
-              <p className="text-sm text-gray-500">or drag and drop</p>
+              <p className="text-sm text-gray-500">
+                {isDragOver ? "Release to upload" : "or drag and drop"}
+              </p>
               <p className="text-xs text-gray-400 mt-2">
-                PNG, JPG, PDF up to 20MB
+                PNG, JPG, PDF, HEIC up to 20MB
               </p>
             </div>
           </div>

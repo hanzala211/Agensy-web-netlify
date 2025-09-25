@@ -117,6 +117,7 @@ export const TEMPLATE_SORT_OPTIONS = [
 export const APPOINTMENT_TYPE_FILTERS = [
   { label: "All", value: "all" },
   { label: "Regular Checkup", value: "regular checkup" },
+  { label: "Specialty Doctor", value: "specialty doctor" },
   { label: "Dental", value: "dental" },
   { label: "Therapy", value: "therapy" },
   { label: "Laboratory", value: "laboratory" },
@@ -155,6 +156,7 @@ export const CODE_STATUS_OPTIONS = [
   { label: "DNR", value: "dnr" },
   { label: "DNI", value: "dni" },
   { label: "Comfort Care", value: "comfort_care" },
+  { label: "Unknown", value: "unknown" },
 ];
 
 export const ADVANCE_DIRECTIVE_OPTIONS = [
