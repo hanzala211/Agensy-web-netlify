@@ -19,8 +19,8 @@ import {
   usePostImportantPeopleInLifeMutation,
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
-import { DateUtils, toast } from "@agensy/utils";
+import { useEffect, useCallback } from "react";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { APP_ACTIONS, ICONS } from "@agensy/constants";
@@ -53,7 +53,13 @@ const createSafeOpenedFileData = (
 
 export const ImportantPeopleInLife = () => {
   const params = useParams();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const { handleFilterPermission } = useAuthContext();
   const {
     register,
@@ -348,200 +354,230 @@ export const ImportantPeopleInLife = () => {
           postImportantPeopleInLifeMutation.data?.last_update?.updatedAt
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postImportantPeopleInLifeMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postImportantPeopleInLifeMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postImportantPeopleInLifeMutation.status]);
 
-  const onSubmit = (data: ImportantPeopleInLifeFormData) => {
-    const postData: {
-      client_info: {
-        first_name: string | null;
-        last_name: string | null;
-        date_of_birth: string | null;
+  const onSubmit = useCallback(
+    (data: ImportantPeopleInLifeFormData) => {
+      const postData: {
+        client_info: {
+          first_name: string | null;
+          last_name: string | null;
+          date_of_birth: string | null;
+        };
+        emergency_contact: {
+          first_name: string | null;
+          last_name: string | null;
+          phone: string | null;
+          relationship: string | null;
+        };
+        short_form: {
+          mpoa: string | null;
+          mpoa_phone: string | null;
+          dpoa: string | null;
+          dpoa_phone: string | null;
+        };
+        important_people: {
+          mpoa_relationship: string | null;
+          fpoa_relationship: string | null;
+          lawyer_name: string | null;
+          lawyer_phone: string | null;
+          lawyer_firm: string | null;
+          accountant_name: string | null;
+          accountant_phone: string | null;
+          accountant_firm: string | null;
+          financial_advisor_name: string | null;
+          financial_advisor_phone: string | null;
+          financial_advisor_firm: string | null;
+          trust_officer_name: string | null;
+          trust_officer_phone: string | null;
+          trust_officer_agency: string | null;
+          emergency_contact_name: string | null;
+          emergency_contact_phone: string | null;
+          emergency_contact_relationship: string | null;
+          neighbor_name: string | null;
+          neighbor_phone: string | null;
+          neighbor_address: string | null;
+          closest_friend_name: string | null;
+          closest_friend_phone: string | null;
+          closest_friend_relationship: string | null;
+          faith_contact_name: string | null;
+          faith_contact_phone: string | null;
+          faith_contact_affiliation: string | null;
+          club_group_name: string | null;
+          club_group_contact: string | null;
+          additional_notes: string | null;
+        };
+      } = {
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+        },
+        emergency_contact: {
+          first_name: null,
+          last_name: null,
+          phone: null,
+          relationship: null,
+        },
+        short_form: {
+          mpoa: null,
+          mpoa_phone: null,
+          dpoa: null,
+          dpoa_phone: null,
+        },
+        important_people: {
+          mpoa_relationship: null,
+          fpoa_relationship: null,
+          lawyer_name: null,
+          lawyer_phone: null,
+          lawyer_firm: null,
+          accountant_name: null,
+          accountant_phone: null,
+          accountant_firm: null,
+          financial_advisor_name: null,
+          financial_advisor_phone: null,
+          financial_advisor_firm: null,
+          trust_officer_name: null,
+          trust_officer_phone: null,
+          trust_officer_agency: null,
+          emergency_contact_name: null,
+          emergency_contact_phone: null,
+          emergency_contact_relationship: null,
+          neighbor_name: null,
+          neighbor_phone: null,
+          neighbor_address: null,
+          closest_friend_name: null,
+          closest_friend_phone: null,
+          closest_friend_relationship: null,
+          faith_contact_name: null,
+          faith_contact_phone: null,
+          faith_contact_affiliation: null,
+          club_group_name: null,
+          club_group_contact: null,
+          additional_notes: data.notesAndReminders || null,
+        },
       };
-      emergency_contact: {
-        first_name: string | null;
-        last_name: string | null;
-        phone: string | null;
-        relationship: string | null;
-      };
-      short_form: {
-        mpoa: string | null;
-        mpoa_phone: string | null;
-        dpoa: string | null;
-        dpoa_phone: string | null;
-      };
-      important_people: {
-        mpoa_relationship: string | null;
-        fpoa_relationship: string | null;
-        lawyer_name: string | null;
-        lawyer_phone: string | null;
-        lawyer_firm: string | null;
-        accountant_name: string | null;
-        accountant_phone: string | null;
-        accountant_firm: string | null;
-        financial_advisor_name: string | null;
-        financial_advisor_phone: string | null;
-        financial_advisor_firm: string | null;
-        trust_officer_name: string | null;
-        trust_officer_phone: string | null;
-        trust_officer_agency: string | null;
-        emergency_contact_name: string | null;
-        emergency_contact_phone: string | null;
-        emergency_contact_relationship: string | null;
-        neighbor_name: string | null;
-        neighbor_phone: string | null;
-        neighbor_address: string | null;
-        closest_friend_name: string | null;
-        closest_friend_phone: string | null;
-        closest_friend_relationship: string | null;
-        faith_contact_name: string | null;
-        faith_contact_phone: string | null;
-        faith_contact_affiliation: string | null;
-        club_group_name: string | null;
-        club_group_contact: string | null;
-        additional_notes: string | null;
-      };
-    } = {
-      client_info: {
-        first_name: data.firstName ? data.firstName : null,
-        last_name: data.lastName ? data.lastName : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-      },
-      emergency_contact: {
-        first_name: null,
-        last_name: null,
-        phone: null,
-        relationship: null,
-      },
-      short_form: {
-        mpoa: null,
-        mpoa_phone: null,
-        dpoa: null,
-        dpoa_phone: null,
-      },
-      important_people: {
-        mpoa_relationship: null,
-        fpoa_relationship: null,
-        lawyer_name: null,
-        lawyer_phone: null,
-        lawyer_firm: null,
-        accountant_name: null,
-        accountant_phone: null,
-        accountant_firm: null,
-        financial_advisor_name: null,
-        financial_advisor_phone: null,
-        financial_advisor_firm: null,
-        trust_officer_name: null,
-        trust_officer_phone: null,
-        trust_officer_agency: null,
-        emergency_contact_name: null,
-        emergency_contact_phone: null,
-        emergency_contact_relationship: null,
-        neighbor_name: null,
-        neighbor_phone: null,
-        neighbor_address: null,
-        closest_friend_name: null,
-        closest_friend_phone: null,
-        closest_friend_relationship: null,
-        faith_contact_name: null,
-        faith_contact_phone: null,
-        faith_contact_affiliation: null,
-        club_group_name: null,
-        club_group_contact: null,
-        additional_notes: data.notesAndReminders || null,
-      },
-    };
 
-    data.importantPeople?.forEach((person) => {
-      switch (person.type) {
-        case "medical_poa":
-          postData.short_form.mpoa = person.name || null;
-          postData.short_form.mpoa_phone = person.phone || null;
-          postData.important_people.mpoa_relationship =
-            person.relationship || null;
-          break;
-        case "financial_poa":
-          postData.short_form.dpoa = person.name || null;
-          postData.short_form.dpoa_phone = person.phone || null;
-          postData.important_people.fpoa_relationship =
-            person.relationship || null;
-          break;
-        case "lawyer":
-          postData.important_people.lawyer_name = person.name || null;
-          postData.important_people.lawyer_phone = person.phone || null;
-          postData.important_people.lawyer_firm = person.firm || null;
-          break;
-        case "accountant":
-          postData.important_people.accountant_name = person.name || null;
-          postData.important_people.accountant_phone = person.phone || null;
-          postData.important_people.accountant_firm = person.firm || null;
-          break;
-        case "financial_advisor":
-          postData.important_people.financial_advisor_name =
-            person.name || null;
-          postData.important_people.financial_advisor_phone =
-            person.phone || null;
-          postData.important_people.financial_advisor_firm =
-            person.firm || null;
-          break;
-        case "trust_officer":
-          postData.important_people.trust_officer_name = person.name || null;
-          postData.important_people.trust_officer_phone = person.phone || null;
-          postData.important_people.trust_officer_agency =
-            person.agency || null;
-          break;
-        case "emergency_contact_1":
-          postData.emergency_contact.first_name =
-            (person.name || "").split(" ")[0] || null;
-          postData.emergency_contact.last_name =
-            (person.name || "").split(" ").slice(1).join(" ") || null;
-          postData.emergency_contact.phone = person.phone || null;
-          postData.emergency_contact.relationship = person.relationship || null;
-          break;
-        case "emergency_contact_2":
-          postData.important_people.emergency_contact_name =
-            person.name || null;
-          postData.important_people.emergency_contact_phone =
-            person.phone || null;
-          postData.important_people.emergency_contact_relationship =
-            person.relationship || null;
-          break;
-        case "neighbor":
-          postData.important_people.neighbor_name = person.name || null;
-          postData.important_people.neighbor_phone = person.phone || null;
-          postData.important_people.neighbor_address = person.address || null;
-          break;
-        case "close_friend":
-          postData.important_people.closest_friend_name = person.name || null;
-          postData.important_people.closest_friend_phone = person.phone || null;
-          postData.important_people.closest_friend_relationship =
-            person.relationship || null;
-          break;
-        case "faith_contact":
-          postData.important_people.faith_contact_name = person.name || null;
-          postData.important_people.faith_contact_phone = person.phone || null;
-          postData.important_people.faith_contact_affiliation =
-            person.affiliation || null;
-          break;
-        case "club_group":
-          postData.important_people.club_group_name = person.name || null;
-          postData.important_people.club_group_contact = person.phone || null;
-          break;
-      }
-    });
+      data.importantPeople?.forEach((person) => {
+        switch (person.type) {
+          case "medical_poa":
+            postData.short_form.mpoa = person.name || null;
+            postData.short_form.mpoa_phone = person.phone || null;
+            postData.important_people.mpoa_relationship =
+              person.relationship || null;
+            break;
+          case "financial_poa":
+            postData.short_form.dpoa = person.name || null;
+            postData.short_form.dpoa_phone = person.phone || null;
+            postData.important_people.fpoa_relationship =
+              person.relationship || null;
+            break;
+          case "lawyer":
+            postData.important_people.lawyer_name = person.name || null;
+            postData.important_people.lawyer_phone = person.phone || null;
+            postData.important_people.lawyer_firm = person.firm || null;
+            break;
+          case "accountant":
+            postData.important_people.accountant_name = person.name || null;
+            postData.important_people.accountant_phone = person.phone || null;
+            postData.important_people.accountant_firm = person.firm || null;
+            break;
+          case "financial_advisor":
+            postData.important_people.financial_advisor_name =
+              person.name || null;
+            postData.important_people.financial_advisor_phone =
+              person.phone || null;
+            postData.important_people.financial_advisor_firm =
+              person.firm || null;
+            break;
+          case "trust_officer":
+            postData.important_people.trust_officer_name = person.name || null;
+            postData.important_people.trust_officer_phone =
+              person.phone || null;
+            postData.important_people.trust_officer_agency =
+              person.agency || null;
+            break;
+          case "emergency_contact_1":
+            postData.emergency_contact.first_name =
+              (person.name || "").split(" ")[0] || null;
+            postData.emergency_contact.last_name =
+              (person.name || "").split(" ").slice(1).join(" ") || null;
+            postData.emergency_contact.phone = person.phone || null;
+            postData.emergency_contact.relationship =
+              person.relationship || null;
+            break;
+          case "emergency_contact_2":
+            postData.important_people.emergency_contact_name =
+              person.name || null;
+            postData.important_people.emergency_contact_phone =
+              person.phone || null;
+            postData.important_people.emergency_contact_relationship =
+              person.relationship || null;
+            break;
+          case "neighbor":
+            postData.important_people.neighbor_name = person.name || null;
+            postData.important_people.neighbor_phone = person.phone || null;
+            postData.important_people.neighbor_address = person.address || null;
+            break;
+          case "close_friend":
+            postData.important_people.closest_friend_name = person.name || null;
+            postData.important_people.closest_friend_phone =
+              person.phone || null;
+            postData.important_people.closest_friend_relationship =
+              person.relationship || null;
+            break;
+          case "faith_contact":
+            postData.important_people.faith_contact_name = person.name || null;
+            postData.important_people.faith_contact_phone =
+              person.phone || null;
+            postData.important_people.faith_contact_affiliation =
+              person.affiliation || null;
+            break;
+          case "club_group":
+            postData.important_people.club_group_name = person.name || null;
+            postData.important_people.club_group_contact = person.phone || null;
+            break;
+        }
+      });
 
-    postImportantPeopleInLifeMutation.mutate({
-      clientId: params.clientId!,
-      data: postData,
-    });
-  };
+      postImportantPeopleInLifeMutation.mutate({
+        clientId: params.clientId!,
+        data: postData,
+      });
+    },
+    [postImportantPeopleInLifeMutation, params.clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   const addNewPerson = () => {
     const allImportantPeople = watch("importantPeople") || [];

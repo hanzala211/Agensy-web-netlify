@@ -19,15 +19,21 @@ import {
   useGetInPatientStayNotes,
   usePostInPatientStayNotes,
 } from "@agensy/api";
-import { useEffect } from "react";
-import { DateUtils, toast } from "@agensy/utils";
+import { useEffect, useCallback } from "react";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { APP_ACTIONS } from "@agensy/constants";
 
 export const InPatientStayNotes = () => {
   const params = useParams();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const {
     data: inPatientData,
     isFetching: isLoadingInPatient,
@@ -158,11 +164,23 @@ export const InPatientStayNotes = () => {
           })
         ),
       } as unknown as OpenedFileData);
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postInPatientStayNotesMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postInPatientStayNotesMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postInPatientStayNotesMutation.status, setHasUnsavedChanges]);
 
@@ -176,70 +194,88 @@ export const InPatientStayNotes = () => {
     refetch();
   }, []);
 
-  const onSubmit = (data: InPatientStayNotesFormData) => {
-    console.log("Form data:", data);
+  const onSubmit = useCallback(
+    (data: InPatientStayNotesFormData) => {
+      console.log("Form data:", data);
 
-    const mappedInPatientStayNotes =
-      data.inPatientStayNotes?.map((note) => {
-        const item = {
-          id: note.id ? note.id : null,
-          date: note.date ? DateUtils.changetoISO(note.date) : null,
-          facility_name: note.facilityName ? note.facilityName : null,
-          medical_provider: note.medicalProvider ? note.medicalProvider : null,
-          specialty: note.specialty ? note.specialty : null,
-          questions_for_provider:
-            note.questionsForProvider && note.questionsForProvider.length > 0
-              ? note.questionsForProvider
-                  .map((item) => item.question)
-                  .join(", ").length > 0
+      const mappedInPatientStayNotes =
+        data.inPatientStayNotes?.map((note) => {
+          const item = {
+            id: note.id ? note.id : null,
+            date: note.date ? DateUtils.changetoISO(note.date) : null,
+            facility_name: note.facilityName ? note.facilityName : null,
+            medical_provider: note.medicalProvider
+              ? note.medicalProvider
+              : null,
+            specialty: note.specialty ? note.specialty : null,
+            questions_for_provider:
+              note.questionsForProvider && note.questionsForProvider.length > 0
                 ? note.questionsForProvider
                     .map((item) => item.question)
-                    .join(", ")
-                : null
-              : null,
-          updates_from_provider:
-            note.updatesFromProvider && note.updatesFromProvider.length > 0
-              ? note.updatesFromProvider.map((item) => item.update).join(", ")
-                  .length > 0
+                    .join(", ").length > 0
+                  ? note.questionsForProvider
+                      .map((item) => item.question)
+                      .join(", ")
+                  : null
+                : null,
+            updates_from_provider:
+              note.updatesFromProvider && note.updatesFromProvider.length > 0
                 ? note.updatesFromProvider.map((item) => item.update).join(", ")
-                : null
-              : null,
-          recommendations_next_steps:
-            note.recommendationsNextSteps &&
-            note.recommendationsNextSteps.length > 0
-              ? note.recommendationsNextSteps
-                  .map((item) => item.recommendation)
-                  .join(", ").length > 0
+                    .length > 0
+                  ? note.updatesFromProvider
+                      .map((item) => item.update)
+                      .join(", ")
+                  : null
+                : null,
+            recommendations_next_steps:
+              note.recommendationsNextSteps &&
+              note.recommendationsNextSteps.length > 0
                 ? note.recommendationsNextSteps
                     .map((item) => item.recommendation)
-                    .join(", ")
-                : null
-              : null,
-        };
+                    .join(", ").length > 0
+                  ? note.recommendationsNextSteps
+                      .map((item) => item.recommendation)
+                      .join(", ")
+                  : null
+                : null,
+          };
 
-        if (!item.id) {
-          // @ts-expect-error - TODO: fix this
-          delete item.id;
-        }
+          if (!item.id) {
+            // @ts-expect-error - TODO: fix this
+            delete item.id;
+          }
 
-        return item;
-      }) || [];
+          return item;
+        }) || [];
 
-    const postData = {
-      in_patient_stay_notes: mappedInPatientStayNotes,
-      client_info: {
-        first_name: data.firstName ? data.firstName : null,
-        last_name: data.lastName ? data.lastName : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-      },
-    };
-    postInPatientStayNotesMutation.mutate({
-      clientId: params.clientId!,
-      data: postData,
-    });
-  };
+      const postData = {
+        in_patient_stay_notes: mappedInPatientStayNotes,
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+        },
+      };
+      postInPatientStayNotesMutation.mutate({
+        clientId: params.clientId!,
+        data: postData,
+      });
+    },
+    [postInPatientStayNotesMutation, params.clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   if (isLoadingInPatient)
     return (

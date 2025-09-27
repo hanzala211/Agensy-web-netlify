@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { FieldRenderer } from "../FieldRenderer";
 import {
   nextStepAfterDeathSchema as checklistSchema,
@@ -12,7 +12,7 @@ import {
   usePostChecklistFormsMutation,
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
-import { toast } from "@agensy/utils";
+import { StringUtils, toast } from "@agensy/utils";
 import { APP_ACTIONS } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -51,7 +51,13 @@ export const NextStepsAfterDeath = () => {
     generateNextStepAfterDeathDefaultValues()
   );
   const postStartCareChecklistMutation = usePostChecklistFormsMutation();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const { handleFilterPermission } = useAuthContext();
 
   // Extract client data from query cache
@@ -107,11 +113,23 @@ export const NextStepsAfterDeath = () => {
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postStartCareChecklistMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postStartCareChecklistMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postStartCareChecklistMutation.status]);
 
@@ -140,17 +158,33 @@ export const NextStepsAfterDeath = () => {
     startOfCareChecklist?.updatedAt,
   ]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Checklist data:", formData);
-    postStartCareChecklistMutation.mutate({
-      clientId: params.clientId!,
-      param: "next_step_after_death",
-      data: {
-        checklist_data: formData,
-      },
-    });
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      console.log("Checklist data:", formData);
+      postStartCareChecklistMutation.mutate({
+        clientId: params.clientId!,
+        param: "next_step_after_death",
+        data: {
+          checklist_data: formData,
+        },
+      });
+    },
+    [formData, postStartCareChecklistMutation, params.clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit({
+      preventDefault: () => {},
+    } as React.FormEvent<HTMLFormElement>);
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   const groupedItems = checklistSchema.reduce((acc, field) => {
     const headingId = field.headingId || "default";

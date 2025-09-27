@@ -131,7 +131,6 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
     name: "Essential Documents for Aging",
     type: "folder",
     children: [
-      // Only show personal-info if user does NOT have ViewPersonalInfo permission
       ...(!userPermissions.includes(APP_ACTIONS.ViewPersonalInfo)
         ? []
         : [
@@ -141,13 +140,14 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
               type: "file" as const,
               slug: "personal-info",
             },
+            {
+              id: "important-people-in-life",
+              name: "Trusted Network Directory",
+              type: "file" as const,
+              slug: "important-people-in-life",
+            },
           ]),
-      {
-        id: "important-people-in-life",
-        name: "Trusted Network Directory",
-        type: "file",
-        slug: "important-people-in-life",
-      },
+
       {
         id: "burial-instructions",
         name: "Burial Instructions",

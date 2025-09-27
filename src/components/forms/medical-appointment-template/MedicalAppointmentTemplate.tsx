@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -35,7 +35,7 @@ import {
   PROVIDER_TYPES,
   SPECIALTIES,
 } from "@agensy/constants";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 
@@ -88,7 +88,13 @@ const createSafeOpenedFileData = (
 
 export const MedicalAppointmentTemplate: React.FC = () => {
   const queryClient = useQueryClient();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const { clientId, formSlug } = useParams();
   const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
   const [isMedicationModalOpen, setIsMedicationModalOpen] = useState(false);
@@ -144,11 +150,23 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           string | string[] | Record<string, string | number>
         >
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postMedicalAppointmentTemplateMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postMedicalAppointmentTemplateMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postMedicalAppointmentTemplateMutation.status]);
 
@@ -364,221 +382,239 @@ export const MedicalAppointmentTemplate: React.FC = () => {
     }
   }, [Object.keys(getValues()).length]);
 
-  const onSubmit = (data: MedicalAppointmentTemplateData) => {
-    console.log(data);
-    const medications =
-      data.medications &&
-      data.medications.map((item) => {
-        const medication = {
-          medication_name: item.medication_name ? item.medication_name : null,
-          dosage: item.dosage ? item.dosage : null,
-          frequency: item.frequency ? item.frequency : null,
-          notes: item.notes ? item.notes : null,
-          prescribing_doctor: item.prescribing_doctor
-            ? item.prescribing_doctor
-            : null,
-          start_date: item.start_date
-            ? DateUtils.changetoISO(item.start_date)
-            : null,
-          end_date: item.end_date ? DateUtils.changetoISO(item.end_date) : null,
-          active: true,
-          id: item.id ? item.id : null,
-          client_medication_id: item.client_medication_id
-            ? item.client_medication_id
-            : null,
-        };
-        return medication;
+  const onSubmit = useCallback(
+    (data: MedicalAppointmentTemplateData) => {
+      console.log(data);
+      const medications =
+        data.medications &&
+        data.medications.map((item) => {
+          const medication = {
+            medication_name: item.medication_name ? item.medication_name : null,
+            dosage: item.dosage ? item.dosage : null,
+            frequency: item.frequency ? item.frequency : null,
+            notes: item.notes ? item.notes : null,
+            prescribing_doctor: item.prescribing_doctor
+              ? item.prescribing_doctor
+              : null,
+            start_date: item.start_date
+              ? DateUtils.changetoISO(item.start_date)
+              : null,
+            end_date: item.end_date
+              ? DateUtils.changetoISO(item.end_date)
+              : null,
+            active: true,
+            id: item.id ? item.id : null,
+            client_medication_id: item.client_medication_id
+              ? item.client_medication_id
+              : null,
+          };
+          return medication;
+        });
+
+      medications?.forEach((item, index) => {
+        const isFromExisting = isMedicationFromExisting[index];
+        const originalData = originalMedicationsData[index];
+
+        const hasMedicationChanged = originalData
+          ? (item.medication_name || "") !==
+              (originalData.medication_name || "") ||
+            (item.dosage || "") !== (originalData.dosage || "") ||
+            (item.frequency || "") !== (originalData.frequency || "") ||
+            (item.notes || "") !== (originalData.notes || "") ||
+            (item.prescribing_doctor || "") !==
+              (originalData.prescribing_doctor || "") ||
+            (item.start_date || "") !== (originalData.start_date || "") ||
+            (item.end_date || "") !== (originalData.end_date || "")
+          : false;
+
+        if (isFromExisting && hasMedicationChanged) {
+          if (item.id) {
+            item.client_medication_id = item.id;
+          }
+          // @ts-expect-error - TODO: fix this
+          delete item.id;
+        } else if (isFromExisting && !hasMedicationChanged) {
+          // @ts-expect-error - TODO: fix this
+          delete item.client_medication_id;
+        } else if (!isFromExisting) {
+          if (item.client_medication_id) {
+            // @ts-expect-error - TODO: fix this
+            delete item.id;
+          } else if (item.id) {
+            // @ts-expect-error - TODO: fix this
+            delete item.client_medication_id;
+          } else {
+            // @ts-expect-error - TODO: fix this
+            delete item.client_medication_id;
+            // @ts-expect-error // fix this
+            delete item.id;
+          }
+          if (item.client_medication_id === null) {
+            // @ts-expect-error - TODO: fix this
+            delete item.client_medication_id;
+          }
+        }
       });
 
-    medications?.forEach((item, index) => {
-      const isFromExisting = isMedicationFromExisting[index];
-      const originalData = originalMedicationsData[index];
+      const provider = data.healthcareProvider
+        ? {
+            healthcare_provider_name: data.healthcareProvider.providerName
+              ? data.healthcareProvider.providerName
+              : null,
+            healthcare_provider_address: data.healthcareProvider.address
+              ? data.healthcareProvider.address
+              : null,
+            healthcare_provider_phone: data.healthcareProvider.phone
+              ? data.healthcareProvider.phone
+              : null,
+            healthcare_provider_notes: data.healthcareProvider.notes
+              ? data.healthcareProvider.notes
+              : null,
+            healthcare_provider_follow_up: data.healthcareProvider.follow_up
+              ? data.healthcareProvider.follow_up
+              : null,
+            healthcare_provider_specialty: data.healthcareProvider.specialty
+              ? data.healthcareProvider.specialty
+              : null,
+            id: data.healthcareProvider.id ? data.healthcareProvider.id : null,
+            healthcare_provider_type: data.healthcareProvider.providerType
+              ? data.healthcareProvider.providerType
+              : null,
+            healthcare_provider_id: data.healthcareProvider.provider_id
+              ? data.healthcareProvider.provider_id
+              : null,
+          }
+        : null;
 
-      const hasMedicationChanged = originalData
-        ? (item.medication_name || "") !==
-            (originalData.medication_name || "") ||
-          (item.dosage || "") !== (originalData.dosage || "") ||
-          (item.frequency || "") !== (originalData.frequency || "") ||
-          (item.notes || "") !== (originalData.notes || "") ||
-          (item.prescribing_doctor || "") !==
-            (originalData.prescribing_doctor || "") ||
-          (item.start_date || "") !== (originalData.start_date || "") ||
-          (item.end_date || "") !== (originalData.end_date || "")
-        : false;
+      const hasProviderChanged =
+        originalProviderData && data.healthcareProvider
+          ? (data.healthcareProvider.providerName || "") !==
+              (originalProviderData.providerName || "") ||
+            (data.healthcareProvider.address || "") !==
+              (originalProviderData.address || "") ||
+            (data.healthcareProvider.phone || "") !==
+              (originalProviderData.phone || "") ||
+            (data.healthcareProvider.notes || "") !==
+              (originalProviderData.notes || "") ||
+            (data.healthcareProvider.follow_up || "") !==
+              (originalProviderData.follow_up || "") ||
+            (data.healthcareProvider.specialty || "") !==
+              (originalProviderData.specialty || "") ||
+            (data.healthcareProvider.providerType || "") !==
+              (originalProviderData.providerType || "")
+          : false;
 
-      if (isFromExisting && hasMedicationChanged) {
-        if (item.id) {
-          item.client_medication_id = item.id;
-        }
-        // @ts-expect-error - TODO: fix this
-        delete item.id;
-      } else if (isFromExisting && !hasMedicationChanged) {
-        // @ts-expect-error - TODO: fix this
-        delete item.client_medication_id;
-      } else if (!isFromExisting) {
-        if (item.client_medication_id) {
-          // @ts-expect-error - TODO: fix this
-          delete item.id;
-        } else if (item.id) {
-          // @ts-expect-error - TODO: fix this
-          delete item.client_medication_id;
-        } else {
-          // @ts-expect-error - TODO: fix this
-          delete item.client_medication_id;
-          // @ts-expect-error // fix this
-          delete item.id;
-        }
-        if (item.client_medication_id === null) {
-          // @ts-expect-error - TODO: fix this
-          delete item.client_medication_id;
-        }
-      }
-    });
-
-    const provider = data.healthcareProvider
-      ? {
-          healthcare_provider_name: data.healthcareProvider.providerName
-            ? data.healthcareProvider.providerName
-            : null,
-          healthcare_provider_address: data.healthcareProvider.address
-            ? data.healthcareProvider.address
-            : null,
-          healthcare_provider_phone: data.healthcareProvider.phone
-            ? data.healthcareProvider.phone
-            : null,
-          healthcare_provider_notes: data.healthcareProvider.notes
-            ? data.healthcareProvider.notes
-            : null,
-          healthcare_provider_follow_up: data.healthcareProvider.follow_up
-            ? data.healthcareProvider.follow_up
-            : null,
-          healthcare_provider_specialty: data.healthcareProvider.specialty
-            ? data.healthcareProvider.specialty
-            : null,
-          id: data.healthcareProvider.id ? data.healthcareProvider.id : null,
-          healthcare_provider_type: data.healthcareProvider.providerType
-            ? data.healthcareProvider.providerType
-            : null,
-          healthcare_provider_id: data.healthcareProvider.provider_id
-            ? data.healthcareProvider.provider_id
-            : null,
-        }
-      : null;
-
-    const hasProviderChanged =
-      originalProviderData && data.healthcareProvider
-        ? (data.healthcareProvider.providerName || "") !==
-            (originalProviderData.providerName || "") ||
-          (data.healthcareProvider.address || "") !==
-            (originalProviderData.address || "") ||
-          (data.healthcareProvider.phone || "") !==
-            (originalProviderData.phone || "") ||
-          (data.healthcareProvider.notes || "") !==
-            (originalProviderData.notes || "") ||
-          (data.healthcareProvider.follow_up || "") !==
-            (originalProviderData.follow_up || "") ||
-          (data.healthcareProvider.specialty || "") !==
-            (originalProviderData.specialty || "") ||
-          (data.healthcareProvider.providerType || "") !==
-            (originalProviderData.providerType || "")
-        : false;
-
-    if (provider) {
-      if (isProviderFromExisting && hasProviderChanged) {
-        if (provider.id) {
-          provider.healthcare_provider_id = provider.id;
-        }
-        // @ts-expect-error - TODO: fix this
-        delete provider.id;
-      } else if (isProviderFromExisting && !hasProviderChanged) {
-        // @ts-expect-error - TODO: fix this
-        delete provider.healthcare_provider_id;
-      } else if (!isProviderFromExisting) {
-        if (provider?.healthcare_provider_id) {
+      if (provider) {
+        if (isProviderFromExisting && hasProviderChanged) {
+          if (provider.id) {
+            provider.healthcare_provider_id = provider.id;
+          }
           // @ts-expect-error - TODO: fix this
           delete provider.id;
-        } else if (provider?.id) {
+        } else if (isProviderFromExisting && !hasProviderChanged) {
           // @ts-expect-error - TODO: fix this
-          delete provider?.healthcare_provider_id;
-        } else {
-          // @ts-expect-error - TODO: fix this
-          delete provider?.healthcare_provider_id;
-          // @ts-expect-error // fix this
-          delete provider.id;
-        }
-        if (provider?.healthcare_provider_id === null) {
-          // @ts-expect-error - TODO: fix this
-          delete provider?.healthcare_provider_id;
+          delete provider.healthcare_provider_id;
+        } else if (!isProviderFromExisting) {
+          if (provider?.healthcare_provider_id) {
+            // @ts-expect-error - TODO: fix this
+            delete provider.id;
+          } else if (provider?.id) {
+            // @ts-expect-error - TODO: fix this
+            delete provider?.healthcare_provider_id;
+          } else {
+            // @ts-expect-error - TODO: fix this
+            delete provider?.healthcare_provider_id;
+            // @ts-expect-error // fix this
+            delete provider.id;
+          }
+          if (provider?.healthcare_provider_id === null) {
+            // @ts-expect-error - TODO: fix this
+            delete provider?.healthcare_provider_id;
+          }
         }
       }
-    }
 
-    const postData = {
-      client_info: {
-        first_name: data.firstName ? data.firstName : null,
-        last_name: data.lastName ? data.lastName : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
+      const postData = {
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+        },
+        global_allergies: clientData?.medical?.allergies
+          ? clientData?.medical?.allergies
           : null,
-      },
-      global_allergies: clientData?.medical?.allergies
-        ? clientData?.medical?.allergies
-        : null,
-      allergies:
-        data.allergies && data.allergies.length > 0
-          ? data.allergies.map((item) => item.allergen).join(", ").length > 0
-            ? data.allergies.map((item) => item.allergen).join(", ")
-            : null
-          : null,
-      global_diagnoses: clientData?.medical?.diagnoses
-        ? clientData?.medical?.diagnoses
-        : null,
-      diagnoses:
-        data.diagnoses && data.diagnoses.length > 0
-          ? data.diagnoses.map((item) => item.diagnosis).join(", ").length > 0
-            ? data.diagnoses.map((item) => item.diagnosis).join(", ")
-            : null
-          : null,
-      medical_template: {
-        date: data.date ? DateUtils.changetoISO(data.date) : null,
-        surgical_history:
-          data.surgical_history && data.surgical_history.length > 0
-            ? data.surgical_history
-                .map((item) => item.surgicalHistory)
-                .join(", ").length > 0
-              ? data.surgical_history
-                  .map((item) => item.surgicalHistory)
-                  .join(", ")
+        allergies:
+          data.allergies && data.allergies.length > 0
+            ? data.allergies.map((item) => item.allergen).join(", ").length > 0
+              ? data.allergies.map((item) => item.allergen).join(", ")
               : null
             : null,
-        height: data.height ? data.height : null,
-        weight: data.weight ? data.weight : null,
-        blood_pressure: data.blood_pressure ? data.blood_pressure : null,
-        temperature: data.temperature ? data.temperature : null,
-        heart_rate: data.heart_rate ? data.heart_rate : null,
-        additional_vitals: data.additional_vitals
-          ? data.additional_vitals
+        global_diagnoses: clientData?.medical?.diagnoses
+          ? clientData?.medical?.diagnoses
           : null,
-        reason_for_visit: data.reason_for_visit ? data.reason_for_visit : null,
-        top_3_concerns: data.top_3_concerns ? data.top_3_concerns : null,
-        tests_labs_imaging: data.tests_labs_imaging
-          ? data.tests_labs_imaging
-          : null,
-        visit_notes: data.visit_notes ? data.visit_notes : null,
-        recommendations: data.recommendations ? data.recommendations : null,
-        referrals: data.referrals ? data.referrals : null,
-        follow_up: data.follow_up ? data.follow_up : null,
-        report_given_to: data.report_given_to ? data.report_given_to : null,
-      },
-      healthcare_provider: provider ? provider : null,
-      medications: medications || [],
-    };
-    postMedicalAppointmentTemplateMutation.mutate({
-      clientId: clientId!,
-      templateId: formSlug?.split("_")?.[1] as string,
-      data: postData,
-    });
-  };
+        diagnoses:
+          data.diagnoses && data.diagnoses.length > 0
+            ? data.diagnoses.map((item) => item.diagnosis).join(", ").length > 0
+              ? data.diagnoses.map((item) => item.diagnosis).join(", ")
+              : null
+            : null,
+        medical_template: {
+          date: data.date ? DateUtils.changetoISO(data.date) : null,
+          surgical_history:
+            data.surgical_history && data.surgical_history.length > 0
+              ? data.surgical_history
+                  .map((item) => item.surgicalHistory)
+                  .join(", ").length > 0
+                ? data.surgical_history
+                    .map((item) => item.surgicalHistory)
+                    .join(", ")
+                : null
+              : null,
+          height: data.height ? data.height : null,
+          weight: data.weight ? data.weight : null,
+          blood_pressure: data.blood_pressure ? data.blood_pressure : null,
+          temperature: data.temperature ? data.temperature : null,
+          heart_rate: data.heart_rate ? data.heart_rate : null,
+          additional_vitals: data.additional_vitals
+            ? data.additional_vitals
+            : null,
+          reason_for_visit: data.reason_for_visit
+            ? data.reason_for_visit
+            : null,
+          top_3_concerns: data.top_3_concerns ? data.top_3_concerns : null,
+          tests_labs_imaging: data.tests_labs_imaging
+            ? data.tests_labs_imaging
+            : null,
+          visit_notes: data.visit_notes ? data.visit_notes : null,
+          recommendations: data.recommendations ? data.recommendations : null,
+          referrals: data.referrals ? data.referrals : null,
+          follow_up: data.follow_up ? data.follow_up : null,
+          report_given_to: data.report_given_to ? data.report_given_to : null,
+        },
+        healthcare_provider: provider ? provider : null,
+        medications: medications || [],
+      };
+      postMedicalAppointmentTemplateMutation.mutate({
+        clientId: clientId!,
+        templateId: formSlug?.split("_")?.[1] as string,
+        data: postData,
+      });
+    },
+    [postMedicalAppointmentTemplateMutation, clientId, formSlug]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   const handleProviderSelect = (provider: HealthcareProvider) => {
     // Store original provider data for comparison

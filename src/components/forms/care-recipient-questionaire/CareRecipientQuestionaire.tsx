@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CommonLoader, PrimaryButton } from "@agensy/components";
@@ -31,7 +31,7 @@ import {
   useGetCareRecipientQuestionnaire,
   usePostCareRecipientQuestionaireMutation,
 } from "@agensy/api";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { APP_ACTIONS, RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { MedicationsSection } from "./MedicationsSection";
@@ -205,7 +205,13 @@ const createSafeOpenedFileData = (
 export const CareRecipientQuestionaire = () => {
   const queryClient = useQueryClient();
   const { handleFilterPermission } = useAuthContext();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const { clientId } = useParams();
   const {
     data: careRecipientQuestionnaire,
@@ -807,11 +813,22 @@ export const CareRecipientQuestionaire = () => {
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postCareRecipientQuestionaireMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postCareRecipientQuestionaireMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postCareRecipientQuestionaireMutation.status]);
 
@@ -822,446 +839,472 @@ export const CareRecipientQuestionaire = () => {
     };
   }, [setHasUnsavedChanges]);
 
-  const onSubmit = (data: CareRecipientQuestionnaireData) => {
-    console.log("Form data:", data);
+  const onSubmit = useCallback(
+    (data: CareRecipientQuestionnaireData) => {
+      console.log("Form data:", data);
 
-    const relatives = data.relatives?.map((item) => {
-      if (item.id) {
-        return {
-          name: item.name ? item.name : null,
-          address: item.address ? item.address : null,
-          home_phone: item.homePhone ? item.homePhone : null,
-          work_phone: item.workPhone ? item.workPhone : null,
-          relationship: item.relationship ? item.relationship : null,
-          email: item.email ? item.email : null,
+      const relatives = data.relatives?.map((item) => {
+        if (item.id) {
+          return {
+            name: item.name ? item.name : null,
+            address: item.address ? item.address : null,
+            home_phone: item.homePhone ? item.homePhone : null,
+            work_phone: item.workPhone ? item.workPhone : null,
+            relationship: item.relationship ? item.relationship : null,
+            email: item.email ? item.email : null,
+            id: item.id,
+          };
+        } else {
+          // @ts-expect-error - TODO: fix this
+          delete item.id;
+          return {
+            name: item.name ? item.name : null,
+            address: item.address ? item.address : null,
+            home_phone: item.homePhone ? item.homePhone : null,
+            work_phone: item.workPhone ? item.workPhone : null,
+            relationship: item.relationship ? item.relationship : null,
+            email: item.email ? item.email : null,
+          };
+        }
+      });
+
+      const friendsContact = data.friendsNeighbors?.map((item) => {
+        if (item.id) {
+          return {
+            name: item.name ? item.name : null,
+            address: item.address ? item.address : null,
+            relationship: item.relationship ? item.relationship : null,
+            phone: item.phone ? item.phone : null,
+            help_description: item.helpDescription
+              ? item.helpDescription
+              : null,
+            id: item.id,
+          };
+        } else {
+          // @ts-expect-error - TODO: fix this
+          delete item.id;
+          return {
+            name: item.name ? item.name : null,
+            address: item.address ? item.address : null,
+            relationship: item.relationship ? item.relationship : null,
+            phone: item.phone ? item.phone : null,
+            help_description: item.helpDescription
+              ? item.helpDescription
+              : null,
+          };
+        }
+      });
+
+      const professional_contacts = [
+        {
+          role: "lawyer",
+          name: data.lawyerName ? data.lawyerName : null,
+          phone: data.lawyerPhone ? data.lawyerPhone : null,
+          id: data.lawyerId ? data.lawyerId : null,
+        },
+        {
+          role: "power_of_attorney_finances",
+          name: data.powerOfAttorneyFinancesName
+            ? data.powerOfAttorneyFinancesName
+            : null,
+          phone: data.powerOfAttorneyFinancesPhone
+            ? data.powerOfAttorneyFinancesPhone
+            : null,
+          id: data.powerOfAttorneyFinancesId
+            ? data.powerOfAttorneyFinancesId
+            : null,
+        },
+        {
+          role: "power_of_attorney_healthcare",
+          name: data.powerOfAttorneyHealthcareName
+            ? data.powerOfAttorneyHealthcareName
+            : null,
+          phone: data.powerOfAttorneyHealthcarePhone
+            ? data.powerOfAttorneyHealthcarePhone
+            : null,
+          id: data.powerOfAttorneyHealthcareId
+            ? data.powerOfAttorneyHealthcareId
+            : null,
+        },
+        {
+          role: "tax_professional",
+          name: data.taxProfessionalName ? data.taxProfessionalName : null,
+          phone: data.taxProfessionalPhone ? data.taxProfessionalPhone : null,
+          id: data.taxProfessionalId ? data.taxProfessionalId : null,
+        },
+        {
+          role: "accountant",
+          name: data.accountantName ? data.accountantName : null,
+          phone: data.accountantPhone ? data.accountantPhone : null,
+          id: data.accountantId ? data.accountantId : null,
+        },
+        {
+          role: "financial_advisor",
+          name: data.financialAdvisorName ? data.financialAdvisorName : null,
+          phone: data.financialAdvisorPhone ? data.financialAdvisorPhone : null,
+          id: data.financialAdvisorId ? data.financialAdvisorId : null,
+        },
+        {
+          role: "significant_other_1",
+          name: data.significantOther1Name ? data.significantOther1Name : null,
+          phone: data.significantOther1Phone
+            ? data.significantOther1Phone
+            : null,
+          id: data.significantOther1Id ? data.significantOther1Id : null,
+        },
+        {
+          role: "significant_other_2",
+          name: data.significantOther2Name ? data.significantOther2Name : null,
+          phone: data.significantOther2Phone
+            ? data.significantOther2Phone
+            : null,
+          id: data.significantOther2Id ? data.significantOther2Id : null,
+        },
+      ];
+
+      professional_contacts.forEach((item) => {
+        if (item.id) {
+          return item;
+        } else {
+          // @ts-expect-error - TODO: fix this
+          delete item.id;
+          return item;
+        }
+      });
+
+      const healthcare_providers = data.healthcareProviders?.map((item) => {
+        if (item.id) {
+          return {
+            provider_name: item.providerName ? item.providerName : null,
+            phone: item.phone ? item.phone : null,
+            for_what_problem: item.forWhatProblem ? item.forWhatProblem : null,
+            id: item.id,
+          };
+        } else {
+          // @ts-expect-error - TODO: fix this
+          delete item.id;
+          return {
+            provider_name: item.providerName ? item.providerName : null,
+            phone: item.phone ? item.phone : null,
+            for_what_problem: item.forWhatProblem ? item.forWhatProblem : null,
+          };
+        }
+      });
+      const medications = data.medications?.map((item) => {
+        const medication = {
+          medication_name: item.medicationName ? item.medicationName : null,
+          purpose: item.usedToTreat ? item.usedToTreat : null,
+          refill_due: item.refillDue
+            ? DateUtils.changetoISO(item.refillDue)
+            : null,
+          frequency: item.frequency ? item.frequency : null,
           id: item.id,
+          prescribing_doctor: item.prescribingDoctor
+            ? item.prescribingDoctor
+            : null,
+          dosage: item.dosage ? item.dosage : null,
         };
-      } else {
-        // @ts-expect-error - TODO: fix this
-        delete item.id;
-        return {
-          name: item.name ? item.name : null,
-          address: item.address ? item.address : null,
-          home_phone: item.homePhone ? item.homePhone : null,
-          work_phone: item.workPhone ? item.workPhone : null,
-          relationship: item.relationship ? item.relationship : null,
-          email: item.email ? item.email : null,
-        };
-      }
-    });
+        if (medication.id) {
+          return medication;
+        } else {
+          delete medication.id;
+          return medication;
+        }
+      });
 
-    const friendsContact = data.friendsNeighbors?.map((item) => {
-      if (item.id) {
-        return {
-          name: item.name ? item.name : null,
-          address: item.address ? item.address : null,
-          relationship: item.relationship ? item.relationship : null,
-          phone: item.phone ? item.phone : null,
-          help_description: item.helpDescription ? item.helpDescription : null,
-          id: item.id,
-        };
-      } else {
-        // @ts-expect-error - TODO: fix this
-        delete item.id;
-        return {
-          name: item.name ? item.name : null,
-          address: item.address ? item.address : null,
-          relationship: item.relationship ? item.relationship : null,
-          phone: item.phone ? item.phone : null,
-          help_description: item.helpDescription ? item.helpDescription : null,
-        };
-      }
-    });
-
-    const professional_contacts = [
-      {
-        role: "lawyer",
-        name: data.lawyerName ? data.lawyerName : null,
-        phone: data.lawyerPhone ? data.lawyerPhone : null,
-        id: data.lawyerId ? data.lawyerId : null,
-      },
-      {
-        role: "power_of_attorney_finances",
-        name: data.powerOfAttorneyFinancesName
-          ? data.powerOfAttorneyFinancesName
-          : null,
-        phone: data.powerOfAttorneyFinancesPhone
-          ? data.powerOfAttorneyFinancesPhone
-          : null,
-        id: data.powerOfAttorneyFinancesId
-          ? data.powerOfAttorneyFinancesId
-          : null,
-      },
-      {
-        role: "power_of_attorney_healthcare",
-        name: data.powerOfAttorneyHealthcareName
-          ? data.powerOfAttorneyHealthcareName
-          : null,
-        phone: data.powerOfAttorneyHealthcarePhone
-          ? data.powerOfAttorneyHealthcarePhone
-          : null,
-        id: data.powerOfAttorneyHealthcareId
-          ? data.powerOfAttorneyHealthcareId
-          : null,
-      },
-      {
-        role: "tax_professional",
-        name: data.taxProfessionalName ? data.taxProfessionalName : null,
-        phone: data.taxProfessionalPhone ? data.taxProfessionalPhone : null,
-        id: data.taxProfessionalId ? data.taxProfessionalId : null,
-      },
-      {
-        role: "accountant",
-        name: data.accountantName ? data.accountantName : null,
-        phone: data.accountantPhone ? data.accountantPhone : null,
-        id: data.accountantId ? data.accountantId : null,
-      },
-      {
-        role: "financial_advisor",
-        name: data.financialAdvisorName ? data.financialAdvisorName : null,
-        phone: data.financialAdvisorPhone ? data.financialAdvisorPhone : null,
-        id: data.financialAdvisorId ? data.financialAdvisorId : null,
-      },
-      {
-        role: "significant_other_1",
-        name: data.significantOther1Name ? data.significantOther1Name : null,
-        phone: data.significantOther1Phone ? data.significantOther1Phone : null,
-        id: data.significantOther1Id ? data.significantOther1Id : null,
-      },
-      {
-        role: "significant_other_2",
-        name: data.significantOther2Name ? data.significantOther2Name : null,
-        phone: data.significantOther2Phone ? data.significantOther2Phone : null,
-        id: data.significantOther2Id ? data.significantOther2Id : null,
-      },
-    ];
-
-    professional_contacts.forEach((item) => {
-      if (item.id) {
-        return item;
-      } else {
-        // @ts-expect-error - TODO: fix this
-        delete item.id;
-        return item;
-      }
-    });
-
-    const healthcare_providers = data.healthcareProviders?.map((item) => {
-      if (item.id) {
-        return {
-          provider_name: item.providerName ? item.providerName : null,
-          phone: item.phone ? item.phone : null,
-          for_what_problem: item.forWhatProblem ? item.forWhatProblem : null,
-          id: item.id,
-        };
-      } else {
-        // @ts-expect-error - TODO: fix this
-        delete item.id;
-        return {
-          provider_name: item.providerName ? item.providerName : null,
-          phone: item.phone ? item.phone : null,
-          for_what_problem: item.forWhatProblem ? item.forWhatProblem : null,
-        };
-      }
-    });
-    const medications = data.medications?.map((item) => {
-      const medication = {
-        medication_name: item.medicationName ? item.medicationName : null,
-        purpose: item.usedToTreat ? item.usedToTreat : null,
-        refill_due: item.refillDue
-          ? DateUtils.changetoISO(item.refillDue)
-          : null,
-        frequency: item.frequency ? item.frequency : null,
-        id: item.id,
-        prescribing_doctor: item.prescribingDoctor
-          ? item.prescribingDoctor
-          : null,
-        dosage: item.dosage ? item.dosage : null,
+      const postData = {
+        client_info: {
+          first_name: data.careRecipientFirstName
+            ? data.careRecipientFirstName
+            : null,
+          last_name: data.careRecipientLastName
+            ? data.careRecipientLastName
+            : null,
+          preferred_name: data.careRecipientPreferredName
+            ? data.careRecipientPreferredName
+            : null,
+          preferred_hospital: data.hospitalPreference
+            ? data.hospitalPreference
+            : null,
+          address: data.careRecipientAddress ? data.careRecipientAddress : null,
+          city: data.careRecipientCity ? data.careRecipientCity : null,
+          state: data.careRecipientState ? data.careRecipientState : null,
+          zip: data.careRecipientZip ? data.careRecipientZip : null,
+          ssn: data.careRecipientSSN ? data.careRecipientSSN : null,
+          date_of_birth: data.careRecipientBirthdate
+            ? DateUtils.changetoISO(data.careRecipientBirthdate)
+            : null,
+          birth_place: data.careRecipientBirthplace
+            ? data.careRecipientBirthplace
+            : null,
+          phone: data.careRecipientPhone ? data.careRecipientPhone : null,
+          email: data.careRecipientEmail ? data.careRecipientEmail : null,
+          cultural_background: data.careRecipientCulturalBackground
+            ? data.careRecipientCulturalBackground
+            : null,
+          education: data.careRecipientEducation
+            ? data.careRecipientEducation
+            : null,
+          religion: data.careRecipientReligion
+            ? data.careRecipientReligion
+            : null,
+          active_religion_location: data.careRecipientActiveReligionLocation
+            ? data.careRecipientActiveReligionLocation
+            : null,
+          marital_status: data.careRecipientMaritalStatus
+            ? data.careRecipientMaritalStatus
+            : null,
+          date_of_divorce_or_widowhood:
+            data.careRecipientDateOfDivorceOrWidowhood
+              ? DateUtils.changetoISO(
+                  data.careRecipientDateOfDivorceOrWidowhood
+                )
+              : null,
+          loss_impact_description: data.recentLossesImpact
+            ? data.recentLossesImpact
+            : null,
+          dnr: data.dnr ? data.dnr : null,
+          trust: data.trust ? data.trust : null,
+          lifecare: data.lifecare ? data.lifecare : null,
+          will: data.will ? data.will : null,
+          living_will: data.livingWill ? data.livingWill : null,
+          funeral_arrangements: data.funeralArrangements
+            ? data.funeralArrangements
+            : null,
+          cemetery_plot: data.cemeteryPlot ? data.cemeteryPlot : null,
+          monthly_income: data.monthlyIncome ? data.monthlyIncome : null,
+          spouse_income: data.spouseIncome ? data.spouseIncome : null,
+          savings: data.savings ? data.savings : null,
+          other_assets: data.otherAssets ? data.otherAssets : null,
+          financial_problems_description: data.financialProblemsDescription
+            ? data.financialProblemsDescription
+            : null,
+        },
+        short_form: {
+          medicare: data.medicareNumbers ? data.medicareNumbers : null,
+          insurance: data.insuranceProvider ? data.insuranceProvider : null,
+          id_number: data.insurancePolicyNumber
+            ? data.insurancePolicyNumber
+            : null,
+        },
+        insurance: {
+          medicare_a: data.medicareA
+            ? DateUtils.changetoISO(data.medicareA)
+            : null,
+          medicare_b: data.medicareB
+            ? DateUtils.changetoISO(data.medicareB)
+            : null,
+          supplement_plan: data.medicareSupplementPlan
+            ? data.medicareSupplementPlan
+            : null,
+          phone: data.insurancePhone ? data.insurancePhone : null,
+          mental_health_coverage: data.mentalHealthCoverage
+            ? data.mentalHealthCoverage === "true"
+              ? true
+              : false
+            : null,
+          hmo: data.hmo ? data.hmo : null,
+          hmo_policy_number: data.hmoPolicyNumber ? data.hmoPolicyNumber : null,
+          hmo_phone: data.hmoPhone ? data.hmoPhone : null,
+          long_term_care_insurance_name: data.longTermCareInsuranceName
+            ? data.longTermCareInsuranceName
+            : null,
+          long_term_care_insurance_policy_number:
+            data.longTermCareInsurancePolicyNumber
+              ? data.longTermCareInsurancePolicyNumber
+              : null,
+          long_term_care_insurance_phone: data.longTermCareInsurancePhone
+            ? data.longTermCareInsurancePhone
+            : null,
+        },
+        relatives: relatives || [],
+        friends_contact: friendsContact || [],
+        professional_contacts: professional_contacts || [],
+        healthcare_providers: healthcare_providers || [],
+        medications: medications || [],
+        medical_conditions: {
+          problem:
+            data.medicalConditions
+              ?.map((item) => item.problem || null)
+              .join(", ") || null,
+          treatment:
+            data.medicalConditions
+              ?.map((item) => item.treatment || null)
+              .join(", ") || null,
+          medications:
+            data.medicalConditions
+              ?.map((item) => item.medications || null)
+              .join(", ") || null,
+        },
+        medical_info: {
+          last_checkup_date: data.lastCheckupDate
+            ? DateUtils.changetoISO(data.lastCheckupDate)
+            : null,
+          allergies: data.allergies ? data.allergies : null,
+          recent_hospitalization: data.recentHospitalization
+            ? data.recentHospitalization === "true"
+              ? true
+              : false
+            : false,
+          hospital_details: data.hospitalDetails ? data.hospitalDetails : null,
+          support_system_thoughts: data.supportSystemThoughts
+            ? data.supportSystemThoughts
+            : null,
+        },
+        questionnaire: {
+          support_system_rating: data.supportSystemRating
+            ? data.supportSystemRating
+            : null,
+          support_system_problems: data.supportSystemProblems
+            ? data.supportSystemProblems
+            : null,
+          emergency_contacts: data.emergencyContacts
+            ? data.emergencyContacts
+            : null,
+          house_cleaning_agency: data.houseCleaningAgency
+            ? data.houseCleaningAgency
+            : null,
+          house_cleaning_satisfaction: data.houseCleaningSatisfaction
+            ? data.houseCleaningSatisfaction
+            : null,
+          house_cleaning_frequency: data.houseCleaningFrequency
+            ? data.houseCleaningFrequency
+            : null,
+          home_aid_agency: data.homeAidAgency ? data.homeAidAgency : null,
+          home_aid_satisfaction: data.homeAidSatisfaction
+            ? data.homeAidSatisfaction
+            : null,
+          home_aid_frequency: data.homeAidFrequency
+            ? data.homeAidFrequency
+            : null,
+          home_health_agency: data.homeHealthAgency
+            ? data.homeHealthAgency
+            : null,
+          home_health_satisfaction: data.homeHealthSatisfaction
+            ? data.homeHealthSatisfaction
+            : null,
+          home_health_frequency: data.homeHealthFrequency
+            ? data.homeHealthFrequency
+            : null,
+          maintenance_agency: data.maintenanceAgency
+            ? data.maintenanceAgency
+            : null,
+          maintenance_satisfaction: data.maintenanceSatisfaction
+            ? data.maintenanceSatisfaction
+            : null,
+          maintenance_frequency: data.maintenanceFrequency
+            ? data.maintenanceFrequency
+            : null,
+          other_help_agency: data.otherHelpAgency ? data.otherHelpAgency : null,
+          other_help_satisfaction: data.otherHelpSatisfaction
+            ? data.otherHelpSatisfaction
+            : null,
+          other_help_frequency: data.otherHelpFrequency
+            ? data.otherHelpFrequency
+            : null,
+          living_environment_type:
+            data.livingEnvironmentType && data.livingEnvironmentType?.length > 0
+              ? data.livingEnvironmentType
+                ? data.livingEnvironmentType.join(", ")
+                : null
+              : null,
+          home_environment_adequacy: data.homeEnvironmentAdequacy
+            ? data.homeEnvironmentAdequacy
+            : null,
+          problem_areas_daily_living:
+            data.problemAreasDailyLiving &&
+            data.problemAreasDailyLiving.length > 0
+              ? data.problemAreasDailyLiving
+                ? data.problemAreasDailyLiving.join(", ")
+                : null
+              : null,
+          problem_areas_explanation: data.problemAreasExplanation
+            ? data.problemAreasExplanation
+            : null,
+          problems_risks:
+            data.problemsRisks && data.problemsRisks.length > 0
+              ? data.problemsRisks
+                ? data.problemsRisks.join(", ")
+                : null
+              : null,
+          nutrition_concerns: data.nutritionConcerns
+            ? data.nutritionConcerns
+            : null,
+          self_care_capacity_summary: data.selfCareCapacitySummary
+            ? data.selfCareCapacitySummary
+            : null,
+          memory_problems: data.memoryProblems ? data.memoryProblems : null,
+          emotional_health_notes: data.emotionalHealthNotes
+            ? data.emotionalHealthNotes
+            : null,
+          personality_coping: data.personalityCoping
+            ? data.personalityCoping
+            : null,
+          recent_behavior_changes: data.recentBehaviorChanges
+            ? data.recentBehaviorChanges
+            : null,
+          recipient_shares_concerns: data.recipientSharesConcerns
+            ? data.recipientSharesConcerns === "true"
+              ? true
+              : false
+            : null,
+          recipient_shares_concerns_notes: data.recipientSharesConcernsNotes
+            ? data.recipientSharesConcernsNotes
+            : null,
+          emotional_problems_history: data.emotionalProblemsHistory
+            ? data.emotionalProblemsHistory === "true"
+              ? true
+              : false
+            : null,
+          emotional_problems_treatment: data.emotionalProblemsTreatment
+            ? data.emotionalProblemsTreatment === "true"
+              ? true
+              : false
+            : null,
+          emotional_problems_notes: data.emotionalProblemsNotes
+            ? data.emotionalProblemsNotes
+            : null,
+          recent_losses_impact: data.recentLossesImpact
+            ? data.recentLossesImpact
+            : null,
+          social_life_notes: data.socialLifeNotes ? data.socialLifeNotes : null,
+          occupation_profession: data.occupationProfession
+            ? data.occupationProfession
+            : null,
+          retirement_date: data.retirementDate
+            ? DateUtils.changetoISO(data.retirementDate)
+            : null,
+          retirement_adjustment: data.retirementAdjustment
+            ? data.retirementAdjustment
+            : null,
+          major_concerns: data.majorConcernsAndAssistance
+            ? data.majorConcernsAndAssistance
+            : null,
+          areas_accepting_help: data.areasAcceptingHelp
+            ? data.areasAcceptingHelp
+            : null,
+        },
       };
-      if (medication.id) {
-        return medication;
-      } else {
-        delete medication.id;
-        return medication;
-      }
-    });
 
-    const postData = {
-      client_info: {
-        first_name: data.careRecipientFirstName
-          ? data.careRecipientFirstName
-          : null,
-        last_name: data.careRecipientLastName
-          ? data.careRecipientLastName
-          : null,
-        preferred_name: data.careRecipientPreferredName
-          ? data.careRecipientPreferredName
-          : null,
-        preferred_hospital: data.hospitalPreference
-          ? data.hospitalPreference
-          : null,
-        address: data.careRecipientAddress ? data.careRecipientAddress : null,
-        city: data.careRecipientCity ? data.careRecipientCity : null,
-        state: data.careRecipientState ? data.careRecipientState : null,
-        zip: data.careRecipientZip ? data.careRecipientZip : null,
-        ssn: data.careRecipientSSN ? data.careRecipientSSN : null,
-        date_of_birth: data.careRecipientBirthdate
-          ? DateUtils.changetoISO(data.careRecipientBirthdate)
-          : null,
-        birth_place: data.careRecipientBirthplace
-          ? data.careRecipientBirthplace
-          : null,
-        phone: data.careRecipientPhone ? data.careRecipientPhone : null,
-        email: data.careRecipientEmail ? data.careRecipientEmail : null,
-        cultural_background: data.careRecipientCulturalBackground
-          ? data.careRecipientCulturalBackground
-          : null,
-        education: data.careRecipientEducation
-          ? data.careRecipientEducation
-          : null,
-        religion: data.careRecipientReligion
-          ? data.careRecipientReligion
-          : null,
-        active_religion_location: data.careRecipientActiveReligionLocation
-          ? data.careRecipientActiveReligionLocation
-          : null,
-        marital_status: data.careRecipientMaritalStatus
-          ? data.careRecipientMaritalStatus
-          : null,
-        date_of_divorce_or_widowhood: data.careRecipientDateOfDivorceOrWidowhood
-          ? DateUtils.changetoISO(data.careRecipientDateOfDivorceOrWidowhood)
-          : null,
-        loss_impact_description: data.recentLossesImpact
-          ? data.recentLossesImpact
-          : null,
-        dnr: data.dnr ? data.dnr : null,
-        trust: data.trust ? data.trust : null,
-        lifecare: data.lifecare ? data.lifecare : null,
-        will: data.will ? data.will : null,
-        living_will: data.livingWill ? data.livingWill : null,
-        funeral_arrangements: data.funeralArrangements
-          ? data.funeralArrangements
-          : null,
-        cemetery_plot: data.cemeteryPlot ? data.cemeteryPlot : null,
-        monthly_income: data.monthlyIncome ? data.monthlyIncome : null,
-        spouse_income: data.spouseIncome ? data.spouseIncome : null,
-        savings: data.savings ? data.savings : null,
-        other_assets: data.otherAssets ? data.otherAssets : null,
-        financial_problems_description: data.financialProblemsDescription
-          ? data.financialProblemsDescription
-          : null,
-      },
-      short_form: {
-        medicare: data.medicareNumbers ? data.medicareNumbers : null,
-        insurance: data.insuranceProvider ? data.insuranceProvider : null,
-        id_number: data.insurancePolicyNumber
-          ? data.insurancePolicyNumber
-          : null,
-      },
-      insurance: {
-        medicare_a: data.medicareA
-          ? DateUtils.changetoISO(data.medicareA)
-          : null,
-        medicare_b: data.medicareB
-          ? DateUtils.changetoISO(data.medicareB)
-          : null,
-        supplement_plan: data.medicareSupplementPlan
-          ? data.medicareSupplementPlan
-          : null,
-        phone: data.insurancePhone ? data.insurancePhone : null,
-        mental_health_coverage: data.mentalHealthCoverage
-          ? data.mentalHealthCoverage === "true"
-            ? true
-            : false
-          : null,
-        hmo: data.hmo ? data.hmo : null,
-        hmo_policy_number: data.hmoPolicyNumber ? data.hmoPolicyNumber : null,
-        hmo_phone: data.hmoPhone ? data.hmoPhone : null,
-        long_term_care_insurance_name: data.longTermCareInsuranceName
-          ? data.longTermCareInsuranceName
-          : null,
-        long_term_care_insurance_policy_number:
-          data.longTermCareInsurancePolicyNumber
-            ? data.longTermCareInsurancePolicyNumber
-            : null,
-        long_term_care_insurance_phone: data.longTermCareInsurancePhone
-          ? data.longTermCareInsurancePhone
-          : null,
-      },
-      relatives: relatives || [],
-      friends_contact: friendsContact || [],
-      professional_contacts: professional_contacts || [],
-      healthcare_providers: healthcare_providers || [],
-      medications: medications || [],
-      medical_conditions: {
-        problem:
-          data.medicalConditions
-            ?.map((item) => item.problem || null)
-            .join(", ") || null,
-        treatment:
-          data.medicalConditions
-            ?.map((item) => item.treatment || null)
-            .join(", ") || null,
-        medications:
-          data.medicalConditions
-            ?.map((item) => item.medications || null)
-            .join(", ") || null,
-      },
-      medical_info: {
-        last_checkup_date: data.lastCheckupDate
-          ? DateUtils.changetoISO(data.lastCheckupDate)
-          : null,
-        allergies: data.allergies ? data.allergies : null,
-        recent_hospitalization: data.recentHospitalization
-          ? data.recentHospitalization === "true"
-            ? true
-            : false
-          : false,
-        hospital_details: data.hospitalDetails ? data.hospitalDetails : null,
-        support_system_thoughts: data.supportSystemThoughts
-          ? data.supportSystemThoughts
-          : null,
-      },
-      questionnaire: {
-        support_system_rating: data.supportSystemRating
-          ? data.supportSystemRating
-          : null,
-        support_system_problems: data.supportSystemProblems
-          ? data.supportSystemProblems
-          : null,
-        emergency_contacts: data.emergencyContacts
-          ? data.emergencyContacts
-          : null,
-        house_cleaning_agency: data.houseCleaningAgency
-          ? data.houseCleaningAgency
-          : null,
-        house_cleaning_satisfaction: data.houseCleaningSatisfaction
-          ? data.houseCleaningSatisfaction
-          : null,
-        house_cleaning_frequency: data.houseCleaningFrequency
-          ? data.houseCleaningFrequency
-          : null,
-        home_aid_agency: data.homeAidAgency ? data.homeAidAgency : null,
-        home_aid_satisfaction: data.homeAidSatisfaction
-          ? data.homeAidSatisfaction
-          : null,
-        home_aid_frequency: data.homeAidFrequency
-          ? data.homeAidFrequency
-          : null,
-        home_health_agency: data.homeHealthAgency
-          ? data.homeHealthAgency
-          : null,
-        home_health_satisfaction: data.homeHealthSatisfaction
-          ? data.homeHealthSatisfaction
-          : null,
-        home_health_frequency: data.homeHealthFrequency
-          ? data.homeHealthFrequency
-          : null,
-        maintenance_agency: data.maintenanceAgency
-          ? data.maintenanceAgency
-          : null,
-        maintenance_satisfaction: data.maintenanceSatisfaction
-          ? data.maintenanceSatisfaction
-          : null,
-        maintenance_frequency: data.maintenanceFrequency
-          ? data.maintenanceFrequency
-          : null,
-        other_help_agency: data.otherHelpAgency ? data.otherHelpAgency : null,
-        other_help_satisfaction: data.otherHelpSatisfaction
-          ? data.otherHelpSatisfaction
-          : null,
-        other_help_frequency: data.otherHelpFrequency
-          ? data.otherHelpFrequency
-          : null,
-        living_environment_type:
-          data.livingEnvironmentType && data.livingEnvironmentType?.length > 0
-            ? data.livingEnvironmentType
-              ? data.livingEnvironmentType.join(", ")
-              : null
-            : null,
-        home_environment_adequacy: data.homeEnvironmentAdequacy
-          ? data.homeEnvironmentAdequacy
-          : null,
-        problem_areas_daily_living:
-          data.problemAreasDailyLiving &&
-          data.problemAreasDailyLiving.length > 0
-            ? data.problemAreasDailyLiving
-              ? data.problemAreasDailyLiving.join(", ")
-              : null
-            : null,
-        problem_areas_explanation: data.problemAreasExplanation
-          ? data.problemAreasExplanation
-          : null,
-        problems_risks:
-          data.problemsRisks && data.problemsRisks.length > 0
-            ? data.problemsRisks
-              ? data.problemsRisks.join(", ")
-              : null
-            : null,
-        nutrition_concerns: data.nutritionConcerns
-          ? data.nutritionConcerns
-          : null,
-        self_care_capacity_summary: data.selfCareCapacitySummary
-          ? data.selfCareCapacitySummary
-          : null,
-        memory_problems: data.memoryProblems ? data.memoryProblems : null,
-        emotional_health_notes: data.emotionalHealthNotes
-          ? data.emotionalHealthNotes
-          : null,
-        personality_coping: data.personalityCoping
-          ? data.personalityCoping
-          : null,
-        recent_behavior_changes: data.recentBehaviorChanges
-          ? data.recentBehaviorChanges
-          : null,
-        recipient_shares_concerns: data.recipientSharesConcerns
-          ? data.recipientSharesConcerns === "true"
-            ? true
-            : false
-          : null,
-        recipient_shares_concerns_notes: data.recipientSharesConcernsNotes
-          ? data.recipientSharesConcernsNotes
-          : null,
-        emotional_problems_history: data.emotionalProblemsHistory
-          ? data.emotionalProblemsHistory === "true"
-            ? true
-            : false
-          : null,
-        emotional_problems_treatment: data.emotionalProblemsTreatment
-          ? data.emotionalProblemsTreatment === "true"
-            ? true
-            : false
-          : null,
-        emotional_problems_notes: data.emotionalProblemsNotes
-          ? data.emotionalProblemsNotes
-          : null,
-        recent_losses_impact: data.recentLossesImpact
-          ? data.recentLossesImpact
-          : null,
-        social_life_notes: data.socialLifeNotes ? data.socialLifeNotes : null,
-        occupation_profession: data.occupationProfession
-          ? data.occupationProfession
-          : null,
-        retirement_date: data.retirementDate
-          ? DateUtils.changetoISO(data.retirementDate)
-          : null,
-        retirement_adjustment: data.retirementAdjustment
-          ? data.retirementAdjustment
-          : null,
-        major_concerns: data.majorConcernsAndAssistance
-          ? data.majorConcernsAndAssistance
-          : null,
-        areas_accepting_help: data.areasAcceptingHelp
-          ? data.areasAcceptingHelp
-          : null,
-      },
-    };
+      postCareRecipientQuestionaireMutation.mutate({
+        clientId: clientId as string,
+        data: postData,
+      });
+    },
+    [postCareRecipientQuestionaireMutation, clientId]
+  );
 
-    postCareRecipientQuestionaireMutation.mutate({
-      clientId: clientId as string,
-      data: postData,
-    });
-  };
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    // @ts-expect-error //TODO fix this
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   return isLoadingData ? (
     <div className="flex justify-center items-center h-screen">

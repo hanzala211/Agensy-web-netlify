@@ -70,6 +70,7 @@ export * from "./clients/AddAccessModal";
 export * from "./templates/TemplateCard";
 export * from "./appointments/AppointmentCard";
 export * from "./appointments/AddAppointmentModal";
+export * from "./appointments/AppointmentDetailsModal";
 export * from "./skeletons/AppointmentsSkeleton";
 export * from "./common/AntdBadge";
 export * from "./common/StatefulDatePicker";

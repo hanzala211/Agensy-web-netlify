@@ -1,17 +1,18 @@
 import { Calendar, Views, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   AppointmentsCalendarCard,
   CalendarHeader,
   createCalendarComponents,
+  AppointmentDetailsModal,
 } from "@agensy/components";
 import { useAppointmentsContext } from "@agensy/context";
 import { enUS } from "date-fns/locale";
 import { useCalendarState } from "@agensy/hooks";
 import { CalendarUtils } from "@agensy/utils";
-import type { ViewMode } from "@agensy/types";
+import type { ViewMode, Appointment } from "@agensy/types";
 
 const localizer = dateFnsLocalizer({
   format,
@@ -26,6 +27,10 @@ const localizer = dateFnsLocalizer({
 export const AppointmentsCalendar: React.FC = () => {
   const { appointments, setIsAddAppointmentModalOpen } =
     useAppointmentsContext();
+
+  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
 
   const {
     currentDate,
@@ -72,8 +77,16 @@ export const AppointmentsCalendar: React.FC = () => {
   }, [filteredAppointments]);
 
   const components = useMemo(
-    () => createCalendarComponents(filteredAppointments, viewMode),
-    [filteredAppointments, viewMode, handleSelectSlot, clientFilter, typeFilter]
+    () =>
+      createCalendarComponents(
+        filteredAppointments,
+        viewMode,
+        (appointment) => {
+          setSelectedAppointment(appointment);
+          setIsAppointmentModalOpen(true);
+        }
+      ),
+    [filteredAppointments, viewMode]
   );
 
   const handlePrevious = () => {
@@ -82,6 +95,17 @@ export const AppointmentsCalendar: React.FC = () => {
 
   const handleNext = () => {
     setCurrentDate(CalendarUtils.getNextDate(currentDate, viewMode));
+  };
+
+  const handleEventClick = (event: { appointment: Appointment }) => {
+    console.log("Calendar event clicked:", event);
+    setSelectedAppointment(event.appointment);
+    setIsAppointmentModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAppointmentModalOpen(false);
+    setSelectedAppointment(null);
   };
 
   return (
@@ -113,6 +137,7 @@ export const AppointmentsCalendar: React.FC = () => {
           toolbar={false}
           selectable={true} // it is used to enable selection
           onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleEventClick}
           step={60}
           timeslots={1}
           min={new Date(0, 0, 0, 0, 0, 0)} // it is used to show starting of time in day view
@@ -124,6 +149,12 @@ export const AppointmentsCalendar: React.FC = () => {
         currentDate={currentDate}
         selectedAppointments={selectedAppointments}
         setIsAddAppointmentModalOpen={setIsAddAppointmentModalOpen}
+      />
+
+      <AppointmentDetailsModal
+        isOpen={isAppointmentModalOpen}
+        onClose={handleCloseModal}
+        appointment={selectedAppointment}
       />
     </div>
   );

@@ -68,6 +68,12 @@ export interface ClientContextType {
   setOcrResult: React.Dispatch<React.SetStateAction<OCRField[]>>;
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: React.Dispatch<React.SetStateAction<boolean>>;
+  shouldDownloadAfterSave: boolean;
+  setShouldDownloadAfterSave: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSaveAndDownload?: () => void;
+  setHandleSaveAndDownload: React.Dispatch<
+    React.SetStateAction<(() => void) | undefined>
+  >;
 }
 
 export interface DocumentContextType {

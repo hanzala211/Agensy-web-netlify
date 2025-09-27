@@ -10,14 +10,15 @@ import {
 import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import {
   labsTrackerFormSchema,
+  type Client,
   type LabsTrackerFormData,
   type OpenedFileData,
 } from "@agensy/types";
 import { LabsTrackerCard } from "./LabsTrackerCard";
 import { useGetLabsTracker, usePostLabsTracker } from "@agensy/api";
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
-import { DateUtils, toast } from "@agensy/utils";
+import { useEffect, useCallback } from "react";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 
@@ -30,7 +31,13 @@ const defaultValues: LabsTrackerFormData = {
 
 export const LabsTracker = () => {
   const params = useParams();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const {
     data: labsTrackerData,
     isFetching: isLoadingLabs,
@@ -48,7 +55,13 @@ export const LabsTracker = () => {
     defaultValues,
   });
   const { handleFilterPermission } = useAuthContext();
-  // Watch form changes to detect unsaved changes
+  const client = queryClient.getQueryData(["client", params.clientId]) as
+    | Client
+    | undefined;
+  const providers = client?.healthcareProviders.map((item) => ({
+    label: `${item.provider_name}`,
+    value: item.id,
+  }));
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -106,6 +119,12 @@ export const LabsTracker = () => {
       );
       reset(formData);
 
+      formData?.labs?.forEach((item) => {
+        item.doctorName = providers?.find(
+          (provider) => provider.value === item.doctorName
+        )?.label;
+      });
+
       setOpenedFileData({
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
@@ -120,8 +139,20 @@ export const LabsTracker = () => {
           })
         ),
       } as unknown as OpenedFileData);
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postLabsTracker.status === "error") {
       toast.error("Error Occurred", String(postLabsTracker.error));
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postLabsTracker.status, setHasUnsavedChanges]);
 
@@ -150,7 +181,10 @@ export const LabsTracker = () => {
           const item = {
             id: lab.id ? lab.id : null,
             date: lab.date ? DateUtils.changetoISO(lab.date) : null,
-            doctor_name: lab.doctorName ? lab.doctorName : null,
+            doctor_name: lab.doctorName
+              ? providers?.find((provider) => provider.value === lab.doctorName)
+                  ?.label
+              : null,
             type: lab.type ? lab.type : null,
             provider_company: lab.providerCompanyUsed
               ? lab.providerCompanyUsed
@@ -191,6 +225,12 @@ export const LabsTracker = () => {
       );
       reset(formData);
 
+      formData?.labs?.forEach((item) => {
+        item.doctorName = providers?.find(
+          (provider) => provider.value === item.doctorName
+        )?.label;
+      });
+
       setOpenedFileData({
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
@@ -208,21 +248,35 @@ export const LabsTracker = () => {
     refetch();
   }, []);
 
-  const onSubmit = (data: LabsTrackerFormData) => {
-    postLabsTracker.mutate({
-      data: {
-        labs_tests_imaging_trackers: mapFormDataToVitals(data),
-        client_info: {
-          first_name: data.firstName ? data.firstName : null,
-          last_name: data.lastName ? data.lastName : null,
-          date_of_birth: data.dateOfBirth
-            ? DateUtils.changetoISO(data.dateOfBirth)
-            : null,
+  const onSubmit = useCallback(
+    (data: LabsTrackerFormData) => {
+      postLabsTracker.mutate({
+        data: {
+          labs_tests_imaging_trackers: mapFormDataToVitals(data),
+          client_info: {
+            first_name: data.firstName ? data.firstName : null,
+            last_name: data.lastName ? data.lastName : null,
+            date_of_birth: data.dateOfBirth
+              ? DateUtils.changetoISO(data.dateOfBirth)
+              : null,
+          },
         },
-      },
-      clientId: params.clientId!,
-    });
-  };
+        clientId: params.clientId!,
+      });
+    },
+    [postLabsTracker, params.clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   if (isLoadingLabs)
     return (
@@ -274,6 +328,9 @@ export const LabsTracker = () => {
             ) : (
               fields.map((field, index) => (
                 <LabsTrackerCard
+                  providers={
+                    providers as unknown as { label: string; value: string }[]
+                  }
                   key={field.id}
                   register={register}
                   errors={errors}

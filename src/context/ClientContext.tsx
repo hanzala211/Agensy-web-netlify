@@ -26,6 +26,11 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
   );
   const [ocrResult, setOcrResult] = useState<OCRField[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+  const [shouldDownloadAfterSave, setShouldDownloadAfterSave] =
+    useState<boolean>(false);
+  const [handleSaveAndDownload, setHandleSaveAndDownload] = useState<
+    (() => void) | undefined
+  >(undefined);
 
   const addClientContact = (contact: ClientContact) => {
     setSelectedClient((prev) => {
@@ -264,6 +269,10 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
         setOcrResult,
         hasUnsavedChanges,
         setHasUnsavedChanges,
+        shouldDownloadAfterSave,
+        setShouldDownloadAfterSave,
+        handleSaveAndDownload,
+        setHandleSaveAndDownload,
       }}
     >
       {children}

@@ -7,15 +7,24 @@ import { ROUTES } from "@agensy/constants";
 
 const getFormNavigationPath = (formType: string, subtypeId?: string) => {
   const formTypeMap: Record<string, { folder: string; form: string }> = {
-    face_sheet_short: { folder: "medical", form: "face-sheet-short" },
-    face_sheet_long: { folder: "medical", form: "face-sheet-long" },
-    health_history: { folder: "medical", form: "health-history-form-medical" },
+    face_sheet_short: {
+      folder: "essential-health-information",
+      form: "face-sheet-short",
+    },
+    face_sheet_long: {
+      folder: "essential-health-information",
+      form: "face-sheet-long",
+    },
+    health_history: {
+      folder: "essential-health-information",
+      form: "health-history-form-medical",
+    },
     care_recipient_questionnaire: {
       folder: "assessment",
       form: "care-recipient-questionnaire",
     },
     caregiver_information_sheet: {
-      folder: "caregiver",
+      folder: "guides-checklists",
       form: "caregiver-information",
     },
     initial_care_plan_assessment: {
@@ -27,42 +36,54 @@ const getFormNavigationPath = (formType: string, subtypeId?: string) => {
       form: "comprehensive-care-plan-assessment",
     },
     essential_document: {
-      folder: "checklists",
+      folder: "guides-checklists",
       form: "essential-document-for-aging",
     },
     labs_test_imaging_tracker: {
-      folder: "records-trackers",
+      folder: "essential-health-information",
       form: "labs-test-tracker",
     },
-    burial_instructions: { folder: "checklists", form: "burial-instructions" },
+    burial_instructions: {
+      folder: "essential-documents-for-aging",
+      form: "burial-instructions",
+    },
     in_patient_stay_notes: {
-      folder: "records-trackers",
+      folder: "essential-health-information",
       form: "in-patient-stay-notes",
     },
     comprehensive_medication_supplement_list: {
-      folder: "records-trackers",
+      folder: "essential-health-information",
       form: "comprehensive-medication-list",
     },
     personal_info_password_manager: {
-      folder: "records-trackers",
+      folder: "essential-documents-for-aging",
       form: "personal-info",
     },
     important_people: {
-      folder: "records-trackers",
+      folder: "essential-documents-for-aging",
       form: "important-people-in-life",
     },
-    start_of_care: { folder: "start-of-care", form: "start-of-care-checklist" },
-    hospitalization: { folder: "checklists", form: "hospital-checklist" },
-    move_in: { folder: "checklists", form: "move-in" },
+    start_of_care: {
+      folder: "essential-health-information",
+      form: "start-of-care-checklist",
+    },
+    hospitalization: {
+      folder: "guides-checklists",
+      form: "hospital-checklist",
+    },
+    move_in: { folder: "guides-checklists", form: "move-in-checklist" },
     next_step_after_death: {
-      folder: "checklists",
+      folder: "guides-checklists",
       form: "next-steps-after-death",
     },
-    vitals_tracker: { folder: "records-trackers", form: "vitals-tracker" },
-    care_plan: { folder: "care-plans", form: "care-plan-checklists" },
+    vitals_tracker: {
+      folder: "essential-health-information",
+      form: "vitals-tracker",
+    },
+    care_plan: { folder: "guides-checklists", form: "care-plan-checklists" },
     medical_template: {
-      folder: "medical",
-      form: "medical-appointment-template",
+      folder: "guides-checklists",
+      form: "medical-appointment-templates",
     },
   };
 
@@ -70,8 +91,8 @@ const getFormNavigationPath = (formType: string, subtypeId?: string) => {
 
   if (formType === "medical_template" && subtypeId) {
     return {
-      ...path,
-      form: `medical-appointment-template_${subtypeId}`,
+      folder: "guides-checklists",
+      form: `medical-appointment-templates/medical-appointment-template_${subtypeId}`,
     };
   }
 
@@ -91,7 +112,11 @@ export const LogsCard = (log: LogEntry) => {
 
   const handleFormClick = () => {
     const formPath = getFormNavigationPath(log.form_type, log.subtype_id);
-    if (formPath && clientId) {
+    if (formPath && clientId && "folder" in formPath) {
+      if (formPath.form.includes("/")) {
+        const [parentFolder, formSlug] = formPath.form.split("/");
+        return `/clients/${clientId}/${ROUTES.agensyFormsFolders}/${formPath.folder}/${parentFolder}/${formSlug}`;
+      }
       return `/clients/${clientId}/${ROUTES.agensyFormsFolders}/${formPath.folder}/${formPath.form}`;
     }
   };

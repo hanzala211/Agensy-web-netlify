@@ -3,6 +3,7 @@ import {
   Input,
   TextArea,
   TertiaryButton,
+  Select,
 } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import type { LabsTrackerFormData } from "@agensy/types";
@@ -15,6 +16,7 @@ interface LabsTrackerCardProps {
   control: Control<LabsTrackerFormData>;
   onRemove: () => void;
   canRemove: boolean;
+  providers: { label: string; value: string }[];
 }
 
 export const LabsTrackerCard = ({
@@ -24,6 +26,7 @@ export const LabsTrackerCard = ({
   control,
   onRemove,
   canRemove,
+  providers = [],
 }: LabsTrackerCardProps) => {
   return (
     <div key={index} className="p-6 border border-gray-200 rounded-lg bg-white">
@@ -61,14 +64,12 @@ export const LabsTrackerCard = ({
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Doctor's Name
-          </label>
-          <Input
-            register={register(`labs.${index}.doctorName`)}
-            placeholder="Enter doctor's name"
-            inputClassname="w-full"
-            error={errors.labs?.[index]?.doctorName?.message as string}
+          <Select
+            label="Doctor's Name"
+            name={`labs.${index}.doctorName`}
+            control={control}
+            data={providers}
+            labelOption="Select Doctor's Name"
           />
         </div>
       </div>

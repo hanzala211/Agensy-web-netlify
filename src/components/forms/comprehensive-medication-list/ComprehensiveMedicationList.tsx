@@ -21,8 +21,8 @@ import {
   useGetComprehensiveMedicationList,
   usePostComprehensiveMedicationList,
 } from "@agensy/api";
-import { useEffect } from "react";
-import { DateUtils, toast } from "@agensy/utils";
+import { useEffect, useCallback } from "react";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { AntdBadge } from "@agensy/components";
@@ -37,7 +37,13 @@ export const ComprehensiveMedicationList = () => {
   } = useGetComprehensiveMedicationList(params.clientId!);
   const postComprehensiveMedicationList = usePostComprehensiveMedicationList();
   const queryClient = useQueryClient();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
 
   const clientData = queryClient.getQueryData(["client", params.clientId]) as
     | Client
@@ -123,11 +129,23 @@ export const ComprehensiveMedicationList = () => {
           comprehensiveMedicationList?.last_update?.updatedAt
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postComprehensiveMedicationList.status === "error") {
       toast.error(
         "Error Occurred",
         String(postComprehensiveMedicationList.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postComprehensiveMedicationList.status, setHasUnsavedChanges]);
 
@@ -211,57 +229,71 @@ export const ComprehensiveMedicationList = () => {
     }
   }, [comprehensiveMedicationList]);
 
-  const onSubmit = (data: ComprehensiveMedicationListFormData) => {
-    console.log("Form data:", data);
+  const onSubmit = useCallback(
+    (data: ComprehensiveMedicationListFormData) => {
+      console.log("Form data:", data);
 
-    const medications = data.medications?.map((item) => {
-      const medication = {
-        refill_due: item.refillDue
-          ? DateUtils.changetoISO(item.refillDue)
-          : null,
-        purpose: item.usedToTreat ? item.usedToTreat : null,
-        medication_name: item.medicationName ? item.medicationName : null,
-        dosage: item.dosage ? item.dosage : null,
-        prescribing_doctor: item.prescriber ? item.prescriber : null,
-        client_medication_id: item?.medicationId,
-        frequency: item.frequency ? item.frequency : null,
-        side_effects: item.sideEffects ? item.sideEffects : null,
-        start_date: item.startDate
-          ? DateUtils.changetoISO(item.startDate)
-          : null,
-        end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
-        pharmacy: item.pharmacy ? item.pharmacy : null,
+      const medications = data.medications?.map((item) => {
+        const medication = {
+          refill_due: item.refillDue
+            ? DateUtils.changetoISO(item.refillDue)
+            : null,
+          purpose: item.usedToTreat ? item.usedToTreat : null,
+          medication_name: item.medicationName ? item.medicationName : null,
+          dosage: item.dosage ? item.dosage : null,
+          prescribing_doctor: item.prescriber ? item.prescriber : null,
+          client_medication_id: item?.medicationId,
+          frequency: item.frequency ? item.frequency : null,
+          side_effects: item.sideEffects ? item.sideEffects : null,
+          start_date: item.startDate
+            ? DateUtils.changetoISO(item.startDate)
+            : null,
+          end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
+          pharmacy: item.pharmacy ? item.pharmacy : null,
+        };
+        if (item.medicationId) {
+          return medication;
+        } else {
+          delete medication.client_medication_id;
+          return medication;
+        }
+      });
+
+      const postData = {
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+        },
+        client_medical: {
+          allergies: data.allergies
+            ? data.allergies.map((item) => item.allergen).join(", ").length > 0
+              ? data.allergies.map((item) => item.allergen).join(", ")
+              : null
+            : null,
+        },
+        medications: medications || [],
       };
-      if (item.medicationId) {
-        return medication;
-      } else {
-        delete medication.client_medication_id;
-        return medication;
-      }
-    });
+      postComprehensiveMedicationList.mutate({
+        clientId: params.clientId!,
+        data: postData,
+      });
+    },
+    [postComprehensiveMedicationList, params.clientId]
+  );
 
-    const postData = {
-      client_info: {
-        first_name: data.firstName ? data.firstName : null,
-        last_name: data.lastName ? data.lastName : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-      },
-      client_medical: {
-        allergies: data.allergies
-          ? data.allergies.map((item) => item.allergen).join(", ").length > 0
-            ? data.allergies.map((item) => item.allergen).join(", ")
-            : null
-          : null,
-      },
-      medications: medications || [],
-    };
-    postComprehensiveMedicationList.mutate({
-      clientId: params.clientId!,
-      data: postData,
-    });
-  };
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   if (isLoadingChecklist)
     return (

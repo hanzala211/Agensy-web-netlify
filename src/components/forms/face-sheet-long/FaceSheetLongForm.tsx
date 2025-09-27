@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CommonLoader, PrimaryButton } from "@agensy/components";
@@ -122,7 +122,6 @@ const defaultValues = {
   mentalStatusText: "",
 };
 
-// Add this helper function at the top of the component (after the imports)
 const createSafeOpenedFileData = (
   formData: FaceSheetLongFormData,
   lastUpdate?: string
@@ -141,8 +140,15 @@ export const FaceSheetLongForm: React.FC = () => {
   const params = useParams();
   const { handleFilterPermission } = useAuthContext();
   const queryClient = useQueryClient();
-  const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
-    useClientContext();
+  const {
+    setOpenedFileData,
+    ocrResult,
+    setOcrResult,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const { clientId } = useParams();
   const postFaceSheetLongFormMutation = usePostFaceSheetLongFormMutation();
   const {
@@ -194,22 +200,35 @@ export const FaceSheetLongForm: React.FC = () => {
         "Your client's medical information has been saved and is now up to date."
       );
       queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
-      setHasUnsavedChanges(false);
+
+      const currentValues = getValues();
+      reset(currentValues, { keepDefaultValues: false });
+
       setOpenedFileData(
         createSafeOpenedFileData(
-          getValues(),
+          currentValues,
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postFaceSheetLongFormMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postFaceSheetLongFormMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postFaceSheetLongFormMutation.status]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -529,268 +548,286 @@ export const FaceSheetLongForm: React.FC = () => {
     );
   }, [faceSheetLongData]);
 
-  const onSubmit = (data: FaceSheetLongFormData) => {
-    const medications = data.medications?.map((item) => {
-      const medication = {
-        purpose: item.usedToTreat ? item.usedToTreat : null,
-        medication_name: item.medicationName ? item.medicationName : null,
-        dosage: item.dose ? item.dose : null,
-        id: item?.id,
-        frequency: item.frequency ? item.frequency : null,
-        prescribing_doctor: item.prescriber ? item.prescriber : null,
-        refill_due: item.refillDue
-          ? DateUtils.changetoISO(item.refillDue)
-          : null,
+  const onSubmit = useCallback(
+    (data: FaceSheetLongFormData) => {
+      const medications = data.medications?.map((item) => {
+        const medication = {
+          purpose: item.usedToTreat ? item.usedToTreat : null,
+          medication_name: item.medicationName ? item.medicationName : null,
+          dosage: item.dose ? item.dose : null,
+          id: item?.id,
+          frequency: item.frequency ? item.frequency : null,
+          prescribing_doctor: item.prescriber ? item.prescriber : null,
+          refill_due: item.refillDue
+            ? DateUtils.changetoISO(item.refillDue)
+            : null,
+        };
+        if (item.id) {
+          return medication;
+        } else {
+          delete medication.id;
+          return medication;
+        }
+      });
+      const providers = data.providers?.map((item) => {
+        const provider = {
+          provider_type: item?.providerType,
+          provider_name: item.providerName ? item.providerName : null,
+          specialty: item.specialty ? item.specialty : null,
+          address: item.address ? item.address : null,
+          phone: item.phone ? item.phone : null,
+          last_visit: item.lastVisit
+            ? DateUtils.changetoISO(item.lastVisit)
+            : null,
+          next_visit: item.nextVisit
+            ? DateUtils.changetoISO(item.nextVisit)
+            : null,
+          id: item.id,
+        };
+        if (provider.provider_type?.length === 0) {
+          delete provider.provider_type;
+        }
+        if (item.id) {
+          return provider;
+        } else {
+          delete provider.id;
+          delete provider.provider_type;
+          return provider;
+        }
+      });
+      const bloodwork = data.bloodwork?.map((item) => {
+        const bloodwork = {
+          name: item.test ? item.test : null,
+          date: item.date ? DateUtils.changetoISO(item.date) : null,
+          results: item.results ? item.results : null,
+          ordered_by: item.orderedBy ? item.orderedBy : null,
+          repeat: item.repeat ? item.repeat : null,
+          id: item.id,
+        };
+        if (item.id) {
+          return bloodwork;
+        } else {
+          delete bloodwork.id;
+          return bloodwork;
+        }
+      });
+
+      const vaccinations = data.vaccinations?.map((item) => {
+        const vaccination = {
+          name: item.vaccineName ? item.vaccineName : null,
+          date: item.date ? DateUtils.changetoISO(item.date) : null,
+          next_vaccine: item.nextVaccine
+            ? DateUtils.changetoISO(item.nextVaccine)
+            : null,
+          id: item.id,
+        };
+        if (item.id) {
+          return vaccination;
+        } else {
+          delete vaccination.id;
+          return vaccination;
+        }
+      });
+      const medicalConditions = data.medicalConditions?.map((item) => {
+        const medicalCondition = {
+          condition: item.condition ? item.condition : null,
+          onset_date: item.onsetDate
+            ? DateUtils.changeMonthYearToISO(item.onsetDate)
+            : null,
+          notes: item.notes ? item.notes : null,
+          id: item.id,
+        };
+        if (item.id) {
+          return medicalCondition;
+        } else {
+          delete medicalCondition.id;
+          return medicalCondition;
+        }
+      });
+      const postData = {
+        client_info: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          address: data.address ? data.address : null,
+          preferred_name: data.preferredName ? data.preferredName : null,
+          ssn: data.ssn ? data.ssn : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+          phone: data.phoneNumber ? data.phoneNumber : null,
+          preferred_hospital: data.hospitalPreference
+            ? data.hospitalPreference
+            : null,
+          hospital_address: data.hospitalAddress ? data.hospitalAddress : null,
+          hospital_phone: data.hospitalPhoneNumber
+            ? data.hospitalPhoneNumber
+            : null,
+          pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
+          pharmacy_address: data.pharmacyAddress ? data.pharmacyAddress : null,
+          pharmacy_phone: data.pharmacyPhone ? data.pharmacyPhone : null,
+          pharmacy_fax: data.pharmacyFax ? data.pharmacyFax : null,
+          code_status: data.codeStatus ? data.codeStatus : null,
+          advance_directive: data.advanceDirective
+            ? data.advanceDirective
+            : null,
+          race: data.race ? data.race : null,
+          last_care_plan_date: data.dateOfLastCarePlan
+            ? DateUtils.changetoISO(data.dateOfLastCarePlan)
+            : null,
+          gender: data.gender
+            ? GENDER_OPTIONS.find((gender) => gender.value === data.gender)
+                ?.value
+            : null,
+          marital_status: data.maritalStatus
+            ? MARITAL_STATUS_OPTIONS.find(
+                (maritalStatus) => maritalStatus.value === data.maritalStatus
+              )?.value
+            : null,
+          language: data.language
+            ? LANGUAGE_OPTIONS.find(
+                (language) => language.value === data.language
+              )?.value
+            : null,
+          living_situation: data.livingSituation
+            ? LIVING_SITUATION_OPTIONS.find(
+                (livingSituation) =>
+                  livingSituation.value === data.livingSituation
+              )?.value
+            : null,
+        },
+
+        medical_info: {
+          allergies: StringUtils.filterAndJoinWithCommas(
+            data.allergies,
+            (allergies) => allergies.allergen || ""
+          ),
+          diagnoses: StringUtils.filterAndJoinWithCommas(
+            data.diagnoses,
+            (diagnoses) => diagnoses.diagnosis || ""
+          ),
+          surgical_history: StringUtils.filterAndJoinWithCommas(
+            data.surgicalHistory,
+            (surgicalHistory) => surgicalHistory.surgicalHistory || ""
+          ),
+          dietary_restrictions: StringUtils.filterAndJoinWithCommas(
+            data.dietaryRestrictions,
+            (dietaryRestrictions) =>
+              dietaryRestrictions.dietaryRestrictions || ""
+          ),
+          cognitive_status: (() => {
+            const raw = (data.mentalStatus || "").trim();
+            if (!raw) return null;
+            const tokens = raw.split(", ");
+            const replaced = tokens.map((t) =>
+              t === "Other"
+                ? data.mentalStatusText?.trim()
+                  ? data.mentalStatusText.trim()
+                  : "Other"
+                : t
+            );
+            const joined = replaced.join(", ");
+            return joined.length > 0 ? joined : null;
+          })(),
+          last_cognitive_screening: data.cognitiveScreeningDate
+            ? DateUtils.changetoISO(data.cognitiveScreeningDate)
+            : null,
+          cognitive_score: data.cognitiveScreeningScore
+            ? data.cognitiveScreeningScore
+            : null,
+          notes: data.notesAndConcerns ? data.notesAndConcerns : null,
+          test_type: data.test_type ? data.test_type : null,
+        },
+
+        emergency_contact: {
+          first_name: data.emergencyContactFirstName
+            ? data.emergencyContactFirstName
+            : null,
+          last_name: data.emergencyContactLastName
+            ? data.emergencyContactLastName
+            : null,
+          email: data.emergencyContactEmail ? data.emergencyContactEmail : null,
+          phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
+          relationship: data.emergencyContactRelationship
+            ? data.emergencyContactRelationship
+            : null,
+          address: data.emergencyContactAddress
+            ? data.emergencyContactAddress
+            : null,
+        },
+
+        medications: medications,
+
+        healthcare_providers: providers,
+
+        vaccinations: vaccinations,
+
+        home_health_agency: {
+          name: data.homeHealthAgency ? data.homeHealthAgency : null,
+          phone: data.homeHealthPhone ? data.homeHealthPhone : null,
+          address: data.homeHealthAddress ? data.homeHealthAddress : null,
+          fax: data.homeHealthFax ? data.homeHealthFax : null,
+          schedule: data.homeHealthSchedule ? data.homeHealthSchedule : null,
+          prescribing_doctor: data.homeHealthPrescribingDoctor
+            ? data.homeHealthPrescribingDoctor
+            : null,
+          start_date: data.homeHealthStartDate
+            ? DateUtils.changetoISO(data.homeHealthStartDate)
+            : null,
+          discharge_date: data.homeHealthDischargeDate
+            ? DateUtils.changetoISO(data.homeHealthDischargeDate)
+            : null,
+        },
+
+        bloodwork: bloodwork,
+
+        caregiver_agency: {
+          name: data.caregiverAgency ? data.caregiverAgency : null,
+          phone: data.caregiverPhone ? data.caregiverPhone : null,
+          address: data.caregiverAddress ? data.caregiverAddress : null,
+          point_of_contact: data.caregiverPointOfContact
+            ? data.caregiverPointOfContact
+            : null,
+          caregiver_schedule: data.caregiverSchedule
+            ? data.caregiverSchedule
+            : null,
+          caregiver_duties: data.caregiverDuties ? data.caregiverDuties : null,
+          important_information: data.importantInformationForCaregivers
+            ? data.importantInformationForCaregivers
+            : null,
+        },
+
+        short_form: {
+          insurance: data.insurance ? data.insurance : null,
+          medicare: data.medicare ? data.medicare : null,
+          group_number: data.groupNumber ? data.groupNumber : null,
+          id_number: data.idNumber ? data.idNumber : null,
+          mpoa: data.mpoaName ? data.mpoaName : null,
+          mpoa_phone: data.mpoaPhone ? data.mpoaPhone : null,
+          mpoa_address: data.mpoaAddress ? data.mpoaAddress : null,
+          dpoa: data.dpoaName ? data.dpoaName : null,
+          dpoa_phone: data.dpoaPhone ? data.dpoaPhone : null,
+          dpoa_address: data.dpoaAddress ? data.dpoaAddress : null,
+        },
+        medical_conditions: medicalConditions,
       };
-      if (item.id) {
-        return medication;
-      } else {
-        delete medication.id;
-        return medication;
-      }
-    });
-    const providers = data.providers?.map((item) => {
-      const provider = {
-        provider_type: item?.providerType,
-        provider_name: item.providerName ? item.providerName : null,
-        specialty: item.specialty ? item.specialty : null,
-        address: item.address ? item.address : null,
-        phone: item.phone ? item.phone : null,
-        last_visit: item.lastVisit
-          ? DateUtils.changetoISO(item.lastVisit)
-          : null,
-        next_visit: item.nextVisit
-          ? DateUtils.changetoISO(item.nextVisit)
-          : null,
-        id: item.id,
-      };
-      if (provider.provider_type?.length === 0) {
-        delete provider.provider_type;
-      }
-      if (item.id) {
-        return provider;
-      } else {
-        delete provider.id;
-        delete provider.provider_type;
-        return provider;
-      }
-    });
-    const bloodwork = data.bloodwork?.map((item) => {
-      const bloodwork = {
-        name: item.test ? item.test : null,
-        date: item.date ? DateUtils.changetoISO(item.date) : null,
-        results: item.results ? item.results : null,
-        ordered_by: item.orderedBy ? item.orderedBy : null,
-        repeat: item.repeat ? item.repeat : null,
-        id: item.id,
-      };
-      if (item.id) {
-        return bloodwork;
-      } else {
-        delete bloodwork.id;
-        return bloodwork;
-      }
-    });
+      postFaceSheetLongFormMutation.mutate({
+        clientId: clientId as string,
+        data: postData,
+      });
+    },
+    [postFaceSheetLongFormMutation, clientId]
+  );
 
-    const vaccinations = data.vaccinations?.map((item) => {
-      const vaccination = {
-        name: item.vaccineName ? item.vaccineName : null,
-        date: item.date ? DateUtils.changetoISO(item.date) : null,
-        next_vaccine: item.nextVaccine
-          ? DateUtils.changetoISO(item.nextVaccine)
-          : null,
-        id: item.id,
-      };
-      if (item.id) {
-        return vaccination;
-      } else {
-        delete vaccination.id;
-        return vaccination;
-      }
-    });
-    const medicalConditions = data.medicalConditions?.map((item) => {
-      const medicalCondition = {
-        condition: item.condition ? item.condition : null,
-        onset_date: item.onsetDate
-          ? DateUtils.changeMonthYearToISO(item.onsetDate)
-          : null,
-        notes: item.notes ? item.notes : null,
-        id: item.id,
-      };
-      if (item.id) {
-        return medicalCondition;
-      } else {
-        delete medicalCondition.id;
-        return medicalCondition;
-      }
-    });
-    const postData = {
-      client_info: {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        address: data.address ? data.address : null,
-        preferred_name: data.preferredName ? data.preferredName : null,
-        ssn: data.ssn ? data.ssn : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-        phone: data.phoneNumber ? data.phoneNumber : null,
-        preferred_hospital: data.hospitalPreference
-          ? data.hospitalPreference
-          : null,
-        hospital_address: data.hospitalAddress ? data.hospitalAddress : null,
-        hospital_phone: data.hospitalPhoneNumber
-          ? data.hospitalPhoneNumber
-          : null,
-        pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
-        pharmacy_address: data.pharmacyAddress ? data.pharmacyAddress : null,
-        pharmacy_phone: data.pharmacyPhone ? data.pharmacyPhone : null,
-        pharmacy_fax: data.pharmacyFax ? data.pharmacyFax : null,
-        code_status: data.codeStatus ? data.codeStatus : null,
-        advance_directive: data.advanceDirective ? data.advanceDirective : null,
-        race: data.race ? data.race : null,
-        last_care_plan_date: data.dateOfLastCarePlan
-          ? DateUtils.changetoISO(data.dateOfLastCarePlan)
-          : null,
-        gender: data.gender
-          ? GENDER_OPTIONS.find((gender) => gender.value === data.gender)?.value
-          : null,
-        marital_status: data.maritalStatus
-          ? MARITAL_STATUS_OPTIONS.find(
-              (maritalStatus) => maritalStatus.value === data.maritalStatus
-            )?.value
-          : null,
-        language: data.language
-          ? LANGUAGE_OPTIONS.find(
-              (language) => language.value === data.language
-            )?.value
-          : null,
-        living_situation: data.livingSituation
-          ? LIVING_SITUATION_OPTIONS.find(
-              (livingSituation) =>
-                livingSituation.value === data.livingSituation
-            )?.value
-          : null,
-      },
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, [setShouldDownloadAfterSave]);
 
-      medical_info: {
-        allergies: StringUtils.filterAndJoinWithCommas(
-          data.allergies,
-          (allergies) => allergies.allergen || ""
-        ),
-        diagnoses: StringUtils.filterAndJoinWithCommas(
-          data.diagnoses,
-          (diagnoses) => diagnoses.diagnosis || ""
-        ),
-        surgical_history: StringUtils.filterAndJoinWithCommas(
-          data.surgicalHistory,
-          (surgicalHistory) => surgicalHistory.surgicalHistory || ""
-        ),
-        dietary_restrictions: StringUtils.filterAndJoinWithCommas(
-          data.dietaryRestrictions,
-          (dietaryRestrictions) => dietaryRestrictions.dietaryRestrictions || ""
-        ),
-        cognitive_status: (() => {
-          const raw = (data.mentalStatus || "").trim();
-          if (!raw) return null;
-          const tokens = raw.split(", ");
-          const replaced = tokens.map((t) =>
-            t === "Other"
-              ? data.mentalStatusText?.trim()
-                ? data.mentalStatusText.trim()
-                : "Other"
-              : t
-          );
-          const joined = replaced.join(", ");
-          return joined.length > 0 ? joined : null;
-        })(),
-        last_cognitive_screening: data.cognitiveScreeningDate
-          ? DateUtils.changetoISO(data.cognitiveScreeningDate)
-          : null,
-        cognitive_score: data.cognitiveScreeningScore
-          ? data.cognitiveScreeningScore
-          : null,
-        notes: data.notesAndConcerns ? data.notesAndConcerns : null,
-        test_type: data.test_type ? data.test_type : null,
-      },
-
-      emergency_contact: {
-        first_name: data.emergencyContactFirstName
-          ? data.emergencyContactFirstName
-          : null,
-        last_name: data.emergencyContactLastName
-          ? data.emergencyContactLastName
-          : null,
-        email: data.emergencyContactEmail ? data.emergencyContactEmail : null,
-        phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
-        relationship: data.emergencyContactRelationship
-          ? data.emergencyContactRelationship
-          : null,
-        address: data.emergencyContactAddress
-          ? data.emergencyContactAddress
-          : null,
-      },
-
-      medications: medications,
-
-      healthcare_providers: providers,
-
-      vaccinations: vaccinations,
-
-      home_health_agency: {
-        name: data.homeHealthAgency ? data.homeHealthAgency : null,
-        phone: data.homeHealthPhone ? data.homeHealthPhone : null,
-        address: data.homeHealthAddress ? data.homeHealthAddress : null,
-        fax: data.homeHealthFax ? data.homeHealthFax : null,
-        schedule: data.homeHealthSchedule ? data.homeHealthSchedule : null,
-        prescribing_doctor: data.homeHealthPrescribingDoctor
-          ? data.homeHealthPrescribingDoctor
-          : null,
-        start_date: data.homeHealthStartDate
-          ? DateUtils.changetoISO(data.homeHealthStartDate)
-          : null,
-        discharge_date: data.homeHealthDischargeDate
-          ? DateUtils.changetoISO(data.homeHealthDischargeDate)
-          : null,
-      },
-
-      bloodwork: bloodwork,
-
-      caregiver_agency: {
-        name: data.caregiverAgency ? data.caregiverAgency : null,
-        phone: data.caregiverPhone ? data.caregiverPhone : null,
-        address: data.caregiverAddress ? data.caregiverAddress : null,
-        point_of_contact: data.caregiverPointOfContact
-          ? data.caregiverPointOfContact
-          : null,
-        caregiver_schedule: data.caregiverSchedule
-          ? data.caregiverSchedule
-          : null,
-        caregiver_duties: data.caregiverDuties ? data.caregiverDuties : null,
-        important_information: data.importantInformationForCaregivers
-          ? data.importantInformationForCaregivers
-          : null,
-      },
-
-      short_form: {
-        insurance: data.insurance ? data.insurance : null,
-        medicare: data.medicare ? data.medicare : null,
-        group_number: data.groupNumber ? data.groupNumber : null,
-        id_number: data.idNumber ? data.idNumber : null,
-        mpoa: data.mpoaName ? data.mpoaName : null,
-        mpoa_phone: data.mpoaPhone ? data.mpoaPhone : null,
-        mpoa_address: data.mpoaAddress ? data.mpoaAddress : null,
-        dpoa: data.dpoaName ? data.dpoaName : null,
-        dpoa_phone: data.dpoaPhone ? data.dpoaPhone : null,
-        dpoa_address: data.dpoaAddress ? data.dpoaAddress : null,
-      },
-      medical_conditions: medicalConditions,
-    };
-    postFaceSheetLongFormMutation.mutate({
-      clientId: clientId as string,
-      data: postData,
-    });
-  };
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload]);
 
   return isFaceSheetLoading ? (
     <div className="flex justify-center items-center h-screen">

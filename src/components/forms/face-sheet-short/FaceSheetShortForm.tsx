@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CommonLoader, PrimaryButton } from "@agensy/components";
@@ -76,7 +76,6 @@ const defaultValues = {
   emergencyContactEmail: "",
 };
 
-// Add this helper function at the top of the component (after the imports)
 const createSafeOpenedFileData = (
   formData: FaceSheetShortFormData,
   lastUpdate?: string
@@ -95,8 +94,15 @@ export const FaceSheetShortForm: React.FC = () => {
   const { clientId } = useParams();
   const queryClient = useQueryClient();
   const { handleFilterPermission } = useAuthContext();
-  const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
-    useClientContext();
+  const {
+    setOpenedFileData,
+    ocrResult,
+    setOcrResult,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const {
     data: faceSheetShortForm,
     refetch,
@@ -179,15 +185,24 @@ export const FaceSheetShortForm: React.FC = () => {
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postFaceSheetShortFormMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postFaceSheetShortFormMutation.error)
       );
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postFaceSheetShortFormMutation.status]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -325,130 +340,146 @@ export const FaceSheetShortForm: React.FC = () => {
     );
   }, [faceSheetShortForm]);
 
-  const onSubmit = (data: FaceSheetShortFormData) => {
-    const medications = data.medications?.map((item) => {
-      const medication = {
-        refill_due: item.refillDue
-          ? DateUtils.changetoISO(item.refillDue)
-          : null,
-        purpose: item.usedToTreat ? item.usedToTreat : null,
-        medication_name: item.medicationName ? item.medicationName : null,
-        dosage: item.dose ? item.dose : null,
-        prescribing_doctor: item.prescriber ? item.prescriber : null,
-        id: item?.id,
-        frequency: item.frequency ? item.frequency : null,
-      };
-      if (item.id) {
-        return medication;
-      } else {
-        delete medication.id;
-        return medication;
-      }
-    });
-    const providers = data.providers?.map((item) => {
-      const provider = {
-        provider_type: item.providerType,
-        provider_name: item.providerName ? item.providerName : null,
-        specialty: item.specialty ? item.specialty : null,
-        address: item.address ? item.address : null,
-        phone: item.phone ? item.phone : null,
-        last_visit: item.lastVisit
-          ? DateUtils.changetoISO(item.lastVisit)
-          : null,
-        next_visit: item.nextVisit
-          ? DateUtils.changetoISO(item.nextVisit)
-          : null,
-        id: item.id,
-      };
-      if (provider.provider_type?.length === 0) {
-        delete provider.provider_type;
-      }
-      if (item.id) {
-        return provider;
-      } else {
-        delete provider.id;
-        delete provider.provider_type;
-        return provider;
-      }
-    });
-    const postData = {
-      client_info: {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        address: data.address ? data.address : null,
-        ssn: data.ssn ? data.ssn : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-        phone: data.phoneNumber ? data.phoneNumber : null,
-        preferred_hospital: data.hospitalPreference
-          ? data.hospitalPreference
-          : null,
-        hospital_address: data.hospitalAddress ? data.hospitalAddress : null,
-        hospital_phone: data.hospitalPhoneNumber
-          ? data.hospitalPhoneNumber
-          : null,
-        pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
-        pharmacy_address: data.pharmacyAddress ? data.pharmacyAddress : null,
-        pharmacy_phone: data.pharmacyPhone ? data.pharmacyPhone : null,
-        pharmacy_fax: data.pharmacyFax ? data.pharmacyFax : null,
-        code_status: data.codeStatus ? data.codeStatus : null,
-        advance_directive: data.advanceDirective ? data.advanceDirective : null,
-        gender: data.gender ? data.gender : null,
-        preferred_name: data.preferredName ? data.preferredName : null,
-      },
+  const onSubmit = useCallback(
+    (data: FaceSheetShortFormData) => {
+      const medications = data.medications?.map((item) => {
+        const medication = {
+          refill_due: item.refillDue
+            ? DateUtils.changetoISO(item.refillDue)
+            : null,
+          purpose: item.usedToTreat ? item.usedToTreat : null,
+          medication_name: item.medicationName ? item.medicationName : null,
+          dosage: item.dose ? item.dose : null,
+          prescribing_doctor: item.prescriber ? item.prescriber : null,
+          id: item?.id,
+          frequency: item.frequency ? item.frequency : null,
+        };
+        if (item.id) {
+          return medication;
+        } else {
+          delete medication.id;
+          return medication;
+        }
+      });
+      const providers = data.providers?.map((item) => {
+        const provider = {
+          provider_type: item.providerType,
+          provider_name: item.providerName ? item.providerName : null,
+          specialty: item.specialty ? item.specialty : null,
+          address: item.address ? item.address : null,
+          phone: item.phone ? item.phone : null,
+          last_visit: item.lastVisit
+            ? DateUtils.changetoISO(item.lastVisit)
+            : null,
+          next_visit: item.nextVisit
+            ? DateUtils.changetoISO(item.nextVisit)
+            : null,
+          id: item.id,
+        };
+        if (provider.provider_type?.length === 0) {
+          delete provider.provider_type;
+        }
+        if (item.id) {
+          return provider;
+        } else {
+          delete provider.id;
+          delete provider.provider_type;
+          return provider;
+        }
+      });
+      const postData = {
+        client_info: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          address: data.address ? data.address : null,
+          ssn: data.ssn ? data.ssn : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+          phone: data.phoneNumber ? data.phoneNumber : null,
+          preferred_hospital: data.hospitalPreference
+            ? data.hospitalPreference
+            : null,
+          hospital_address: data.hospitalAddress ? data.hospitalAddress : null,
+          hospital_phone: data.hospitalPhoneNumber
+            ? data.hospitalPhoneNumber
+            : null,
+          pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
+          pharmacy_address: data.pharmacyAddress ? data.pharmacyAddress : null,
+          pharmacy_phone: data.pharmacyPhone ? data.pharmacyPhone : null,
+          pharmacy_fax: data.pharmacyFax ? data.pharmacyFax : null,
+          code_status: data.codeStatus ? data.codeStatus : null,
+          advance_directive: data.advanceDirective
+            ? data.advanceDirective
+            : null,
+          gender: data.gender ? data.gender : null,
+          preferred_name: data.preferredName ? data.preferredName : null,
+        },
 
-      medical_info: {
-        allergies: StringUtils.filterAndJoinWithCommas(
-          data.allergies,
-          (allergies) => allergies.allergen || ""
-        ),
-        diagnoses: StringUtils.filterAndJoinWithCommas(
-          data.diagnoses,
-          (diagnosis) => diagnosis.diagnosis || ""
-        ),
-        surgical_history: StringUtils.filterAndJoinWithCommas(
-          data.surgicalHistory,
-          (surgicalHistory) => surgicalHistory.surgicalHistory || ""
-        ),
-      },
+        medical_info: {
+          allergies: StringUtils.filterAndJoinWithCommas(
+            data.allergies,
+            (allergies) => allergies.allergen || ""
+          ),
+          diagnoses: StringUtils.filterAndJoinWithCommas(
+            data.diagnoses,
+            (diagnosis) => diagnosis.diagnosis || ""
+          ),
+          surgical_history: StringUtils.filterAndJoinWithCommas(
+            data.surgicalHistory,
+            (surgicalHistory) => surgicalHistory.surgicalHistory || ""
+          ),
+        },
 
-      emergency_contact: {
-        first_name: data.emergencyContactFirstName
-          ? data.emergencyContactFirstName
-          : null,
-        last_name: data.emergencyContactLastName
-          ? data.emergencyContactLastName
-          : null,
-        email: data.emergencyContactEmail ? data.emergencyContactEmail : null,
-        phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
-        relationship: data.emergencyContactRelationship
-          ? data.emergencyContactRelationship
-          : null,
-        address: data.emergencyContactAddress
-          ? data.emergencyContactAddress
-          : null,
-      },
-      medications,
-      healthcare_providers: providers,
-      short_form: {
-        insurance: data.insurance ? data.insurance : null,
-        medicare: data.medicare ? data.medicare : null,
-        group_number: data.groupNumber ? data.groupNumber : null,
-        id_number: data.idNumber ? data.idNumber : null,
-        mpoa: data.mpoaName ? data.mpoaName : null,
-        mpoa_phone: data.mpoaPhone ? data.mpoaPhone : null,
-        mpoa_address: data.mpoaAddress ? data.mpoaAddress : null,
-        dpoa: data.dpoaName ? data.dpoaName : null,
-        dpoa_phone: data.dpoaPhone ? data.dpoaPhone : null,
-        dpoa_address: data.dpoaAddress ? data.dpoaAddress : null,
-      },
-    };
-    postFaceSheetShortFormMutation.mutate({
-      clientId: clientId!,
-      data: postData,
-    });
-  };
+        emergency_contact: {
+          first_name: data.emergencyContactFirstName
+            ? data.emergencyContactFirstName
+            : null,
+          last_name: data.emergencyContactLastName
+            ? data.emergencyContactLastName
+            : null,
+          email: data.emergencyContactEmail ? data.emergencyContactEmail : null,
+          phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
+          relationship: data.emergencyContactRelationship
+            ? data.emergencyContactRelationship
+            : null,
+          address: data.emergencyContactAddress
+            ? data.emergencyContactAddress
+            : null,
+        },
+        medications,
+        healthcare_providers: providers,
+        short_form: {
+          insurance: data.insurance ? data.insurance : null,
+          medicare: data.medicare ? data.medicare : null,
+          group_number: data.groupNumber ? data.groupNumber : null,
+          id_number: data.idNumber ? data.idNumber : null,
+          mpoa: data.mpoaName ? data.mpoaName : null,
+          mpoa_phone: data.mpoaPhone ? data.mpoaPhone : null,
+          mpoa_address: data.mpoaAddress ? data.mpoaAddress : null,
+          dpoa: data.dpoaName ? data.dpoaName : null,
+          dpoa_phone: data.dpoaPhone ? data.dpoaPhone : null,
+          dpoa_address: data.dpoaAddress ? data.dpoaAddress : null,
+        },
+      };
+      postFaceSheetShortFormMutation.mutate({
+        clientId: clientId!,
+        data: postData,
+      });
+    },
+    [postFaceSheetShortFormMutation, clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, []);
 
   return isFaceSheetLoading ? (
     <div className="flex justify-center items-center h-screen">

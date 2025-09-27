@@ -15,13 +15,8 @@ export const ProfileSettingCard: React.FC = () => {
   const updateUserAvatarMutation = useUpdateProfileAvatarMutation();
   const updateUserMutation = useUpdateProfileMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] =
     useState<boolean>(false);
-
-  //   const userRole = useMemo(() => {
-  //     return USER_ROLES.find((role) => role.value === userData?.role)?.label;
-  //   }, [userData?.role]);
 
   const handleImageClick = () => {
     if (!updateUserAvatarMutation.isPending) fileInputRef.current?.click();
@@ -67,7 +62,6 @@ export const ProfileSettingCard: React.FC = () => {
 
     if (file.type.startsWith("image/")) {
       setFile(file);
-      setIsHovered(false);
       const formData = new FormData();
       formData.append("file", file);
       updateUserAvatarMutation.mutate(formData);
@@ -90,40 +84,40 @@ export const ProfileSettingCard: React.FC = () => {
         onButtonClick={() => setIsProfileEditModalOpen(true)}
       >
         <div className="flex flex-col items-center md:items-start md:flex-row gap-8">
-          <div className="relative">
-            <div
-              className="w-32 h-32 rounded-full flex items-center justify-center cursor-pointer overflow-hidden"
-              onMouseEnter={() => {
-                if (!updateUserAvatarMutation.isPending) setIsHovered(true);
-              }}
-              onMouseLeave={() => {
-                if (!updateUserAvatarMutation.isPending) setIsHovered(false);
-              }}
-              onClick={handleImageClick}
-            >
-              {userData?.avatar ? (
-                <img
-                  src={file ? URL.createObjectURL(file) : userData.avatar}
-                  alt="profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-r from-primaryColor to-basicBlue text-white text-3xl font-medium flex items-center justify-center">
-                  {(userData?.first_name?.[0]?.toUpperCase() || "") +
-                    (userData?.last_name?.[0]?.toUpperCase() || "")}
-                </div>
-              )}
-              {isHovered && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center rounded-full justify-center">
-                  <ICONS.edit size={24} className="text-white" />
-                </div>
-              )}
-              {updateUserAvatarMutation.isPending && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center rounded-full justify-center">
-                  <PuffLoader color="#fff" size={24} />
-                </div>
-              )}
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full flex items-center justify-center overflow-hidden">
+                {userData?.avatar ? (
+                  <img
+                    src={file ? URL.createObjectURL(file) : userData.avatar}
+                    alt="profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-primaryColor to-basicBlue text-white text-3xl font-medium flex items-center justify-center">
+                    {(userData?.first_name?.[0]?.toUpperCase() || "") +
+                      (userData?.last_name?.[0]?.toUpperCase() || "")}
+                  </div>
+                )}
+                {updateUserAvatarMutation.isPending && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center rounded-full justify-center">
+                    <PuffLoader color="#fff" size={24} />
+                  </div>
+                )}
+              </div>
             </div>
+            <button
+              onClick={handleImageClick}
+              disabled={updateUserAvatarMutation.isPending}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ICONS.edit size={16} />
+              <span className="text-sm font-medium">
+                {updateUserAvatarMutation.isPending
+                  ? "Uploading..."
+                  : "Edit Photo"}
+              </span>
+            </button>
             <input
               type="file"
               ref={fileInputRef}

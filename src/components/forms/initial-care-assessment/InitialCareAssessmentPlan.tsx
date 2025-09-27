@@ -16,13 +16,13 @@ import {
   type OpenedFileData,
 } from "@agensy/types";
 import { APP_ACTIONS, ICONS } from "@agensy/constants";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useParams } from "react-router-dom";
 import {
   useGetInitialCareAssessmentPlan,
   usePostInitialCareAssessmentPlan,
 } from "@agensy/api";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 
@@ -43,7 +43,13 @@ const createSafeOpenedFileData = (
 export const InitialCareAssessmentPlan = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const {
     data: initialCareAssessment,
     isFetching: isLoadingData,
@@ -155,11 +161,23 @@ export const InitialCareAssessmentPlan = () => {
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postInitialCareAssessmentPlanMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postInitialCareAssessmentPlanMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postInitialCareAssessmentPlanMutation.status]);
 
@@ -308,158 +326,172 @@ export const InitialCareAssessmentPlan = () => {
     }
   }, [initialCareAssessment]);
 
-  const onSubmit = (data: InitialCareAssessmentPlanFormData) => {
-    console.log(data);
-    const focusedRecommendations = data.focusedRecommendations?.map(
-      (item, index) => {
-        const recommendation = {
-          id: item.id ? item.id : null,
-          option_number: index + 1 || null,
-          name: item.name ? item.name : null,
-          description: item.description ? item.description : null,
-          details: item.details
-            ? item.details.length > 0
-              ? item.details.join(", ")
+  const onSubmit = useCallback(
+    (data: InitialCareAssessmentPlanFormData) => {
+      console.log(data);
+      const focusedRecommendations = data.focusedRecommendations?.map(
+        (item, index) => {
+          const recommendation = {
+            id: item.id ? item.id : null,
+            option_number: index + 1 || null,
+            name: item.name ? item.name : null,
+            description: item.description ? item.description : null,
+            details: item.details
+              ? item.details.length > 0
+                ? item.details.join(", ")
+                : null
+              : null,
+          };
+          if (recommendation.id) {
+            return recommendation;
+          } else {
+            // @ts-expect-error :// TODO: fix this
+            delete recommendation.id;
+            return recommendation;
+          }
+        }
+      );
+
+      const functionalAdls = {
+        summary: data.functionalAdls?.summary
+          ? data.functionalAdls?.summary
+          : null,
+        category_name: data.functionalAdls?.categoryName
+          ? data.functionalAdls?.categoryName
+          : "functional_adls",
+      };
+
+      const functionalIadls = {
+        summary: data.functionalIadls?.summary
+          ? data.functionalIadls?.summary
+          : null,
+        category_name: data.functionalIadls?.categoryName
+          ? data.functionalIadls?.categoryName
+          : "functional_iadls",
+      };
+
+      const homeSafety = {
+        summary: data.homeSafety?.summary ? data.homeSafety?.summary : null,
+        category_name: data.homeSafety?.categoryName
+          ? data.homeSafety?.categoryName
+          : "home_safety",
+      };
+
+      const memoryAndRecommendations = {
+        summary: data.memoryAndRecommendations?.summary
+          ? data.memoryAndRecommendations?.summary
+          : null,
+        category_name: data.memoryAndRecommendations?.categoryName
+          ? data.memoryAndRecommendations?.categoryName
+          : "memory_reasoning",
+      };
+
+      const geriatricDepression = {
+        summary: data.geriatricDepression?.summary
+          ? data.geriatricDepression?.summary
+          : null,
+        category_name: data.geriatricDepression?.categoryName
+          ? data.geriatricDepression?.categoryName
+          : "geriatric_depression",
+      };
+      const nutritional_health = {
+        summary: data.nutritionalHealth?.summary
+          ? data.nutritionalHealth?.summary
+          : null,
+        category_name: data.nutritionalHealth?.categoryName
+          ? data.nutritionalHealth?.categoryName
+          : "nutritional_health",
+      };
+      const legal_and_financial = {
+        summary: data.legalAndFinancial?.summary
+          ? data.legalAndFinancial?.summary
+          : null,
+        category_name: data.legalAndFinancial?.categoryName
+          ? data.legalAndFinancial?.categoryName
+          : "legal_financial",
+      };
+      const care_giver_support = {
+        summary: data.caregiverSupport?.summary
+          ? data.caregiverSupport?.summary
+          : null,
+        category_name: data.caregiverSupport?.categoryName
+          ? data.caregiverSupport?.categoryName
+          : "care_giver_support",
+      };
+
+      const postData = {
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+        },
+        initial_care_plan_assessment: {
+          date_of_assessment: data.dateOfAssessment
+            ? DateUtils.changetoISO(data.dateOfAssessment)
+            : null,
+          date_of_care_plan: data.dateOfCarePlan
+            ? DateUtils.changetoISO(data.dateOfCarePlan)
+            : null,
+          person_completing_assessment: data.personCompletingAssessment
+            ? data.personCompletingAssessment
+            : null,
+          present_for_assessment: data.presentForAssessment
+            ? data.presentForAssessment
+            : null,
+          goals_for_assessment: data.goalsForAssessment
+            ? data.goalsForAssessment.length > 0
+              ? data.goalsForAssessment.join(", ").length > 0
+                ? data.goalsForAssessment.join(", ")
+                : null
               : null
             : null,
-        };
-        if (recommendation.id) {
-          return recommendation;
-        } else {
-          // @ts-expect-error :// TODO: fix this
-          delete recommendation.id;
-          return recommendation;
-        }
-      }
-    );
-
-    const functionalAdls = {
-      summary: data.functionalAdls?.summary
-        ? data.functionalAdls?.summary
-        : null,
-      category_name: data.functionalAdls?.categoryName
-        ? data.functionalAdls?.categoryName
-        : "functional_adls",
-    };
-
-    const functionalIadls = {
-      summary: data.functionalIadls?.summary
-        ? data.functionalIadls?.summary
-        : null,
-      category_name: data.functionalIadls?.categoryName
-        ? data.functionalIadls?.categoryName
-        : "functional_iadls",
-    };
-
-    const homeSafety = {
-      summary: data.homeSafety?.summary ? data.homeSafety?.summary : null,
-      category_name: data.homeSafety?.categoryName
-        ? data.homeSafety?.categoryName
-        : "home_safety",
-    };
-
-    const memoryAndRecommendations = {
-      summary: data.memoryAndRecommendations?.summary
-        ? data.memoryAndRecommendations?.summary
-        : null,
-      category_name: data.memoryAndRecommendations?.categoryName
-        ? data.memoryAndRecommendations?.categoryName
-        : "memory_reasoning",
-    };
-
-    const geriatricDepression = {
-      summary: data.geriatricDepression?.summary
-        ? data.geriatricDepression?.summary
-        : null,
-      category_name: data.geriatricDepression?.categoryName
-        ? data.geriatricDepression?.categoryName
-        : "geriatric_depression",
-    };
-    const nutritional_health = {
-      summary: data.nutritionalHealth?.summary
-        ? data.nutritionalHealth?.summary
-        : null,
-      category_name: data.nutritionalHealth?.categoryName
-        ? data.nutritionalHealth?.categoryName
-        : "nutritional_health",
-    };
-    const legal_and_financial = {
-      summary: data.legalAndFinancial?.summary
-        ? data.legalAndFinancial?.summary
-        : null,
-      category_name: data.legalAndFinancial?.categoryName
-        ? data.legalAndFinancial?.categoryName
-        : "legal_financial",
-    };
-    const care_giver_support = {
-      summary: data.caregiverSupport?.summary
-        ? data.caregiverSupport?.summary
-        : null,
-      category_name: data.caregiverSupport?.categoryName
-        ? data.caregiverSupport?.categoryName
-        : "care_giver_support",
-    };
-
-    const postData = {
-      client_info: {
-        first_name: data.firstName ? data.firstName : null,
-        last_name: data.lastName ? data.lastName : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-      },
-      initial_care_plan_assessment: {
-        date_of_assessment: data.dateOfAssessment
-          ? DateUtils.changetoISO(data.dateOfAssessment)
-          : null,
-        date_of_care_plan: data.dateOfCarePlan
-          ? DateUtils.changetoISO(data.dateOfCarePlan)
-          : null,
-        person_completing_assessment: data.personCompletingAssessment
-          ? data.personCompletingAssessment
-          : null,
-        present_for_assessment: data.presentForAssessment
-          ? data.presentForAssessment
-          : null,
-        goals_for_assessment: data.goalsForAssessment
-          ? data.goalsForAssessment.length > 0
-            ? data.goalsForAssessment.join(", ").length > 0
-              ? data.goalsForAssessment.join(", ")
+          next_step_care_recipient: data.nextStepCareRecipient
+            ? data.nextStepCareRecipient.length > 0
+              ? data.nextStepCareRecipient.join(", ").length > 0
+                ? data.nextStepCareRecipient.join(", ")
+                : null
               : null
-            : null
-          : null,
-        next_step_care_recipient: data.nextStepCareRecipient
-          ? data.nextStepCareRecipient.length > 0
-            ? data.nextStepCareRecipient.join(", ").length > 0
-              ? data.nextStepCareRecipient.join(", ")
+            : null,
+          next_step_care_partner: data.nextStepCarePartner
+            ? data.nextStepCarePartner.length > 0
+              ? data.nextStepCarePartner.join(", ").length > 0
+                ? data.nextStepCarePartner.join(", ")
+                : null
               : null
-            : null
-          : null,
-        next_step_care_partner: data.nextStepCarePartner
-          ? data.nextStepCarePartner.length > 0
-            ? data.nextStepCarePartner.join(", ").length > 0
-              ? data.nextStepCarePartner.join(", ")
-              : null
-            : null
-          : null,
-      },
-      focused_recommendations: focusedRecommendations || [],
+            : null,
+        },
+        focused_recommendations: focusedRecommendations || [],
 
-      functional_adls: functionalAdls,
-      functional_iadls: functionalIadls,
-      home_safety: homeSafety,
-      memory_and_recommendations: memoryAndRecommendations,
-      geriatric_depression: geriatricDepression,
-      nutritional_health: nutritional_health,
-      legal_and_financial: legal_and_financial,
-      care_giver_support: care_giver_support,
-    };
+        functional_adls: functionalAdls,
+        functional_iadls: functionalIadls,
+        home_safety: homeSafety,
+        memory_and_recommendations: memoryAndRecommendations,
+        geriatric_depression: geriatricDepression,
+        nutritional_health: nutritional_health,
+        legal_and_financial: legal_and_financial,
+        care_giver_support: care_giver_support,
+      };
 
-    postInitialCareAssessmentPlanMutation.mutate({
-      clientId: params.clientId!,
-      data: postData,
-    });
-  };
+      postInitialCareAssessmentPlanMutation.mutate({
+        clientId: params.clientId!,
+        data: postData,
+      });
+    },
+    [postInitialCareAssessmentPlanMutation, params.clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   if (isLoadingData) {
     return (

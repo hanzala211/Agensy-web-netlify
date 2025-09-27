@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldRenderer } from "../FieldRenderer";
@@ -26,7 +26,7 @@ import {
 } from "@agensy/api";
 import { caregiverInformationFormSchema } from "@agensy/types";
 import { useParams } from "react-router-dom";
-import { toast } from "@agensy/utils";
+import { StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { APP_ACTIONS } from "@agensy/constants";
 
@@ -38,7 +38,13 @@ export const CaregiverInformation = () => {
   );
   const postCaregiverInformationMutation =
     usePostCaregiverInformationMutation();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const queryClient = useQueryClient();
   const {
     data: careGiverInfo,
@@ -211,11 +217,23 @@ export const CaregiverInformation = () => {
           getValues()
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postCaregiverInformationMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postCaregiverInformationMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postCaregiverInformationMutation.status]);
 
@@ -226,38 +244,52 @@ export const CaregiverInformation = () => {
     };
   }, [setHasUnsavedChanges]);
 
-  const onSubmit = (data: CaregiverInformationFormData) => {
-    console.log(data);
-    const postData = {
-      name: data.name ? data.name : null,
-      nickname_preferred_name: data.nickname_preferred_name
-        ? data.nickname_preferred_name
-        : null,
-      wake_time: data.wake_time ? data.wake_time : null,
-      sleep_time: data.sleep_time ? data.sleep_time : null,
-      breakfast_time: data.breakfast_time ? data.breakfast_time : null,
-      lunch_time: data.lunch_time ? data.lunch_time : null,
-      snacks_time: data.snacks_time ? data.snacks_time : null,
-      activity_time: data.activity_time ? data.activity_time : null,
-      nap_time: data.nap_time ? data.nap_time : null,
-      dinner_time: data.dinner_time ? data.dinner_time : null,
-      medication_time: data.medication_time ? data.medication_time : null,
-      likes: data.likes ? data.likes : null,
-      dislikes: data.dislikes ? data.dislikes : null,
-      redirection_techniques: data.redirection_techniques
-        ? data.redirection_techniques
-        : null,
-      triggers: data.triggers ? data.triggers : null,
-      helpful_information: data.helpful_information
-        ? data.helpful_information
-        : null,
-      documentation: data.documentation ? data.documentation : null,
-    };
-    postCaregiverInformationMutation.mutate({
-      clientId: clientId!,
-      data: postData,
-    });
-  };
+  const onSubmit = useCallback(
+    (data: CaregiverInformationFormData) => {
+      console.log(data);
+      const postData = {
+        name: data.name ? data.name : null,
+        nickname_preferred_name: data.nickname_preferred_name
+          ? data.nickname_preferred_name
+          : null,
+        wake_time: data.wake_time ? data.wake_time : null,
+        sleep_time: data.sleep_time ? data.sleep_time : null,
+        breakfast_time: data.breakfast_time ? data.breakfast_time : null,
+        lunch_time: data.lunch_time ? data.lunch_time : null,
+        snacks_time: data.snacks_time ? data.snacks_time : null,
+        activity_time: data.activity_time ? data.activity_time : null,
+        nap_time: data.nap_time ? data.nap_time : null,
+        dinner_time: data.dinner_time ? data.dinner_time : null,
+        medication_time: data.medication_time ? data.medication_time : null,
+        likes: data.likes ? data.likes : null,
+        dislikes: data.dislikes ? data.dislikes : null,
+        redirection_techniques: data.redirection_techniques
+          ? data.redirection_techniques
+          : null,
+        triggers: data.triggers ? data.triggers : null,
+        helpful_information: data.helpful_information
+          ? data.helpful_information
+          : null,
+        documentation: data.documentation ? data.documentation : null,
+      };
+      postCaregiverInformationMutation.mutate({
+        clientId: clientId!,
+        data: postData,
+      });
+    },
+    [postCaregiverInformationMutation, clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleFormSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   const groupedItems = checklistSchema.reduce((acc, field) => {
     const headingId = field.headingId || "default";

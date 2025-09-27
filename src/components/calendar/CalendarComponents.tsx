@@ -7,6 +7,7 @@ import type { Appointment, ViewMode } from "@agensy/types";
 interface WrapperProps {
   appointments: Appointment[];
   viewMode: ViewMode;
+  onAppointmentClick?: (appointment: Appointment) => void;
 }
 
 interface DateCellProps extends WrapperProps {
@@ -32,6 +33,7 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
   children,
   appointments,
   viewMode,
+  onAppointmentClick,
 }) => {
   const dayAppointments = appointments.filter((appointment: Appointment) =>
     isSameDay(new Date(appointment.start_time), value)
@@ -40,6 +42,16 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
   const handleCellClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
+  };
+
+  const handleAppointmentClick = (
+    appointment: Appointment,
+    e: React.MouseEvent
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Appointment clicked:", appointment);
+    onAppointmentClick?.(appointment);
   };
 
   return (
@@ -52,13 +64,11 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
     >
       {children}
       <div
-        className={`custom-badge-container  ${
-          viewMode === "month"
-            ? "flex flex-col md:gap-2"
-            : "hidden"
+        className={`custom-badge-container relative z-10 ${
+          viewMode === "month" ? "flex flex-col md:gap-2" : "hidden"
         }`}
       >
-        {dayAppointments.map((appointment: Appointment) => (
+        {dayAppointments.map((appointment: Appointment, index: number) => (
           <AntdBadge
             key={appointment.id}
             status={
@@ -76,6 +86,10 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
                 : ""
             }
             size="small"
+            className={`!cursor-pointer ${index === 0 ? "mt-2" : ""}`}
+            onClick={(e: React.MouseEvent) =>
+              handleAppointmentClick(appointment, e)
+            }
           />
         ))}
       </div>
@@ -87,6 +101,7 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
   value,
   children,
   appointments,
+  onAppointmentClick,
 }) => {
   const timeSlotAppointments = appointments.filter(
     (appointment: Appointment) => {
@@ -101,11 +116,21 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
     }
   );
 
+  const handleAppointmentClick = (
+    appointment: Appointment,
+    e: React.MouseEvent
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Appointment clicked:", appointment);
+    onAppointmentClick?.(appointment);
+  };
+
   return (
     <div className="rbc-time-slot cursor-default" role="button" tabIndex={0}>
       {children}
-      <div className="custom-badge-container">
-        {timeSlotAppointments.map((appointment: Appointment) => (
+      <div className="custom-badge-container relative z-10">
+        {timeSlotAppointments.map((appointment: Appointment, index: number) => (
           <AntdBadge
             key={appointment.id}
             status={
@@ -118,7 +143,11 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
                 : "error"
             }
             size="small"
+            className={`!cursor-pointer ${index === 0 ? "mt-1" : ""}`}
             text={appointment.title}
+            onClick={(e: React.MouseEvent) =>
+              handleAppointmentClick(appointment, e)
+            }
           />
         ))}
       </div>
@@ -128,7 +157,8 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
 
 export const createCalendarComponents = (
   appointments: Appointment[],
-  viewMode: ViewMode
+  viewMode: ViewMode,
+  onAppointmentClick?: (appointment: Appointment) => void
 ): Components<CalendarEvent> => ({
   event: () => null,
   dateCellWrapper: (props) => (
@@ -136,13 +166,14 @@ export const createCalendarComponents = (
       {...(props as unknown as DateCellProps)}
       appointments={appointments}
       viewMode={viewMode}
+      onAppointmentClick={onAppointmentClick}
     />
   ),
   timeSlotWrapper: (props) => (
     <TimeSlotWrapper
       {...(props as TimeSlotProps)}
       appointments={appointments}
-      viewMode={viewMode}
+      onAppointmentClick={onAppointmentClick}
     />
   ),
   toolbar: () => null,

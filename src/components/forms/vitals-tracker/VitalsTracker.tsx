@@ -12,8 +12,8 @@ import {
 import { VitalsTrackerTable } from "./VitalsTrackerTable";
 import { useParams } from "react-router-dom";
 import { useGetVitalsTracker, usePostVitalsTracker } from "@agensy/api";
-import { useEffect } from "react";
-import { DateUtils, toast } from "@agensy/utils";
+import { useEffect, useCallback } from "react";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 
@@ -28,7 +28,13 @@ export const VitalsTracker = () => {
   const params = useParams();
   const { handleFilterPermission } = useAuthContext();
   const queryClient = useQueryClient();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const {
     data: vitalsTrackerData,
     isFetching: isLoadingVitals,
@@ -194,10 +200,22 @@ export const VitalsTracker = () => {
           postVitalsTrackerMutation.data?.last_update?.updatedAt
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postVitalsTrackerMutation.status === "error") {
       toast.error("Error Occurred", String(postVitalsTrackerMutation.error));
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
-  }, [postVitalsTrackerMutation.status, setHasUnsavedChanges]);
+  }, [postVitalsTrackerMutation.status]);
 
   useEffect(() => {
     return () => {
@@ -227,13 +245,27 @@ export const VitalsTracker = () => {
     refetch();
   }, []);
 
-  const onSubmit = (data: VitalsTrackerFormData) => {
-    const postData = mapFormDataToVitals(data);
-    postVitalsTrackerMutation.mutate({
-      clientId: params.clientId!,
-      data: postData,
-    });
-  };
+  const onSubmit = useCallback(
+    (data: VitalsTrackerFormData) => {
+      const postData = mapFormDataToVitals(data);
+      postVitalsTrackerMutation.mutate({
+        clientId: params.clientId!,
+        data: postData,
+      });
+    },
+    [postVitalsTrackerMutation, params.clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   const vitalsFields = [
     { key: "date", label: "Date", type: "date" },

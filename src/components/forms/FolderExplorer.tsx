@@ -97,10 +97,14 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
     hasUnsavedChanges,
     setHasUnsavedChanges,
     selectedClient,
+    handleSaveAndDownload,
   } = useClientContext();
   const [isOCRModelOpen, setIsOCRModelOpen] = useState<boolean>(false);
   const [isUnsavedChangesModalOpen, setIsUnsavedChangesModalOpen] =
     useState<boolean>(false);
+  const [isPDFDownloadModalOpen, setIsPDFDownloadModalOpen] =
+    useState<boolean>(false);
+  const [pdfDownloadKey, setPdfDownloadKey] = useState<number>(0);
   const params = useParams();
   const navigate = useNavigate();
   const { handleFilterPermission } = useAuthContext();
@@ -113,11 +117,15 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   useEffect(() => {
     return () => {
       setOpenedFileData(null);
+      setIsPDFDownloadModalOpen(false);
+      setIsUnsavedChangesModalOpen(false);
     };
   }, [params.clientId, params.formSlug, setOpenedFileData]);
 
   useEffect(() => {
     setOpenedFileData(null);
+    setIsPDFDownloadModalOpen(false);
+    setIsUnsavedChangesModalOpen(false);
   }, [params.formSlug, setOpenedFileData]);
   const isShowingFileContent = useMemo(
     () => selectedItem && fileContent,
@@ -169,6 +177,62 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
 
   const handleCancelNavigation = () => {
     setIsUnsavedChangesModalOpen(false);
+  };
+
+  const handlePDFDownloadClick = () => {
+    if (hasUnsavedChanges) {
+      setIsPDFDownloadModalOpen(true);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (typeof window !== "undefined" && (window as any).triggerPDFDownload) {
+        console.log("Using global PDF download function for direct download");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).triggerPDFDownload();
+        setPdfDownloadKey((prev) => prev + 1);
+      } else {
+        console.log("Fallback: looking for PDF download button");
+        const downloadButton = document.querySelector(
+          'button[aria-label="Download PDF"]'
+        ) as HTMLButtonElement;
+        if (downloadButton) {
+          console.log("Found download button, clicking...");
+          downloadButton.click();
+          setPdfDownloadKey((prev) => prev + 1);
+        } else {
+          console.log("No download button found");
+        }
+      }
+    }
+  };
+
+  const handleConfirmPDFDownload = () => {
+    setIsPDFDownloadModalOpen(false);
+    if (handleSaveAndDownload) {
+      handleSaveAndDownload();
+    }
+  };
+
+  const handleCancelPDFDownload = () => {
+    setIsPDFDownloadModalOpen(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof window !== "undefined" && (window as any).triggerPDFDownload) {
+      console.log("Triggering direct download with unsaved data");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).triggerPDFDownload();
+      setPdfDownloadKey((prev) => prev + 1);
+    } else {
+      console.log("Fallback: looking for PDF download button for unsaved data");
+      const downloadButton = document.querySelector(
+        'button[aria-label="Download PDF"]'
+      ) as HTMLButtonElement;
+      if (downloadButton) {
+        console.log("Found download button for unsaved data, clicking...");
+        downloadButton.click();
+        setPdfDownloadKey((prev) => prev + 1);
+      } else {
+        console.log("No download button found for unsaved data");
+      }
+    }
   };
 
   const pdfDocument = useMemo(() => {
@@ -672,14 +736,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                       pdfDocument &&
                       typeof openedFileData === "object" &&
                       Object.keys(openedFileData).length > 0 && (
-                        <PDFDownloadLink
-                          document={pdfDocument}
-                          fileName={`${fileContent?.name}.pdf`}
-                          key={`pdf-${
-                            JSON.stringify(openedFileData).length
-                          }-${Date.now()}`}
-                        >
+                        <>
                           <TertiaryButton
+                            onClick={handlePDFDownloadClick}
                             aria_label="Download PDF"
                             className="hover:bg-green-50 shadow-none hover:text-green-500 hover:border-green-300 bg-transparent"
                           >
@@ -687,7 +746,50 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                               <ICONS.download />
                             </span>
                           </TertiaryButton>
-                        </PDFDownloadLink>
+                          {/* Hidden PDFDownloadLink for actual download */}
+                          <div
+                            style={{ display: "none" }}
+                            data-testid="pdf-download-link"
+                          >
+                            <PDFDownloadLink
+                              document={pdfDocument}
+                              fileName={`${fileContent?.name}.pdf`}
+                              key={`pdf-${
+                                JSON.stringify(openedFileData).length
+                              }-${pdfDownloadKey}`}
+                            >
+                              {({ url }) => {
+                                if (typeof window !== "undefined") {
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                  (window as any).triggerPDFDownload = () => {
+                                    if (url) {
+                                      console.log(
+                                        "Triggering PDF download with URL:",
+                                        url
+                                      );
+                                      const link = document.createElement("a");
+                                      link.href = url;
+                                      link.download = `${fileContent?.name}.pdf`;
+                                      link.style.display = "none";
+                                      document.body.appendChild(link);
+                                      link.click();
+                                      setTimeout(() => {
+                                        if (document.body.contains(link)) {
+                                          document.body.removeChild(link);
+                                        }
+                                      }, 100);
+                                    } else {
+                                      console.log(
+                                        "No URL available for PDF download"
+                                      );
+                                    }
+                                  };
+                                }
+                                return <button aria-label="Download PDF" />;
+                              }}
+                            </PDFDownloadLink>
+                          </div>
+                        </>
                       )}
                   </div>
                 </div>
@@ -836,6 +938,24 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
         <p>
           You have unsaved changes. Are you sure you want to leave without
           saving?
+        </p>
+      </ConfirmationModal>
+
+      {/* PDF Download Confirmation Modal */}
+      <ConfirmationModal
+        title="Save Before Download"
+        isModalOpen={isPDFDownloadModalOpen}
+        onOk={handleConfirmPDFDownload}
+        onCancel={handleCancelPDFDownload}
+      >
+        <p>
+          You have unsaved changes. Do you want to save changes before
+          downloading the form?
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          <strong>Yes:</strong> Save changes first, then download
+          <br />
+          <strong>No:</strong> Download current form without saving changes
         </p>
       </ConfirmationModal>
     </div>

@@ -337,3 +337,23 @@ export const mapExtractedDataToFormValues = (
 
   return filledValues;
 };
+
+export const triggerPDFDownload = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (typeof window !== "undefined" && (window as any).triggerPDFDownload) {
+    console.log("Using global PDF download function");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).triggerPDFDownload();
+  } else {
+    console.log("Fallback: looking for PDF download button");
+    const downloadButton = document.querySelector(
+      'button[aria-label="Download PDF"]'
+    ) as HTMLButtonElement;
+    if (downloadButton) {
+      console.log("Found download button, clicking...");
+      downloadButton.click();
+    } else {
+      console.log("No download button found");
+    }
+  }
+};

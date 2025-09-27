@@ -11,14 +11,14 @@ import { BurialPreferencesSection } from "./BurialPreferencesSection";
 import { ServiceDetailsSection } from "./ServiceDetailsSection";
 import { KeyContactsSection } from "./KeyContactsSection";
 import { DocumentsAndNotesSection } from "./DocumentsAndNotesSection";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import {
   useGetBurialInstructions,
   usePostBurialInstructionsMutation,
 } from "@agensy/api";
 import { useParams } from "react-router-dom";
-import { DateUtils, toast } from "@agensy/utils";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { APP_ACTIONS, BURIAL_TYPES } from "@agensy/constants";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -75,7 +75,13 @@ const createSafeOpenedFileData = (
 export const BurialInstructions = () => {
   const params = useParams();
   const { handleFilterPermission } = useAuthContext();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const {
     data: burialInstructions,
     isFetching: isFetchingBurialInstructions,
@@ -119,11 +125,23 @@ export const BurialInstructions = () => {
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postBurialInstructionsMutation.status === "error") {
       toast.error(
         "Error Occurred",
         String(postBurialInstructionsMutation.error)
       );
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postBurialInstructionsMutation.status]);
 
@@ -220,90 +238,106 @@ export const BurialInstructions = () => {
     }
   }, [burialInstructions, reset]);
 
-  const onSubmit = (data: BurialInstructionsFormData) => {
-    console.log("Form data:", data);
-    const postData = {
-      client_info: {
-        first_name: data.firstName ? data.firstName : null,
-        last_name: data.lastName ? data.lastName : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-        time_of_death: data.timeOfDeath ? data.timeOfDeath : null,
-        date_of_death: data.dateOfDeath
-          ? DateUtils.changetoISO(data.dateOfDeath)
-          : null,
-        county_issuing_certificate: data.countyThatIssuedDeathCertificate
-          ? data.countyThatIssuedDeathCertificate
-          : null,
-        death_certificate_number: data.numberOfDeathCertificatesOrdered
-          ? data.numberOfDeathCertificatesOrdered
-          : null,
-      },
-      burial_instructions: {
-        burial_type: data.burialType
-          ? Object.values(BURIAL_TYPES).includes(data.burialType)
-            ? data.burialType === BURIAL_TYPES.OTHER
-              ? data.burialTypeOther && data.burialTypeOther.length > 0
-                ? data.burialTypeOther
-                : null
-              : data.burialType
-            : null
-          : null,
-        burial_location: data.preferredCemetery ? data.preferredCemetery : null,
-        plot_owned: data.plotOwned === "yes" ? true : false,
-        plot_number: data.plotNumberLocation ? data.plotNumberLocation : null,
-        funeral_home: data.funeralHome ? data.funeralHome : null,
-        vault_casket_preferences: data.vaultCasketPreferences
-          ? data.vaultCasketPreferences
-          : null,
-        urn: data.urnSelection ? data.urnSelection : null,
-        ashes: data.ashesDisposition ? data.ashesDisposition : null,
-        service_type: data.typeOfService ? data.typeOfService : null,
-        officiant: data.officiantSpeakerRequested
-          ? data.officiantSpeakerRequested
-          : null,
-        service_location: data.locationOfService
-          ? data.locationOfService
-          : null,
-        spiritual_advisor_name: data.clergySpiritualAdvisorName
-          ? data.clergySpiritualAdvisorName
-          : null,
-        spiritual_advisor_phone: data.clergySpiritualAdvisorPhone
-          ? data.clergySpiritualAdvisorPhone
-          : null,
-        relationship: data.relationship ? data.relationship : null,
-        obituary_wishes: data.obituaryWishes ? data.obituaryWishes : null,
-        special_requests: data.specialRequests ? data.specialRequests : null,
-        person_responsible_name: data.personResponsibleName
-          ? data.personResponsibleName
-          : null,
-        person_responsible_phone: data.personResponsiblePhone
-          ? data.personResponsiblePhone
-          : null,
-        person_responsible_relationship: data.personResponsibleRelationship
-          ? data.personResponsibleRelationship
-          : null,
-        legal_medical_poa_name: data.legalMedicalPowerOfAttorneyName
-          ? data.legalMedicalPowerOfAttorneyName
-          : null,
-        legal_medical_poa_phone: data.legalMedicalPowerOfAttorneyPhone
-          ? data.legalMedicalPowerOfAttorneyPhone
-          : null,
-        will_location: data.willLocation ? data.willLocation : null,
-        living_will_location: data.advanceDirectiveLocation
-          ? data.advanceDirectiveLocation
-          : null,
-        life_insurance_info: data.lifeInsuranceInfo
-          ? data.lifeInsuranceInfo
-          : null,
-      },
-    };
-    postBurialInstructionsMutation.mutate({
-      clientId: params.clientId as string,
-      data: postData,
-    });
-  };
+  const onSubmit = useCallback(
+    (data: BurialInstructionsFormData) => {
+      console.log("Form data:", data);
+      const postData = {
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+          time_of_death: data.timeOfDeath ? data.timeOfDeath : null,
+          date_of_death: data.dateOfDeath
+            ? DateUtils.changetoISO(data.dateOfDeath)
+            : null,
+          county_issuing_certificate: data.countyThatIssuedDeathCertificate
+            ? data.countyThatIssuedDeathCertificate
+            : null,
+          death_certificate_number: data.numberOfDeathCertificatesOrdered
+            ? data.numberOfDeathCertificatesOrdered
+            : null,
+        },
+        burial_instructions: {
+          burial_type: data.burialType
+            ? Object.values(BURIAL_TYPES).includes(data.burialType)
+              ? data.burialType === BURIAL_TYPES.OTHER
+                ? data.burialTypeOther && data.burialTypeOther.length > 0
+                  ? data.burialTypeOther
+                  : null
+                : data.burialType
+              : null
+            : null,
+          burial_location: data.preferredCemetery
+            ? data.preferredCemetery
+            : null,
+          plot_owned: data.plotOwned === "yes" ? true : false,
+          plot_number: data.plotNumberLocation ? data.plotNumberLocation : null,
+          funeral_home: data.funeralHome ? data.funeralHome : null,
+          vault_casket_preferences: data.vaultCasketPreferences
+            ? data.vaultCasketPreferences
+            : null,
+          urn: data.urnSelection ? data.urnSelection : null,
+          ashes: data.ashesDisposition ? data.ashesDisposition : null,
+          service_type: data.typeOfService ? data.typeOfService : null,
+          officiant: data.officiantSpeakerRequested
+            ? data.officiantSpeakerRequested
+            : null,
+          service_location: data.locationOfService
+            ? data.locationOfService
+            : null,
+          spiritual_advisor_name: data.clergySpiritualAdvisorName
+            ? data.clergySpiritualAdvisorName
+            : null,
+          spiritual_advisor_phone: data.clergySpiritualAdvisorPhone
+            ? data.clergySpiritualAdvisorPhone
+            : null,
+          relationship: data.relationship ? data.relationship : null,
+          obituary_wishes: data.obituaryWishes ? data.obituaryWishes : null,
+          special_requests: data.specialRequests ? data.specialRequests : null,
+          person_responsible_name: data.personResponsibleName
+            ? data.personResponsibleName
+            : null,
+          person_responsible_phone: data.personResponsiblePhone
+            ? data.personResponsiblePhone
+            : null,
+          person_responsible_relationship: data.personResponsibleRelationship
+            ? data.personResponsibleRelationship
+            : null,
+          legal_medical_poa_name: data.legalMedicalPowerOfAttorneyName
+            ? data.legalMedicalPowerOfAttorneyName
+            : null,
+          legal_medical_poa_phone: data.legalMedicalPowerOfAttorneyPhone
+            ? data.legalMedicalPowerOfAttorneyPhone
+            : null,
+          will_location: data.willLocation ? data.willLocation : null,
+          living_will_location: data.advanceDirectiveLocation
+            ? data.advanceDirectiveLocation
+            : null,
+          life_insurance_info: data.lifeInsuranceInfo
+            ? data.lifeInsuranceInfo
+            : null,
+        },
+      };
+      postBurialInstructionsMutation.mutate({
+        clientId: params.clientId as string,
+        data: postData,
+      });
+    },
+    [postBurialInstructionsMutation, params.clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
 
   if (isFetchingBurialInstructions)
     return (

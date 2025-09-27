@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -82,7 +82,6 @@ const defaultValues: HealthHistoryFormData = {
   severityOfSymptoms: "",
 };
 
-// Add this helper function at the top of the component (after the imports)
 const createSafeOpenedFileData = (
   formData: HealthHistoryFormData,
   lastUpdate?: string
@@ -100,8 +99,15 @@ const createSafeOpenedFileData = (
 export const HealthHistoryForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { clientId } = useParams();
-  const { setOpenedFileData, ocrResult, setOcrResult, setHasUnsavedChanges } =
-    useClientContext();
+  const {
+    setOpenedFileData,
+    ocrResult,
+    setOcrResult,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const { handleFilterPermission } = useAuthContext();
   const {
     data: healthHistoryForm,
@@ -122,7 +128,6 @@ export const HealthHistoryForm: React.FC = () => {
     defaultValues,
   });
 
-  // Watch form changes to detect unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty]);
@@ -160,12 +165,21 @@ export const HealthHistoryForm: React.FC = () => {
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postHealthHistoryMutation.status === "error") {
       toast.error("Error Occurred", String(postHealthHistoryMutation.error));
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postHealthHistoryMutation.status]);
 
-  // Cleanup unsaved changes when component unmounts
   useEffect(() => {
     return () => {
       setHasUnsavedChanges(false);
@@ -196,117 +210,134 @@ export const HealthHistoryForm: React.FC = () => {
     name: "anesthesia",
   });
 
-  const onSubmit = (data: HealthHistoryFormData) => {
-    const medicationsStarted = data.medicationsStarted?.map((item) => {
-      const medication = {
-        medication_name: item.medicationName ? item.medicationName : null,
-        dosage: item.dosage ? item.dosage : null,
-        prescribing_doctor: item.prescribingDoctor
-          ? item.prescribingDoctor
-          : null,
-        id: item?.id,
-        start_date: item.startDate
-          ? DateUtils.changetoISO(item.startDate)
-          : null,
-        end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
-      };
-      if (item.id) {
-        return medication;
-      } else {
-        delete medication.id;
-        return medication;
-      }
-    });
-    const medicationsEnded = data.medicationsEnded?.map((item) => {
-      const medication = {
-        medication_name: item.medicationName ? item.medicationName : null,
-        dosage: item.dosage ? item.dosage : null,
-        prescribing_doctor: item.prescribingDoctor
-          ? item.prescribingDoctor
-          : null,
-        id: item?.id,
-        start_date: item.startDate
-          ? DateUtils.changetoISO(item.startDate)
-          : null,
-        end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
-      };
-      if (item.id) {
-        return medication;
-      } else {
-        delete medication.id;
-        return medication;
-      }
-    });
-    const postData = {
-      client_info: {
-        first_name: data.firstName || null,
-        last_name: data.lastName || null,
-      },
-      medical_info: {
-        diagnoses: StringUtils.filterAndJoinWithCommas(
-          data.diagnoses,
-          (diagnoses) => diagnoses.diagnosis || ""
-        ),
-      },
-      medications: [...(medicationsStarted || []), ...(medicationsEnded || [])],
-      healthcare_providers:
-        data.providers?.map((provider) => ({
-          provider_name: provider.providerName ? provider.providerName : null,
-          address: provider.address ? provider.address : null,
-          phone: provider.phone ? provider.phone : null,
-          notes: provider.notes ? provider.notes : null,
-          follow_up: provider.follow_up
-            ? DateUtils.changetoISO(provider.follow_up)
+  const onSubmit = useCallback(
+    (data: HealthHistoryFormData) => {
+      const medicationsStarted = data.medicationsStarted?.map((item) => {
+        const medication = {
+          medication_name: item.medicationName ? item.medicationName : null,
+          dosage: item.dosage ? item.dosage : null,
+          prescribing_doctor: item.prescribingDoctor
+            ? item.prescribingDoctor
             : null,
-        })) || [],
-      home_health_agency: {
-        name: data.homeHealthName ? data.homeHealthName : null,
-        phone: data.homeHealthPhone ? data.homeHealthPhone : null,
-        address: data.homeHealthAddress ? data.homeHealthAddress : null,
-        fax: data.homeHealthFax ? data.homeHealthFax : null,
-        service_received: data.homeHealthServiceReceived
-          ? data.homeHealthServiceReceived
-          : null,
-        start_date: data.homeHealthStartDate
-          ? DateUtils.changetoISO(data.homeHealthStartDate)
-          : null,
-        discharge_date: data.homeHealthDischargeDate
-          ? DateUtils.changetoISO(data.homeHealthDischargeDate)
-          : null,
-      },
-      health_history: {
-        what_worked: data.whatWorked ? data.whatWorked : null,
-        date: data.healthHistoryDate
-          ? DateUtils.changetoISO(data.healthHistoryDate)
-          : null,
-        notes: data.healthHistoryNotes ? data.healthHistoryNotes : null,
-        description_of_health_concern: data.descriptionOfHealthConcern
-          ? data.descriptionOfHealthConcern
-          : null,
-        onset_of_symptoms: data.onsetOfSymptoms ? data.onsetOfSymptoms : null,
-        frequency_of_symptoms: data.frequencyOfSymptoms
-          ? data.frequencyOfSymptoms
-          : null,
-        severity_of_symptoms: data.severityOfSymptoms
-          ? data.severityOfSymptoms
-          : null,
-        admitting_diagnosis: data.admittingDiagnosis
-          ? data.admittingDiagnosis
-          : null,
-        treatment: data.hospitalizationTreatment
-          ? data.hospitalizationTreatment
-          : null,
-        medication_anesthesia_reactions: StringUtils.filterAndJoinWithCommas(
-          data.anesthesia,
-          (anesthesia) => anesthesia.anesthesia || ""
-        ),
-      },
-    };
-    postHealthHistoryMutation.mutate({
-      clientId: clientId as string,
-      data: postData,
-    });
-  };
+          id: item?.id,
+          start_date: item.startDate
+            ? DateUtils.changetoISO(item.startDate)
+            : null,
+          end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
+        };
+        if (item.id) {
+          return medication;
+        } else {
+          delete medication.id;
+          return medication;
+        }
+      });
+      const medicationsEnded = data.medicationsEnded?.map((item) => {
+        const medication = {
+          medication_name: item.medicationName ? item.medicationName : null,
+          dosage: item.dosage ? item.dosage : null,
+          prescribing_doctor: item.prescribingDoctor
+            ? item.prescribingDoctor
+            : null,
+          id: item?.id,
+          start_date: item.startDate
+            ? DateUtils.changetoISO(item.startDate)
+            : null,
+          end_date: item.endDate ? DateUtils.changetoISO(item.endDate) : null,
+        };
+        if (item.id) {
+          return medication;
+        } else {
+          delete medication.id;
+          return medication;
+        }
+      });
+      const postData = {
+        client_info: {
+          first_name: data.firstName || null,
+          last_name: data.lastName || null,
+        },
+        medical_info: {
+          diagnoses: StringUtils.filterAndJoinWithCommas(
+            data.diagnoses,
+            (diagnoses) => diagnoses.diagnosis || ""
+          ),
+        },
+        medications: [
+          ...(medicationsStarted || []),
+          ...(medicationsEnded || []),
+        ],
+        healthcare_providers:
+          data.providers?.map((provider) => ({
+            provider_name: provider.providerName ? provider.providerName : null,
+            address: provider.address ? provider.address : null,
+            phone: provider.phone ? provider.phone : null,
+            notes: provider.notes ? provider.notes : null,
+            follow_up: provider.follow_up
+              ? DateUtils.changetoISO(provider.follow_up)
+              : null,
+          })) || [],
+        home_health_agency: {
+          name: data.homeHealthName ? data.homeHealthName : null,
+          phone: data.homeHealthPhone ? data.homeHealthPhone : null,
+          address: data.homeHealthAddress ? data.homeHealthAddress : null,
+          fax: data.homeHealthFax ? data.homeHealthFax : null,
+          service_received: data.homeHealthServiceReceived
+            ? data.homeHealthServiceReceived
+            : null,
+          start_date: data.homeHealthStartDate
+            ? DateUtils.changetoISO(data.homeHealthStartDate)
+            : null,
+          discharge_date: data.homeHealthDischargeDate
+            ? DateUtils.changetoISO(data.homeHealthDischargeDate)
+            : null,
+        },
+        health_history: {
+          what_worked: data.whatWorked ? data.whatWorked : null,
+          date: data.healthHistoryDate
+            ? DateUtils.changetoISO(data.healthHistoryDate)
+            : null,
+          notes: data.healthHistoryNotes ? data.healthHistoryNotes : null,
+          description_of_health_concern: data.descriptionOfHealthConcern
+            ? data.descriptionOfHealthConcern
+            : null,
+          onset_of_symptoms: data.onsetOfSymptoms ? data.onsetOfSymptoms : null,
+          frequency_of_symptoms: data.frequencyOfSymptoms
+            ? data.frequencyOfSymptoms
+            : null,
+          severity_of_symptoms: data.severityOfSymptoms
+            ? data.severityOfSymptoms
+            : null,
+          admitting_diagnosis: data.admittingDiagnosis
+            ? data.admittingDiagnosis
+            : null,
+          treatment: data.hospitalizationTreatment
+            ? data.hospitalizationTreatment
+            : null,
+          medication_anesthesia_reactions: StringUtils.filterAndJoinWithCommas(
+            data.anesthesia,
+            (anesthesia) => anesthesia.anesthesia || ""
+          ),
+        },
+      };
+      postHealthHistoryMutation.mutate({
+        clientId: clientId as string,
+        data: postData,
+      });
+    },
+    [postHealthHistoryMutation, clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, []);
 
   useEffect(() => {
     if (healthHistoryForm) {

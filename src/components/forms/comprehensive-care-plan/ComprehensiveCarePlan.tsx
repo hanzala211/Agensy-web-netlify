@@ -30,8 +30,8 @@ import {
   useGetComprehensiveCarePlan,
   usePostComprehensiveCarePlanMutation,
 } from "@agensy/api";
-import { DateUtils } from "@agensy/utils";
-import { useEffect } from "react";
+import { DateUtils, StringUtils } from "@agensy/utils";
+import { useEffect, useCallback } from "react";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -106,7 +106,13 @@ const createFormDataForPDF = (
 };
 
 export const ComprehensiveCarePlan = () => {
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const { clientId } = useParams();
   const { handleFilterPermission } = useAuthContext();
   const queryClient = useQueryClient();
@@ -530,6 +536,13 @@ export const ComprehensiveCarePlan = () => {
           new Date().toISOString()
         ) as unknown as OpenedFileData
       );
+
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postComprehensiveCarePlanMutation.status === "error") {
       toast.error(
         "Error Occurred",
@@ -1858,1128 +1871,1170 @@ export const ComprehensiveCarePlan = () => {
     }
   }, [comprehensiveCarePlan]);
 
-  const onSubmit = (data: ComprehensiveCarePlanFormData) => {
-    console.log(data);
-    const medications = data.medications?.map((medication) => {
-      const med = {
-        medication_name: medication.medicationName
-          ? medication.medicationName
-          : null,
-        dosage: medication.dosage ? medication.dosage : null,
-        frequency: medication.frequency ? medication.frequency : null,
-        start_date: medication.startDate
-          ? DateUtils.changetoISO(medication.startDate)
-          : null,
-        end_date: medication.endDate
-          ? DateUtils.changetoISO(medication.endDate)
-          : null,
-        purpose: medication.usedToTreat ? medication.usedToTreat : null,
-        id: medication.id ? medication.id : null,
-      };
-      if (med.id) {
-        return med;
-      } else {
-        // @ts-expect-error - TODO: fix this
-        delete med.id;
-        return med;
-      }
-    });
-
-    const healthCareProviders = data.healthcareProviders?.map((provider) => {
-      const providerData = {
-        provider_type: provider.providerType ? provider.providerType : null,
-        provider_name: provider.providerName ? provider.providerName : null,
-        specialty: provider.specialty ? provider.specialty : null,
-        address: provider.address ? provider.address : null,
-        phone: provider.phone ? provider.phone : null,
-        id: provider.id ? provider.id : null,
-      };
-      if (providerData.id) {
-        return providerData;
-      } else {
-        // @ts-expect-error - TODO: fix this
-        delete providerData.id;
-        return providerData;
-      }
-    });
-
-    const focusedRecommendations = data.focusedRecommendations?.map(
-      (item, index) => {
-        const focused = {
-          option_number: index + 1 || null,
-          name: item.name ? item.name : null,
-          description: item.description ? item.description : null,
-          details: item.details
-            ? item.details.length > 0
-              ? item.details.join(", ")
-              : null
+  const onSubmit = useCallback(
+    (data: ComprehensiveCarePlanFormData) => {
+      console.log(data);
+      const medications = data.medications?.map((medication) => {
+        const med = {
+          medication_name: medication.medicationName
+            ? medication.medicationName
             : null,
-          id: item.id ? item.id : null,
+          dosage: medication.dosage ? medication.dosage : null,
+          frequency: medication.frequency ? medication.frequency : null,
+          start_date: medication.startDate
+            ? DateUtils.changetoISO(medication.startDate)
+            : null,
+          end_date: medication.endDate
+            ? DateUtils.changetoISO(medication.endDate)
+            : null,
+          purpose: medication.usedToTreat ? medication.usedToTreat : null,
+          id: medication.id ? medication.id : null,
         };
-        if (focused.id) {
-          return focused;
+        if (med.id) {
+          return med;
         } else {
           // @ts-expect-error - TODO: fix this
-          delete focused.id;
-          return focused;
+          delete med.id;
+          return med;
         }
-      }
-    );
+      });
 
-    const postData = {
-      client_info: {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-        preferred_hospital: data.preferredHospital
-          ? data.preferredHospital
-          : null,
-        pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
-      },
-      medications: medications,
-      medical_info: {
-        allergies:
-          data.allergies?.length && data.allergies.length > 0
-            ? data.allergies.map((allergy) => allergy.allergen).join(", ")
-            : null,
-      },
-      healthcare_providers: healthCareProviders,
-      initial_assessment: {
-        date_of_assessment: data.dateOfAssessment
-          ? DateUtils.changetoISO(data.dateOfAssessment)
-          : null,
-        date_of_care_plan: data.dateOfCarePlan
-          ? DateUtils.changetoISO(data.dateOfCarePlan)
-          : null,
-        person_completing_assessment: data.personCompletingAssessment
-          ? data.personCompletingAssessment
-          : null,
-        present_for_assessment: data.presentForAssessment
-          ? data.presentForAssessment
-          : null,
-        goals_for_assessment: data.goalsForAssessment
-          ? data.goalsForAssessment.length > 0
-            ? data.goalsForAssessment.join(", ").length > 0
-              ? data.goalsForAssessment.join(", ")
-              : null
-            : null
-          : null,
-        next_step_care_recipient: data.nextStepCareRecipient
-          ? data.nextStepCareRecipient.length > 0
-            ? data.nextStepCareRecipient.join(", ").length > 0
-              ? data.nextStepCareRecipient.join(", ")
-              : null
-            : null
-          : null,
-        next_step_care_partner: data.nextStepCarePartner
-          ? data.nextStepCarePartner.length > 0
-            ? data.nextStepCarePartner.join(", ").length > 0
-              ? data.nextStepCarePartner.join(", ")
-              : null
-            : null
-          : null,
-      },
-      focused_recommendations: focusedRecommendations,
-      functional_adls: {
-        summary: data.functionalAdls?.summary
-          ? data.functionalAdls?.summary
-          : null,
-        deficits_noted: data.functionalAdls?.deficitsNoted
-          ? data.functionalAdls?.deficitsNoted === "true"
-            ? true
-            : false
-          : false,
-        category_name: data.functionalAdls?.categoryName
-          ? data.functionalAdls?.categoryName
-          : "functional_adls",
-        detailed_table: {
-          katz_index: {
-            description: data.functionalAdls?.detailedTable?.katzIndex
-              ?.description
-              ? data.functionalAdls?.detailedTable?.katzIndex?.description
-              : null,
-            score: data.functionalAdls?.detailedTable?.katzIndex?.score
-              ? Number(data.functionalAdls?.detailedTable?.katzIndex?.score)
-              : null,
-          },
-          bathing: {
-            description: data.functionalAdls?.detailedTable?.bathing
-              ?.description
-              ? data.functionalAdls?.detailedTable?.bathing?.description
-              : null,
-            score: data.functionalAdls?.detailedTable?.bathing?.score
-              ? Number(data.functionalAdls?.detailedTable?.bathing?.score)
-              : null,
-          },
-          dressing: {
-            description: data.functionalAdls?.detailedTable?.dressing
-              ?.description
-              ? data.functionalAdls?.detailedTable?.dressing?.description
-              : null,
-            score: data.functionalAdls?.detailedTable?.dressing?.score
-              ? Number(data.functionalAdls?.detailedTable?.dressing?.score)
-              : null,
-          },
-          toileting: {
-            description: data.functionalAdls?.detailedTable?.toileting
-              ?.description
-              ? data.functionalAdls?.detailedTable?.toileting?.description
-              : null,
-            score: data.functionalAdls?.detailedTable?.toileting?.score
-              ? Number(data.functionalAdls?.detailedTable?.toileting?.score)
-              : null,
-          },
-          transfers: {
-            description: data.functionalAdls?.detailedTable?.transfers
-              ?.description
-              ? data.functionalAdls?.detailedTable?.transfers?.description
-              : null,
-            score: data.functionalAdls?.detailedTable?.transfers?.score
-              ? Number(data.functionalAdls?.detailedTable?.transfers?.score)
-              : null,
-          },
-          continence: {
-            description: data.functionalAdls?.detailedTable?.continence
-              ?.description
-              ? data.functionalAdls?.detailedTable?.continence?.description
-              : null,
-            score: data.functionalAdls?.detailedTable?.continence?.score
-              ? Number(data.functionalAdls?.detailedTable?.continence?.score)
-              : null,
-          },
-          feeding: {
-            description: data.functionalAdls?.detailedTable?.feeding
-              ?.description
-              ? data.functionalAdls?.detailedTable?.feeding?.description
-              : null,
-            score: data.functionalAdls?.detailedTable?.feeding?.score
-              ? Number(data.functionalAdls?.detailedTable?.feeding?.score)
-              : null,
-          },
-        },
-      },
-      functional_iadls: {
-        summary: data.functionalIadls?.summary
-          ? data.functionalIadls?.summary
-          : null,
-        category_name: data.functionalIadls?.categoryName
-          ? data.functionalIadls?.categoryName
-          : "functional_iadls",
-        detailed_table: {
-          telephone: {
-            description: data.functionalIadls?.detailedTable?.telephone
-              ?.description
-              ? data.functionalIadls?.detailedTable?.telephone?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.telephone?.score
-              ? Number(data.functionalIadls?.detailedTable?.telephone?.score)
-              : null,
-          },
-          shopping: {
-            description: data.functionalIadls?.detailedTable?.shopping
-              ?.description
-              ? data.functionalIadls?.detailedTable?.shopping?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.shopping?.score
-              ? Number(data.functionalIadls?.detailedTable?.shopping?.score)
-              : null,
-          },
-          foodPreparation: {
-            description: data.functionalIadls?.detailedTable?.foodPreparation
-              ?.description
-              ? data.functionalIadls?.detailedTable?.foodPreparation
-                  ?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.foodPreparation?.score
-              ? Number(
-                  data.functionalIadls?.detailedTable?.foodPreparation?.score
-                )
-              : null,
-          },
-          housekeeping: {
-            description: data.functionalIadls?.detailedTable?.housekeeping
-              ?.description
-              ? data.functionalIadls?.detailedTable?.housekeeping?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.housekeeping?.score
-              ? Number(data.functionalIadls?.detailedTable?.housekeeping?.score)
-              : null,
-          },
-          laundry: {
-            description: data.functionalIadls?.detailedTable?.laundry
-              ?.description
-              ? data.functionalIadls?.detailedTable?.laundry?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.laundry?.score
-              ? Number(data.functionalIadls?.detailedTable?.laundry?.score)
-              : null,
-          },
-          transportation: {
-            description: data.functionalIadls?.detailedTable?.transportation
-              ?.description
-              ? data.functionalIadls?.detailedTable?.transportation?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.transportation?.score
-              ? Number(
-                  data.functionalIadls?.detailedTable?.transportation?.score
-                )
-              : null,
-          },
-          medication: {
-            description: data.functionalIadls?.detailedTable?.medication
-              ?.description
-              ? data.functionalIadls?.detailedTable?.medication?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.medication?.score
-              ? Number(data.functionalIadls?.detailedTable?.medication?.score)
-              : null,
-          },
-          finances: {
-            description: data.functionalIadls?.detailedTable?.finances
-              ?.description
-              ? data.functionalIadls?.detailedTable?.finances?.description
-              : null,
-            score: data.functionalIadls?.detailedTable?.finances?.score
-              ? Number(data.functionalIadls?.detailedTable?.finances?.score)
-              : null,
-          },
-        },
-        additional_data: {
-          identified_problem_1: {
-            identified_problem: data.functionalIadls?.additionalData
-              ?.identifiedProblem1?.identifiedProblem
-              ? data.functionalIadls?.additionalData?.identifiedProblem1
-                  .identifiedProblem
-              : null,
-            intervention_action: data.functionalIadls?.additionalData
-              ?.identifiedProblem1?.interventionAction
-              ? data.functionalIadls?.additionalData?.identifiedProblem1
-                  .interventionAction
-              : null,
-            goal: data.functionalIadls?.additionalData?.identifiedProblem1?.goal
-              ? data.functionalIadls?.additionalData?.identifiedProblem1.goal
-              : null,
-            referral_options: data.functionalIadls?.additionalData
-              ?.identifiedProblem1?.referralOptions
-              ? data.functionalIadls?.additionalData?.identifiedProblem1
-                  .referralOptions
-              : null,
-          },
-          identified_problem_2: {
-            identified_problem: data.functionalIadls?.additionalData
-              ?.identifiedProblem2?.identifiedProblem
-              ? data.functionalIadls?.additionalData?.identifiedProblem2
-                  .identifiedProblem
-              : null,
-            intervention_action: data.functionalIadls?.additionalData
-              ?.identifiedProblem2?.interventionAction
-              ? data.functionalIadls?.additionalData?.identifiedProblem2
-                  .interventionAction
-              : null,
-            goal: data.functionalIadls?.additionalData?.identifiedProblem2?.goal
-              ? data.functionalIadls?.additionalData?.identifiedProblem2.goal
-              : null,
-            referral_options: data.functionalIadls?.additionalData
-              ?.identifiedProblem2?.referralOptions
-              ? data.functionalIadls?.additionalData?.identifiedProblem2
-                  .referralOptions
-              : null,
-          },
-          identified_problem_3: {
-            identified_problem: data.functionalIadls?.additionalData
-              ?.identifiedProblem3?.identifiedProblem
-              ? data.functionalIadls?.additionalData?.identifiedProblem3
-                  .identifiedProblem
-              : null,
-            intervention_action: data.functionalIadls?.additionalData
-              ?.identifiedProblem3?.interventionAction
-              ? data.functionalIadls?.additionalData?.identifiedProblem3
-                  .interventionAction
-              : null,
-            goal: data.functionalIadls?.additionalData?.identifiedProblem3?.goal
-              ? data.functionalIadls?.additionalData?.identifiedProblem3.goal
-              : null,
-            referral_options: data.functionalIadls?.additionalData
-              ?.identifiedProblem3?.referralOptions
-              ? data.functionalIadls?.additionalData?.identifiedProblem3
-                  .referralOptions
-              : null,
-          },
-          identified_problem_4: {
-            identified_problem: data.functionalIadls?.additionalData
-              ?.identifiedProblem4?.identifiedProblem
-              ? data.functionalIadls?.additionalData?.identifiedProblem4
-                  .identifiedProblem
-              : null,
-            intervention_action: data.functionalIadls?.additionalData
-              ?.identifiedProblem4?.interventionAction
-              ? data.functionalIadls?.additionalData?.identifiedProblem4
-                  .interventionAction
-              : null,
-            goal: data.functionalIadls?.additionalData?.identifiedProblem4?.goal
-              ? data.functionalIadls?.additionalData?.identifiedProblem4.goal
-              : null,
-            referral_options: data.functionalIadls?.additionalData
-              ?.identifiedProblem4?.referralOptions
-              ? data.functionalIadls?.additionalData?.identifiedProblem4
-                  .referralOptions
-              : null,
-          },
-        },
-      },
-      home_safety: {
-        summary: data.homeSafety?.summary ? data.homeSafety?.summary : null,
-        deficits_noted: data.homeSafety?.deficitsNoted
-          ? data.homeSafety?.deficitsNoted === "true"
-            ? true
-            : false
-          : false,
-        category_name: data.homeSafety?.categoryName
-          ? data.homeSafety?.categoryName
-          : "home_safety",
-        detailed_table: {
-          are_pathways_clear: data.homeSafety?.detailedTable?.arePathwaysClear
-            ? data.homeSafety?.detailedTable?.arePathwaysClear
-            : null,
-          are_there_throw_rugs: data.homeSafety?.detailedTable
-            ?.areThereThrowRugs
-            ? data.homeSafety?.detailedTable?.areThereThrowRugs
-            : null,
-          are_stairs_safe: data.homeSafety?.detailedTable?.areStairsSafe
-            ? data.homeSafety?.detailedTable?.areStairsSafe
-            : null,
-          is_there_clutter_or_hoarding: data.homeSafety?.detailedTable
-            ?.isThereClutterOrHoarding
-            ? data.homeSafety?.detailedTable?.isThereClutterOrHoarding
-            : null,
-          are_floors_slippery: data.homeSafety?.detailedTable?.areFloorsSlippery
-            ? data.homeSafety?.detailedTable?.areFloorsSlippery
-            : null,
-          condition_of_floor_surfaces: data.homeSafety?.detailedTable
-            ?.conditionOfFloorSurfaces
-            ? data.homeSafety?.detailedTable?.conditionOfFloorSurfaces
-            : null,
-          condition_of_carpeting: data.homeSafety?.detailedTable
-            ?.conditionOfCarpeting
-            ? data.homeSafety?.detailedTable?.conditionOfCarpeting
-            : null,
-          are_chairs_sturdy_and_stable: data.homeSafety?.detailedTable
-            ?.areChairsSturdyAndStable
-            ? data.homeSafety?.detailedTable?.areChairsSturdyAndStable
-            : null,
-          electricity_fully_functional: data.homeSafety?.detailedTable
-            ?.electricityFullyFunctional
-            ? data.homeSafety?.detailedTable?.electricityFullyFunctional
-            : null,
-          adequate_lighting: data.homeSafety?.detailedTable?.adequateLighting
-            ? data.homeSafety?.detailedTable?.adequateLighting
-            : null,
-          exposed_wires_or_cords: data.homeSafety?.detailedTable
-            ?.exposedWiresOrCords
-            ? data.homeSafety?.detailedTable?.exposedWiresOrCords
-            : null,
-          condition_of_wires_and_plugs: data.homeSafety?.detailedTable
-            ?.conditionOfWiresAndPlugs
-            ? data.homeSafety?.detailedTable?.conditionOfWiresAndPlugs
-            : null,
-          are_there_space_heaters: data.homeSafety?.detailedTable
-            ?.areThereSpaceHeaters
-            ? data.homeSafety?.detailedTable?.areThereSpaceHeaters
-            : null,
-          care_recipient_smokes: data.homeSafety?.detailedTable
-            ?.careRecipientSmokes
-            ? data.homeSafety?.detailedTable?.careRecipientSmokes
-            : null,
-          fire_extinguisher_accessible: data.homeSafety?.detailedTable
-            ? data.homeSafety?.detailedTable?.fireExtinguisherAccessible
-            : null,
-          condition_of_appliances: data.homeSafety?.detailedTable
-            ?.conditionOfAppliances
-            ? data.homeSafety?.detailedTable?.conditionOfAppliances
-            : null,
-          kitchen_safety_hazards: data.homeSafety?.detailedTable
-            ?.kitchenSafetyHazards
-            ? data.homeSafety?.detailedTable?.kitchenSafetyHazards
-            : null,
-          locks_on_doors_and_windows: data.homeSafety?.detailedTable
-            ?.locksOnDoorsAndWindows
-            ? data.homeSafety?.detailedTable?.locksOnDoorsAndWindows
-            : null,
-          emergency_numbers_posted: data.homeSafety?.detailedTable
-            ?.emergencyNumbersPosted
-            ? data.homeSafety?.detailedTable?.emergencyNumbersPosted
-            : null,
-          accessible_telephones: data.homeSafety?.detailedTable
-            ? data.homeSafety?.detailedTable?.accessibleTelephones
-            : null,
-          weapons_or_firearms_present: data.homeSafety?.detailedTable
-            ?.weaponsOrFirearmsPresent
-            ? data.homeSafety?.detailedTable?.weaponsOrFirearmsPresent
-            : null,
-          pets_present: data.homeSafety?.detailedTable?.petsPresent
-            ? data.homeSafety?.detailedTable?.petsPresent
-            : null,
-          condition_of_bed: data.homeSafety?.detailedTable?.conditionOfBed
-            ? data.homeSafety?.detailedTable?.conditionOfBed
-            : null,
-          other: data.homeSafety?.detailedTable?.other
-            ? data.homeSafety?.detailedTable?.other
-            : null,
-        },
-      },
-      memory_and_reasoning: {
-        summary: data.memoryAndReasoning?.summary
-          ? data.memoryAndReasoning?.summary
-          : null,
-        deficits_noted: data.memoryAndReasoning?.deficitsNoted
-          ? data.memoryAndReasoning?.deficitsNoted === "true"
-            ? true
-            : false
-          : false,
-        category_name: data.memoryAndReasoning?.categoryName
-          ? data.memoryAndReasoning?.categoryName
-          : "memory_reasoning",
-        detailed_table: {
-          identified_problem_1: {
-            identified_problem: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem1?.identifiedProblem
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem1?.interventionAction
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1
-                  ?.interventionAction
-              : null,
-            goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem1
-              ?.goal
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1?.goal
-              : null,
-            referral_options: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem1?.referralOptions
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_2: {
-            identified_problem: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem2?.identifiedProblem
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem2?.interventionAction
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2
-                  ?.interventionAction
-              : null,
-            goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem2
-              ?.goal
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2?.goal
-              : null,
-            referral_options: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem2?.referralOptions
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_3: {
-            identified_problem: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem3?.identifiedProblem
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem3?.interventionAction
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3
-                  ?.interventionAction
-              : null,
-            goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem3
-              ?.goal
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3?.goal
-              : null,
-            referral_options: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem3?.referralOptions
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_4: {
-            identified_problem: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem4?.identifiedProblem
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem4?.interventionAction
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4
-                  ?.interventionAction
-              : null,
-            goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem4
-              ?.goal
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4?.goal
-              : null,
-            referral_options: data.memoryAndReasoning?.detailedTable
-              ?.identifiedProblem4?.referralOptions
-              ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4
-                  ?.referralOptions
-              : null,
-          },
-        },
-      },
-      geriatric_depression: {
-        summary: data.geriatricDepression?.summary
-          ? data.geriatricDepression?.summary
-          : null,
-        deficits_noted: data.geriatricDepression?.deficitsNoted
-          ? data.geriatricDepression?.deficitsNoted === "true"
-            ? true
-            : false
-          : false,
-        category_name: data.geriatricDepression?.categoryName
-          ? data.geriatricDepression?.categoryName
-          : "geriatric_depression",
-        detailed_table: {
-          identified_problem_1: {
-            identified_problem: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem1?.identifiedProblem
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem1
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem1?.interventionAction
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem1
-                  ?.interventionAction
-              : null,
-            goal: data.geriatricDepression?.detailedTable?.identifiedProblem1
-              ?.goal,
-          },
-          identified_problem_2: {
-            identified_problem: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem2?.identifiedProblem
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem2
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem2?.interventionAction
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem2
-                  ?.interventionAction
-              : null,
-            goal: data.geriatricDepression?.detailedTable?.identifiedProblem2
-              ?.goal
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem2
-                  ?.goal
-              : null,
-            referral_options: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem2?.referralOptions
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem2
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_3: {
-            identified_problem: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem3?.identifiedProblem
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem3
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem3?.interventionAction
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem3
-                  ?.interventionAction
-              : null,
-            goal: data.geriatricDepression?.detailedTable?.identifiedProblem3
-              ?.goal
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem3
-                  ?.goal
-              : null,
-            referral_options: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem3?.referralOptions
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem3
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_4: {
-            identified_problem: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem4?.identifiedProblem
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem4
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem4?.interventionAction
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem4
-                  ?.interventionAction
-              : null,
-            goal: data.geriatricDepression?.detailedTable?.identifiedProblem4
-              ?.goal
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem4
-                  ?.goal
-              : null,
-            referral_options: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem4?.referralOptions
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem4
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_5: {
-            identified_problem: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem5?.identifiedProblem
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem5
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem5?.interventionAction
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem5
-                  ?.interventionAction
-              : null,
-            goal: data.geriatricDepression?.detailedTable?.identifiedProblem5
-              ?.goal
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem5
-                  ?.goal
-              : null,
-            referral_options: data.geriatricDepression?.detailedTable
-              ?.identifiedProblem5?.referralOptions
-              ? data.geriatricDepression?.detailedTable?.identifiedProblem5
-                  ?.referralOptions
-              : null,
-          },
-        },
-      },
-      nutritional_health: {
-        summary: data.nutritionalHealth?.summary
-          ? data.nutritionalHealth?.summary
-          : null,
-        deficits_noted: data.nutritionalHealth?.deficitsNoted
-          ? data.nutritionalHealth?.deficitsNoted === "true"
-            ? true
-            : false
-          : false,
-        category_name: data.nutritionalHealth?.categoryName
-          ? data.nutritionalHealth?.categoryName
-          : "nutritional_health",
-        detailed_table: {
-          identified_problem_1: {
-            identified_problem: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem1?.identifiedProblem
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem1
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem1?.interventionAction
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem1
-                  ?.interventionAction
-              : null,
-            goal: data.nutritionalHealth?.detailedTable?.identifiedProblem1
-              ?.goal
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem1?.goal
-              : null,
-            referral_options: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem1?.referralOptions
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem1
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_2: {
-            identified_problem: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem2?.identifiedProblem
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem2
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem2?.interventionAction
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem2
-                  ?.interventionAction
-              : null,
-          },
-          identified_problem_3: {
-            identified_problem: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem3?.identifiedProblem
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem3
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem3?.interventionAction
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem3
-                  ?.interventionAction
-              : null,
-          },
-          identified_problem_4: {
-            identified_problem: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem4?.identifiedProblem
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem4
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem4?.interventionAction
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem4
-                  ?.interventionAction
-              : null,
-            goal: data.nutritionalHealth?.detailedTable?.identifiedProblem4
-              ?.goal
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem4?.goal
-              : null,
-            referral_options: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem4?.referralOptions
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem4
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_5: {
-            identified_problem: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem5?.identifiedProblem
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem5
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem5?.interventionAction
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem5
-                  ?.interventionAction
-              : null,
-            goal: data.nutritionalHealth?.detailedTable?.identifiedProblem5
-              ?.goal
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem5?.goal
-              : null,
-            referral_options: data.nutritionalHealth?.detailedTable
-              ?.identifiedProblem5?.referralOptions
-              ? data.nutritionalHealth?.detailedTable?.identifiedProblem5
-                  ?.referralOptions
-              : null,
-          },
-        },
-      },
-      legal_and_financial: {
-        summary: data.legalAndFinancial?.summary
-          ? data.legalAndFinancial?.summary
-          : null,
-        deficits_noted: data.legalAndFinancial?.deficitsNoted
-          ? data.legalAndFinancial?.deficitsNoted === "true"
-            ? true
-            : false
-          : false,
-        category_name: data.legalAndFinancial?.categoryName
-          ? data.legalAndFinancial?.categoryName
-          : "legal_financial",
-        detailed_table: {
-          identified_problem_1: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem1?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem1
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem1?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem1
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem1
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem1?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem1?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem1
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_2: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem2?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem2
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem2?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem2
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem2
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem2?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem2?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem2
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_3: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem3?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem3
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem3?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem3
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem3
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem3?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem3?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem3
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_4: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem4?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem4
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem4?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem4
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem4
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem4?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem4?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem4
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_5: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem5?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem5
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem5?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem5
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem5
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem5?.goal
-              : null,
-            referral_options:
-              data.legalAndFinancial?.detailedTable?.identifiedProblem5
-                ?.referralOptions,
-          },
-          identified_problem_6: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem6?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem6
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem6?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem6
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem6
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem6?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem6?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem6
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_7: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem7?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem7
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem7?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem7
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem7
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem7?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem7?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem7
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_8: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem8?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem8
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem8?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem8
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem8
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem8?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem8?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem8
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_9: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem9?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem9
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem9?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem9
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem9
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem9?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem9?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem9
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_10: {
-            identified_problem: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem10?.identifiedProblem
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem10
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem10?.interventionAction
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem10
-                  ?.interventionAction
-              : null,
-            goal: data.legalAndFinancial?.detailedTable?.identifiedProblem10
-              ?.goal
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem10?.goal
-              : null,
-            referral_options: data.legalAndFinancial?.detailedTable
-              ?.identifiedProblem10?.referralOptions
-              ? data.legalAndFinancial?.detailedTable?.identifiedProblem10
-                  ?.referralOptions
-              : null,
-          },
-        },
-      },
-      care_giver_support: {
-        summary: data.careGiverSupport?.summary
-          ? data.careGiverSupport?.summary
-          : null,
-        deficits_noted: data.careGiverSupport?.deficitsNoted
-          ? data.careGiverSupport?.deficitsNoted === "true"
-            ? true
-            : false
-          : false,
-        category_name: data.careGiverSupport?.categoryName
-          ? data.careGiverSupport?.categoryName
-          : "care_giver_support",
-        detailed_table: {
-          identified_problem_1: {
-            identified_problem: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem1?.identifiedProblem
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem1
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem1?.interventionAction
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem1
-                  ?.interventionAction
-              : null,
-            goal: data.careGiverSupport?.detailedTable?.identifiedProblem1?.goal
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem1?.goal
-              : null,
-            referral_options: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem1?.referralOptions
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem1
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_2: {
-            identified_problem: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem2?.identifiedProblem
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem2
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem2?.interventionAction
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem2
-                  ?.interventionAction
-              : null,
-            goal: data.careGiverSupport?.detailedTable?.identifiedProblem2?.goal
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem2?.goal
-              : null,
-            referral_options: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem2?.referralOptions
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem2
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_3: {
-            identified_problem: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem3?.identifiedProblem
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem3
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem3?.interventionAction
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem3
-                  ?.interventionAction
-              : null,
-            referral_options: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem3?.referralOptions
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem3
-                  ?.referralOptions
-              : null,
-          },
-          identified_problem_4: {
-            identified_problem: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem4?.identifiedProblem
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem4
-                  ?.identifiedProblem
-              : null,
-            intervention_action: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem4?.interventionAction
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem4
-                  ?.interventionAction
-              : null,
-            goal: data.careGiverSupport?.detailedTable?.identifiedProblem4?.goal
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem4?.goal
-              : null,
-            referral_options: data.careGiverSupport?.detailedTable
-              ?.identifiedProblem4?.referralOptions
-              ? data.careGiverSupport?.detailedTable?.identifiedProblem4
-                  ?.referralOptions
-              : null,
-          },
-        },
-      },
-      comprehensive_care_plan_assessment: {
-        initial_request: data.initialRequest ? data.initialRequest : null,
-        care_recipient_goals: data.careRecipientGoals
-          ? data.careRecipientGoals
-          : null,
-        demographic_and_historic_information:
-          data.demographicAndHistoricInformation
-            ? data.demographicAndHistoricInformation
-            : null,
-        medical_history: data.medicalHistory ? data.medicalHistory : null,
-      },
-    };
+      const healthCareProviders = data.healthcareProviders?.map((provider) => {
+        const providerData = {
+          provider_type: provider.providerType ? provider.providerType : null,
+          provider_name: provider.providerName ? provider.providerName : null,
+          specialty: provider.specialty ? provider.specialty : null,
+          address: provider.address ? provider.address : null,
+          phone: provider.phone ? provider.phone : null,
+          id: provider.id ? provider.id : null,
+        };
+        if (providerData.id) {
+          return providerData;
+        } else {
+          // @ts-expect-error - TODO: fix this
+          delete providerData.id;
+          return providerData;
+        }
+      });
 
-    postComprehensiveCarePlanMutation.mutate({
-      clientId: clientId as string,
-      data: postData,
-    });
-  };
+      const focusedRecommendations = data.focusedRecommendations?.map(
+        (item, index) => {
+          const focused = {
+            option_number: index + 1 || null,
+            name: item.name ? item.name : null,
+            description: item.description ? item.description : null,
+            details: item.details
+              ? item.details.length > 0
+                ? item.details.join(", ")
+                : null
+              : null,
+            id: item.id ? item.id : null,
+          };
+          if (focused.id) {
+            return focused;
+          } else {
+            // @ts-expect-error - TODO: fix this
+            delete focused.id;
+            return focused;
+          }
+        }
+      );
+
+      const postData = {
+        client_info: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+          preferred_hospital: data.preferredHospital
+            ? data.preferredHospital
+            : null,
+          pharmacy_name: data.pharmacyName ? data.pharmacyName : null,
+        },
+        medications: medications,
+        medical_info: {
+          allergies:
+            data.allergies?.length && data.allergies.length > 0
+              ? data.allergies.map((allergy) => allergy.allergen).join(", ")
+              : null,
+        },
+        healthcare_providers: healthCareProviders,
+        initial_assessment: {
+          date_of_assessment: data.dateOfAssessment
+            ? DateUtils.changetoISO(data.dateOfAssessment)
+            : null,
+          date_of_care_plan: data.dateOfCarePlan
+            ? DateUtils.changetoISO(data.dateOfCarePlan)
+            : null,
+          person_completing_assessment: data.personCompletingAssessment
+            ? data.personCompletingAssessment
+            : null,
+          present_for_assessment: data.presentForAssessment
+            ? data.presentForAssessment
+            : null,
+          goals_for_assessment: data.goalsForAssessment
+            ? data.goalsForAssessment.length > 0
+              ? data.goalsForAssessment.join(", ").length > 0
+                ? data.goalsForAssessment.join(", ")
+                : null
+              : null
+            : null,
+          next_step_care_recipient: data.nextStepCareRecipient
+            ? data.nextStepCareRecipient.length > 0
+              ? data.nextStepCareRecipient.join(", ").length > 0
+                ? data.nextStepCareRecipient.join(", ")
+                : null
+              : null
+            : null,
+          next_step_care_partner: data.nextStepCarePartner
+            ? data.nextStepCarePartner.length > 0
+              ? data.nextStepCarePartner.join(", ").length > 0
+                ? data.nextStepCarePartner.join(", ")
+                : null
+              : null
+            : null,
+        },
+        focused_recommendations: focusedRecommendations,
+        functional_adls: {
+          summary: data.functionalAdls?.summary
+            ? data.functionalAdls?.summary
+            : null,
+          deficits_noted: data.functionalAdls?.deficitsNoted
+            ? data.functionalAdls?.deficitsNoted === "true"
+              ? true
+              : false
+            : false,
+          category_name: data.functionalAdls?.categoryName
+            ? data.functionalAdls?.categoryName
+            : "functional_adls",
+          detailed_table: {
+            katz_index: {
+              description: data.functionalAdls?.detailedTable?.katzIndex
+                ?.description
+                ? data.functionalAdls?.detailedTable?.katzIndex?.description
+                : null,
+              score: data.functionalAdls?.detailedTable?.katzIndex?.score
+                ? Number(data.functionalAdls?.detailedTable?.katzIndex?.score)
+                : null,
+            },
+            bathing: {
+              description: data.functionalAdls?.detailedTable?.bathing
+                ?.description
+                ? data.functionalAdls?.detailedTable?.bathing?.description
+                : null,
+              score: data.functionalAdls?.detailedTable?.bathing?.score
+                ? Number(data.functionalAdls?.detailedTable?.bathing?.score)
+                : null,
+            },
+            dressing: {
+              description: data.functionalAdls?.detailedTable?.dressing
+                ?.description
+                ? data.functionalAdls?.detailedTable?.dressing?.description
+                : null,
+              score: data.functionalAdls?.detailedTable?.dressing?.score
+                ? Number(data.functionalAdls?.detailedTable?.dressing?.score)
+                : null,
+            },
+            toileting: {
+              description: data.functionalAdls?.detailedTable?.toileting
+                ?.description
+                ? data.functionalAdls?.detailedTable?.toileting?.description
+                : null,
+              score: data.functionalAdls?.detailedTable?.toileting?.score
+                ? Number(data.functionalAdls?.detailedTable?.toileting?.score)
+                : null,
+            },
+            transfers: {
+              description: data.functionalAdls?.detailedTable?.transfers
+                ?.description
+                ? data.functionalAdls?.detailedTable?.transfers?.description
+                : null,
+              score: data.functionalAdls?.detailedTable?.transfers?.score
+                ? Number(data.functionalAdls?.detailedTable?.transfers?.score)
+                : null,
+            },
+            continence: {
+              description: data.functionalAdls?.detailedTable?.continence
+                ?.description
+                ? data.functionalAdls?.detailedTable?.continence?.description
+                : null,
+              score: data.functionalAdls?.detailedTable?.continence?.score
+                ? Number(data.functionalAdls?.detailedTable?.continence?.score)
+                : null,
+            },
+            feeding: {
+              description: data.functionalAdls?.detailedTable?.feeding
+                ?.description
+                ? data.functionalAdls?.detailedTable?.feeding?.description
+                : null,
+              score: data.functionalAdls?.detailedTable?.feeding?.score
+                ? Number(data.functionalAdls?.detailedTable?.feeding?.score)
+                : null,
+            },
+          },
+        },
+        functional_iadls: {
+          summary: data.functionalIadls?.summary
+            ? data.functionalIadls?.summary
+            : null,
+          category_name: data.functionalIadls?.categoryName
+            ? data.functionalIadls?.categoryName
+            : "functional_iadls",
+          detailed_table: {
+            telephone: {
+              description: data.functionalIadls?.detailedTable?.telephone
+                ?.description
+                ? data.functionalIadls?.detailedTable?.telephone?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.telephone?.score
+                ? Number(data.functionalIadls?.detailedTable?.telephone?.score)
+                : null,
+            },
+            shopping: {
+              description: data.functionalIadls?.detailedTable?.shopping
+                ?.description
+                ? data.functionalIadls?.detailedTable?.shopping?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.shopping?.score
+                ? Number(data.functionalIadls?.detailedTable?.shopping?.score)
+                : null,
+            },
+            foodPreparation: {
+              description: data.functionalIadls?.detailedTable?.foodPreparation
+                ?.description
+                ? data.functionalIadls?.detailedTable?.foodPreparation
+                    ?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.foodPreparation?.score
+                ? Number(
+                    data.functionalIadls?.detailedTable?.foodPreparation?.score
+                  )
+                : null,
+            },
+            housekeeping: {
+              description: data.functionalIadls?.detailedTable?.housekeeping
+                ?.description
+                ? data.functionalIadls?.detailedTable?.housekeeping?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.housekeeping?.score
+                ? Number(
+                    data.functionalIadls?.detailedTable?.housekeeping?.score
+                  )
+                : null,
+            },
+            laundry: {
+              description: data.functionalIadls?.detailedTable?.laundry
+                ?.description
+                ? data.functionalIadls?.detailedTable?.laundry?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.laundry?.score
+                ? Number(data.functionalIadls?.detailedTable?.laundry?.score)
+                : null,
+            },
+            transportation: {
+              description: data.functionalIadls?.detailedTable?.transportation
+                ?.description
+                ? data.functionalIadls?.detailedTable?.transportation
+                    ?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.transportation?.score
+                ? Number(
+                    data.functionalIadls?.detailedTable?.transportation?.score
+                  )
+                : null,
+            },
+            medication: {
+              description: data.functionalIadls?.detailedTable?.medication
+                ?.description
+                ? data.functionalIadls?.detailedTable?.medication?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.medication?.score
+                ? Number(data.functionalIadls?.detailedTable?.medication?.score)
+                : null,
+            },
+            finances: {
+              description: data.functionalIadls?.detailedTable?.finances
+                ?.description
+                ? data.functionalIadls?.detailedTable?.finances?.description
+                : null,
+              score: data.functionalIadls?.detailedTable?.finances?.score
+                ? Number(data.functionalIadls?.detailedTable?.finances?.score)
+                : null,
+            },
+          },
+          additional_data: {
+            identified_problem_1: {
+              identified_problem: data.functionalIadls?.additionalData
+                ?.identifiedProblem1?.identifiedProblem
+                ? data.functionalIadls?.additionalData?.identifiedProblem1
+                    .identifiedProblem
+                : null,
+              intervention_action: data.functionalIadls?.additionalData
+                ?.identifiedProblem1?.interventionAction
+                ? data.functionalIadls?.additionalData?.identifiedProblem1
+                    .interventionAction
+                : null,
+              goal: data.functionalIadls?.additionalData?.identifiedProblem1
+                ?.goal
+                ? data.functionalIadls?.additionalData?.identifiedProblem1.goal
+                : null,
+              referral_options: data.functionalIadls?.additionalData
+                ?.identifiedProblem1?.referralOptions
+                ? data.functionalIadls?.additionalData?.identifiedProblem1
+                    .referralOptions
+                : null,
+            },
+            identified_problem_2: {
+              identified_problem: data.functionalIadls?.additionalData
+                ?.identifiedProblem2?.identifiedProblem
+                ? data.functionalIadls?.additionalData?.identifiedProblem2
+                    .identifiedProblem
+                : null,
+              intervention_action: data.functionalIadls?.additionalData
+                ?.identifiedProblem2?.interventionAction
+                ? data.functionalIadls?.additionalData?.identifiedProblem2
+                    .interventionAction
+                : null,
+              goal: data.functionalIadls?.additionalData?.identifiedProblem2
+                ?.goal
+                ? data.functionalIadls?.additionalData?.identifiedProblem2.goal
+                : null,
+              referral_options: data.functionalIadls?.additionalData
+                ?.identifiedProblem2?.referralOptions
+                ? data.functionalIadls?.additionalData?.identifiedProblem2
+                    .referralOptions
+                : null,
+            },
+            identified_problem_3: {
+              identified_problem: data.functionalIadls?.additionalData
+                ?.identifiedProblem3?.identifiedProblem
+                ? data.functionalIadls?.additionalData?.identifiedProblem3
+                    .identifiedProblem
+                : null,
+              intervention_action: data.functionalIadls?.additionalData
+                ?.identifiedProblem3?.interventionAction
+                ? data.functionalIadls?.additionalData?.identifiedProblem3
+                    .interventionAction
+                : null,
+              goal: data.functionalIadls?.additionalData?.identifiedProblem3
+                ?.goal
+                ? data.functionalIadls?.additionalData?.identifiedProblem3.goal
+                : null,
+              referral_options: data.functionalIadls?.additionalData
+                ?.identifiedProblem3?.referralOptions
+                ? data.functionalIadls?.additionalData?.identifiedProblem3
+                    .referralOptions
+                : null,
+            },
+            identified_problem_4: {
+              identified_problem: data.functionalIadls?.additionalData
+                ?.identifiedProblem4?.identifiedProblem
+                ? data.functionalIadls?.additionalData?.identifiedProblem4
+                    .identifiedProblem
+                : null,
+              intervention_action: data.functionalIadls?.additionalData
+                ?.identifiedProblem4?.interventionAction
+                ? data.functionalIadls?.additionalData?.identifiedProblem4
+                    .interventionAction
+                : null,
+              goal: data.functionalIadls?.additionalData?.identifiedProblem4
+                ?.goal
+                ? data.functionalIadls?.additionalData?.identifiedProblem4.goal
+                : null,
+              referral_options: data.functionalIadls?.additionalData
+                ?.identifiedProblem4?.referralOptions
+                ? data.functionalIadls?.additionalData?.identifiedProblem4
+                    .referralOptions
+                : null,
+            },
+          },
+        },
+        home_safety: {
+          summary: data.homeSafety?.summary ? data.homeSafety?.summary : null,
+          deficits_noted: data.homeSafety?.deficitsNoted
+            ? data.homeSafety?.deficitsNoted === "true"
+              ? true
+              : false
+            : false,
+          category_name: data.homeSafety?.categoryName
+            ? data.homeSafety?.categoryName
+            : "home_safety",
+          detailed_table: {
+            are_pathways_clear: data.homeSafety?.detailedTable?.arePathwaysClear
+              ? data.homeSafety?.detailedTable?.arePathwaysClear
+              : null,
+            are_there_throw_rugs: data.homeSafety?.detailedTable
+              ?.areThereThrowRugs
+              ? data.homeSafety?.detailedTable?.areThereThrowRugs
+              : null,
+            are_stairs_safe: data.homeSafety?.detailedTable?.areStairsSafe
+              ? data.homeSafety?.detailedTable?.areStairsSafe
+              : null,
+            is_there_clutter_or_hoarding: data.homeSafety?.detailedTable
+              ?.isThereClutterOrHoarding
+              ? data.homeSafety?.detailedTable?.isThereClutterOrHoarding
+              : null,
+            are_floors_slippery: data.homeSafety?.detailedTable
+              ?.areFloorsSlippery
+              ? data.homeSafety?.detailedTable?.areFloorsSlippery
+              : null,
+            condition_of_floor_surfaces: data.homeSafety?.detailedTable
+              ?.conditionOfFloorSurfaces
+              ? data.homeSafety?.detailedTable?.conditionOfFloorSurfaces
+              : null,
+            condition_of_carpeting: data.homeSafety?.detailedTable
+              ?.conditionOfCarpeting
+              ? data.homeSafety?.detailedTable?.conditionOfCarpeting
+              : null,
+            are_chairs_sturdy_and_stable: data.homeSafety?.detailedTable
+              ?.areChairsSturdyAndStable
+              ? data.homeSafety?.detailedTable?.areChairsSturdyAndStable
+              : null,
+            electricity_fully_functional: data.homeSafety?.detailedTable
+              ?.electricityFullyFunctional
+              ? data.homeSafety?.detailedTable?.electricityFullyFunctional
+              : null,
+            adequate_lighting: data.homeSafety?.detailedTable?.adequateLighting
+              ? data.homeSafety?.detailedTable?.adequateLighting
+              : null,
+            exposed_wires_or_cords: data.homeSafety?.detailedTable
+              ?.exposedWiresOrCords
+              ? data.homeSafety?.detailedTable?.exposedWiresOrCords
+              : null,
+            condition_of_wires_and_plugs: data.homeSafety?.detailedTable
+              ?.conditionOfWiresAndPlugs
+              ? data.homeSafety?.detailedTable?.conditionOfWiresAndPlugs
+              : null,
+            are_there_space_heaters: data.homeSafety?.detailedTable
+              ?.areThereSpaceHeaters
+              ? data.homeSafety?.detailedTable?.areThereSpaceHeaters
+              : null,
+            care_recipient_smokes: data.homeSafety?.detailedTable
+              ?.careRecipientSmokes
+              ? data.homeSafety?.detailedTable?.careRecipientSmokes
+              : null,
+            fire_extinguisher_accessible: data.homeSafety?.detailedTable
+              ? data.homeSafety?.detailedTable?.fireExtinguisherAccessible
+              : null,
+            condition_of_appliances: data.homeSafety?.detailedTable
+              ?.conditionOfAppliances
+              ? data.homeSafety?.detailedTable?.conditionOfAppliances
+              : null,
+            kitchen_safety_hazards: data.homeSafety?.detailedTable
+              ?.kitchenSafetyHazards
+              ? data.homeSafety?.detailedTable?.kitchenSafetyHazards
+              : null,
+            locks_on_doors_and_windows: data.homeSafety?.detailedTable
+              ?.locksOnDoorsAndWindows
+              ? data.homeSafety?.detailedTable?.locksOnDoorsAndWindows
+              : null,
+            emergency_numbers_posted: data.homeSafety?.detailedTable
+              ?.emergencyNumbersPosted
+              ? data.homeSafety?.detailedTable?.emergencyNumbersPosted
+              : null,
+            accessible_telephones: data.homeSafety?.detailedTable
+              ? data.homeSafety?.detailedTable?.accessibleTelephones
+              : null,
+            weapons_or_firearms_present: data.homeSafety?.detailedTable
+              ?.weaponsOrFirearmsPresent
+              ? data.homeSafety?.detailedTable?.weaponsOrFirearmsPresent
+              : null,
+            pets_present: data.homeSafety?.detailedTable?.petsPresent
+              ? data.homeSafety?.detailedTable?.petsPresent
+              : null,
+            condition_of_bed: data.homeSafety?.detailedTable?.conditionOfBed
+              ? data.homeSafety?.detailedTable?.conditionOfBed
+              : null,
+            other: data.homeSafety?.detailedTable?.other
+              ? data.homeSafety?.detailedTable?.other
+              : null,
+          },
+        },
+        memory_and_reasoning: {
+          summary: data.memoryAndReasoning?.summary
+            ? data.memoryAndReasoning?.summary
+            : null,
+          deficits_noted: data.memoryAndReasoning?.deficitsNoted
+            ? data.memoryAndReasoning?.deficitsNoted === "true"
+              ? true
+              : false
+            : false,
+          category_name: data.memoryAndReasoning?.categoryName
+            ? data.memoryAndReasoning?.categoryName
+            : "memory_reasoning",
+          detailed_table: {
+            identified_problem_1: {
+              identified_problem: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem1?.identifiedProblem
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem1?.interventionAction
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1
+                    ?.interventionAction
+                : null,
+              goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem1
+                ?.goal
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1
+                    ?.goal
+                : null,
+              referral_options: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem1?.referralOptions
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem1
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_2: {
+              identified_problem: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem2?.identifiedProblem
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem2?.interventionAction
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2
+                    ?.interventionAction
+                : null,
+              goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem2
+                ?.goal
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2
+                    ?.goal
+                : null,
+              referral_options: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem2?.referralOptions
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem2
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_3: {
+              identified_problem: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem3?.identifiedProblem
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem3?.interventionAction
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3
+                    ?.interventionAction
+                : null,
+              goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem3
+                ?.goal
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3
+                    ?.goal
+                : null,
+              referral_options: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem3?.referralOptions
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem3
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_4: {
+              identified_problem: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem4?.identifiedProblem
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem4?.interventionAction
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4
+                    ?.interventionAction
+                : null,
+              goal: data.memoryAndReasoning?.detailedTable?.identifiedProblem4
+                ?.goal
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4
+                    ?.goal
+                : null,
+              referral_options: data.memoryAndReasoning?.detailedTable
+                ?.identifiedProblem4?.referralOptions
+                ? data.memoryAndReasoning?.detailedTable?.identifiedProblem4
+                    ?.referralOptions
+                : null,
+            },
+          },
+        },
+        geriatric_depression: {
+          summary: data.geriatricDepression?.summary
+            ? data.geriatricDepression?.summary
+            : null,
+          deficits_noted: data.geriatricDepression?.deficitsNoted
+            ? data.geriatricDepression?.deficitsNoted === "true"
+              ? true
+              : false
+            : false,
+          category_name: data.geriatricDepression?.categoryName
+            ? data.geriatricDepression?.categoryName
+            : "geriatric_depression",
+          detailed_table: {
+            identified_problem_1: {
+              identified_problem: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem1?.identifiedProblem
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem1
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem1?.interventionAction
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem1
+                    ?.interventionAction
+                : null,
+              goal: data.geriatricDepression?.detailedTable?.identifiedProblem1
+                ?.goal,
+            },
+            identified_problem_2: {
+              identified_problem: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem2?.identifiedProblem
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem2
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem2?.interventionAction
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem2
+                    ?.interventionAction
+                : null,
+              goal: data.geriatricDepression?.detailedTable?.identifiedProblem2
+                ?.goal
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem2
+                    ?.goal
+                : null,
+              referral_options: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem2?.referralOptions
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem2
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_3: {
+              identified_problem: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem3?.identifiedProblem
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem3
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem3?.interventionAction
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem3
+                    ?.interventionAction
+                : null,
+              goal: data.geriatricDepression?.detailedTable?.identifiedProblem3
+                ?.goal
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem3
+                    ?.goal
+                : null,
+              referral_options: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem3?.referralOptions
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem3
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_4: {
+              identified_problem: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem4?.identifiedProblem
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem4
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem4?.interventionAction
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem4
+                    ?.interventionAction
+                : null,
+              goal: data.geriatricDepression?.detailedTable?.identifiedProblem4
+                ?.goal
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem4
+                    ?.goal
+                : null,
+              referral_options: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem4?.referralOptions
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem4
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_5: {
+              identified_problem: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem5?.identifiedProblem
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem5
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem5?.interventionAction
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem5
+                    ?.interventionAction
+                : null,
+              goal: data.geriatricDepression?.detailedTable?.identifiedProblem5
+                ?.goal
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem5
+                    ?.goal
+                : null,
+              referral_options: data.geriatricDepression?.detailedTable
+                ?.identifiedProblem5?.referralOptions
+                ? data.geriatricDepression?.detailedTable?.identifiedProblem5
+                    ?.referralOptions
+                : null,
+            },
+          },
+        },
+        nutritional_health: {
+          summary: data.nutritionalHealth?.summary
+            ? data.nutritionalHealth?.summary
+            : null,
+          deficits_noted: data.nutritionalHealth?.deficitsNoted
+            ? data.nutritionalHealth?.deficitsNoted === "true"
+              ? true
+              : false
+            : false,
+          category_name: data.nutritionalHealth?.categoryName
+            ? data.nutritionalHealth?.categoryName
+            : "nutritional_health",
+          detailed_table: {
+            identified_problem_1: {
+              identified_problem: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem1?.identifiedProblem
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem1
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem1?.interventionAction
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem1
+                    ?.interventionAction
+                : null,
+              goal: data.nutritionalHealth?.detailedTable?.identifiedProblem1
+                ?.goal
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem1
+                    ?.goal
+                : null,
+              referral_options: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem1?.referralOptions
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem1
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_2: {
+              identified_problem: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem2?.identifiedProblem
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem2
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem2?.interventionAction
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem2
+                    ?.interventionAction
+                : null,
+            },
+            identified_problem_3: {
+              identified_problem: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem3?.identifiedProblem
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem3
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem3?.interventionAction
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem3
+                    ?.interventionAction
+                : null,
+            },
+            identified_problem_4: {
+              identified_problem: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem4?.identifiedProblem
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem4
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem4?.interventionAction
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem4
+                    ?.interventionAction
+                : null,
+              goal: data.nutritionalHealth?.detailedTable?.identifiedProblem4
+                ?.goal
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem4
+                    ?.goal
+                : null,
+              referral_options: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem4?.referralOptions
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem4
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_5: {
+              identified_problem: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem5?.identifiedProblem
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem5
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem5?.interventionAction
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem5
+                    ?.interventionAction
+                : null,
+              goal: data.nutritionalHealth?.detailedTable?.identifiedProblem5
+                ?.goal
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem5
+                    ?.goal
+                : null,
+              referral_options: data.nutritionalHealth?.detailedTable
+                ?.identifiedProblem5?.referralOptions
+                ? data.nutritionalHealth?.detailedTable?.identifiedProblem5
+                    ?.referralOptions
+                : null,
+            },
+          },
+        },
+        legal_and_financial: {
+          summary: data.legalAndFinancial?.summary
+            ? data.legalAndFinancial?.summary
+            : null,
+          deficits_noted: data.legalAndFinancial?.deficitsNoted
+            ? data.legalAndFinancial?.deficitsNoted === "true"
+              ? true
+              : false
+            : false,
+          category_name: data.legalAndFinancial?.categoryName
+            ? data.legalAndFinancial?.categoryName
+            : "legal_financial",
+          detailed_table: {
+            identified_problem_1: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem1?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem1
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem1?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem1
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem1
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem1
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem1?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem1
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_2: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem2?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem2
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem2?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem2
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem2
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem2
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem2?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem2
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_3: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem3?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem3
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem3?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem3
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem3
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem3
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem3?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem3
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_4: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem4?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem4
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem4?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem4
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem4
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem4
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem4?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem4
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_5: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem5?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem5
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem5?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem5
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem5
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem5
+                    ?.goal
+                : null,
+              referral_options:
+                data.legalAndFinancial?.detailedTable?.identifiedProblem5
+                  ?.referralOptions,
+            },
+            identified_problem_6: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem6?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem6
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem6?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem6
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem6
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem6
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem6?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem6
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_7: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem7?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem7
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem7?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem7
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem7
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem7
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem7?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem7
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_8: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem8?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem8
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem8?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem8
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem8
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem8
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem8?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem8
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_9: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem9?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem9
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem9?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem9
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem9
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem9
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem9?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem9
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_10: {
+              identified_problem: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem10?.identifiedProblem
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem10
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem10?.interventionAction
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem10
+                    ?.interventionAction
+                : null,
+              goal: data.legalAndFinancial?.detailedTable?.identifiedProblem10
+                ?.goal
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem10
+                    ?.goal
+                : null,
+              referral_options: data.legalAndFinancial?.detailedTable
+                ?.identifiedProblem10?.referralOptions
+                ? data.legalAndFinancial?.detailedTable?.identifiedProblem10
+                    ?.referralOptions
+                : null,
+            },
+          },
+        },
+        care_giver_support: {
+          summary: data.careGiverSupport?.summary
+            ? data.careGiverSupport?.summary
+            : null,
+          deficits_noted: data.careGiverSupport?.deficitsNoted
+            ? data.careGiverSupport?.deficitsNoted === "true"
+              ? true
+              : false
+            : false,
+          category_name: data.careGiverSupport?.categoryName
+            ? data.careGiverSupport?.categoryName
+            : "care_giver_support",
+          detailed_table: {
+            identified_problem_1: {
+              identified_problem: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem1?.identifiedProblem
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem1
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem1?.interventionAction
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem1
+                    ?.interventionAction
+                : null,
+              goal: data.careGiverSupport?.detailedTable?.identifiedProblem1
+                ?.goal
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem1?.goal
+                : null,
+              referral_options: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem1?.referralOptions
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem1
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_2: {
+              identified_problem: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem2?.identifiedProblem
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem2
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem2?.interventionAction
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem2
+                    ?.interventionAction
+                : null,
+              goal: data.careGiverSupport?.detailedTable?.identifiedProblem2
+                ?.goal
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem2?.goal
+                : null,
+              referral_options: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem2?.referralOptions
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem2
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_3: {
+              identified_problem: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem3?.identifiedProblem
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem3
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem3?.interventionAction
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem3
+                    ?.interventionAction
+                : null,
+              referral_options: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem3?.referralOptions
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem3
+                    ?.referralOptions
+                : null,
+            },
+            identified_problem_4: {
+              identified_problem: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem4?.identifiedProblem
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem4
+                    ?.identifiedProblem
+                : null,
+              intervention_action: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem4?.interventionAction
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem4
+                    ?.interventionAction
+                : null,
+              goal: data.careGiverSupport?.detailedTable?.identifiedProblem4
+                ?.goal
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem4?.goal
+                : null,
+              referral_options: data.careGiverSupport?.detailedTable
+                ?.identifiedProblem4?.referralOptions
+                ? data.careGiverSupport?.detailedTable?.identifiedProblem4
+                    ?.referralOptions
+                : null,
+            },
+          },
+        },
+        comprehensive_care_plan_assessment: {
+          initial_request: data.initialRequest ? data.initialRequest : null,
+          care_recipient_goals: data.careRecipientGoals
+            ? data.careRecipientGoals
+            : null,
+          demographic_and_historic_information:
+            data.demographicAndHistoricInformation
+              ? data.demographicAndHistoricInformation
+              : null,
+          medical_history: data.medicalHistory ? data.medicalHistory : null,
+        },
+      };
+
+      postComprehensiveCarePlanMutation.mutate({
+        clientId: clientId as string,
+        data: postData,
+      });
+    },
+    [postComprehensiveCarePlanMutation, clientId]
+  );
+
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  // Register the save function with context
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, []);
 
   if (isLoadingCarePlan) {
     return (

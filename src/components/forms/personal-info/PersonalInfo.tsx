@@ -16,8 +16,8 @@ import { CommonQuestionsSection } from "./CommonQuestionsSection";
 import { NotesBackupContactsSection } from "./NotesBackupContactsSection";
 import { Navigate, useParams } from "react-router-dom";
 import { useGetPersonalInfo, usePostPersonalInfoMutation } from "@agensy/api";
-import { useEffect } from "react";
-import { DateUtils, toast } from "@agensy/utils";
+import { useEffect, useCallback } from "react";
+import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { APP_ACTIONS } from "@agensy/constants";
@@ -128,7 +128,13 @@ const createSafeOpenedFileData = (
 export const PersonalInfo = () => {
   const params = useParams();
   const queryClient = useQueryClient();
-  const { setOpenedFileData, setHasUnsavedChanges } = useClientContext();
+  const {
+    setOpenedFileData,
+    setHasUnsavedChanges,
+    shouldDownloadAfterSave,
+    setShouldDownloadAfterSave,
+    setHandleSaveAndDownload,
+  } = useClientContext();
   const postPersonalInfoMutation = usePostPersonalInfoMutation();
   const {
     data: personalInfo,
@@ -179,8 +185,20 @@ export const PersonalInfo = () => {
           personalInfo?.last_update?.updatedAt
         ) as unknown as OpenedFileData
       );
+
+      // Trigger PDF download if requested
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+        setTimeout(() => {
+          StringUtils.triggerPDFDownload();
+        }, 500);
+      }
     } else if (postPersonalInfoMutation.status === "error") {
       toast.error("Error Occurred", String(postPersonalInfoMutation.error));
+      // Reset download flag on error
+      if (shouldDownloadAfterSave) {
+        setShouldDownloadAfterSave(false);
+      }
     }
   }, [postPersonalInfoMutation.status]);
 
@@ -320,145 +338,161 @@ export const PersonalInfo = () => {
     }
   }, [personalInfo]);
 
-  const onSubmit = (data: PersonalInfoFormData) => {
-    console.log("Form data:", data);
+  const onSubmit = useCallback(
+    (data: PersonalInfoFormData) => {
+      console.log("Form data:", data);
 
-    const digital_accounts = data.digitalAccounts?.map((item) => {
-      const account = {
-        account: item.accountWebsite ? item.accountWebsite : null,
-        user_name: item.usernameEmail ? item.usernameEmail : null,
-        password: item.password ? item.password : null,
-        notes: item.notes ? item.notes : null,
-        id: item.id ? item.id : null,
+      const digital_accounts = data.digitalAccounts?.map((item) => {
+        const account = {
+          account: item.accountWebsite ? item.accountWebsite : null,
+          user_name: item.usernameEmail ? item.usernameEmail : null,
+          password: item.password ? item.password : null,
+          notes: item.notes ? item.notes : null,
+          id: item.id ? item.id : null,
+        };
+        if (account.id) {
+          return account;
+        } else {
+          // @ts-expect-error // TODO Fix this
+          delete account.id;
+          return account;
+        }
+      });
+      const postData = {
+        client_info: {
+          first_name: data.firstName ? data.firstName : null,
+          last_name: data.lastName ? data.lastName : null,
+          date_of_birth: data.dateOfBirth
+            ? DateUtils.changetoISO(data.dateOfBirth)
+            : null,
+          social_security_number: data.socialSecurityNumber
+            ? data.socialSecurityNumber
+            : null,
+          passport_number: data.passportNumber ? data.passportNumber : null,
+          passport_expiration_date: data.passportExpirationDate
+            ? data.passportExpirationDate
+            : null,
+          driver_license_number: data.driversLicenseNumber
+            ? data.driversLicenseNumber
+            : null,
+          driver_license_state: data.driversLicenseState
+            ? data.driversLicenseState
+            : null,
+        },
+        emergency_contact: {
+          first_name: data.emergencyContactFirstName
+            ? data.emergencyContactFirstName
+            : null,
+          last_name: data.emergencyContactLastName
+            ? data.emergencyContactLastName
+            : null,
+          phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
+          relationship: data.emergencyContactRelationship
+            ? data.emergencyContactRelationship
+            : null,
+        },
+        personal_info_password_manager: {
+          health_insurance_provider: data.healthInsuranceProvider
+            ? data.healthInsuranceProvider
+            : null,
+          health_insurance_policy_number: data.healthInsurancePolicyNumber
+            ? data.healthInsurancePolicyNumber
+            : null,
+          bank_name: data.bankName ? data.bankName : null,
+          bankaccount_type: data.bankAccountType ? data.bankAccountType : null,
+          bank_account_number: data.bankAccountNumberPartial
+            ? data.bankAccountNumberPartial
+            : null,
+          bank_login_info: data.bankOnlineLoginInfo
+            ? data.bankOnlineLoginInfo
+            : null,
+          credit_card_issuer: data.creditCardIssuer
+            ? data.creditCardIssuer
+            : null,
+          card_last_four_digits: data.creditCardLastFourDigits
+            ? data.creditCardLastFourDigits
+            : null,
+          credit_card_login_info: data.creditCardOnlineLoginInfo
+            ? data.creditCardOnlineLoginInfo
+            : null,
+          electricity_provider: data.electricityProvider
+            ? data.electricityProvider
+            : null,
+          electricity_provider_name: data.electricityUsername
+            ? data.electricityUsername
+            : null,
+          electricity_provider_password: data.electricityPassword
+            ? data.electricityPassword
+            : null,
+          internet_provider: data.internetProvider
+            ? data.internetProvider
+            : null,
+          internet_provider_name: data.internetUsername
+            ? data.internetUsername
+            : null,
+          internet_provider_password: data.internetPassword
+            ? data.internetPassword
+            : null,
+          phone_provider: data.phoneProvider ? data.phoneProvider : null,
+          phone_provider_name: data.phoneUsername ? data.phoneUsername : null,
+          phone_provider_password: data.phonePassword
+            ? data.phonePassword
+            : null,
+          streaming_service: data.streamingServices
+            ? data.streamingServices
+            : null,
+          streaming_service_name: data.streamingUsername
+            ? data.streamingUsername
+            : null,
+          streaming_service_password: data.streamingPassword
+            ? data.streamingPassword
+            : null,
+          social_security_questions: data.socialSecurityQuestion
+            ? data.socialSecurityQuestion
+            : null,
+          banking_history_institutions: data.bankingHistoryInstitutions
+            ? data.bankingHistoryInstitutions
+            : null,
+          mortgage_payment: data.monthlyCarMortgagePayment
+            ? data.monthlyCarMortgagePayment
+            : null,
+          previously_lived_streets: data.previousStreetNames
+            ? data.previousStreetNames
+            : null,
+          credit_card_institutions: data.creditCardInstitutions
+            ? data.creditCardInstitutions
+            : null,
+          mother_median_name: data.mothersMaidenName
+            ? data.mothersMaidenName
+            : null,
+          trusted_person_name: data.trustedPersonName
+            ? data.trustedPersonName
+            : null,
+          trusted_person_phone: data.trustedPersonPhone
+            ? data.trustedPersonPhone
+            : null,
+          additional_notes: data.additionalNotes ? data.additionalNotes : null,
+        },
+        digital_accounts: digital_accounts || [],
       };
-      if (account.id) {
-        return account;
-      } else {
-        // @ts-expect-error // TODO Fix this
-        delete account.id;
-        return account;
-      }
-    });
-    const postData = {
-      client_info: {
-        first_name: data.firstName ? data.firstName : null,
-        last_name: data.lastName ? data.lastName : null,
-        date_of_birth: data.dateOfBirth
-          ? DateUtils.changetoISO(data.dateOfBirth)
-          : null,
-        social_security_number: data.socialSecurityNumber
-          ? data.socialSecurityNumber
-          : null,
-        passport_number: data.passportNumber ? data.passportNumber : null,
-        passport_expiration_date: data.passportExpirationDate
-          ? data.passportExpirationDate
-          : null,
-        driver_license_number: data.driversLicenseNumber
-          ? data.driversLicenseNumber
-          : null,
-        driver_license_state: data.driversLicenseState
-          ? data.driversLicenseState
-          : null,
-      },
-      emergency_contact: {
-        first_name: data.emergencyContactFirstName
-          ? data.emergencyContactFirstName
-          : null,
-        last_name: data.emergencyContactLastName
-          ? data.emergencyContactLastName
-          : null,
-        phone: data.emergencyContactPhone ? data.emergencyContactPhone : null,
-        relationship: data.emergencyContactRelationship
-          ? data.emergencyContactRelationship
-          : null,
-      },
-      personal_info_password_manager: {
-        health_insurance_provider: data.healthInsuranceProvider
-          ? data.healthInsuranceProvider
-          : null,
-        health_insurance_policy_number: data.healthInsurancePolicyNumber
-          ? data.healthInsurancePolicyNumber
-          : null,
-        bank_name: data.bankName ? data.bankName : null,
-        bankaccount_type: data.bankAccountType ? data.bankAccountType : null,
-        bank_account_number: data.bankAccountNumberPartial
-          ? data.bankAccountNumberPartial
-          : null,
-        bank_login_info: data.bankOnlineLoginInfo
-          ? data.bankOnlineLoginInfo
-          : null,
-        credit_card_issuer: data.creditCardIssuer
-          ? data.creditCardIssuer
-          : null,
-        card_last_four_digits: data.creditCardLastFourDigits
-          ? data.creditCardLastFourDigits
-          : null,
-        credit_card_login_info: data.creditCardOnlineLoginInfo
-          ? data.creditCardOnlineLoginInfo
-          : null,
-        electricity_provider: data.electricityProvider
-          ? data.electricityProvider
-          : null,
-        electricity_provider_name: data.electricityUsername
-          ? data.electricityUsername
-          : null,
-        electricity_provider_password: data.electricityPassword
-          ? data.electricityPassword
-          : null,
-        internet_provider: data.internetProvider ? data.internetProvider : null,
-        internet_provider_name: data.internetUsername
-          ? data.internetUsername
-          : null,
-        internet_provider_password: data.internetPassword
-          ? data.internetPassword
-          : null,
-        phone_provider: data.phoneProvider ? data.phoneProvider : null,
-        phone_provider_name: data.phoneUsername ? data.phoneUsername : null,
-        phone_provider_password: data.phonePassword ? data.phonePassword : null,
-        streaming_service: data.streamingServices
-          ? data.streamingServices
-          : null,
-        streaming_service_name: data.streamingUsername
-          ? data.streamingUsername
-          : null,
-        streaming_service_password: data.streamingPassword
-          ? data.streamingPassword
-          : null,
-        social_security_questions: data.socialSecurityQuestion
-          ? data.socialSecurityQuestion
-          : null,
-        banking_history_institutions: data.bankingHistoryInstitutions
-          ? data.bankingHistoryInstitutions
-          : null,
-        mortgage_payment: data.monthlyCarMortgagePayment
-          ? data.monthlyCarMortgagePayment
-          : null,
-        previously_lived_streets: data.previousStreetNames
-          ? data.previousStreetNames
-          : null,
-        credit_card_institutions: data.creditCardInstitutions
-          ? data.creditCardInstitutions
-          : null,
-        mother_median_name: data.mothersMaidenName
-          ? data.mothersMaidenName
-          : null,
-        trusted_person_name: data.trustedPersonName
-          ? data.trustedPersonName
-          : null,
-        trusted_person_phone: data.trustedPersonPhone
-          ? data.trustedPersonPhone
-          : null,
-        additional_notes: data.additionalNotes ? data.additionalNotes : null,
-      },
-      digital_accounts: digital_accounts || [],
-    };
-    postPersonalInfoMutation.mutate({
-      clientId: params.clientId!,
-      data: postData,
-    });
-  };
+      postPersonalInfoMutation.mutate({
+        clientId: params.clientId!,
+        data: postData,
+      });
+    },
+    [postPersonalInfoMutation, params.clientId]
+  );
 
-  /// Restrict access to Personal Info & Password Organizer (financial/credential form).
+  const handleSaveAndDownload = useCallback(() => {
+    setShouldDownloadAfterSave(true);
+    handleSubmit(onSubmit)();
+  }, []);
+
+  useEffect(() => {
+    setHandleSaveAndDownload(() => handleSaveAndDownload);
+    return () => setHandleSaveAndDownload(undefined);
+  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
+
   if (
     !handleFilterPermission(
       params.clientId as string,
