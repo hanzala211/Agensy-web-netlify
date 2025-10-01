@@ -14,7 +14,7 @@ import { type AccessFormData, accessSchema } from "@agensy/types";
 interface AddAccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: AccessFormData) => void;
+  onSubmit: (data: unknown) => void;
   isLoading?: boolean;
 }
 
@@ -63,7 +63,11 @@ export const AddAccessModal: React.FC<AddAccessModalProps> = ({
   };
 
   const handleFormSubmit = (data: AccessFormData) => {
-    onSubmit(data);
+    const postData = {
+      ...data,
+      phone: data.phone ? data.phone : null,
+    };
+    onSubmit(postData);
   };
 
   return (

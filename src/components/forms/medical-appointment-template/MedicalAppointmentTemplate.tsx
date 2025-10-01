@@ -265,7 +265,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           medicalAppointmentTemplate?.healthcare_provider_template
             ? {
                 follow_up: medicalAppointmentTemplate
-                  .healthcare_provider_template.follow_up
+                  .healthcare_provider_template.healthcare_provider_follow_up
                   ? DateUtils.formatDateToRequiredFormat(
                       medicalAppointmentTemplate.healthcare_provider_template
                         .healthcare_provider_follow_up

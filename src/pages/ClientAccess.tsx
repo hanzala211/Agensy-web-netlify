@@ -14,11 +14,7 @@ import {
   ICONS,
   ROUTES,
 } from "@agensy/constants";
-import type {
-  AccessFormData,
-  AccessInfo,
-  EditAccessFormData,
-} from "@agensy/types";
+import type { AccessInfo, Client } from "@agensy/types";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import {
   useAddClientAccessMutation,
@@ -27,6 +23,7 @@ import {
 } from "@agensy/api";
 import { toast } from "@agensy/utils";
 import { Navigate, useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 const itemsPerPage = 4;
 
@@ -51,12 +48,25 @@ export const ClientAccess: React.FC = () => {
     useState<boolean>(false);
   const [editData, setEditData] = useState<AccessInfo | null>(null);
   const { handleFilterPermission } = useAuthContext();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (addClientAccessMutation.status === "success") {
       toast.success("User added successfully");
       addClientAccess(addClientAccessMutation.data);
       setIsAddAccessModalOpen(false);
+      queryClient.setQueryData(["clients"], (oldData: Client[]) => {
+        return [...oldData, addClientAccessMutation.data];
+      });
+      queryClient.setQueryData(
+        ["client", params.clientId],
+        (oldData: Client) => {
+          return {
+            ...oldData,
+            Users: [...oldData.Users, addClientAccessMutation.data],
+          };
+        }
+      );
     } else if (addClientAccessMutation.status === "error") {
       toast.error("Failed to add user", String(addClientAccessMutation.error));
     }
@@ -66,6 +76,32 @@ export const ClientAccess: React.FC = () => {
     if (deleteClientAccessMutation.status === "success") {
       toast.success("User deleted successfully");
       deleteClientAccess(deleteClientAccessMutation.variables.userId);
+
+      queryClient.setQueryData(["clients"], (oldData: Client[]) => {
+        return oldData.map((client) => {
+          if (client.id === deleteClientAccessMutation.variables.clientId) {
+            return {
+              ...client,
+              Users: client.Users.filter(
+                (user) =>
+                  user.id !== deleteClientAccessMutation.variables.userId
+              ),
+            };
+          }
+          return client;
+        });
+      });
+      queryClient.setQueryData(
+        ["client", params.clientId],
+        (oldData: Client) => {
+          return {
+            ...oldData,
+            Users: oldData.Users.filter(
+              (user) => user.id !== deleteClientAccessMutation.variables.userId
+            ),
+          };
+        }
+      );
     } else if (deleteClientAccessMutation.status === "error") {
       toast.error(
         "Failed to delete user",
@@ -183,14 +219,14 @@ export const ClientAccess: React.FC = () => {
     });
   };
 
-  const handleAddUser = (data: AccessFormData) => {
+  const handleAddUser = (data: unknown) => {
     addClientAccessMutation.mutate({
       items: data,
       clientId: selectedClient?.id as string,
     });
   };
 
-  const handleEditUser = (data: EditAccessFormData) => {
+  const handleEditUser = (data: unknown) => {
     editClientAccessMutation.mutate({
       clientId: selectedClient?.id as string,
       userId: editData?.id as string,

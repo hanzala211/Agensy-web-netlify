@@ -18,7 +18,7 @@ import {
 interface EditAccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: EditAccessFormData) => void;
+  onSubmit?: (data: unknown) => void;
   isLoading?: boolean;
   editData?: AccessInfo;
 }
@@ -81,7 +81,11 @@ export const EditAccessModal: React.FC<EditAccessModalProps> = ({
   };
 
   const handleFormSubmit = (data: EditAccessFormData) => {
-    onSubmit?.(data);
+    const postData = {
+      ...data,
+      phone: data.phone ? data.phone : null,
+    };
+    onSubmit?.(postData);
   };
 
   return (

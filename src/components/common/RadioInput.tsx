@@ -5,7 +5,7 @@ interface RadioInputProps {
   register?: UseFormRegisterReturn;
   className?: string;
   label: string;
-  value: string
+  value: string;
 }
 
 export const RadioInput: React.FC<RadioInputProps> = ({

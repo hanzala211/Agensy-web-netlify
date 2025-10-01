@@ -276,7 +276,7 @@ export const accessSchema = z.object({
   last_name: z.string().min(1, "Last Name is required").transform(trimString),
   relation: z.string().min(1, "Relationship is required").transform(trimString),
   email: z.string().email("Valid email is required").transform(trimString),
-  phone: z.string().min(1, "Phone number is required").transform(trimString),
+  phone: z.string().optional(),
   role: z.string().min(1, "Role is required").transform(trimString),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
@@ -287,7 +287,7 @@ export const editAccessSchema = z.object({
   first_name: z.string().min(1, "First Name is required").transform(trimString),
   last_name: z.string().min(1, "Last Name is required").transform(trimString),
   relation: z.string().min(1, "Relationship is required").transform(trimString),
-  phone: z.string().min(1, "Phone number is required").transform(trimString),
+  phone: z.string().optional(),
   role: z.string().min(1, "Role is required").transform(trimString),
 });
 

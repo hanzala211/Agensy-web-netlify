@@ -46,69 +46,170 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 
-  section: {
-    borderWidth: 1,
+  // Main form container with border
+  mainFormContainer: {
+    borderWidth: 2,
     borderColor: BORDER,
-    marginBottom: 10,
+    marginTop: 10,
   },
 
-  sectionTitle: {
-    backgroundColor: HEADER_BG,
-    color: BORDER,
-    fontWeight: "bold",
-    paddingVertical: 3,
-    paddingHorizontal: 6,
+  // Header section for name and DOB
+  headerSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 8,
     borderBottomWidth: 1,
-    borderBottomColor: BORDER,
-    fontSize: 10,
+    borderBottomColor: BORDER_LITE,
+  },
+  headerField: {
+    flex: 1,
+    marginRight: 10,
+  },
+  headerFieldLast: {
+    flex: 1,
+  },
+  headerLabel: {
+    fontSize: 9,
+    fontWeight: "bold",
+    marginBottom: 2,
+  },
+  headerInput: {
+    borderWidth: 1,
+    borderColor: BORDER_LITE,
+    padding: 4,
+    minHeight: 20,
   },
 
+  // Two-column layout for main form fields
   fieldRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: BORDER_LITE,
+    minHeight: 30,
   },
   label: {
-    width: "32%",
-    padding: 4,
+    width: "35%",
+    padding: 6,
     borderRightWidth: 1,
     borderRightColor: BORDER_LITE,
-    fontWeight: "bold",
-  },
-  value: { flex: 1, padding: 4 },
-
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: HEADER_BG,
-    borderBottomWidth: 1,
-    borderColor: BORDER,
-  },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderColor: BORDER_LITE,
-  },
-  th: {
-    flex: 1,
-    padding: 4,
-    fontWeight: "bold",
+    backgroundColor: "#f5f5f5",
     fontSize: 9,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    justifyContent: "center",
   },
-  td: { flex: 1, padding: 4, fontSize: 9 },
+  value: {
+    flex: 1,
+    padding: 6,
+    backgroundColor: "#ffffff",
+    justifyContent: "center",
+  },
+
+  // Multi-line fields
+  multiLineField: {
+    minHeight: 60,
+  },
+  multiLineValue: {
+    flex: 1,
+    padding: 6,
+    backgroundColor: "#ffffff",
+    minHeight: 50,
+  },
+
+  // Large text areas
+  largeTextArea: {
+    minHeight: 100,
+  },
+  largeTextValue: {
+    flex: 1,
+    padding: 6,
+    backgroundColor: "#ffffff",
+    minHeight: 90,
+  },
+
+  // Medication sections
+  medicationSection: {
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER_LITE,
+  },
+  medicationHeader: {
+    backgroundColor: HEADER_BG,
+    padding: 4,
+    fontSize: 9,
+    fontWeight: "bold",
+    color: BORDER,
+  },
 });
 
 const Field = ({
+  label,
+  children,
+  isMultiLine = false,
+  isLargeTextArea = false,
+}: {
+  label: string;
+  children?: React.ReactNode;
+  isMultiLine?: boolean;
+  isLargeTextArea?: boolean;
+}) => {
+  const fieldStyle = [
+    styles.fieldRow,
+    ...(isMultiLine ? [styles.multiLineField] : []),
+    ...(isLargeTextArea ? [styles.largeTextArea] : []),
+  ];
+
+  const valueStyle = [
+    isMultiLine ? styles.multiLineValue : styles.value,
+    ...(isLargeTextArea ? [styles.largeTextValue] : []),
+  ];
+
+  return (
+    <View style={fieldStyle}>
+      {label && <Text style={styles.label}>{label}</Text>}
+      <Text style={valueStyle}>{children ?? " "}</Text>
+    </View>
+  );
+};
+
+const HeaderField = ({
   label,
   children,
 }: {
   label: string;
   children?: React.ReactNode;
 }) => (
-  <View style={styles.fieldRow}>
-    {label && <Text style={styles.label}>{label}</Text>}
-    <Text style={styles.value}>{children ?? " "}</Text>
+  <View style={styles.headerField}>
+    <Text style={styles.headerLabel}>{label}</Text>
+    <View style={styles.headerInput}>
+      <Text>{children ?? " "}</Text>
+    </View>
   </View>
 );
+
+const MedicationField = ({
+  medications,
+  label,
+}: {
+  medications: Array<{
+    medicationName?: string;
+    dosage?: string;
+    prescribingDoctor?: string;
+  }>;
+  label: string;
+}) => {
+  const medicationText =
+    medications
+      ?.filter((m) => m.medicationName)
+      ?.map(
+        (m) =>
+          `${m.medicationName}${m.dosage ? `, ${m.dosage}` : ""}${
+            m.prescribingDoctor ? `, ${m.prescribingDoctor}` : ""
+          }`
+      )
+      ?.join("; ") || "";
+
+  return <Field label={label}>{medicationText}</Field>;
+};
 
 const HealthHistoryFormPDF: React.FC<{
   data?: HealthHistoryFormData & { last_update: { updatedAt: string } };
@@ -135,93 +236,61 @@ const HealthHistoryFormPDF: React.FC<{
           </View>
         </View>
 
-        {/* Personal Information Section */}
-        {(data?.firstName || data?.lastName) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Personal Information</Text>
-            {data.firstName && (
-              <Field label="First Name">{data.firstName}</Field>
-            )}
-            {data.lastName && <Field label="Last Name">{data.lastName}</Field>}
+        {/* Main Form Container */}
+        <View style={styles.mainFormContainer}>
+          {/* Header Section - Name and Date of Birth */}
+          <View style={styles.headerSection}>
+            <HeaderField label="Name:">
+              {data?.firstName && data?.lastName
+                ? `${data.firstName} ${data.lastName}`
+                : data?.firstName || data?.lastName || ""}
+            </HeaderField>
+            <HeaderField label="Date of Birth:">
+              {data?.healthHistoryDate || ""}
+            </HeaderField>
           </View>
-        )}
 
-        {data?.diagnoses?.some((d) => d?.diagnosis) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Diagnoses</Text>
-            <Field label="Diagnoses">
-              {(data.diagnoses ?? [])
-                .filter((d) => d?.diagnosis)
-                .map((d) => d.diagnosis)
-                .join(", ") || "None"}
-            </Field>
-          </View>
-        )}
+          {/* Date Field */}
+          <Field label="Date">{data?.healthHistoryDate || ""}</Field>
 
-        {data?.descriptionOfHealthConcern && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Description of Health Concern
-            </Text>
-            <Field label="Description of Health Concern">
-              {data.descriptionOfHealthConcern}
-            </Field>
-          </View>
-        )}
+          {/* Diagnosis Field */}
+          <Field label="Diagnosis">
+            {(data?.diagnoses ?? [])
+              .filter((d) => d?.diagnosis)
+              .map((d) => d.diagnosis)
+              .join(", ") || ""}
+          </Field>
 
-        {data?.onsetOfSymptoms && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Onset of Symptoms</Text>
-            <Field label="Onset of Symptoms">{data.onsetOfSymptoms}</Field>
-          </View>
-        )}
+          {/* Description of Health Concern */}
+          <Field label="Description of Health Concern" isMultiLine>
+            {data?.descriptionOfHealthConcern || ""}
+          </Field>
 
-        {data?.frequencyOfSymptoms && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Frequency of Symptoms</Text>
-            <Field label="Frequency of Symptoms">
-              {data.frequencyOfSymptoms}
-            </Field>
-          </View>
-        )}
+          {/* Onset of Symptoms */}
+          <Field label="Onset of Symptoms">{data?.onsetOfSymptoms || ""}</Field>
 
-        {data?.severityOfSymptoms && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Severity of Symptoms</Text>
-            <Field label="Severity of Symptoms">
-              {data.severityOfSymptoms}
-            </Field>
-          </View>
-        )}
+          {/* Frequency of Symptoms */}
+          <Field label="Frequency of Symptoms">
+            {data?.frequencyOfSymptoms || ""}
+          </Field>
 
-        {(data?.admittingDiagnosis || data?.hospitalizationTreatment) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Hospitalization</Text>
-            {data.admittingDiagnosis && (
-              <Field label="Admitting Diagnosis">
-                {data.admittingDiagnosis}
-              </Field>
-            )}
-            {data.hospitalizationTreatment && (
-              <Field label="Hospitalization Treatment">
-                {data.hospitalizationTreatment}
-              </Field>
-            )}
-          </View>
-        )}
+          {/* Severity of Symptoms */}
+          <Field label="Severity of Symptoms">
+            {data?.severityOfSymptoms || ""}
+          </Field>
 
-        {data?.providers?.some(
-          (provider) =>
-            provider &&
-            (provider.providerName ||
-              provider.address ||
-              provider.phone ||
-              provider.notes ||
-              provider.follow_up)
-        ) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Healthcare Providers</Text>
-            {(data.providers ?? [])
+          {/* Hospitalization */}
+          <Field label="Hospitalization">
+            {data?.admittingDiagnosis && data?.hospitalizationTreatment
+              ? `${data.admittingDiagnosis}, ${data.hospitalizationTreatment}`
+              : data?.admittingDiagnosis ||
+                data?.hospitalizationTreatment ||
+                ""}
+          </Field>
+
+          {/* Specialty Provider */}
+          <Field label="Specialty Provider">
+            {(data?.providers ?? [])
               .filter(
                 (provider) =>
                   provider &&
@@ -231,109 +300,64 @@ const HealthHistoryFormPDF: React.FC<{
                     provider.notes ||
                     provider.follow_up)
               )
-              .map((provider, index) => (
-                <View key={index} style={styles.fieldRow}>
-                  <Text style={styles.label}>Provider {index + 1}</Text>
-                  <Text style={styles.value}>
-                    {provider.providerName && `Name: ${provider.providerName}`}
-                    {provider.address && `\nAddress: ${provider.address}`}
-                    {provider.phone && `\nPhone: ${provider.phone}`}
-                    {provider.notes && `\nNotes: ${provider.notes}`}
-                    {provider.follow_up && `\nFollow Up: ${provider.follow_up}`}
-                  </Text>
-                </View>
-              ))}
-          </View>
-        )}
+              .map(
+                (provider) =>
+                  `${provider.providerName || ""}${
+                    provider.address ? `, ${provider.address}` : ""
+                  }${provider.phone ? `, ${provider.phone}` : ""}${
+                    provider.notes ? `, ${provider.notes}` : ""
+                  }${provider.follow_up ? `, ${provider.follow_up}` : ""}`
+              )
+              .join("; ") || ""}
+          </Field>
 
-        {data?.medicationsStarted?.some((m) => m.medicationName) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Medication Started</Text>
-            <Field label="Medication Name">
-              {(data.medicationsStarted ?? [])
-                .map((m) => m.medicationName)
-                .join(", ")}
-            </Field>
-            <Field label="Dosage">
-              {(data.medicationsStarted ?? []).map((m) => m.dosage).join(", ")}
-            </Field>
-            <Field label="Prescribing Doctor">
-              {(data.medicationsStarted ?? [])
-                .map((m) => m.prescribingDoctor)
-                .join(", ")}
-            </Field>
-          </View>
-        )}
+          {/* Medication Started */}
+          <MedicationField
+            medications={data?.medicationsStarted || []}
+            label="Medication Started"
+          />
 
-        {data?.medicationsEnded?.some((m) => m.medicationName) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Medication Ended</Text>
-            <Field label="Medication Name">
-              {(data.medicationsEnded ?? [])
-                .map((m) => m.medicationName)
-                .join(", ")}
-            </Field>
-            <Field label="Dosage">
-              {(data.medicationsEnded ?? []).map((m) => m.dosage).join(", ")}
-            </Field>
-            <Field label="Prescribing Doctor">
-              {(data.medicationsEnded ?? [])
-                .map((m) => m.prescribingDoctor)
-                .join(", ")}
-            </Field>
-          </View>
-        )}
+          {/* Medication Stopped */}
+          <MedicationField
+            medications={data?.medicationsEnded || []}
+            label="Medication Stopped"
+          />
 
-        {(data?.homeHealthName ||
-          data?.homeHealthPhone ||
-          data?.homeHealthAddress ||
-          data?.homeHealthFax ||
-          data?.homeHealthServiceReceived ||
-          data?.homeHealthStartDate) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Home Health Agency</Text>
-            {data.homeHealthName && (
-              <Field label="Home Health Name">{data.homeHealthName}</Field>
-            )}
-            {data.homeHealthPhone && (
-              <Field label="Home Health Phone">{data.homeHealthPhone}</Field>
-            )}
-            {data.homeHealthAddress && (
-              <Field label="Home Health Address">
-                {data.homeHealthAddress}
-              </Field>
-            )}
-            {data.homeHealthFax && (
-              <Field label="Home Health Fax">{data.homeHealthFax}</Field>
-            )}
-            {data.homeHealthServiceReceived && (
-              <Field label="Home Health Service Received">
-                {data.homeHealthServiceReceived}
-              </Field>
-            )}
-            {data.homeHealthStartDate && (
-              <Field label="Home Health Start Date">
-                {data.homeHealthStartDate}
-              </Field>
-            )}
-          </View>
-        )}
+          {/* Medication and Anesthesia Reactions and Side Effects */}
+          <Field
+            label="Medication and Anesthesia Reactions and Side Effects"
+            isMultiLine
+          >
+            {(data?.anesthesia ?? [])
+              .filter((a) => a?.anesthesia)
+              .map((a) => a.anesthesia)
+              .join(", ") || ""}
+          </Field>
 
-        {data?.whatWorked && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>What Worked</Text>
-            <Field label="What Worked">{data.whatWorked}</Field>
-          </View>
-        )}
+          {/* Home Health */}
+          <Field label="Home Health">
+            {[
+              data?.homeHealthName,
+              data?.homeHealthServiceReceived,
+              data?.homeHealthPhone,
+              data?.homeHealthAddress,
+              data?.homeHealthStartDate,
+              data?.homeHealthDischargeDate,
+            ]
+              .filter(Boolean)
+              .join(", ") || ""}
+          </Field>
 
-        {data?.healthHistoryNotes && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Health History Notes</Text>
-            <Field label="Health History Notes">
-              {data.healthHistoryNotes}
-            </Field>
-          </View>
-        )}
+          {/* What Worked */}
+          <Field label="What Worked" isLargeTextArea>
+            {data?.whatWorked || ""}
+          </Field>
+
+          {/* Notes */}
+          <Field label="Notes" isLargeTextArea>
+            {data?.healthHistoryNotes || ""}
+          </Field>
+        </View>
       </Page>
     </Document>
   );

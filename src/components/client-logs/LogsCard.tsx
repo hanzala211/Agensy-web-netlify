@@ -64,7 +64,7 @@ const getFormNavigationPath = (formType: string, subtypeId?: string) => {
       form: "important-people-in-life",
     },
     start_of_care: {
-      folder: "essential-health-information",
+      folder: "guides-checklists",
       form: "start-of-care-checklist",
     },
     hospitalization: {
@@ -82,7 +82,7 @@ const getFormNavigationPath = (formType: string, subtypeId?: string) => {
     },
     care_plan: { folder: "guides-checklists", form: "care-plan-checklists" },
     medical_template: {
-      folder: "guides-checklists",
+      folder: "medical-appointment-templates",
       form: "medical-appointment-templates",
     },
   };
@@ -91,8 +91,8 @@ const getFormNavigationPath = (formType: string, subtypeId?: string) => {
 
   if (formType === "medical_template" && subtypeId) {
     return {
-      folder: "guides-checklists",
-      form: `medical-appointment-templates/medical-appointment-template_${subtypeId}`,
+      folder: "medical-appointment-templates",
+      form: `medical-appointment-template_${subtypeId}`,
     };
   }
 

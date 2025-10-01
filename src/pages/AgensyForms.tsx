@@ -75,13 +75,6 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
     type: "folder",
     children: [
       {
-        id: "start-of-care-checklist",
-        name: "Start of Care Checklist",
-        type: "file",
-        slug: "start-of-care-checklist",
-      },
-
-      {
         id: "face-sheet-short",
         name: "Face Sheet Short",
         type: "file",
@@ -156,6 +149,7 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
       },
     ],
   },
+
   {
     id: "guides-checklists",
     slug: "guides-checklists",
@@ -163,11 +157,10 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
     type: "folder",
     children: [
       {
-        id: "medical-appointment-templates",
-        slug: "medical-appointment-templates",
-        name: "Medical Appointment Templates",
-        type: "folder",
-        children: [],
+        id: "start-of-care-checklist",
+        name: "Start of Care Checklist",
+        type: "file",
+        slug: "start-of-care-checklist",
       },
       {
         id: "long-term-care-insurance-policy",
@@ -218,6 +211,13 @@ const getRootFolders = (userPermissions: string[]): FolderItem[] => [
         slug: "medicare-cheat-sheet",
       },
     ],
+  },
+  {
+    id: "medical-appointment-templates",
+    slug: "medical-appointment-templates",
+    name: "Medical Appointment Templates",
+    type: "folder",
+    children: [],
   },
 ];
 
@@ -413,7 +413,7 @@ export const AgensyForms: React.FC = () => {
         queryKey: ["medical-appointment-templates", params.clientId],
       });
       navigate(
-        `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/guides-checklists/medical-appointment-template_${createNewMedicalTemplateMutation.data.id}`
+        `/clients/${params.clientId}/${ROUTES.agensyFormsFolders}/medical-appointment-templates/medical-appointment-template_${createNewMedicalTemplateMutation.data.id}`
       );
     } else if (createNewMedicalTemplateMutation.status === "error") {
       toast.error(
@@ -447,28 +447,12 @@ export const AgensyForms: React.FC = () => {
 
     if (currentPath.length === 0) {
       const updatedRootFolders = rootFolders.map((folder) => {
-        if (folder.id === "guides-checklists") {
-          const staticFiles =
-            folder.children?.filter((item) => item.type === "file") || [];
-          const medicalAppointmentTemplatesFolder = folder.children?.find(
-            (item) => item.id === "medical-appointment-templates"
-          );
-
-          if (medicalAppointmentTemplatesFolder) {
-            const dynamicTemplates = getDynamicMedicalTemplates();
-            const allMedicalItems = [
-              {
-                ...medicalAppointmentTemplatesFolder,
-                children: dynamicTemplates,
-              },
-              ...staticFiles,
-            ];
-
-            return {
-              ...folder,
-              children: allMedicalItems,
-            };
-          }
+        if (folder.id === "medical-appointment-templates") {
+          const dynamicTemplates = getDynamicMedicalTemplates();
+          return {
+            ...folder,
+            children: dynamicTemplates,
+          };
         }
         return folder;
       });
@@ -481,48 +465,7 @@ export const AgensyForms: React.FC = () => {
       if (!foundAll) return;
       const folder = currentLevel.find((item) => item.name === pathItem);
       if (folder && folder.children) {
-        if (folder.id === "guides-checklists") {
-          const staticFiles =
-            folder.children?.filter((item) => item.type === "file") || [];
-          const medicalAppointmentTemplatesFolder = folder.children?.find(
-            (item) => item.id === "medical-appointment-templates"
-          );
-
-          if (medicalAppointmentTemplatesFolder) {
-            const dynamicTemplates = getDynamicMedicalTemplates();
-
-            const allMedicalItems = [
-              {
-                ...medicalAppointmentTemplatesFolder,
-                children: dynamicTemplates,
-              },
-              ...staticFiles,
-            ];
-
-            if (
-              searchQuery &&
-              currentPath.length > 0 &&
-              currentPath[currentPath.length - 1] ===
-                "Medical Appointment Templates"
-            ) {
-              const filteredTemplates = dynamicTemplates.filter((item) =>
-                item.name.toLowerCase().includes(searchQuery.toLowerCase())
-              );
-              currentLevel = [
-                ...staticFiles,
-                {
-                  ...medicalAppointmentTemplatesFolder,
-                  children: filteredTemplates,
-                },
-              ];
-              return;
-            }
-
-            currentLevel = allMedicalItems;
-          } else {
-            currentLevel = folder.children;
-          }
-        } else if (folder.id === "medical-appointment-templates") {
+        if (folder.id === "medical-appointment-templates") {
           const dynamicTemplates = getDynamicMedicalTemplates();
 
           if (searchQuery) {
@@ -579,7 +522,7 @@ export const AgensyForms: React.FC = () => {
       if (dynamicTemplate) {
         const rootFolders = getRootFolders(userPermissions);
         const medicalFolder = rootFolders.find(
-          (folder) => folder.id === "guides-checklists"
+          (folder) => folder.id === "medical-appointment-templates"
         );
         if (medicalFolder) {
           return {
