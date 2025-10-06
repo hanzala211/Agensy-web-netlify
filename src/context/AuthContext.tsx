@@ -79,12 +79,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
     setIsLoggingOut(true);
 
-    signOut();
+    await signOut();
     setUserData(null);
     queryClient.removeQueries();
+    setIsLoggingOut(false);
   };
 
   const filterHealthCareProvider = (clientId: string, providerId: string) => {
@@ -142,6 +146,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         filterClientRole,
         handleFilterPermission,
         isPrimaryUserSubscriptionActive,
+        isLoggingOut,
       }}
     >
       {children}

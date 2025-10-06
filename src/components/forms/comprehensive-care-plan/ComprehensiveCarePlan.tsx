@@ -24,7 +24,7 @@ import {
   type HealthcareProvider,
   type OpenedFileData,
 } from "@agensy/types";
-import { APP_ACTIONS, ICONS } from "@agensy/constants";
+import { APP_ACTIONS, ICONS, SPECIALTIES } from "@agensy/constants";
 import { useParams } from "react-router-dom";
 import {
   useGetComprehensiveCarePlan,
@@ -1845,7 +1845,24 @@ export const ComprehensiveCarePlan = () => {
             return {
               providerType: provider.provider_type || "",
               providerName: provider.provider_name || "",
-              specialty: provider.specialty || "",
+              specialty: (() => {
+                const specialty = provider.specialty || "";
+                const isPredefinedSpecialty = SPECIALTIES.some(
+                  (s) => s.value === specialty
+                );
+                return isPredefinedSpecialty
+                  ? specialty
+                  : specialty !== null && specialty.length > 0
+                  ? "Other"
+                  : "";
+              })(),
+              specialty_custom: (() => {
+                const specialty = provider.specialty || "";
+                const isPredefinedSpecialty = SPECIALTIES.some(
+                  (s) => s.value === specialty
+                );
+                return isPredefinedSpecialty ? "" : specialty;
+              })(),
               address: provider.address || "",
               phone: provider.phone || "",
               id: provider.id,
@@ -1903,7 +1920,15 @@ export const ComprehensiveCarePlan = () => {
         const providerData = {
           provider_type: provider.providerType ? provider.providerType : null,
           provider_name: provider.providerName ? provider.providerName : null,
-          specialty: provider.specialty ? provider.specialty : null,
+          specialty:
+            provider.specialty === "Other"
+              ? provider.specialty_custom &&
+                provider.specialty_custom.trim() !== ""
+                ? provider.specialty_custom
+                : null
+              : provider.specialty && provider.specialty.trim() !== ""
+              ? provider.specialty
+              : null,
           address: provider.address ? provider.address : null,
           phone: provider.phone ? provider.phone : null,
           id: provider.id ? provider.id : null,
@@ -3045,7 +3070,11 @@ export const ComprehensiveCarePlan = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-8"
+    >
       <ComprehensiveCarePlanCard
         register={register}
         control={control}

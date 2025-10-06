@@ -49,6 +49,7 @@ import {
   RACE_OPTIONS,
   COGNITIVE_STATUS,
   APP_ACTIONS,
+  SPECIALTIES,
 } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { useQueryClient } from "@tanstack/react-query";
@@ -352,21 +353,37 @@ export const FaceSheetLongForm: React.FC = () => {
           )?.value || "",
         providers:
           faceSheetLongData?.healthcare_providers?.map(
-            (provider: HealthcareProvider) => ({
-              providerName: provider.provider_name || "",
-              specialty: provider.specialty || "",
-              address: provider.address || "",
-              phone: provider.phone || "",
-              fax: provider.fax || "",
-              lastVisit: provider.last_visit
-                ? DateUtils.formatDateToRequiredFormat(provider.last_visit)
-                : "",
-              nextVisit: provider.next_visit
-                ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
-                : "",
-              id: provider.id || "",
-              providerType: provider.provider_type || "",
-            })
+            (provider: HealthcareProvider) => {
+              // Check if specialty is in the predefined list
+              const isPredefinedSpecialty = SPECIALTIES.some(
+                (s) => s.value === provider.specialty
+              );
+
+              return {
+                providerName: provider.provider_name || "",
+                specialty: isPredefinedSpecialty
+                  ? provider.specialty
+                    ? provider.specialty
+                    : ""
+                  : "Other",
+                specialty_custom: isPredefinedSpecialty
+                  ? ""
+                  : provider.specialty && provider.specialty.trim() !== ""
+                  ? provider.specialty
+                  : "",
+                address: provider.address || "",
+                phone: provider.phone || "",
+                fax: provider.fax || "",
+                lastVisit: provider.last_visit
+                  ? DateUtils.formatDateToRequiredFormat(provider.last_visit)
+                  : "",
+                nextVisit: provider.next_visit
+                  ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
+                  : "",
+                id: provider.id || "",
+                providerType: provider.provider_type || "",
+              };
+            }
           ) || [],
         medications:
           faceSheetLongData?.medications?.map(
@@ -573,7 +590,12 @@ export const FaceSheetLongForm: React.FC = () => {
         const provider = {
           provider_type: item?.providerType,
           provider_name: item.providerName ? item.providerName : null,
-          specialty: item.specialty ? item.specialty : null,
+          specialty:
+            item.specialty === "Other"
+              ? item.specialty_custom && item.specialty_custom.trim() !== ""
+                ? item.specialty_custom
+                : null
+              : item.specialty,
           address: item.address ? item.address : null,
           phone: item.phone ? item.phone : null,
           last_visit: item.lastVisit
@@ -821,13 +843,13 @@ export const FaceSheetLongForm: React.FC = () => {
   const handleSaveAndDownload = useCallback(() => {
     setShouldDownloadAfterSave(true);
     handleSubmit(onSubmit)();
-  }, [setShouldDownloadAfterSave]);
+  }, []);
 
   // Register the save function with context
   useEffect(() => {
     setHandleSaveAndDownload(() => handleSaveAndDownload);
     return () => setHandleSaveAndDownload(undefined);
-  }, [setHandleSaveAndDownload]);
+  }, []);
 
   return isFaceSheetLoading ? (
     <div className="flex justify-center items-center h-screen">
@@ -835,7 +857,11 @@ export const FaceSheetLongForm: React.FC = () => {
     </div>
   ) : (
     <div className="min-h-screen">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         {/* Personal Information - Enhanced */}
         <PersonalInformationSection
           register={register}

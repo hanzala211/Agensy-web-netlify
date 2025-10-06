@@ -99,7 +99,11 @@ export const AddAccessModal: React.FC<AddAccessModalProps> = ({
         </div>
       }
     >
-      <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
+      <form
+        autoComplete="off"
+        className="space-y-4"
+        onSubmit={handleSubmit(handleFormSubmit)}
+      >
         <Input
           label="First Name"
           register={register("first_name")}

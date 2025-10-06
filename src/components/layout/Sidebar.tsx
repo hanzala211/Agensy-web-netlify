@@ -7,7 +7,7 @@ import { PrimaryButton } from "@agensy/components";
 import { useAuthContext } from "@agensy/context";
 
 export const Sidebar: React.FC = () => {
-  const { userData, handleLogout, file } = useAuthContext();
+  const { userData, handleLogout, file, isLoggingOut } = useAuthContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const sideBarRef = useRef<HTMLDivElement>(null);
   const sideBarButtonRef = useRef<HTMLButtonElement>(null);
@@ -137,7 +137,11 @@ export const Sidebar: React.FC = () => {
             aria-label="Logout from account"
           >
             <ICONS.logoutIcon size={18} />
-            <span className="text-sm">Logout</span>
+            {!isLoggingOut ? (
+              <span className="text-sm">Logout</span>
+            ) : (
+              <span className="text-sm">Logging out...</span>
+            )}
           </button>
         </div>
       </aside>

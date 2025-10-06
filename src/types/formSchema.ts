@@ -198,6 +198,7 @@ export const clientHealthProviderSchema = z
       .min(1, "Provider name is required")
       .transform(trimString),
     specialty: z.string().optional(),
+    specialty_custom: z.string().optional(),
     address: z.string().optional(),
     phone: z.string().optional(),
     fax: z.string().optional(),
@@ -423,6 +424,7 @@ export const faceSheetShortFormSchema = z.object({
       z.object({
         providerName: z.string().optional(),
         specialty: z.string().optional(),
+        specialty_custom: z.string().optional(),
         address: z.string().optional(),
         phone: z.string().optional(),
         fax: z.string().optional(),
@@ -576,6 +578,7 @@ export const faceSheetLongFormSchema = z
         z.object({
           providerName: z.string().optional(),
           specialty: z.string().optional().nullable().nullish(),
+          specialty_custom: z.string().optional(),
           address: z.string().optional(),
           phone: z.string().optional(),
           fax: z.string().optional(),
@@ -1899,6 +1902,10 @@ export const medicalAppointmentTemplateSchema = z.object({
         .string()
         .optional()
         .transform((val) => (val ? trimString(val) : val)),
+      specialty_custom: z
+        .string()
+        .optional()
+        .transform((val) => (val ? trimString(val) : val)),
       id: z.string().nullable().nullish().optional(),
       provider_id: z.string().nullable().nullish().optional(),
     })
@@ -2052,6 +2059,7 @@ export const comprehensiveCarePlanSchema = z.object({
         providerName: z.string().optional(),
         providerType: z.string().optional(),
         specialty: z.string().optional(),
+        specialty_custom: z.string().optional(),
         address: z.string().optional(),
         phone: z.string().optional(),
       })
@@ -2683,6 +2691,8 @@ export const vitalsTrackerFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   dateOfBirth: z.string().optional(),
+  bloodType: z.string().optional(),
+  height: z.string().optional(),
   vitals: z
     .array(
       z.object({
@@ -2690,10 +2700,8 @@ export const vitalsTrackerFormSchema = z.object({
         heartRate: z.string().optional(),
         oxygen: z.string().optional(),
         bloodPressure: z.string().optional(),
-        bloodType: z.string().optional(),
         temperature: z.string().optional(),
         weight: z.string().optional(),
-        height: z.string().optional(),
         other: z.string().optional(),
         id: z.string().optional().nullable().nullish(),
       })
@@ -2710,7 +2718,7 @@ export const labsTrackerFormSchema = z.object({
   labs: z
     .array(
       z.object({
-        date: z.string().optional(),
+        date: z.string().min(1, "Date is required"),
         doctorName: z.string().optional(),
         type: z.string().optional(),
         providerCompanyUsed: z.string().optional(),

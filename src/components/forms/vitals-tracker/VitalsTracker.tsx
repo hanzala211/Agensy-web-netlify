@@ -10,9 +10,10 @@ import {
   type VitalsTrackerFormData,
 } from "@agensy/types";
 import { VitalsTrackerTable } from "./VitalsTrackerTable";
+import { HeightInput } from "./HeightInput";
 import { useParams } from "react-router-dom";
 import { useGetVitalsTracker, usePostVitalsTracker } from "@agensy/api";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -21,6 +22,8 @@ const defaultValues: VitalsTrackerFormData = {
   firstName: "",
   lastName: "",
   dateOfBirth: "",
+  bloodType: "",
+  height: "",
   vitals: [],
 };
 
@@ -28,6 +31,7 @@ export const VitalsTracker = () => {
   const params = useParams();
   const { handleFilterPermission } = useAuthContext();
   const queryClient = useQueryClient();
+  const [heightValue, setHeightValue] = useState("");
   const {
     setOpenedFileData,
     setHasUnsavedChanges,
@@ -48,7 +52,8 @@ export const VitalsTracker = () => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    getValues,
+    setValue,
+    watch,
   } = useForm<VitalsTrackerFormData>({
     resolver: zodResolver(vitalsTrackerFormSchema),
     defaultValues,
@@ -57,6 +62,19 @@ export const VitalsTracker = () => {
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
+
+  const watchedHeight = watch("height");
+
+  useEffect(() => {
+    if (watchedHeight !== heightValue) {
+      setHeightValue(watchedHeight || "");
+    }
+  }, [watchedHeight, heightValue]);
+
+  const handleHeightChange = (value: string) => {
+    setHeightValue(value);
+    setValue("height", value);
+  };
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -75,18 +93,22 @@ export const VitalsTracker = () => {
       dateOfBirth: client_info.date_of_birth
         ? DateUtils.formatDateToRequiredFormat(client_info.date_of_birth)
         : "",
-      vitals: vitals.map((item) => ({
-        date: item?.date ? DateUtils.formatDateToRequiredFormat(item.date) : "",
-        heartRate: item?.heart_rate || "",
-        oxygen: item?.oxygen_saturation || "",
-        bloodPressure: item?.blood_pressure || "",
-        bloodType: item?.blood_type || "",
-        temperature: item?.temperature || "",
-        weight: item?.weight || "",
-        height: item?.height || "",
-        other: item?.other_vital_signs || "",
-        id: item?.id ? String(item.id) : null,
-      })),
+      bloodType: client_info.blood_type || "",
+      height: client_info.height || "",
+      vitals: vitals
+        .sort((a, b) => (a.index || 0) - (b.index || 0))
+        .map((item) => ({
+          date: item?.date
+            ? DateUtils.formatDateToRequiredFormat(item.date)
+            : "",
+          heartRate: item?.heart_rate || "",
+          oxygen: item?.oxygen_saturation || "",
+          bloodPressure: item?.blood_pressure || "",
+          temperature: item?.temperature || "",
+          weight: item?.weight || "",
+          other: item?.other_vital_signs || "",
+          id: item?.id ? String(item.id) : null,
+        })),
     };
 
     return formData;
@@ -98,16 +120,14 @@ export const VitalsTracker = () => {
   ): { client_info: Record<string, any>; vitals: Vital[] } => {
     const vitals: Vital[] = [];
 
-    formData.vitals?.forEach((vital) => {
+    formData.vitals?.forEach((vital, index) => {
       if (
         vital.date ||
         vital.heartRate ||
         vital.bloodPressure ||
         vital.temperature ||
         vital.weight ||
-        vital.height ||
         vital.oxygen ||
-        vital.bloodType ||
         vital.other ||
         vital.id
       ) {
@@ -118,10 +138,9 @@ export const VitalsTracker = () => {
           blood_pressure: vital.bloodPressure ? vital.bloodPressure : null,
           temperature: vital.temperature ? vital.temperature : null,
           weight: vital.weight ? vital.weight : null,
-          height: vital.height ? vital.height : null,
           oxygen_saturation: vital.oxygen ? vital.oxygen : null,
-          blood_type: vital.bloodType ? vital.bloodType : null,
           other_vital_signs: vital.other ? vital.other : null,
+          index: index,
         };
         if (!item.id) {
           delete item.id;
@@ -138,6 +157,8 @@ export const VitalsTracker = () => {
         date_of_birth: formData.dateOfBirth
           ? DateUtils.changetoISO(formData.dateOfBirth)
           : null,
+        blood_type: formData.bloodType ? formData.bloodType : null,
+        height: formData.height ? formData.height : null,
       },
     };
   };
@@ -148,10 +169,8 @@ export const VitalsTracker = () => {
       heartRate: "",
       oxygen: "",
       bloodPressure: "",
-      bloodType: "",
       temperature: "",
       weight: "",
-      height: "",
       other: "",
       id: null,
     });
@@ -171,6 +190,8 @@ export const VitalsTracker = () => {
       firstName: formData.firstName || "",
       lastName: formData.lastName || "",
       dateOfBirth: formData.dateOfBirth || "",
+      bloodType: formData.bloodType || "",
+      height: formData.height || "",
       vitals: JSON.parse(JSON.stringify(formData.vitals || [])),
       last_update: JSON.parse(
         JSON.stringify({
@@ -230,6 +251,7 @@ export const VitalsTracker = () => {
         vitalsTrackerData.client_info
       );
       reset(formData);
+      setHeightValue(formData.height || "");
 
       // Use the helper function
       setOpenedFileData(
@@ -283,19 +305,12 @@ export const VitalsTracker = () => {
       placeholder: "mmHg",
     },
     {
-      key: "bloodType",
-      label: "Blood Type",
-      type: "text",
-      placeholder: "A+, B-, etc.",
-    },
-    {
       key: "temperature",
       label: "Temperature",
       type: "number",
       placeholder: "°F",
     },
     { key: "weight", label: "Weight", type: "number", placeholder: "lbs" },
-    { key: "height", label: "Height", type: "text", placeholder: "ft'in\"" },
     {
       key: "other",
       label: "Other",
@@ -303,20 +318,6 @@ export const VitalsTracker = () => {
       placeholder: "Additional info",
     },
   ];
-
-  const handleHeightChange = (rowIndex: number, value: string) => {
-    const updatedFields = [...fields];
-    updatedFields[rowIndex] = {
-      ...updatedFields[rowIndex],
-      height: value,
-    };
-
-    const currentValues = getValues();
-    if (currentValues.vitals && currentValues.vitals[rowIndex]) {
-      currentValues.vitals[rowIndex].height = value;
-      reset(currentValues);
-    }
-  };
 
   if (isLoadingVitals)
     return (
@@ -327,7 +328,11 @@ export const VitalsTracker = () => {
 
   return (
     <div className="bg-gray-50 w-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         <Card title="Personal Information">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Input
@@ -340,12 +345,24 @@ export const VitalsTracker = () => {
               register={register("lastName")}
               error={errors.lastName?.message as string}
             />
-            <div className="md:col-span-2">
-              <DatePickerField
-                control={control}
-                name={"dateOfBirth"}
-                label="Date of Birth:"
-              />
+            <DatePickerField
+              control={control}
+              name={"dateOfBirth"}
+              label="Date of Birth:"
+            />
+            <Input
+              label="Blood Type:"
+              register={register("bloodType")}
+              error={errors.bloodType?.message as string}
+            />
+            <div className="flex flex-col w-full md:col-span-2">
+              <label className="mb-3">Height:</label>
+              <HeightInput value={heightValue} onChange={handleHeightChange} />
+              {errors.height && (
+                <span className="text-red-500 text-sm mt-1">
+                  {errors.height.message}
+                </span>
+              )}
             </div>
           </div>
         </Card>
@@ -364,7 +381,6 @@ export const VitalsTracker = () => {
             register={register}
             control={control}
             onDeleteRow={handleDeleteRow}
-            onHeightChange={handleHeightChange}
           />
         </Card>
 

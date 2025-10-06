@@ -622,7 +622,11 @@ export const ImportantPeopleInLife = () => {
 
   return (
     <div className="bg-gray-50">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         <Card title="Personal Identification">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Input

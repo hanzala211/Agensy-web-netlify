@@ -52,6 +52,7 @@ export const AddClientHealthProviderModal: React.FC<
       provider_type: "",
       provider_name: "",
       specialty: "",
+      specialty_custom: "",
       address: "",
       phone: "",
       fax: "",
@@ -69,7 +70,24 @@ export const AddClientHealthProviderModal: React.FC<
         last_visit: editItem.last_visit
           ? DateUtils.formatDateToRequiredFormat(editItem.last_visit)
           : "",
-        specialty: editItem.specialty ? editItem.specialty : "",
+        specialty: (() => {
+          const specialty = editItem.specialty || "";
+          const isPredefinedSpecialty = SPECIALTIES.some(
+            (s) => s.value === specialty
+          );
+          return isPredefinedSpecialty
+            ? specialty
+            : specialty !== null && specialty.length > 0
+            ? "Other"
+            : "";
+        })(),
+        specialty_custom: (() => {
+          const specialty = editItem.specialty || "";
+          const isPredefinedSpecialty = SPECIALTIES.some(
+            (s) => s.value === specialty
+          );
+          return isPredefinedSpecialty ? "" : specialty;
+        })(),
         address: editItem.address ? editItem.address : "",
         phone: editItem.phone ? editItem.phone : "",
         fax: editItem.fax ? editItem.fax : "",
@@ -89,6 +107,7 @@ export const AddClientHealthProviderModal: React.FC<
           provider_type: "",
           last_visit: "",
           specialty: "",
+          specialty_custom: "",
           address: "",
           phone: "",
           fax: "",
@@ -106,7 +125,19 @@ export const AddClientHealthProviderModal: React.FC<
 
   const onSubmit = (data: ClientHealthProviderFormData) => {
     if (onSubmitProp) {
-      onSubmitProp(data);
+      // Use custom specialty value if "Other" is selected and custom value is not empty
+      const submitData = {
+        ...data,
+        specialty:
+          data.specialty === "Other"
+            ? data.specialty_custom && data.specialty_custom.trim() !== ""
+              ? data.specialty_custom
+              : null
+            : data.specialty && data.specialty.trim() !== ""
+            ? data.specialty
+            : null,
+      };
+      onSubmitProp(submitData as ClientHealthProviderFormData);
     }
   };
 
@@ -148,6 +179,10 @@ export const AddClientHealthProviderModal: React.FC<
           data={SPECIALTIES}
           name="specialty"
           labelOption="Select Specialty"
+          enableTextInput={true}
+          textInputTriggerValue="Other"
+          textInputName="specialty_custom"
+          textInputPlaceholder="Enter specialty"
         />
 
         <Input

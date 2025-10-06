@@ -18,6 +18,7 @@ import type {
   VitalsTrackerFormData,
   ComprehensiveMedicationListFormData,
   CaregiverInformationFormData,
+  Client,
 } from "@agensy/types";
 import {
   CommonLoader,
@@ -26,6 +27,7 @@ import {
   TertiaryButton,
 } from "@agensy/components";
 import { useAuthContext, useClientContext } from "@agensy/context";
+import { useQueryClient } from "@tanstack/react-query";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useParams, useNavigate } from "react-router-dom";
 import FaceSheetLongFormPDF from "./face-sheet-long/FaceSheetLongFormPDF";
@@ -99,6 +101,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
     selectedClient,
     handleSaveAndDownload,
   } = useClientContext();
+  const queryClient = useQueryClient();
   const [isOCRModelOpen, setIsOCRModelOpen] = useState<boolean>(false);
   const [isUnsavedChangesModalOpen, setIsUnsavedChangesModalOpen] =
     useState<boolean>(false);
@@ -290,6 +293,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                 data={
                   openedFileData as unknown as HealthHistoryFormData & {
                     last_update: { updatedAt: string };
+                    dateOfBirth: string;
                   }
                 }
               />
@@ -599,6 +603,12 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           break;
         case "comprehensive-medication-list":
           if (openedFileData && typeof openedFileData === "object") {
+            const clientData = queryClient.getQueryData([
+              "client",
+              selectedClient?.id,
+            ]) as Client | undefined;
+            const clientMedications = clientData?.medications || [];
+
             return (
               <ComprehensiveMedicationListPDF
                 data={
@@ -606,6 +616,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                     last_update: { updatedAt: string };
                   }
                 }
+                clientMedications={clientMedications}
               />
             );
           }

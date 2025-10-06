@@ -17,7 +17,7 @@ import {
 import { LabsTrackerCard } from "./LabsTrackerCard";
 import { useGetLabsTracker, usePostLabsTracker } from "@agensy/api";
 import { useParams } from "react-router-dom";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -38,6 +38,9 @@ export const LabsTracker = () => {
     setShouldDownloadAfterSave,
     setHandleSaveAndDownload,
   } = useClientContext();
+  const [providers, setProviders] = useState<
+    { label: string; value: string }[]
+  >([]);
   const {
     data: labsTrackerData,
     isFetching: isLoadingLabs,
@@ -55,13 +58,19 @@ export const LabsTracker = () => {
     defaultValues,
   });
   const { handleFilterPermission } = useAuthContext();
-  const client = queryClient.getQueryData(["client", params.clientId]) as
-    | Client
-    | undefined;
-  const providers = client?.healthcareProviders.map((item) => ({
-    label: `${item.provider_name}`,
-    value: item.id,
-  }));
+
+  useEffect(() => {
+    const client = queryClient.getQueryData(["client", params.clientId]) as
+      | Client
+      | undefined;
+    const providers = client?.healthcareProviders.map((item) => ({
+      label: `${item.provider_name}`,
+      value: item.id,
+    }));
+
+    setProviders(providers as { label: string; value: string }[]);
+  }, []);
+
   useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
@@ -85,15 +94,17 @@ export const LabsTracker = () => {
       };
     }
 
-    const mappedLabs = labs.map((item) => ({
-      date: DateUtils.formatDateToRequiredFormat(item?.date ?? ""),
-      doctorName: item?.doctor_name ?? "",
-      type: item?.type ?? "",
-      providerCompanyUsed: item?.provider_company ?? "",
-      purpose: item?.purpose ?? "",
-      results: item?.results ?? "",
-      id: item?.id ?? "",
-    }));
+    const mappedLabs = labs
+      .sort((a, b) => (a.index || 0) - (b.index || 0))
+      .map((item) => ({
+        date: DateUtils.formatDateToRequiredFormat(item?.date ?? ""),
+        doctorName: item?.doctor_name ?? "",
+        type: item?.type ?? "",
+        providerCompanyUsed: item?.provider_company ?? "",
+        purpose: item?.purpose ?? "",
+        results: item?.results ?? "",
+        id: item?.id ?? "",
+      }));
 
     return {
       labs: mappedLabs,
@@ -183,7 +194,7 @@ export const LabsTracker = () => {
             date: lab.date ? DateUtils.changetoISO(lab.date) : null,
             doctor_name: lab.doctorName
               ? providers?.find((provider) => provider.value === lab.doctorName)
-                  ?.label
+                  ?.value
               : null,
             type: lab.type ? lab.type : null,
             provider_company: lab.providerCompanyUsed
@@ -287,7 +298,11 @@ export const LabsTracker = () => {
 
   return (
     <div className="bg-gray-50 w-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         <Card title="Personal Information">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Input

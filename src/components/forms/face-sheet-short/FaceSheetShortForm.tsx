@@ -31,6 +31,7 @@ import {
   RELATIONSHIP_TO_CLIENT,
   CODE_STATUS_OPTIONS,
   APP_ACTIONS,
+  SPECIALTIES,
 } from "@agensy/constants";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -258,21 +259,40 @@ export const FaceSheetShortForm: React.FC = () => {
           )?.value || "",
         providers:
           faceSheetShortForm?.healthcare_providers?.map(
-            (provider: HealthcareProvider) => ({
-              providerName: provider.provider_name || "",
-              specialty: provider.specialty || "",
-              address: provider.address || "",
-              phone: provider.phone || "",
-              fax: provider.fax || "",
-              lastVisit: provider.last_visit
-                ? DateUtils.formatDateToRequiredFormat(provider.last_visit)
-                : "",
-              nextVisit: provider.next_visit
-                ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
-                : "",
-              id: provider.id || "",
-              providerType: provider.provider_type || "",
-            })
+            (provider: HealthcareProvider) => {
+              return {
+                providerName: provider.provider_name || "",
+                specialty: (() => {
+                  const specialty = provider.specialty || "";
+                  const isPredefinedSpecialty = SPECIALTIES.some(
+                    (s) => s.value === specialty
+                  );
+                  return isPredefinedSpecialty
+                    ? specialty
+                    : specialty !== null && specialty.length > 0
+                    ? "Other"
+                    : "";
+                })(),
+                specialty_custom: (() => {
+                  const specialty = provider.specialty || "";
+                  const isPredefinedSpecialty = SPECIALTIES.some(
+                    (s) => s.value === specialty
+                  );
+                  return isPredefinedSpecialty ? "" : specialty;
+                })(),
+                address: provider.address || "",
+                phone: provider.phone || "",
+                fax: provider.fax || "",
+                lastVisit: provider.last_visit
+                  ? DateUtils.formatDateToRequiredFormat(provider.last_visit)
+                  : "",
+                nextVisit: provider.next_visit
+                  ? DateUtils.formatDateToRequiredFormat(provider.next_visit)
+                  : "",
+                id: provider.id || "",
+                providerType: provider.provider_type || "",
+              };
+            }
           ) || [],
         medications:
           faceSheetShortForm?.medications?.map(
@@ -365,7 +385,14 @@ export const FaceSheetShortForm: React.FC = () => {
         const provider = {
           provider_type: item.providerType,
           provider_name: item.providerName ? item.providerName : null,
-          specialty: item.specialty ? item.specialty : null,
+          specialty:
+            item.specialty === "Other"
+              ? item.specialty_custom && item.specialty_custom.trim() !== ""
+                ? item.specialty_custom
+                : null
+              : item.specialty && item.specialty.trim() !== ""
+              ? item.specialty
+              : null,
           address: item.address ? item.address : null,
           phone: item.phone ? item.phone : null,
           last_visit: item.lastVisit
@@ -487,7 +514,11 @@ export const FaceSheetShortForm: React.FC = () => {
     </div>
   ) : (
     <div className="min-h-screen">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         {/* Personal Information Section */}
         <PersonalInformationSection
           register={register}

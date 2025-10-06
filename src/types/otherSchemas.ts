@@ -60,10 +60,9 @@ export type Vital = {
   blood_pressure: string | null;
   temperature: string | number | null;
   weight: string | number | null;
-  height: string | number | null;
   oxygen_saturation: string | number | null;
-  blood_type: string | null;
   other_vital_signs: string | null;
+  index?: number;
 };
 
 export interface ConfidenceScore {

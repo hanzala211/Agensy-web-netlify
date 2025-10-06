@@ -19,7 +19,7 @@ export interface AuthContextType {
   setUserData: React.Dispatch<React.SetStateAction<IUser | null>>;
   isAuthLoading: boolean;
   setIsAuthLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  handleLogout: () => void;
+  handleLogout: () => Promise<void>;
   clients: Client[];
   filterHealthCareProvider: (
     clientId: string,
@@ -34,6 +34,7 @@ export interface AuthContextType {
   filterClientRole: (clientId: string) => string;
   handleFilterPermission: (clientId: string, appAction: string) => boolean;
   isPrimaryUserSubscriptionActive: (clientId: string) => boolean;
+  isLoggingOut: boolean;
 }
 
 export interface ClientContextType {

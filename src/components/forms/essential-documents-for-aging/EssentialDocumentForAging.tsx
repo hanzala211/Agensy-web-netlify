@@ -389,7 +389,7 @@ export const EssentialDocumentForAging = () => {
           <CommonLoader />
         </div>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
           <Card title="Essential Documents List">
             <div className="border border-gray-300 rounded-lg overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-5 bg-gray-50 border-b border-gray-300">

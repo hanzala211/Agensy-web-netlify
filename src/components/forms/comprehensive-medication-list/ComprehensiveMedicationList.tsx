@@ -21,7 +21,7 @@ import {
   useGetComprehensiveMedicationList,
   usePostComprehensiveMedicationList,
 } from "@agensy/api";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -30,6 +30,7 @@ import { AntdBadge } from "@agensy/components";
 export const ComprehensiveMedicationList = () => {
   const params = useParams();
   const { handleFilterPermission } = useAuthContext();
+  const [printStoppedMedications, setPrintStoppedMedications] = useState(true);
   const {
     data: comprehensiveMedicationList,
     isFetching: isLoadingChecklist,
@@ -52,7 +53,16 @@ export const ComprehensiveMedicationList = () => {
 
   const isMedicationStopped = (medicationId: string) => {
     if (!medicationId) return false;
-    return !clientMedications.some((med) => med.id === medicationId);
+
+    const foundMedication = clientMedications.find(
+      (med) => med.id === medicationId
+    );
+
+    if (foundMedication) {
+      return false;
+    }
+
+    return true;
   };
 
   const {
@@ -88,6 +98,16 @@ export const ComprehensiveMedicationList = () => {
   });
 
   useEffect(() => {
+    const formData = getValues();
+    setOpenedFileData(
+      createSafeOpenedFileData(
+        formData,
+        comprehensiveMedicationList?.last_update?.updatedAt
+      ) as unknown as OpenedFileData
+    );
+  }, [printStoppedMedications]);
+
+  useEffect(() => {
     setHasUnsavedChanges(isDirty);
   }, [isDirty, setHasUnsavedChanges]);
 
@@ -103,6 +123,7 @@ export const ComprehensiveMedicationList = () => {
       firstName: formData.firstName || "",
       lastName: formData.lastName || "",
       dateOfBirth: formData.dateOfBirth || "",
+      printStoppedMedications: printStoppedMedications,
       allergies: JSON.parse(JSON.stringify(formData.allergies || [])),
       medications: JSON.parse(JSON.stringify(formData.medications || [])),
       last_update: JSON.parse(
@@ -303,7 +324,11 @@ export const ComprehensiveMedicationList = () => {
     );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-8"
+    >
       {/* Personal Information Card */}
       <Card title="Personal Information">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -322,6 +347,181 @@ export const ComprehensiveMedicationList = () => {
             control={control}
             name="dateOfBirth"
           />
+        </div>
+      </Card>
+
+      {/* Medications Card */}
+      <Card
+        title="Medications"
+        buttonText={<ICONS.plus size={16} />}
+        onButtonClick={() =>
+          appendMedication({
+            medicationName: "",
+            dosage: "",
+            frequency: "",
+            usedToTreat: "",
+            refillDue: "",
+            prescriber: "",
+            pharmacy: "",
+            startDate: "",
+            endDate: "",
+            sideEffects: "",
+            medicationId: "",
+          })
+        }
+        ariaLabel="Add Medication"
+        showButton={true}
+      >
+        {/* Print Stopped Medications Checkbox */}
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="printStoppedMedications"
+              checked={printStoppedMedications}
+              onChange={(e) => {
+                setPrintStoppedMedications(e.target.checked);
+              }}
+              className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label
+              htmlFor="printStoppedMedications"
+              className="text-sm font-medium text-gray-700 cursor-pointer"
+            >
+              Print stopped medications in PDF
+            </label>
+          </div>
+          <p className="text-xs text-gray-600 mt-1 ml-7">
+            When checked, stopped medications will be included in a separate
+            section of the PDF
+          </p>
+        </div>
+        <div className="space-y-6">
+          {medicationsFields
+            .map((field) => ({
+              field,
+              isStopped: isMedicationStopped(field.medicationId || ""),
+            }))
+            .sort((a, b) => Number(a.isStopped) - Number(b.isStopped))
+            .map(({ field, isStopped }) => {
+              const originalIndex = medicationsFields.findIndex(
+                (f) => f.id === field.id
+              );
+              return (
+                <div
+                  key={field.id}
+                  className={`p-4 rounded-lg border border-gray-200 ${
+                    isStopped ? "bg-gray-50" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-medium text-gray-700 mr-2">
+                      Medication {originalIndex + 1}:
+                    </span>
+                    {isStopped && (
+                      <AntdBadge status="error" size="small" text="Stopped" />
+                    )}
+                  </div>
+
+                  {/* First row of fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                    <Input
+                      label="Medication"
+                      register={register(
+                        `medications.${originalIndex}.medicationName`
+                      )}
+                      error={
+                        errors.medications?.[originalIndex]?.medicationName
+                          ?.message
+                      }
+                    />
+                    <Input
+                      label="Dose"
+                      register={register(`medications.${originalIndex}.dosage`)}
+                      error={
+                        errors.medications?.[originalIndex]?.dosage?.message
+                      }
+                    />
+                    <Input
+                      label="Frequency"
+                      register={register(
+                        `medications.${originalIndex}.frequency`
+                      )}
+                      error={
+                        errors.medications?.[originalIndex]?.frequency?.message
+                      }
+                    />
+                    <Input
+                      label="Used to Treat"
+                      register={register(
+                        `medications.${originalIndex}.usedToTreat`
+                      )}
+                      error={
+                        errors.medications?.[originalIndex]?.usedToTreat
+                          ?.message
+                      }
+                    />
+                    <DatePickerField
+                      label="Refill Due"
+                      control={control}
+                      name={`medications.${originalIndex}.refillDue`}
+                    />
+
+                    <Input
+                      label="Prescriber"
+                      register={register(
+                        `medications.${originalIndex}.prescriber`
+                      )}
+                      error={
+                        errors.medications?.[originalIndex]?.prescriber?.message
+                      }
+                    />
+                    <Input
+                      label="Pharmacy"
+                      register={register(
+                        `medications.${originalIndex}.pharmacy`
+                      )}
+                      error={
+                        errors.medications?.[originalIndex]?.pharmacy?.message
+                      }
+                    />
+                    <DatePickerField
+                      label="Start Date"
+                      control={control}
+                      name={`medications.${originalIndex}.startDate`}
+                    />
+                    <DatePickerField
+                      label="End Date"
+                      control={control}
+                      name={`medications.${originalIndex}.endDate`}
+                    />
+                    <div className="lg:col-span-3">
+                      <Input
+                        label="Side Effects"
+                        register={register(
+                          `medications.${originalIndex}.sideEffects`
+                        )}
+                        error={
+                          errors.medications?.[originalIndex]?.sideEffects
+                            ?.message
+                        }
+                      />
+                    </div>
+                  </div>
+                  {medicationsFields.length > 1 && (
+                    <div className="flex justify-end">
+                      <TertiaryButton
+                        type="button"
+                        onClick={() => removeMedication(originalIndex)}
+                        className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
+                      >
+                        <ICONS.delete />
+                      </TertiaryButton>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
       </Card>
 
@@ -359,115 +559,6 @@ export const ComprehensiveMedicationList = () => {
                   </TertiaryButton>
                 )}
               </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Medications Card */}
-      <Card
-        title="Medications"
-        buttonText={<ICONS.plus size={16} />}
-        onButtonClick={() =>
-          appendMedication({
-            medicationName: "",
-            dosage: "",
-            frequency: "",
-            usedToTreat: "",
-            refillDue: "",
-            prescriber: "",
-            pharmacy: "",
-            startDate: "",
-            endDate: "",
-            sideEffects: "",
-            medicationId: "",
-          })
-        }
-        ariaLabel="Add Medication"
-        showButton={true}
-      >
-        <div className="space-y-6">
-          {medicationsFields.map((field, index) => (
-            <div
-              key={field.id}
-              className="p-4 rounded-lg border border-gray-200"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium text-gray-700 mr-2">
-                  Medication {index + 1}:
-                </span>
-                {isMedicationStopped(field.medicationId || "") && (
-                  <AntdBadge status="error" size="small" text="Stopped" />
-                )}
-              </div>
-
-              {/* First row of fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                <Input
-                  label="Medication"
-                  register={register(`medications.${index}.medicationName`)}
-                  error={errors.medications?.[index]?.medicationName?.message}
-                />
-                <Input
-                  label="Dose"
-                  register={register(`medications.${index}.dosage`)}
-                  error={errors.medications?.[index]?.dosage?.message}
-                />
-                <Input
-                  label="Frequency"
-                  register={register(`medications.${index}.frequency`)}
-                  error={errors.medications?.[index]?.frequency?.message}
-                />
-                <Input
-                  label="Used to Treat"
-                  register={register(`medications.${index}.usedToTreat`)}
-                  error={errors.medications?.[index]?.usedToTreat?.message}
-                />
-                <DatePickerField
-                  label="Refill Due"
-                  control={control}
-                  name={`medications.${index}.refillDue`}
-                />
-
-                <Input
-                  label="Prescriber"
-                  register={register(`medications.${index}.prescriber`)}
-                  error={errors.medications?.[index]?.prescriber?.message}
-                />
-                <Input
-                  label="Pharmacy"
-                  register={register(`medications.${index}.pharmacy`)}
-                  error={errors.medications?.[index]?.pharmacy?.message}
-                />
-                <DatePickerField
-                  label="Start Date"
-                  control={control}
-                  name={`medications.${index}.startDate`}
-                />
-                <DatePickerField
-                  label="End Date"
-                  control={control}
-                  name={`medications.${index}.endDate`}
-                />
-                <div className="lg:col-span-3">
-                  <Input
-                    label="Side Effects"
-                    register={register(`medications.${index}.sideEffects`)}
-                    error={errors.medications?.[index]?.sideEffects?.message}
-                  />
-                </div>
-              </div>
-              {medicationsFields.length > 1 && (
-                <div className="flex justify-end">
-                  <TertiaryButton
-                    type="button"
-                    onClick={() => removeMedication(index)}
-                    className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
-                  >
-                    <ICONS.delete />
-                  </TertiaryButton>
-                </div>
-              )}
             </div>
           ))}
         </div>

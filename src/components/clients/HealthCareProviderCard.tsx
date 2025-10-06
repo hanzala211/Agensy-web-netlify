@@ -12,13 +12,18 @@ import {
 import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import type {
+  Client,
   ClientHealthProviderFormData,
   HealthcareProvider,
 } from "@agensy/types";
 import { DateUtils, toast } from "@agensy/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 export const HealthCareProviderCard: React.FC = () => {
+  const params = useParams();
+  const queryClient = useQueryClient();
   const { handleFilterPermission } = useAuthContext();
   const addHealthCareProviderMutation = useAddHealthCareMutation();
   const updateHealthCareProviderMutation = useUpdateHealthCareMutation();
@@ -39,6 +44,21 @@ export const HealthCareProviderCard: React.FC = () => {
       addClientHealthCareProvider(addHealthCareProviderMutation.data);
       toast.success("New provider added successfully!");
       setIsHealthCareModalOpen(false);
+
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      queryClient.setQueryData(["clients"], (old: Client[]) => {
+        return old.map((client) =>
+          client.id === params.clientId
+            ? {
+                ...client,
+                healthcareProviders: [
+                  ...client.healthcareProviders,
+                  addHealthCareProviderMutation.data,
+                ],
+              }
+            : client
+        );
+      });
     } else if (addHealthCareProviderMutation.status === "error") {
       toast.error("Couldn’t add provider. Please retry.");
     }
@@ -48,8 +68,22 @@ export const HealthCareProviderCard: React.FC = () => {
     if (updateHealthCareProviderMutation.status === "success") {
       updateClientHealthCareProvider(updateHealthCareProviderMutation.data);
       toast.success("Provider updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
+      queryClient.setQueryData(["clients"], (old: Client[]) => {
+        return old.map((client) =>
+          client.id === params.clientId
+            ? {
+                ...client,
+                healthcareProviders: [
+                  ...client.healthcareProviders,
+                  updateHealthCareProviderMutation.data,
+                ],
+              }
+            : client
+        );
+      });
       setIsHealthCareModalOpen(false);
-    } else if (addHealthCareProviderMutation.status === "error") {
+    } else if (updateHealthCareProviderMutation.status === "error") {
       toast.error("Couldn’t update provider. Please retry.");
     }
   }, [updateHealthCareProviderMutation.status]);
@@ -60,6 +94,21 @@ export const HealthCareProviderCard: React.FC = () => {
         deleteHealthCareProviderMutation.variables.providerId
       );
       toast.success("Provider deleted successfully!");
+      queryClient.setQueryData(["clients"], (old: Client[]) => {
+        return old.map((client) =>
+          client.id === params.clientId
+            ? {
+                ...client,
+                healthcareProviders: client.healthcareProviders.filter(
+                  (provider) =>
+                    provider.id !==
+                    deleteHealthCareProviderMutation.variables.providerId
+                ),
+              }
+            : client
+        );
+      });
+      queryClient.invalidateQueries({ queryKey: ["client", params.clientId] });
       setIsHealthCareModalOpen(false);
     } else if (deleteHealthCareProviderMutation.status === "error") {
       toast.error("Couldn’t delete provider. Please retry.");

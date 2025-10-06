@@ -51,6 +51,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     reset,
     watch,
     formState: { errors },
+    setValue,
   } = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
@@ -102,6 +103,19 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   };
 
   useEffect(() => {
+    if (
+      watch("healthcare_provider_id") &&
+      watch("healthcare_provider_id").length > 0
+    ) {
+      setValue(
+        "location",
+        healthCares.find((item) => item.id === watch("healthcare_provider_id"))
+          ?.address || ""
+      );
+    }
+  }, [watch("healthcare_provider_id")]);
+
+  useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
         reset({
@@ -143,6 +157,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   };
 
   const handleFormSubmit = (data: AppointmentFormData) => {
+    console.log(data);
     if (onSubmit) {
       onSubmit(data);
     }

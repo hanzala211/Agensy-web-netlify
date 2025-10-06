@@ -53,6 +53,7 @@ export const HealthcareProvidersCard = ({
           providerName: "",
           providerType: "",
           specialty: "",
+          specialty_custom: "",
           address: "",
           phone: "",
         })
@@ -91,6 +92,10 @@ export const HealthcareProvidersCard = ({
                 control={control}
                 data={SPECIALTIES}
                 labelOption="Select Specialty"
+                enableTextInput={true}
+                textInputTriggerValue="Other"
+                textInputName={`healthcareProviders.${index}.specialty_custom`}
+                textInputPlaceholder="Enter specialty"
               />
               <PhoneNumberInput
                 label="Phone"

@@ -48,10 +48,8 @@ export const LabsTrackerCard = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* Date and Doctor's Name row */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Date
-          </label>
           <DatePickerField
+            label="Date"
             control={control}
             name={`labs.${index}.date`}
             className="w-full"
@@ -76,10 +74,9 @@ export const LabsTrackerCard = ({
 
       {/* Type field */}
       <div className="space-y-2 mb-4">
-        <label className="block text-sm font-medium text-gray-700">Type</label>
         <Input
           register={register(`labs.${index}.type`)}
-          placeholder="Enter lab type"
+          label="Type"
           inputClassname="w-full"
           error={
             // @ts-expect-error - TODO: fix this
@@ -90,12 +87,9 @@ export const LabsTrackerCard = ({
 
       {/* Provider / Company Used field */}
       <div className="space-y-2 mb-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Provider / Company Used
-        </label>
         <Input
+          label="Provider / Company Used"
           register={register(`labs.${index}.providerCompanyUsed`)}
-          placeholder="Enter provider or company name"
           inputClassname="w-full"
           error={errors.labs?.[index]?.providerCompanyUsed?.message as string}
         />
@@ -103,12 +97,9 @@ export const LabsTrackerCard = ({
 
       {/* Purpose field */}
       <div className="space-y-2 mb-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Purpose
-        </label>
         <TextArea
           register={register(`labs.${index}.purpose`)}
-          placeholder="Enter purpose of the lab test"
+          label="Purposes"
           className="w-full"
           rows={2}
           error={errors.labs?.[index]?.purpose?.message as string}
@@ -117,12 +108,9 @@ export const LabsTrackerCard = ({
 
       {/* Results field */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Results
-        </label>
         <TextArea
+          label="Results"
           register={register(`labs.${index}.results`)}
-          placeholder="Enter lab results"
           className="w-full"
           rows={3}
           error={errors.labs?.[index]?.results?.message as string}

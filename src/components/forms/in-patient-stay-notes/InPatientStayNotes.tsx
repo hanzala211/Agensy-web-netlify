@@ -19,7 +19,7 @@ import {
   useGetInPatientStayNotes,
   usePostInPatientStayNotes,
 } from "@agensy/api";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { DateUtils, StringUtils, toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -27,12 +27,14 @@ import { APP_ACTIONS } from "@agensy/constants";
 
 export const InPatientStayNotes = () => {
   const params = useParams();
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc"); // Default to newest first
   const {
     setOpenedFileData,
     setHasUnsavedChanges,
     shouldDownloadAfterSave,
     setShouldDownloadAfterSave,
     setHandleSaveAndDownload,
+    openedFileData,
   } = useClientContext();
   const {
     data: inPatientData,
@@ -68,6 +70,49 @@ export const InPatientStayNotes = () => {
     control,
     name: "inPatientStayNotes",
   });
+
+  // Helper function to get sorted inPatientStayNotes data
+  const getSortedInPatientStayNotes = useCallback(
+    (formDataNotes: InPatientStayNotesFormData["inPatientStayNotes"]) => {
+      if (!Array.isArray(formDataNotes)) return [];
+      return [...formDataNotes].sort((a, b) => {
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+
+        if (sortOrder === "asc") {
+          return dateA - dateB;
+        } else {
+          return dateB - dateA;
+        }
+      });
+    },
+    [sortOrder]
+  );
+
+  useEffect(() => {
+    if (openedFileData && typeof openedFileData === "object") {
+      // Cast to the proper type to access inPatientStayNotes
+      const typedData =
+        openedFileData as unknown as InPatientStayNotesFormData & {
+          last_update?: { updatedAt?: string };
+        };
+
+      if (
+        typedData.inPatientStayNotes &&
+        Array.isArray(typedData.inPatientStayNotes)
+      ) {
+        const sortedNotes = getSortedInPatientStayNotes(
+          typedData.inPatientStayNotes
+        );
+
+        setOpenedFileData({
+          ...openedFileData,
+          inPatientStayNotes: JSON.parse(JSON.stringify(sortedNotes)),
+        } as unknown as OpenedFileData);
+      }
+    }
+  }, [sortOrder]);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapPatientDataToFormData = (inPatientData: any) => {
     // Fix: Add proper null/undefined check
@@ -119,13 +164,16 @@ export const InPatientStayNotes = () => {
       const formData = mapPatientDataToFormData(inPatientData);
       reset(formData as unknown as InPatientStayNotesFormData);
 
+      // Get sorted data for PDF
+      const sortedNotes = getSortedInPatientStayNotes(
+        formData.inPatientStayNotes
+      );
+
       setOpenedFileData({
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
         dateOfBirth: formData.dateOfBirth || "",
-        inPatientStayNotes: JSON.parse(
-          JSON.stringify(formData.inPatientStayNotes || [])
-        ),
+        inPatientStayNotes: JSON.parse(JSON.stringify(sortedNotes || [])),
         last_update: JSON.parse(
           JSON.stringify({
             updatedAt: inPatientData?.last_update?.updatedAt || "",
@@ -148,13 +196,16 @@ export const InPatientStayNotes = () => {
       );
       reset(formData as unknown as InPatientStayNotesFormData);
 
+      // Get sorted data for PDF using current sort order
+      const sortedNotes = getSortedInPatientStayNotes(
+        formData.inPatientStayNotes
+      );
+
       setOpenedFileData({
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
         dateOfBirth: formData.dateOfBirth || "",
-        inPatientStayNotes: JSON.parse(
-          JSON.stringify(formData.inPatientStayNotes || [])
-        ),
+        inPatientStayNotes: JSON.parse(JSON.stringify(sortedNotes || [])),
         last_update: JSON.parse(
           JSON.stringify({
             updatedAt:
@@ -182,7 +233,7 @@ export const InPatientStayNotes = () => {
         setShouldDownloadAfterSave(false);
       }
     }
-  }, [postInPatientStayNotesMutation.status, setHasUnsavedChanges]);
+  }, [postInPatientStayNotesMutation.status]);
 
   useEffect(() => {
     return () => {
@@ -297,9 +348,31 @@ export const InPatientStayNotes = () => {
     });
   };
 
+  const toggleSortOrder = () => {
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
+
+  // Sort the fields by date
+  const sortedInPatientStayNotesFields = [...inPatientStayNotesFields].sort(
+    (a, b) => {
+      const dateA = a.date ? new Date(a.date).getTime() : 0;
+      const dateB = b.date ? new Date(b.date).getTime() : 0;
+
+      if (sortOrder === "asc") {
+        return dateA - dateB;
+      } else {
+        return dateB - dateA;
+      }
+    }
+  );
+
   return (
     <div className="bg-gray-50 w-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         <Card title="Personal Information">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Input
@@ -330,6 +403,26 @@ export const InPatientStayNotes = () => {
           ariaLabel="Add New In-Patient Stay Note"
           showButton={true}
         >
+          {/* Sort Button */}
+          {inPatientStayNotesFields.length > 0 && (
+            <div className="mb-4 flex justify-end">
+              <button
+                type="button"
+                onClick={toggleSortOrder}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+                title={`Sort by date ${
+                  sortOrder === "asc" ? "(Oldest first)" : "(Newest first)"
+                }`}
+              >
+                <ICONS.downArrow size={16} />
+                <span className="font-medium">
+                  Sort by Date (
+                  {sortOrder === "asc" ? "Oldest First" : "Newest First"})
+                </span>
+              </button>
+            </div>
+          )}
+
           <div className="space-y-6">
             {inPatientStayNotesFields.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
@@ -340,17 +433,23 @@ export const InPatientStayNotes = () => {
                 </p>
               </div>
             ) : (
-              inPatientStayNotesFields.map((field, index) => (
-                <InPatientStayNotesCard
-                  key={field.id}
-                  index={index}
-                  register={register}
-                  control={control}
-                  errors={errors}
-                  onRemove={() => removeInPatientStayNote(index)}
-                  canRemove={inPatientStayNotesFields.length > 1}
-                />
-              ))
+              sortedInPatientStayNotesFields.map((field) => {
+                // Find the original index for the remove function
+                const originalIndex = inPatientStayNotesFields.findIndex(
+                  (f) => f.id === field.id
+                );
+                return (
+                  <InPatientStayNotesCard
+                    key={field.id}
+                    index={originalIndex}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                    onRemove={() => removeInPatientStayNote(originalIndex)}
+                    canRemove={inPatientStayNotesFields.length > 1}
+                  />
+                );
+              })
             )}
           </div>
         </Card>

@@ -13,6 +13,7 @@ import {
 } from "@agensy/components";
 import {
   healthHistoryFormSchema,
+  type Client,
   type ClientMedications,
   type HealthcareProvider,
   type HealthHistoryFormData,
@@ -84,10 +85,12 @@ const defaultValues: HealthHistoryFormData = {
 
 const createSafeOpenedFileData = (
   formData: HealthHistoryFormData,
-  lastUpdate?: string
+  lastUpdate?: string,
+  dateOfBirth?: string
 ) => {
   return {
     ...formData,
+    dateOfBirth,
     last_update: JSON.parse(
       JSON.stringify({
         updatedAt: lastUpdate || new Date().toISOString(),
@@ -99,6 +102,7 @@ const createSafeOpenedFileData = (
 export const HealthHistoryForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { clientId } = useParams();
+  const client = queryClient.getQueryData(["client", clientId]) as Client;
   const {
     setOpenedFileData,
     ocrResult,
@@ -162,7 +166,8 @@ export const HealthHistoryForm: React.FC = () => {
       setOpenedFileData(
         createSafeOpenedFileData(
           getValues(),
-          new Date().toISOString()
+          new Date().toISOString(),
+          client?.date_of_birth as string
         ) as unknown as OpenedFileData
       );
 
@@ -454,7 +459,8 @@ export const HealthHistoryForm: React.FC = () => {
       setOpenedFileData(
         createSafeOpenedFileData(
           getValues(),
-          healthHistoryForm?.last_update?.updatedAt
+          healthHistoryForm?.last_update?.updatedAt,
+          client?.date_of_birth as string
         ) as unknown as OpenedFileData
       );
     }
@@ -466,7 +472,11 @@ export const HealthHistoryForm: React.FC = () => {
     </div>
   ) : (
     <div className="w-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         {/* Personal Information Section */}
         <Card title="Personal Information">
           <div className="grid md:grid-cols-2 gap-4">

@@ -511,7 +511,11 @@ export const PersonalInfo = () => {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6"
+      >
         <PersonalIdentificationSection
           register={register}
           control={control}

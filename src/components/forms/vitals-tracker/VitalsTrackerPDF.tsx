@@ -100,10 +100,8 @@ const columns = [
   { key: "heartRate", label: "Heart Rate (bpm)", flex: 1.1 },
   { key: "oxygen", label: "Oxygen (%)", flex: 1 },
   { key: "bloodPressure", label: "Blood Pressure (mmHg)", flex: 1.4 },
-  { key: "bloodType", label: "Blood Type", flex: 0.9 },
   { key: "temperature", label: "Temp (°F)", flex: 0.9 },
   { key: "weight", label: "Weight (lbs)", flex: 1 },
-  { key: "height", label: "Height (in)", flex: 1 },
   { key: "other", label: "Other", flex: 1.3 },
 ] as const;
 
@@ -126,10 +124,8 @@ export const VitalsTrackerPDF: React.FC<{
       vital.heartRate ||
       vital.oxygen ||
       vital.bloodPressure ||
-      vital.bloodType ||
       vital.temperature ||
       vital.weight ||
-      vital.height ||
       vital.other
   );
 
@@ -165,6 +161,16 @@ export const VitalsTrackerPDF: React.FC<{
           <Text
             style={styles.sectionContent}
           >{`Date of Birth: ${data?.dateOfBirth}`}</Text>
+          {data?.bloodType && (
+            <Text
+              style={styles.sectionContent}
+            >{`Blood Type: ${data.bloodType}`}</Text>
+          )}
+          {data?.height && (
+            <Text
+              style={styles.sectionContent}
+            >{`Height: ${data.height}`}</Text>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -192,7 +198,7 @@ export const VitalsTrackerPDF: React.FC<{
             </>
           ) : (
             <View style={styles.tableRow}>
-              <Text style={[styles.td, { flex: 9.7, textAlign: "center" }]}>
+              <Text style={[styles.td, { flex: 7.4, textAlign: "center" }]}>
                 No vitals data available
               </Text>
             </View>

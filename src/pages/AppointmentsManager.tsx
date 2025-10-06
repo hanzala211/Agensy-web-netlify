@@ -67,6 +67,7 @@ export const AppointmentsManager: React.FC = () => {
         ? data.post_appointment_notes
         : null,
     };
+    console.log(postData);
     addClientAppointmentMutation.mutate({
       items: postData,
       clientId: data.clientId as string,

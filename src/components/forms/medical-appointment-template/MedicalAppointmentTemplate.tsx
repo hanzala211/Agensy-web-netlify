@@ -283,9 +283,28 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                 notes:
                   medicalAppointmentTemplate.healthcare_provider_template
                     .healthcare_provider_name || "",
-                specialty:
-                  medicalAppointmentTemplate.healthcare_provider_template
-                    .healthcare_provider_specialty || "",
+                specialty: (() => {
+                  const specialty =
+                    medicalAppointmentTemplate.healthcare_provider_template
+                      .healthcare_provider_specialty || "";
+                  const isPredefinedSpecialty = SPECIALTIES.some(
+                    (s) => s.value === specialty
+                  );
+                  return isPredefinedSpecialty
+                    ? specialty
+                    : specialty !== null && specialty.length > 0
+                    ? "Other"
+                    : "";
+                })(),
+                specialty_custom: (() => {
+                  const specialty =
+                    medicalAppointmentTemplate.healthcare_provider_template
+                      .healthcare_provider_specialty || "";
+                  const isPredefinedSpecialty = SPECIALTIES.some(
+                    (s) => s.value === specialty
+                  );
+                  return isPredefinedSpecialty ? "" : specialty;
+                })(),
                 provider_id:
                   medicalAppointmentTemplate.healthcare_provider_template
                     .healthcare_provider_id || "",
@@ -473,9 +492,16 @@ export const MedicalAppointmentTemplate: React.FC = () => {
             healthcare_provider_follow_up: data.healthcareProvider.follow_up
               ? data.healthcareProvider.follow_up
               : null,
-            healthcare_provider_specialty: data.healthcareProvider.specialty
-              ? data.healthcareProvider.specialty
-              : null,
+            healthcare_provider_specialty:
+              data.healthcareProvider.specialty === "Other"
+                ? data.healthcareProvider.specialty_custom &&
+                  data.healthcareProvider.specialty_custom.trim() !== ""
+                  ? data.healthcareProvider.specialty_custom
+                  : null
+                : data.healthcareProvider.specialty &&
+                  data.healthcareProvider.specialty.trim() !== ""
+                ? data.healthcareProvider.specialty
+                : null,
             id: data.healthcareProvider.id ? data.healthcareProvider.id : null,
             healthcare_provider_type: data.healthcareProvider.providerType
               ? data.healthcareProvider.providerType
@@ -710,7 +736,11 @@ export const MedicalAppointmentTemplate: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6"
+      >
         <Card title="Personal Information">
           {/* Personal Information Section */}
           <div className="space-y-4">
@@ -783,6 +813,10 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                     name="healthcareProvider.specialty"
                     data={SPECIALTIES}
                     labelOption="Select Specialty"
+                    enableTextInput={true}
+                    textInputTriggerValue="Other"
+                    textInputName="healthcareProvider.specialty_custom"
+                    textInputPlaceholder="Enter specialty"
                   />
 
                   <Input

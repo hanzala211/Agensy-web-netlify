@@ -71,22 +71,22 @@ export const InHomeHelpSection = <T extends FieldValues>({
     <Card title="List in-home help, phone, and degree of satisfaction">
       <div className="space-y-6">
         {/* In-Home Help Services Table */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Table Header */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 font-medium text-sm text-gray-700">
-            <div>Phone/agency</div>
-            <div className="hidden md:block">Check degree of satisfaction</div>
-            <div className="hidden md:block">Check rate of Frequency</div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 font-medium text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+            <div className="text-center lg:text-left">Phone/Agency</div>
+            <div className="text-center">Satisfaction</div>
+            <div className="text-center">Frequency</div>
           </div>
 
           {/* Service Rows */}
           {services.map((service) => (
             <div
               key={service.name}
-              className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors"
             >
               {/* Agency/Phone Field */}
-              <div>
+              <div className="lg:order-1">
                 <Input
                   register={register(service.agencyField)}
                   error={errors[service.agencyField]?.message as string}
@@ -95,34 +95,36 @@ export const InHomeHelpSection = <T extends FieldValues>({
               </div>
 
               {/* Satisfaction Radio Buttons */}
-              <div className="space-y-2">
-                <div className="md:hidden text-sm font-medium text-gray-700 mb-2">
-                  Check degree of satisfaction
+              <div className="lg:order-2 space-y-2">
+                <div className="lg:hidden text-xs font-medium text-gray-600 mb-1">
+                  Satisfaction
                 </div>
-                <div className="flex flex-wrap gap-2 md:gap-4">
+                <div className="flex justify-center gap-3">
                   {["High", "Medium", "Low"].map((satisfaction) => (
                     <RadioInput
                       key={satisfaction}
                       label={satisfaction}
                       value={satisfaction}
                       register={register(service.satisfactionField)}
+                      className="text-xs"
                     />
                   ))}
                 </div>
               </div>
 
               {/* Frequency Radio Buttons */}
-              <div className="space-y-2">
-                <div className="md:hidden text-sm font-medium text-gray-700 mb-2">
-                  Check rate of Frequency
+              <div className="lg:order-3 space-y-2">
+                <div className="lg:hidden text-xs font-medium text-gray-600 mb-1">
+                  Frequency
                 </div>
-                <div className="flex flex-wrap gap-2 md:gap-4">
+                <div className="flex justify-center gap-3">
                   {["Daily", "Weekly", "Monthly"].map((frequency) => (
                     <RadioInput
                       key={frequency}
                       label={frequency}
                       value={frequency}
                       register={register(service.frequencyField)}
+                      className="text-xs"
                     />
                   ))}
                 </div>

@@ -1304,7 +1304,7 @@ export const CareRecipientQuestionaire = () => {
   useEffect(() => {
     setHandleSaveAndDownload(() => handleSaveAndDownload);
     return () => setHandleSaveAndDownload(undefined);
-  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
+  }, []);
 
   return isLoadingData ? (
     <div className="flex justify-center items-center h-screen">
@@ -1313,6 +1313,7 @@ export const CareRecipientQuestionaire = () => {
   ) : (
     <div className="space-y-6">
       <form
+        autoComplete="off"
         // @ts-expect-error - TODO: fix this
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-6"

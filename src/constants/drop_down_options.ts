@@ -7,6 +7,8 @@ export const RELATIONSHIP_TO_CLIENT = [
   { label: "Grandchild", value: "grandchild" },
   { label: "Legal Guardian", value: "legal_guardian" },
   { label: "Caregiver", value: "caregiver" },
+  { label: "Friend", value: "friend" },
+  { label: "Neighbor", value: "neighbor" },
   { label: "Other", value: "other" },
 ];
 

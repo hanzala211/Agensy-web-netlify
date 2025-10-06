@@ -491,7 +491,7 @@ export const InitialCareAssessmentPlan = () => {
   useEffect(() => {
     setHandleSaveAndDownload(() => handleSaveAndDownload);
     return () => setHandleSaveAndDownload(undefined);
-  }, [setHandleSaveAndDownload, handleSaveAndDownload]);
+  }, []);
 
   if (isLoadingData) {
     return (
@@ -502,7 +502,11 @@ export const InitialCareAssessmentPlan = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-8"
+    >
       <Card title="Initial Care Assessment Plan">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
           <Input

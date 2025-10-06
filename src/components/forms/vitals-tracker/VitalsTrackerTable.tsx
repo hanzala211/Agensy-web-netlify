@@ -7,7 +7,6 @@ import type {
   UseFormRegister,
   FieldArrayWithId,
 } from "react-hook-form";
-import { HeightInput } from "./HeightInput";
 
 interface VitalsTrackerTableProps {
   fields: FieldArrayWithId<VitalsTrackerFormData, "vitals", "id">[];
@@ -21,7 +20,6 @@ interface VitalsTrackerTableProps {
   register: UseFormRegister<VitalsTrackerFormData>;
   errors: FieldErrors<VitalsTrackerFormData>;
   onDeleteRow: (index: number) => void;
-  onHeightChange: (rowIndex: number, value: string) => void;
 }
 
 export const VitalsTrackerTable = ({
@@ -31,7 +29,6 @@ export const VitalsTrackerTable = ({
   register,
   errors,
   onDeleteRow,
-  onHeightChange,
 }: VitalsTrackerTableProps) => {
   return (
     <div className="overflow-x-auto w-screen md:max-w-[calc(100vw-400px)] max-w-[calc(100vw-120px)]">
@@ -90,17 +87,13 @@ export const VitalsTrackerTable = ({
                           name={fieldName}
                           className="w-full min-w-[100px]"
                         />
-                      ) : vitalField.key === "height" ? (
-                        <HeightInput
-                          value={field.height || ""}
-                          onChange={(value) => onHeightChange(rowIndex, value)}
-                        />
                       ) : (
                         <Input
                           label=""
                           type={vitalField.type}
                           // @ts-expect-error // fix this
                           register={register(fieldName)}
+                          step="0.1"
                           error={
                             errors.vitals?.[rowIndex]?.[
                               vitalField.key as keyof NonNullable<

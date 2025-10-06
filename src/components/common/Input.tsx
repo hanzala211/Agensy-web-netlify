@@ -17,6 +17,7 @@ interface InputProps {
   register?: UseFormRegisterReturn;
   isPassword?: boolean;
   mainClassname?: string;
+  step?: string;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -32,6 +33,7 @@ export const Input: React.FC<InputProps> = ({
   register,
   isPassword = false,
   mainClassname = "",
+  step = "",
 }) => {
   const [selectedType, setSelectedType] = useState<string>(type);
 
@@ -46,6 +48,7 @@ export const Input: React.FC<InputProps> = ({
           placeholder={placeholder}
           className={`${inputClassname} text-darkGray bg-lightGray placeholder:text-darkGray p-2
           border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+          step={step}
         />
         {Icon && (
           <Icon

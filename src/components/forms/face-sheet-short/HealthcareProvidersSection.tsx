@@ -44,6 +44,7 @@ export const HealthcareProvidersSection = <T extends FieldValues>({
           // @ts-expect-error - TODO: fix this
           providerName: "",
           specialty: "",
+          specialty_custom: "",
           address: "",
           phone: "",
           fax: "",
@@ -77,6 +78,12 @@ export const HealthcareProvidersSection = <T extends FieldValues>({
                   data={SPECIALTIES}
                   name={`providers.${index}.specialty` as Path<T>}
                   labelOption="Select Specialty"
+                  enableTextInput={true}
+                  textInputTriggerValue="Other"
+                  textInputName={
+                    `providers.${index}.specialty_custom` as Path<T>
+                  }
+                  textInputPlaceholder="Enter specialty"
                 />
                 <Input
                   label="Address"

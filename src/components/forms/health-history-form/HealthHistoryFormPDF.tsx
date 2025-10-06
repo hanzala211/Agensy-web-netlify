@@ -212,7 +212,10 @@ const MedicationField = ({
 };
 
 const HealthHistoryFormPDF: React.FC<{
-  data?: HealthHistoryFormData & { last_update: { updatedAt: string } };
+  data?: HealthHistoryFormData & {
+    last_update: { updatedAt: string };
+    dateOfBirth: string;
+  };
 }> = ({ data }) => {
   return (
     <Document title="Agensy Health History Form">
@@ -246,7 +249,7 @@ const HealthHistoryFormPDF: React.FC<{
                 : data?.firstName || data?.lastName || ""}
             </HeaderField>
             <HeaderField label="Date of Birth:">
-              {data?.healthHistoryDate || ""}
+              {data?.dateOfBirth || ""}
             </HeaderField>
           </View>
 

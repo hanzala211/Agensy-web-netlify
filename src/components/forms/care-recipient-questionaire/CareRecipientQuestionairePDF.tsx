@@ -256,70 +256,104 @@ const CareRecipientQuestionairePDF: React.FC<{
             <Text style={styles.sectionTitle}>
               Care Recipient Personal Information
             </Text>
-            {data.careRecipientFirstName && (
-              <Field label="First Name">{data.careRecipientFirstName}</Field>
-            )}
-            {data.careRecipientLastName && (
-              <Field label="Last Name">{data.careRecipientLastName}</Field>
-            )}
-            {data.careRecipientPreferredName && (
-              <Field label="Preferred Name">
-                {data.careRecipientPreferredName}
+
+            {/* Name Line */}
+            {(data.careRecipientFirstName ||
+              data.careRecipientLastName ||
+              data.careRecipientPreferredName) && (
+              <Field label="Name">
+                {[data.careRecipientFirstName, data.careRecipientLastName]
+                  .filter(Boolean)
+                  .join(" ")}
+                {data.careRecipientPreferredName &&
+                  ` (Preferred: ${data.careRecipientPreferredName})`}
               </Field>
             )}
-            {data.careRecipientAddress && (
-              <Field label="Address">{data.careRecipientAddress}</Field>
-            )}
-            {data.careRecipientCity && (
-              <Field label="City">{data.careRecipientCity}</Field>
-            )}
-            {data.careRecipientState && (
-              <Field label="State">{data.careRecipientState}</Field>
-            )}
-            {data.careRecipientZip && (
-              <Field label="ZIP Code">{data.careRecipientZip}</Field>
-            )}
-            {data.careRecipientBirthdate && (
-              <Field label="Date of Birth">{data.careRecipientBirthdate}</Field>
-            )}
-            {data.careRecipientBirthplace && (
-              <Field label="Birthplace">{data.careRecipientBirthplace}</Field>
-            )}
-            {data.careRecipientSSN && (
-              <Field label="SSN">{data.careRecipientSSN}</Field>
-            )}
-            {data.careRecipientPhone && (
-              <Field label="Phone">{data.careRecipientPhone}</Field>
-            )}
-            {data.careRecipientEmail && (
-              <Field label="Email">{data.careRecipientEmail}</Field>
-            )}
-            {data.careRecipientCulturalBackground && (
-              <Field label="Cultural Background">
-                {data.careRecipientCulturalBackground}
+
+            {/* Address Line */}
+            {(data.careRecipientAddress ||
+              data.careRecipientCity ||
+              data.careRecipientState ||
+              data.careRecipientZip) && (
+              <Field label="Address">
+                {[
+                  data.careRecipientAddress,
+                  data.careRecipientCity,
+                  data.careRecipientState,
+                  data.careRecipientZip,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
               </Field>
             )}
-            {data.careRecipientEducation && (
-              <Field label="Education">{data.careRecipientEducation}</Field>
-            )}
-            {data.careRecipientReligion && (
-              <Field label="Religion">{data.careRecipientReligion}</Field>
-            )}
-            {data.careRecipientActiveReligionLocation && (
-              <Field label="Active Religion Location">
-                {data.careRecipientActiveReligionLocation}
+
+            {/* Birth Info Line */}
+            {(data.careRecipientBirthdate || data.careRecipientBirthplace) && (
+              <Field label="Birth Information">
+                {data.careRecipientBirthdate &&
+                  `DOB: ${data.careRecipientBirthdate}`}
+                {data.careRecipientBirthdate &&
+                  data.careRecipientBirthplace &&
+                  " | "}
+                {data.careRecipientBirthplace &&
+                  `Birthplace: ${data.careRecipientBirthplace}`}
               </Field>
             )}
-            {data.careRecipientMaritalStatus && (
+
+            {/* Contact Info Line */}
+            {(data.careRecipientPhone ||
+              data.careRecipientEmail ||
+              data.careRecipientSSN) && (
+              <Field label="Contact Information">
+                {data.careRecipientPhone && `Phone: ${data.careRecipientPhone}`}
+                {data.careRecipientPhone && data.careRecipientEmail && " | "}
+                {data.careRecipientEmail && `Email: ${data.careRecipientEmail}`}
+                {data.careRecipientSSN && ` | SSN: ${data.careRecipientSSN}`}
+              </Field>
+            )}
+
+            {/* Religious Info Line */}
+            {(data.careRecipientReligion ||
+              data.careRecipientActiveReligionLocation) && (
+              <Field label="Religious Information">
+                {data.careRecipientReligion &&
+                  `Religion: ${data.careRecipientReligion}`}
+                {data.careRecipientReligion &&
+                  data.careRecipientActiveReligionLocation &&
+                  " | "}
+                {data.careRecipientActiveReligionLocation &&
+                  `Active Location: ${data.careRecipientActiveReligionLocation}`}
+              </Field>
+            )}
+
+            {/* Background Info Line */}
+            {(data.careRecipientCulturalBackground ||
+              data.careRecipientEducation) && (
+              <Field label="Background Information">
+                {data.careRecipientCulturalBackground &&
+                  `Cultural Background: ${data.careRecipientCulturalBackground}`}
+                {data.careRecipientCulturalBackground &&
+                  data.careRecipientEducation &&
+                  " | "}
+                {data.careRecipientEducation &&
+                  `Education: ${data.careRecipientEducation}`}
+              </Field>
+            )}
+
+            {/* Marital Status Line */}
+            {(data.careRecipientMaritalStatus ||
+              data.careRecipientDateOfDivorceOrWidowhood) && (
               <Field label="Marital Status">
-                {data.careRecipientMaritalStatus}
+                {data.careRecipientMaritalStatus &&
+                  `Status: ${data.careRecipientMaritalStatus}`}
+                {data.careRecipientMaritalStatus &&
+                  data.careRecipientDateOfDivorceOrWidowhood &&
+                  " | "}
+                {data.careRecipientDateOfDivorceOrWidowhood &&
+                  `Date of Change: ${data.careRecipientDateOfDivorceOrWidowhood}`}
               </Field>
             )}
-            {data.careRecipientDateOfDivorceOrWidowhood && (
-              <Field label="Date of Divorce/Widowhood">
-                {data.careRecipientDateOfDivorceOrWidowhood}
-              </Field>
-            )}
+
             {data.careRecipientLossImpactDescription && (
               <Field label="Loss Impact Description">
                 {data.careRecipientLossImpactDescription}
@@ -369,56 +403,74 @@ const CareRecipientQuestionairePDF: React.FC<{
           data?.longTermCareInsurancePhone) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Insurance Information</Text>
-            {data.medicareA && (
-              <Field label="Medicare A">{data.medicareA}</Field>
-            )}
-            {data.medicareB && (
-              <Field label="Medicare B">{data.medicareB}</Field>
-            )}
-            {data.medicareNumbers && (
-              <Field label="Medicare Numbers">{data.medicareNumbers}</Field>
-            )}
-            {data.medicareSupplementPlan && (
-              <Field label="Medicare Supplement Plan">
-                {data.medicareSupplementPlan}
+
+            {/* Medicare Information */}
+            {(data.medicareA ||
+              data.medicareB ||
+              data.medicareNumbers ||
+              data.medicareSupplementPlan) && (
+              <Field label="Medicare Information">
+                {data.medicareA && `Medicare A: ${data.medicareA}`}
+                {data.medicareA && data.medicareB && " | "}
+                {data.medicareB && `Medicare B: ${data.medicareB}`}
+                {data.medicareNumbers && ` | Numbers: ${data.medicareNumbers}`}
+                {data.medicareSupplementPlan &&
+                  ` | Supplement: ${data.medicareSupplementPlan}`}
               </Field>
             )}
-            {data.insuranceProvider && (
-              <Field label="Insurance Provider">{data.insuranceProvider}</Field>
-            )}
-            {data.insurancePolicyNumber && (
-              <Field label="Insurance Policy Number">
-                {data.insurancePolicyNumber}
+
+            {/* Primary Insurance */}
+            {(data.insuranceProvider ||
+              data.insurancePolicyNumber ||
+              data.insurancePhone) && (
+              <Field label="Primary Insurance">
+                {data.insuranceProvider &&
+                  `Provider: ${data.insuranceProvider}`}
+                {data.insuranceProvider && data.insurancePolicyNumber && " | "}
+                {data.insurancePolicyNumber &&
+                  `Policy: ${data.insurancePolicyNumber}`}
+                {data.insurancePhone && ` | Phone: ${data.insurancePhone}`}
               </Field>
             )}
-            {data.insurancePhone && (
-              <Field label="Insurance Phone">{data.insurancePhone}</Field>
+
+            {/* HMO Information */}
+            {(data.hmo || data.hmoPolicyNumber || data.hmoPhone) && (
+              <Field label="HMO Information">
+                {data.hmo && `HMO: ${data.hmo}`}
+                {data.hmo && data.hmoPolicyNumber && " | "}
+                {data.hmoPolicyNumber && `Policy: ${data.hmoPolicyNumber}`}
+                {data.hmoPhone && ` | Phone: ${data.hmoPhone}`}
+              </Field>
             )}
+
+            {/* Long Term Care Insurance */}
+            {(data.longTermCareInsuranceName ||
+              data.longTermCareInsurancePolicyNumber ||
+              data.longTermCareInsurancePhone) && (
+              <Field label="Long Term Care Insurance">
+                {data.longTermCareInsuranceName &&
+                  `Provider: ${data.longTermCareInsuranceName}`}
+                {data.longTermCareInsuranceName &&
+                  data.longTermCareInsurancePolicyNumber &&
+                  " | "}
+                {data.longTermCareInsurancePolicyNumber &&
+                  `Policy: ${data.longTermCareInsurancePolicyNumber}`}
+                {data.longTermCareInsurancePhone &&
+                  ` | Phone: ${data.longTermCareInsurancePhone}`}
+              </Field>
+            )}
+
+            {/* Mental Health Coverage */}
             {data.mentalHealthCoverage && (
               <Field label="Mental Health Coverage">
                 {data.mentalHealthCoverage}
               </Field>
             )}
-            {data.hmo && <Field label="HMO">{data.hmo}</Field>}
-            {data.hmoPolicyNumber && (
-              <Field label="HMO Policy Number">{data.hmoPolicyNumber}</Field>
-            )}
-            {data.hmoPhone && <Field label="HMO Phone">{data.hmoPhone}</Field>}
-            {data.longTermCareInsuranceName && (
-              <Field label="Long Term Care Insurance Name">
-                {data.longTermCareInsuranceName}
-              </Field>
-            )}
-            {data.longTermCareInsurancePolicyNumber && (
-              <Field label="Long Term Care Insurance Policy Number">
-                {data.longTermCareInsurancePolicyNumber}
-              </Field>
-            )}
-            {data.longTermCareInsurancePhone && (
-              <Field label="Long Term Care Insurance Phone">
-                {data.longTermCareInsurancePhone}
-              </Field>
-            )}
+
+            {/* Additional Insurance Notes */}
+            <Field label="Additional Insurance Notes">
+              [Space for additional insurance information]
+            </Field>
           </View>
         )}
 
@@ -509,76 +561,100 @@ const CareRecipientQuestionairePDF: React.FC<{
             <Text style={styles.sectionTitle}>
               Professional Contacts Information
             </Text>
-            {data.lawyerName && (
-              <Field label="Lawyer Name">{data.lawyerName}</Field>
-            )}
-            {data.lawyerPhone && (
-              <Field label="Lawyer Phone">{data.lawyerPhone}</Field>
-            )}
-            {data.powerOfAttorneyFinancesName && (
-              <Field label="Power of Attorney (Finances) Name">
-                {data.powerOfAttorneyFinancesName}
+
+            {/* Lawyer */}
+            {(data.lawyerName || data.lawyerPhone) && (
+              <Field label="Lawyer">
+                {data.lawyerName && `Name: ${data.lawyerName}`}
+                {data.lawyerName && data.lawyerPhone && " | "}
+                {data.lawyerPhone && `Phone: ${data.lawyerPhone}`}
               </Field>
             )}
-            {data.powerOfAttorneyFinancesPhone && (
-              <Field label="Power of Attorney (Finances) Phone">
-                {data.powerOfAttorneyFinancesPhone}
+
+            {/* Power of Attorney - Finances */}
+            {(data.powerOfAttorneyFinancesName ||
+              data.powerOfAttorneyFinancesPhone) && (
+              <Field label="Power of Attorney (Finances)">
+                {data.powerOfAttorneyFinancesName &&
+                  `Name: ${data.powerOfAttorneyFinancesName}`}
+                {data.powerOfAttorneyFinancesName &&
+                  data.powerOfAttorneyFinancesPhone &&
+                  " | "}
+                {data.powerOfAttorneyFinancesPhone &&
+                  `Phone: ${data.powerOfAttorneyFinancesPhone}`}
               </Field>
             )}
-            {data.powerOfAttorneyHealthcareName && (
-              <Field label="Power of Attorney (Healthcare) Name">
-                {data.powerOfAttorneyHealthcareName}
+
+            {/* Power of Attorney - Healthcare */}
+            {(data.powerOfAttorneyHealthcareName ||
+              data.powerOfAttorneyHealthcarePhone) && (
+              <Field label="Power of Attorney (Healthcare)">
+                {data.powerOfAttorneyHealthcareName &&
+                  `Name: ${data.powerOfAttorneyHealthcareName}`}
+                {data.powerOfAttorneyHealthcareName &&
+                  data.powerOfAttorneyHealthcarePhone &&
+                  " | "}
+                {data.powerOfAttorneyHealthcarePhone &&
+                  `Phone: ${data.powerOfAttorneyHealthcarePhone}`}
               </Field>
             )}
-            {data.powerOfAttorneyHealthcarePhone && (
-              <Field label="Power of Attorney (Healthcare) Phone">
-                {data.powerOfAttorneyHealthcarePhone}
+
+            {/* Tax Professional */}
+            {(data.taxProfessionalName || data.taxProfessionalPhone) && (
+              <Field label="Tax Professional">
+                {data.taxProfessionalName &&
+                  `Name: ${data.taxProfessionalName}`}
+                {data.taxProfessionalName && data.taxProfessionalPhone && " | "}
+                {data.taxProfessionalPhone &&
+                  `Phone: ${data.taxProfessionalPhone}`}
               </Field>
             )}
-            {data.taxProfessionalName && (
-              <Field label="Tax Professional Name">
-                {data.taxProfessionalName}
+
+            {/* Accountant */}
+            {(data.accountantName || data.accountantPhone) && (
+              <Field label="Accountant">
+                {data.accountantName && `Name: ${data.accountantName}`}
+                {data.accountantName && data.accountantPhone && " | "}
+                {data.accountantPhone && `Phone: ${data.accountantPhone}`}
               </Field>
             )}
-            {data.taxProfessionalPhone && (
-              <Field label="Tax Professional Phone">
-                {data.taxProfessionalPhone}
+
+            {/* Financial Advisor */}
+            {(data.financialAdvisorName || data.financialAdvisorPhone) && (
+              <Field label="Financial Advisor">
+                {data.financialAdvisorName &&
+                  `Name: ${data.financialAdvisorName}`}
+                {data.financialAdvisorName &&
+                  data.financialAdvisorPhone &&
+                  " | "}
+                {data.financialAdvisorPhone &&
+                  `Phone: ${data.financialAdvisorPhone}`}
               </Field>
             )}
-            {data.accountantName && (
-              <Field label="Accountant Name">{data.accountantName}</Field>
-            )}
-            {data.accountantPhone && (
-              <Field label="Accountant Phone">{data.accountantPhone}</Field>
-            )}
-            {data.financialAdvisorName && (
-              <Field label="Financial Advisor Name">
-                {data.financialAdvisorName}
+
+            {/* Significant Other 1 */}
+            {(data.significantOther1Name || data.significantOther1Phone) && (
+              <Field label="Significant Other 1">
+                {data.significantOther1Name &&
+                  `Name: ${data.significantOther1Name}`}
+                {data.significantOther1Name &&
+                  data.significantOther1Phone &&
+                  " | "}
+                {data.significantOther1Phone &&
+                  `Phone: ${data.significantOther1Phone}`}
               </Field>
             )}
-            {data.financialAdvisorPhone && (
-              <Field label="Financial Advisor Phone">
-                {data.financialAdvisorPhone}
-              </Field>
-            )}
-            {data.significantOther1Name && (
-              <Field label="Significant Other 1 Name">
-                {data.significantOther1Name}
-              </Field>
-            )}
-            {data.significantOther1Phone && (
-              <Field label="Significant Other 1 Phone">
-                {data.significantOther1Phone}
-              </Field>
-            )}
-            {data.significantOther2Name && (
-              <Field label="Significant Other 2 Name">
-                {data.significantOther2Name}
-              </Field>
-            )}
-            {data.significantOther2Phone && (
-              <Field label="Significant Other 2 Phone">
-                {data.significantOther2Phone}
+
+            {/* Significant Other 2 */}
+            {(data.significantOther2Name || data.significantOther2Phone) && (
+              <Field label="Significant Other 2">
+                {data.significantOther2Name &&
+                  `Name: ${data.significantOther2Name}`}
+                {data.significantOther2Name &&
+                  data.significantOther2Phone &&
+                  " | "}
+                {data.significantOther2Phone &&
+                  `Phone: ${data.significantOther2Phone}`}
               </Field>
             )}
           </View>
@@ -628,71 +704,84 @@ const CareRecipientQuestionairePDF: React.FC<{
           data?.homeEnvironmentAdequacy) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>In-Home Help Services</Text>
-            {data.houseCleaningAgency && (
-              <Field label="House Cleaning Agency">
-                {data.houseCleaningAgency}
-              </Field>
+
+            {/* In-Home Help Services Table */}
+            <TableHeader
+              columns={["Service", "Agency/Phone", "Satisfaction", "Frequency"]}
+            />
+
+            {/* House Cleaning */}
+            {(data.houseCleaningAgency ||
+              data.houseCleaningSatisfaction ||
+              data.houseCleaningFrequency) && (
+              <TableRow
+                cells={[
+                  "House Cleaning",
+                  data.houseCleaningAgency || "",
+                  data.houseCleaningSatisfaction || "",
+                  data.houseCleaningFrequency || "",
+                ]}
+              />
             )}
-            {data.houseCleaningSatisfaction && (
-              <Field label="House Cleaning Satisfaction">
-                {data.houseCleaningSatisfaction}
-              </Field>
+
+            {/* Home Aid */}
+            {(data.homeAidAgency ||
+              data.homeAidSatisfaction ||
+              data.homeAidFrequency) && (
+              <TableRow
+                cells={[
+                  "Home Aid",
+                  data.homeAidAgency || "",
+                  data.homeAidSatisfaction || "",
+                  data.homeAidFrequency || "",
+                ]}
+              />
             )}
-            {data.houseCleaningFrequency && (
-              <Field label="House Cleaning Frequency">
-                {data.houseCleaningFrequency}
-              </Field>
+
+            {/* Home Health */}
+            {(data.homeHealthAgency ||
+              data.homeHealthSatisfaction ||
+              data.homeHealthFrequency) && (
+              <TableRow
+                cells={[
+                  "Home Health",
+                  data.homeHealthAgency || "",
+                  data.homeHealthSatisfaction || "",
+                  data.homeHealthFrequency || "",
+                ]}
+              />
             )}
-            {data.homeAidAgency && (
-              <Field label="Home Aid Agency">{data.homeAidAgency}</Field>
+
+            {/* Maintenance */}
+            {(data.maintenanceAgency ||
+              data.maintenanceSatisfaction ||
+              data.maintenanceFrequency) && (
+              <TableRow
+                cells={[
+                  "Maintenance",
+                  data.maintenanceAgency || "",
+                  data.maintenanceSatisfaction || "",
+                  data.maintenanceFrequency || "",
+                ]}
+              />
             )}
-            {data.homeAidSatisfaction && (
-              <Field label="Home Aid Satisfaction">
-                {data.homeAidSatisfaction}
-              </Field>
+
+            {/* Other Help */}
+            {(data.otherHelpAgency ||
+              data.otherHelpSatisfaction ||
+              data.otherHelpFrequency) && (
+              <TableRow
+                cells={[
+                  "Other Help",
+                  data.otherHelpAgency || "",
+                  data.otherHelpSatisfaction || "",
+                  data.otherHelpFrequency || "",
+                ]}
+                last={true}
+              />
             )}
-            {data.homeAidFrequency && (
-              <Field label="Home Aid Frequency">{data.homeAidFrequency}</Field>
-            )}
-            {data.homeHealthAgency && (
-              <Field label="Home Health Agency">{data.homeHealthAgency}</Field>
-            )}
-            {data.homeHealthSatisfaction && (
-              <Field label="Home Health Satisfaction">
-                {data.homeHealthSatisfaction}
-              </Field>
-            )}
-            {data.homeHealthFrequency && (
-              <Field label="Home Health Frequency">
-                {data.homeHealthFrequency}
-              </Field>
-            )}
-            {data.maintenanceAgency && (
-              <Field label="Maintenance Agency">{data.maintenanceAgency}</Field>
-            )}
-            {data.maintenanceSatisfaction && (
-              <Field label="Maintenance Satisfaction">
-                {data.maintenanceSatisfaction}
-              </Field>
-            )}
-            {data.maintenanceFrequency && (
-              <Field label="Maintenance Frequency">
-                {data.maintenanceFrequency}
-              </Field>
-            )}
-            {data.otherHelpAgency && (
-              <Field label="Other Help Agency">{data.otherHelpAgency}</Field>
-            )}
-            {data.otherHelpSatisfaction && (
-              <Field label="Other Help Satisfaction">
-                {data.otherHelpSatisfaction}
-              </Field>
-            )}
-            {data.otherHelpFrequency && (
-              <Field label="Other Help Frequency">
-                {data.otherHelpFrequency}
-              </Field>
-            )}
+
+            {/* Living Environment */}
             {data.livingEnvironmentType && (
               <Field label="Living Environment Type">
                 {data.livingEnvironmentType.join(", ")}
@@ -877,52 +966,62 @@ const CareRecipientQuestionairePDF: React.FC<{
           data?.recentLossesImpact) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Emotional Health</Text>
+
+            {/* Emotional Health Notes */}
             {data.emotionalHealthNotes && (
               <Field label="Emotional Health Notes">
                 {data.emotionalHealthNotes}
               </Field>
             )}
+
+            {/* Personality/Coping */}
             {data.personalityCoping && (
               <Field label="Personality/Coping">{data.personalityCoping}</Field>
             )}
+
+            {/* Recent Behavior Changes */}
             {data.recentBehaviorChanges && (
-              <CheckboxField
-                label="Recent Behavior Changes"
-                checked={data.recentBehaviorChanges === "true" ? true : false}
-              />
+              <Field label="Recent Behavior Changes">
+                {data.recentBehaviorChanges === "true" ? "Yes" : "No"}
+              </Field>
             )}
+
+            {/* Recipient Shares Concerns */}
             {data.recipientSharesConcerns && (
-              <CheckboxField
-                label="Recipient Shares Concerns"
-                checked={data.recipientSharesConcerns === "true" ? true : false}
-              />
+              <Field label="Recipient Shares Concerns">
+                {data.recipientSharesConcerns === "true" ? "Yes" : "No"}
+              </Field>
             )}
+
+            {/* Recipient Shares Concerns Notes */}
             {data.recipientSharesConcernsNotes && (
               <Field label="Recipient Shares Concerns Notes">
                 {data.recipientSharesConcernsNotes}
               </Field>
             )}
+
+            {/* Emotional Problems History */}
             {data.emotionalProblemsHistory && (
-              <CheckboxField
-                label="Emotional Problems History"
-                checked={
-                  data.emotionalProblemsHistory === "true" ? true : false
-                }
-              />
+              <Field label="Emotional Problems History">
+                {data.emotionalProblemsHistory === "true" ? "Yes" : "No"}
+              </Field>
             )}
+
+            {/* Emotional Problems Treatment */}
             {data.emotionalProblemsTreatment && (
-              <CheckboxField
-                label="Emotional Problems Treatment"
-                checked={
-                  data.emotionalProblemsTreatment === "true" ? true : false
-                }
-              />
+              <Field label="Emotional Problems Treatment">
+                {data.emotionalProblemsTreatment === "true" ? "Yes" : "No"}
+              </Field>
             )}
+
+            {/* Emotional Problems Notes */}
             {data.emotionalProblemsNotes && (
               <Field label="Emotional Problems Notes">
                 {data.emotionalProblemsNotes}
               </Field>
             )}
+
+            {/* Recent Losses Impact */}
             {data.recentLossesImpact && (
               <Field label="Recent Losses Impact">
                 {data.recentLossesImpact}

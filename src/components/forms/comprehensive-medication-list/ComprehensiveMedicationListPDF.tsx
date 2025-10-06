@@ -7,7 +7,10 @@ import {
   StyleSheet,
   Image,
 } from "@react-pdf/renderer";
-import type { ComprehensiveMedicationListFormData } from "@agensy/types";
+import type {
+  ClientMedications,
+  ComprehensiveMedicationListFormData,
+} from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
 import logo from "@agensy/assets/logo.png";
 
@@ -142,85 +145,140 @@ const TableRow = ({
 export const ComprehensiveMedicationListPDF: React.FC<{
   data?: ComprehensiveMedicationListFormData & {
     last_update?: { updatedAt?: string };
+    printStoppedMedications?: boolean;
   };
-}> = ({ data }) => (
-  <Document title="Agensy Comprehensive Medication & Supplement List">
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.formTitle}>
-        Agensy Comprehensive Medication & Supplement List
-      </Text>
-      <View style={styles.headerRow}>
-        <Image src={logo} style={styles.headerLogo} />
-        <View style={styles.headerDateBoxContainer}>
-          <Text style={styles.headerDateBox}>
-            {`Print Date: ${DateUtils.formatDateToRequiredFormat(
-              new Date().toISOString()
-            )}`}
-          </Text>
-          {data?.last_update?.updatedAt && (
+  clientMedications?: ClientMedications[];
+}> = ({ data, clientMedications = [] }) => {
+  const isMedicationStopped = (medicationId: string) => {
+    if (!medicationId) return false;
+
+    const foundMedication = clientMedications.find(
+      (med) => med.id === medicationId
+    );
+
+    if (foundMedication) {
+      return false;
+    }
+
+    return true;
+  };
+
+  return (
+    <Document title="Agensy Comprehensive Medication & Supplement List">
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.formTitle}>
+          Agensy Comprehensive Medication & Supplement List
+        </Text>
+        <View style={styles.headerRow}>
+          <Image src={logo} style={styles.headerLogo} />
+          <View style={styles.headerDateBoxContainer}>
             <Text style={styles.headerDateBox}>
-              {`Update Date: ${DateUtils.formatDateToRequiredFormat(
-                data.last_update.updatedAt
+              {`Print Date: ${DateUtils.formatDateToRequiredFormat(
+                new Date().toISOString()
               )}`}
             </Text>
+            {data?.last_update?.updatedAt && (
+              <Text style={styles.headerDateBox}>
+                {`Update Date: ${DateUtils.formatDateToRequiredFormat(
+                  data.last_update.updatedAt
+                )}`}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Field label="First Name">{data?.firstName}</Field>
+          <Field label="Last Name">{data?.lastName}</Field>
+          {data?.dateOfBirth && (
+            <Field label="Date of Birth">{data.dateOfBirth}</Field>
           )}
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Personal Information</Text>
-        <Field label="First Name">{data?.firstName}</Field>
-        <Field label="Last Name">{data?.lastName}</Field>
-        {data?.dateOfBirth && (
-          <Field label="Date of Birth">{data.dateOfBirth}</Field>
+        {/* Active Medications Section */}
+        {data?.medications?.some(
+          (m) => !isMedicationStopped(m.medicationId || "")
+        ) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Medications</Text>
+            <TableHeader
+              columns={[
+                "Medication",
+                "Dose",
+                "Used to Treat",
+                "Frequency",
+                "Prescriber",
+                "Refill Due",
+              ]}
+            />
+            {(data.medications ?? [])
+              .filter((m) => !isMedicationStopped(m.medicationId || ""))
+              .map((m, i, arr) => (
+                <TableRow
+                  key={i}
+                  cells={[
+                    m.medicationName ?? "",
+                    m.dosage ?? "",
+                    m.usedToTreat ?? "",
+                    m.frequency ?? "",
+                    m.prescriber ?? "",
+                    m.refillDue ?? "",
+                  ]}
+                  last={i === arr.length - 1}
+                />
+              ))}
+          </View>
         )}
-      </View>
 
-      {data?.allergies?.some((a) => a && a.allergen) && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Allergies</Text>
-          <Field label="Allergies">
-            {data.allergies
-              ?.filter((a) => a && a.allergen)
-              ?.map((a) => a.allergen)
-              .join(", ") ?? ""}
-          </Field>
-        </View>
-      )}
-
-      {data?.medications?.some(
-        (m) => m && (m.medicationName || m.dosage || m.frequency)
-      ) && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medications</Text>
-          <TableHeader
-            columns={[
-              "Medication",
-              "Dose",
-              "Used to Treat",
-              "Frequency",
-              "Prescriber",
-              "Refill Due",
-            ]}
-          />
-          {(data.medications ?? [])
-            .filter((m) => m && (m.medicationName || m.dosage || m.frequency))
-            .map((m, i, arr) => (
-              <TableRow
-                key={i}
-                cells={[
-                  m.medicationName ?? "",
-                  m.dosage ?? "",
-                  m.usedToTreat ?? "",
-                  m.frequency ?? "",
-                  m.prescriber ?? "",
-                  m.refillDue ?? "",
+        {/* Stopped Medications Section - Only show if checkbox is checked */}
+        {data?.printStoppedMedications &&
+          data?.medications?.some((m) =>
+            isMedicationStopped(m.medicationId || "")
+          ) && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Stopped Medications</Text>
+              <TableHeader
+                columns={[
+                  "Medication",
+                  "Dose",
+                  "Used to Treat",
+                  "Frequency",
+                  "Prescriber",
+                  "Refill Due",
                 ]}
-                last={i === arr.length - 1}
               />
-            ))}
-        </View>
-      )}
-    </Page>
-  </Document>
-);
+              {(data.medications ?? [])
+                .filter((m) => isMedicationStopped(m.medicationId || ""))
+                .map((m, i, arr) => (
+                  <TableRow
+                    key={i}
+                    cells={[
+                      m.medicationName ?? "",
+                      m.dosage ?? "",
+                      m.usedToTreat ?? "",
+                      m.frequency ?? "",
+                      m.prescriber ?? "",
+                      m.refillDue ?? "",
+                    ]}
+                    last={i === arr.length - 1}
+                  />
+                ))}
+            </View>
+          )}
+
+        {data?.allergies?.some((a) => a && a.allergen) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Allergies</Text>
+            <Field label="Allergies">
+              {data.allergies
+                ?.filter((a) => a && a.allergen)
+                ?.map((a) => a.allergen)
+                .join(", ") ?? ""}
+            </Field>
+          </View>
+        )}
+      </Page>
+    </Document>
+  );
+};

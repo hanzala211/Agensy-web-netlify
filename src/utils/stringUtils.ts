@@ -321,6 +321,8 @@ export const mapExtractedDataToFormValues = (
           address: item.address ? item.address : "",
           phone: item.phone ? item.phone : "",
           fax: item.fax ? item.fax : "",
+          lastVisit: item.last_visit ? item.last_visit : "",
+          nextVisit: item.next_visit ? item.next_visit : "",
           follow_up: item.follow_up ? item.follow_up : "",
           notes: item.notes ? item.notes : "",
           id: item.id ? item.id : null,
