@@ -6,6 +6,7 @@ import {
   ICONS,
   MEDICATION_FREQUENCY_OPTIONS,
   SPECIALTIES,
+  STATES,
 } from "@agensy/constants";
 import {
   StatefulDatePicker,
@@ -767,33 +768,18 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                                     )
                                   }
                                 />
-
-                                <StatefulDatePicker
-                                  label="Follow Up"
-                                  value={healthcareProvider.follow_up || ""}
-                                  onChangeFunc={(date) =>
+                                <StatefulInput
+                                  label="Notes"
+                                  value={healthcareProvider.notes || ""}
+                                  onChange={(e) =>
                                     handleValueChange(
                                       field.key,
                                       index,
-                                      "follow_up",
-                                      date
+                                      "notes",
+                                      e.target.value
                                     )
                                   }
                                 />
-                                <div className="md:col-span-2">
-                                  <StatefulInput
-                                    label="Notes"
-                                    value={healthcareProvider.notes || ""}
-                                    onChange={(e) =>
-                                      handleValueChange(
-                                        field.key,
-                                        index,
-                                        "notes",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
                               </div>
                             </div>
                           )
@@ -814,6 +800,15 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                     <StatefulPhoneInput
                       value={field.value || ""}
                       onChange={(e) => handleFieldChange(field.key, e)}
+                    />
+                  ) : field.key === "state" ? (
+                    <StatefulSelect
+                      labelOption="Select State"
+                      data={STATES}
+                      value={field.value || ""}
+                      onChange={(e) =>
+                        handleFieldChange(field.key, e.target.value)
+                      }
                     />
                   ) : (
                     <StatefulInput

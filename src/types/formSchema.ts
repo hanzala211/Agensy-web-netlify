@@ -377,6 +377,9 @@ export const faceSheetShortFormSchema = z.object({
   preferredName: z.string().optional(),
   gender: z.string().optional(),
   address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zip: z.string().optional(),
   phoneNumber: z.string().optional(),
   dateOfBirth: z.string().optional(),
   ssn: z.string().optional(),
@@ -440,8 +443,8 @@ export const faceSheetShortFormSchema = z.object({
     .array(
       z.object({
         medicationName: z.string().optional(),
-        dose: z.string().optional(),
-        usedToTreat: z.string().optional(),
+        dosage: z.string().optional(),
+        purpose: z.string().optional(),
         prescriber: z.string().optional(),
         refillDue: z.string().optional(),
         id: z.string().optional().nullable().nullish(),
@@ -483,6 +486,9 @@ export const faceSheetLongFormSchema = z
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zip: z.string().optional(),
     preferredName: z.string().optional(),
     phoneNumber: z.string().optional(),
     dateOfBirth: z.string().optional(),
@@ -594,8 +600,8 @@ export const faceSheetLongFormSchema = z
       .array(
         z.object({
           medicationName: z.string().optional(),
-          dose: z.string().optional(),
-          usedToTreat: z.string().optional(),
+          dosage: z.string().optional(),
+          purpose: z.string().optional(),
           id: z.string().optional().nullable().nullish(),
           frequency: z.string().optional(),
           prescriber: z.string().optional(),

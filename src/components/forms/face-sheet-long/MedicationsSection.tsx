@@ -42,8 +42,8 @@ export const MedicationsSection = <T extends FieldValues>({
         appendMedication({
           // @ts-expect-error - TODO: fix this
           medicationName: "",
-          dose: "",
-          usedToTreat: "",
+          dosage: "",
+          purpose: "",
           prescriber: "",
           refillDue: "",
         })
@@ -69,18 +69,16 @@ export const MedicationsSection = <T extends FieldValues>({
                 />
                 <Input
                   label="Dose"
-                  register={register(`medications.${index}.dose` as Path<T>)}
+                  register={register(`medications.${index}.dosage` as Path<T>)}
                   // @ts-expect-error - TODO: fix this
-                  error={errors.medications?.[index]?.dose?.message as string}
+                  error={errors.medications?.[index]?.dosage?.message as string}
                 />
                 <Input
                   label="Used to Treat"
-                  register={register(
-                    `medications.${index}.usedToTreat` as Path<T>
-                  )}
+                  register={register(`medications.${index}.purpose` as Path<T>)}
                   error={
                     // @ts-expect-error - TODO: fix this
-                    errors.medications?.[index]?.usedToTreat?.message as string
+                    errors.medications?.[index]?.purpose?.message as string
                   }
                 />
                 <Input

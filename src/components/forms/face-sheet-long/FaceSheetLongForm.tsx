@@ -58,6 +58,9 @@ const defaultValues = {
   firstName: "",
   lastName: "",
   address: "",
+  city: "",
+  state: "",
+  zip: "",
   phoneNumber: "",
   dateOfBirth: "",
   ssn: "",
@@ -186,6 +189,7 @@ export const FaceSheetLongForm: React.FC = () => {
         defaultValues,
         getValues()
       );
+      console.log(mappedValues);
       Object.entries(mappedValues).forEach(([key, value]) => {
         setValue(key as keyof FaceSheetLongFormData, value);
       });
@@ -287,6 +291,9 @@ export const FaceSheetLongForm: React.FC = () => {
         firstName: faceSheetLongData?.client_info?.first_name || "",
         lastName: faceSheetLongData?.client_info?.last_name || "",
         address: faceSheetLongData?.client_info?.address || "",
+        city: faceSheetLongData?.client_info?.city || "",
+        state: faceSheetLongData?.client_info?.state || "",
+        zip: faceSheetLongData?.client_info?.zip || "",
         phoneNumber: faceSheetLongData?.client_info?.phone || "",
         preferredName: faceSheetLongData?.client_info?.preferred_name || "",
         dateOfBirth: DateUtils.formatDateToRequiredFormat(
@@ -389,8 +396,8 @@ export const FaceSheetLongForm: React.FC = () => {
           faceSheetLongData?.medications?.map(
             (medication: ClientMedications) => ({
               medicationName: medication.medication_name || "",
-              dose: medication.dosage || "",
-              usedToTreat: medication.purpose || "",
+              dosage: medication.dosage || "",
+              purpose: medication.purpose || "",
               prescriber: medication.prescribing_doctor || "",
               refillDue: medication.refill_due
                 ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
@@ -569,9 +576,9 @@ export const FaceSheetLongForm: React.FC = () => {
     (data: FaceSheetLongFormData) => {
       const medications = data.medications?.map((item) => {
         const medication = {
-          purpose: item.usedToTreat ? item.usedToTreat : null,
+          purpose: item.purpose ? item.purpose : null,
           medication_name: item.medicationName ? item.medicationName : null,
-          dosage: item.dose ? item.dose : null,
+          dosage: item.dosage ? item.dosage : null,
           id: item?.id,
           frequency: item.frequency ? item.frequency : null,
           prescribing_doctor: item.prescriber ? item.prescriber : null,
@@ -671,6 +678,9 @@ export const FaceSheetLongForm: React.FC = () => {
           first_name: data.firstName,
           last_name: data.lastName,
           address: data.address ? data.address : null,
+          city: data.city ? data.city : null,
+          state: data.state ? data.state : null,
+          zip: data.zip ? data.zip : null,
           preferred_name: data.preferredName ? data.preferredName : null,
           ssn: data.ssn ? data.ssn : null,
           date_of_birth: data.dateOfBirth

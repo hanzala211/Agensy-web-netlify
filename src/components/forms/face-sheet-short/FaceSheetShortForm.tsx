@@ -42,6 +42,9 @@ const defaultValues = {
   lastName: "",
   preferredName: "",
   address: "",
+  city: "",
+  state: "",
+  zip: "",
   phoneNumber: "",
   dateOfBirth: "",
   ssn: "",
@@ -216,6 +219,9 @@ export const FaceSheetShortForm: React.FC = () => {
         firstName: faceSheetShortForm?.client_info?.first_name || "",
         lastName: faceSheetShortForm?.client_info?.last_name || "",
         address: faceSheetShortForm?.client_info?.address || "",
+        city: faceSheetShortForm?.client_info?.city || "",
+        state: faceSheetShortForm?.client_info?.state || "",
+        zip: faceSheetShortForm?.client_info?.zip || "",
         phoneNumber: faceSheetShortForm?.client_info?.phone || "",
         dateOfBirth: faceSheetShortForm?.client_info?.date_of_birth
           ? DateUtils.formatDateToRequiredFormat(
@@ -298,8 +304,8 @@ export const FaceSheetShortForm: React.FC = () => {
           faceSheetShortForm?.medications?.map(
             (medication: ClientMedications) => ({
               medicationName: medication.medication_name || "",
-              dose: medication.dosage || "",
-              usedToTreat: medication.purpose || "",
+              dosage: medication.dosage || "",
+              purpose: medication.purpose || "",
               prescriber: medication.prescribing_doctor || "",
               refillDue: medication?.refill_due
                 ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
@@ -367,9 +373,9 @@ export const FaceSheetShortForm: React.FC = () => {
           refill_due: item.refillDue
             ? DateUtils.changetoISO(item.refillDue)
             : null,
-          purpose: item.usedToTreat ? item.usedToTreat : null,
+          purpose: item.purpose ? item.purpose : null,
           medication_name: item.medicationName ? item.medicationName : null,
-          dosage: item.dose ? item.dose : null,
+          dosage: item.dosage ? item.dosage : null,
           prescribing_doctor: item.prescriber ? item.prescriber : null,
           id: item?.id,
           frequency: item.frequency ? item.frequency : null,
@@ -419,6 +425,9 @@ export const FaceSheetShortForm: React.FC = () => {
           first_name: data.firstName,
           last_name: data.lastName,
           address: data.address ? data.address : null,
+          city: data.city ? data.city : null,
+          state: data.state ? data.state : null,
+          zip: data.zip ? data.zip : null,
           ssn: data.ssn ? data.ssn : null,
           date_of_birth: data.dateOfBirth
             ? DateUtils.changetoISO(data.dateOfBirth)

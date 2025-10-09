@@ -12,7 +12,7 @@ import {
   PhoneNumberInput,
   Select,
 } from "@agensy/components";
-import { GENDER_OPTIONS } from "@agensy/constants";
+import { GENDER_OPTIONS, STATES } from "@agensy/constants";
 
 interface PersonalInformationSectionProps<T extends FieldValues> {
   register: UseFormRegister<T>;
@@ -65,11 +65,31 @@ export const PersonalInformationSection = <T extends FieldValues>({
           control={control}
           name={"gender" as Path<T>}
         />
+
         <Input
-          label="Address"
-          register={register("address" as Path<T>)}
-          error={errors.address?.message as string}
+          label="City"
+          register={register("city" as Path<T>)}
+          error={errors.city?.message as string}
         />
+        <Select
+          data={STATES}
+          labelOption="Select State"
+          label="State"
+          control={control}
+          name={"state" as Path<T>}
+        />
+        <Input
+          label="Zip Code"
+          register={register("zip" as Path<T>)}
+          error={errors.zip?.message as string}
+        />
+        <div className="md:col-span-2">
+          <Input
+            label="Address"
+            register={register("address" as Path<T>)}
+            error={errors.address?.message as string}
+          />
+        </div>
       </div>
     </Card>
   );

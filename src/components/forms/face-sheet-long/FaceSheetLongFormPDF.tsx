@@ -18,6 +18,7 @@ import {
   GENDER_OPTIONS,
   MARITAL_STATUS_OPTIONS,
   LIVING_SITUATION_OPTIONS,
+  STATES,
 } from "@agensy/constants";
 import logo from "@agensy/assets/logo.png";
 
@@ -183,6 +184,13 @@ const FaceSheetLongFormPDF: React.FC<{
         {data.phoneNumber && (
           <Field label="Phone Number">{data.phoneNumber}</Field>
         )}
+        {data.city && <Field label="City">{data.city}</Field>}
+        {data.state && (
+          <Field label="State">
+            {STATES.find((item) => item.value === data.state)?.label}
+          </Field>
+        )}
+        {data.zip && <Field label="Zip Code">{data.zip}</Field>}
         {data.address && <Field label="Address">{data.address}</Field>}
         {data.ssn && <Field label="SSN">{data.ssn}</Field>}
       </View>
@@ -425,8 +433,8 @@ const FaceSheetLongFormPDF: React.FC<{
               key={i}
               cells={[
                 m.medicationName,
-                m.dose,
-                m.usedToTreat,
+                m.dosage,
+                m.purpose,
                 m.frequency,
                 m.prescriber,
                 m.refillDue,

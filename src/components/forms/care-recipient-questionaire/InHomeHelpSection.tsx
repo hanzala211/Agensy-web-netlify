@@ -29,6 +29,11 @@ export const InHomeHelpSection = <T extends FieldValues>({
       name: "livingEnvironmentType" as Path<T>,
     }) || [];
 
+  const clearServiceSelection = (service: (typeof services)[0]) => {
+    setValue(service.satisfactionField, "" as PathValueImpl<T, Path<T>>);
+    setValue(service.frequencyField, "" as PathValueImpl<T, Path<T>>);
+  };
+
   const services = [
     {
       name: "houseCleaning",
@@ -73,20 +78,21 @@ export const InHomeHelpSection = <T extends FieldValues>({
         {/* In-Home Help Services Table */}
         <div className="space-y-3">
           {/* Table Header */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 font-medium text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-3 xl:gap-6 font-medium text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
             <div className="text-center lg:text-left">Phone/Agency</div>
             <div className="text-center">Satisfaction</div>
             <div className="text-center">Frequency</div>
+            <div className="text-center">Actions</div>
           </div>
 
           {/* Service Rows */}
           {services.map((service) => (
             <div
               key={service.name}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-6 items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors"
+              className="grid grid-cols-1 xl:grid-cols-4 gap-3 xl:gap-6 items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors"
             >
               {/* Agency/Phone Field */}
-              <div className="lg:order-1">
+              <div className="xl:order-1">
                 <Input
                   register={register(service.agencyField)}
                   error={errors[service.agencyField]?.message as string}
@@ -95,8 +101,8 @@ export const InHomeHelpSection = <T extends FieldValues>({
               </div>
 
               {/* Satisfaction Radio Buttons */}
-              <div className="lg:order-2 space-y-2">
-                <div className="lg:hidden text-xs font-medium text-gray-600 mb-1">
+              <div className="xl:order-2 space-y-2">
+                <div className="xl:hidden text-xs font-medium text-gray-600 mb-1">
                   Satisfaction
                 </div>
                 <div className="flex justify-center gap-3">
@@ -113,8 +119,8 @@ export const InHomeHelpSection = <T extends FieldValues>({
               </div>
 
               {/* Frequency Radio Buttons */}
-              <div className="lg:order-3 space-y-2">
-                <div className="lg:hidden text-xs font-medium text-gray-600 mb-1">
+              <div className="xl:order-3 space-y-2">
+                <div className="xl:hidden text-xs font-medium text-gray-600 mb-1">
                   Frequency
                 </div>
                 <div className="flex justify-center gap-3">
@@ -128,6 +134,17 @@ export const InHomeHelpSection = <T extends FieldValues>({
                     />
                   ))}
                 </div>
+              </div>
+
+              {/* Clear Selection Button */}
+              <div className="lg:order-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => clearServiceSelection(service)}
+                  className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors duration-200 border border-gray-300 hover:border-gray-400"
+                >
+                  Clear Selection
+                </button>
               </div>
             </div>
           ))}
