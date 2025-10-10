@@ -6,6 +6,7 @@ import {
   Input,
   DatePickerField,
   PrimaryButton,
+  StickyScrollToTop,
 } from "@agensy/components";
 import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import {
@@ -377,6 +378,7 @@ export const LabsTracker = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

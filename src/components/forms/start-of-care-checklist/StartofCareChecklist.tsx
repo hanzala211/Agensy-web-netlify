@@ -4,7 +4,12 @@ import {
   checklistSchema,
   generateChecklistDefaultValues,
 } from "@agensy/config";
-import { Card, CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  Card,
+  CommonLoader,
+  PrimaryButton,
+  StickyScrollToTop,
+} from "@agensy/components";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import type { ChecklistFormData, OpenedFileData } from "@agensy/types";
 import {
@@ -274,6 +279,7 @@ export const StartofCareChecklist = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

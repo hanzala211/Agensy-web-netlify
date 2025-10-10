@@ -15,6 +15,7 @@ import {
   MedicationSelectionModal,
   DiagnosisSelectionModal,
   AllergySelectionModal,
+  StickyScrollToTop,
 } from "@agensy/components";
 import {
   medicalAppointmentTemplateSchema,
@@ -1262,6 +1263,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
 
       <HealthcareProviderSelectionModal
         isOpen={isProviderModalOpen}

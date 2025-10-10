@@ -1,7 +1,11 @@
 import React, { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  CommonLoader,
+  PrimaryButton,
+  StickyScrollToTop,
+} from "@agensy/components";
 import {
   faceSheetShortFormSchema,
   type ClientMedications,
@@ -630,6 +634,7 @@ export const FaceSheetShortForm: React.FC = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

@@ -1,6 +1,12 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CommonLoader, Input, PrimaryButton } from "@agensy/components";
+import {
+  Card,
+  CommonLoader,
+  Input,
+  PrimaryButton,
+  StickyScrollToTop,
+} from "@agensy/components";
 import { APP_ACTIONS, ICONS } from "@agensy/constants";
 import { DatePickerField } from "@agensy/components";
 import {
@@ -402,6 +408,7 @@ export const VitalsTracker = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

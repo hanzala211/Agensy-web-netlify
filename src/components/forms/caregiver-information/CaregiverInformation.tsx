@@ -13,6 +13,7 @@ import {
   Input,
   TimeInput,
   TextArea,
+  StickyScrollToTop,
 } from "@agensy/components";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import type {
@@ -524,6 +525,7 @@ export const CaregiverInformation = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

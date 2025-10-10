@@ -1,6 +1,10 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  CommonLoader,
+  PrimaryButton,
+  StickyScrollToTop,
+} from "@agensy/components";
 import {
   personalInfoFormSchema,
   type DigitalAccount,
@@ -568,6 +572,7 @@ export const PersonalInfo = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

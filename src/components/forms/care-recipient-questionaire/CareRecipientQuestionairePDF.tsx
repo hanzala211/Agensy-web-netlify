@@ -222,7 +222,7 @@ const CareRecipientQuestionairePDF: React.FC<{
               <Field label="Form Filler Date">{data.formFillerDate}</Field>
             )}
             {data.fillingForOtherSpecify && (
-              <Field label="Filling For">
+              <Field label="Relationship to Client">
                 {data.fillingForOtherSpecify}
                 {data.fillingForOtherSpecify === "Other" &&
                   data.fillingForOtherSpecifyText &&
@@ -875,6 +875,7 @@ const CareRecipientQuestionairePDF: React.FC<{
         {/* Medical Info */}
         {(data?.lastCheckupDate ||
           data?.allergies ||
+          data?.diagnosis ||
           data?.recentHospitalization ||
           data?.hospitalDetails ||
           data?.supportSystemThoughts) && (
@@ -885,6 +886,9 @@ const CareRecipientQuestionairePDF: React.FC<{
             )}
             {data.allergies && (
               <Field label="Allergies">{data.allergies}</Field>
+            )}
+            {data.diagnosis && (
+              <Field label="Diagnoses">{data.diagnosis}</Field>
             )}
             {data.recentHospitalization && (
               <CheckboxField

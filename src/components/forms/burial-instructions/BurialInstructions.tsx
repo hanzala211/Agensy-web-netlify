@@ -1,6 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  CommonLoader,
+  PrimaryButton,
+  StickyScrollToTop,
+} from "@agensy/components";
 import {
   burialInstructionsFormSchema,
   type BurialInstructionsFormData,
@@ -394,6 +398,7 @@ export const BurialInstructions = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

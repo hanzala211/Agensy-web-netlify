@@ -147,3 +147,4 @@ export * from "./model/HealthcareProviderSelectionModal";
 export * from "./model/MedicationSelectionModal";
 export * from "./model/DiagnosisSelectionModal";
 export * from "./model/AllergySelectionModal";
+export * from "./common/StickyScrollToTop";

@@ -12,6 +12,7 @@ import {
   DatePickerField,
   Input,
   PrimaryButton,
+  StickyScrollToTop,
 } from "@agensy/components";
 import { ICONS } from "@agensy/constants";
 import { useParams } from "react-router-dom";
@@ -472,6 +473,7 @@ export const InPatientStayNotes = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

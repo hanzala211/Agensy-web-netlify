@@ -4,7 +4,7 @@ import {
   medicareCheatSheetSchema as checklistSchema,
   generateMedicareCheatSheetDefaultValues,
 } from "@agensy/config";
-import { Card } from "@agensy/components";
+import { Card, StickyScrollToTop } from "@agensy/components";
 import { useClientContext } from "@agensy/context";
 import type { ChecklistFormData, OpenedFileData } from "@agensy/types";
 import MedicareComparisonTable from "../MedicareComparisonTable";
@@ -90,6 +90,7 @@ export const MedicareCheatSheet = () => {
         </div>
         <MedicareComparisonTable />
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

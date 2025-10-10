@@ -1462,6 +1462,11 @@ export const careRecipientQuestionnaireSchema = z.object({
     .optional()
     .nullable()
     .transform((val) => val || ""),
+  diagnosis: z
+    .string()
+    .optional()
+    .nullable()
+    .transform((val) => val || ""),
   recentHospitalization: z
     .string()
     .optional()

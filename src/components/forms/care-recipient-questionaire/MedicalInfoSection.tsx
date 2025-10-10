@@ -27,7 +27,7 @@ export const MedicalInfoSection = <T extends FieldValues>({
   return (
     <Card title="Medical Information">
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <DatePickerField
             label="Date of last checkup"
             control={control}
@@ -37,6 +37,11 @@ export const MedicalInfoSection = <T extends FieldValues>({
             label="Known allergies (comma separated)"
             register={register("allergies" as Path<T>)}
             error={errors.allergies?.message as string}
+          />
+          <Input
+            label="Known diagnoses (comma separated)"
+            register={register("diagnosis" as Path<T>)}
+            error={errors.diagnosis?.message as string}
           />
         </div>
 

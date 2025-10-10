@@ -10,6 +10,7 @@ import {
   DatePickerField,
   TertiaryButton,
   CommonLoader,
+  StickyScrollToTop,
 } from "@agensy/components";
 import {
   healthHistoryFormSchema,
@@ -866,6 +867,7 @@ export const HealthHistoryForm: React.FC = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

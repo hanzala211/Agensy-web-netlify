@@ -1,7 +1,11 @@
 import { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CommonLoader, PrimaryButton } from "@agensy/components";
+import {
+  CommonLoader,
+  PrimaryButton,
+  StickyScrollToTop,
+} from "@agensy/components";
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { InfoSection } from "./InfoSection";
 import { InsuranceSection } from "./InsuranceSection";
@@ -138,6 +142,7 @@ const defaultValues = {
 
   lastCheckupDate: "",
   allergies: "",
+  diagnosis: "",
   recentHospitalization: undefined,
   hospitalDetails: "",
   supportSystemThoughts: "",
@@ -672,6 +677,7 @@ export const CareRecipientQuestionaire = () => {
             )
           : "",
         allergies: careRecipientQuestionnaire.medical_info?.allergies || "",
+        diagnosis: careRecipientQuestionnaire.medical_info?.diagnoses || "",
         recentHospitalization:
           careRecipientQuestionnaire.medical_info?.recent_hospitalization !==
           null
@@ -1141,6 +1147,7 @@ export const CareRecipientQuestionaire = () => {
             ? DateUtils.changetoISO(data.lastCheckupDate)
             : null,
           allergies: data.allergies ? data.allergies : null,
+          diagnoses: data.diagnosis ? data.diagnosis : null,
           recent_hospitalization: data.recentHospitalization
             ? data.recentHospitalization === "true"
               ? true
@@ -1428,6 +1435,7 @@ export const CareRecipientQuestionaire = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

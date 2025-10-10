@@ -6,6 +6,7 @@ import {
   PrimaryButton,
   TertiaryButton,
   CommonLoader,
+  StickyScrollToTop,
 } from "@agensy/components";
 import { ComprehensiveCarePlanCard } from "./ComprehensiveCarePlanCard";
 import { AssessmentCards } from "./AssessmentCards";
@@ -3070,169 +3071,172 @@ export const ComprehensiveCarePlan = () => {
   }
 
   return (
-    <form
-      autoComplete="off"
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8"
-    >
-      <ComprehensiveCarePlanCard
-        register={register}
-        control={control}
-        errors={errors}
-      />
-
-      <AssessmentCards register={register} errors={errors} />
-
-      <GoalsForAssessmentCard
-        register={register}
-        errors={errors}
-        watch={watch}
-        setValue={setValue}
-      />
-
-      <FocusedRecommendationsCard
-        register={register}
-        errors={errors}
-        watch={watch}
-        setValue={setValue}
-        focusedRecommendationsFields={focusedRecommendationsFields}
-        appendFocusedRecommendation={appendFocusedRecommendation}
-        removeFocusedRecommendation={removeFocusedRecommendation}
-      />
-
-      <TextAreaCards register={register} errors={errors} />
-
-      <MedicationsCard
-        register={register}
-        errors={errors}
-        control={control}
-        medicationsFields={medicationsFields}
-        appendMedication={appendMedication}
-        removeMedication={removeMedication}
-      />
-
-      <AllergiesCard
-        register={register}
-        errors={errors}
-        allergiesFields={allergiesFields}
-        appendAllergy={appendAllergy}
-        removeAllergy={removeAllergy}
-      />
-
-      <HealthcareProvidersCard
-        register={register}
-        errors={errors}
-        control={control}
-        healthcareProvidersFields={healthcareProvidersFields}
-        appendHealthcareProvider={appendHealthcareProvider}
-        removeHealthcareProvider={removeHealthcareProvider}
-      />
-
-      <FunctionalAdlsCard register={register} errors={errors} />
-
-      <FunctionalIadlsCard register={register} errors={errors} />
-
-      <HomeSafetyCard register={register} errors={errors} />
-
-      <MemoryAndReasoning register={register} errors={errors} />
-
-      <GeriatricDepression register={register} errors={errors} />
-
-      <NutritionalHealth register={register} errors={errors} />
-
-      <LegalAndFinancialCard register={register} errors={errors} />
-
-      <CaregiverSupport register={register} errors={errors} />
-
-      <Card
-        title="Next Steps - Care Recipient"
-        buttonText={<ICONS.plus size={16} />}
-        onButtonClick={() => {
-          // @ts-expect-error - TODO: fix this
-          appendNextStepCareRecipient("");
-        }}
-        ariaLabel="Add Care Recipient Step"
-        showButton={true}
+    <>
+      <form
+        autoComplete="off"
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8"
       >
-        <div className="space-y-4 w-full">
-          {nextStepCareRecipientFields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-3 w-full">
-              <Input
-                label={`Step ${index + 1}`}
-                mainClassname="w-full"
-                register={register(`nextStepCareRecipient.${index}`)}
-                error={errors.nextStepCareRecipient?.[index]?.message}
-                placeholder="Physical therapy sessions, medication review, etc."
-              />
-              {nextStepCareRecipientFields.length > 1 && (
-                <TertiaryButton
-                  type="button"
-                  onClick={() => removeNextStepCareRecipient(index)}
-                  className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
-                >
-                  <ICONS.delete />
-                </TertiaryButton>
-              )}
-            </div>
-          ))}
-        </div>
-      </Card>
+        <ComprehensiveCarePlanCard
+          register={register}
+          control={control}
+          errors={errors}
+        />
 
-      <Card
-        title="Next Steps - Care Partner"
-        buttonText={<ICONS.plus size={16} />}
-        onButtonClick={() => {
-          // @ts-expect-error - TODO: fix this
-          appendNextStepCarePartner("");
-        }}
-        ariaLabel="Add Care Partner Step"
-        showButton={true}
-      >
-        <div className="mb-2 text-xs italic text-gray-500">
-          (All next steps are optional and will be completed at the request of
-          the care recipient.)
-        </div>
-        <div className="space-y-4 w-full">
-          {nextStepCarePartnerFields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-3 w-full">
-              <Input
-                label={`Step ${index + 1}`}
-                register={register(`nextStepCarePartner.${index}`)}
-                error={errors.nextStepCarePartner?.[index]?.message}
-                placeholder="Family caregiver training, schedule coordination, etc."
-                mainClassname="w-full"
-              />
-              {nextStepCarePartnerFields.length > 1 && (
-                <TertiaryButton
-                  type="button"
-                  onClick={() => removeNextStepCarePartner(index)}
-                  className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
-                >
-                  <ICONS.delete />
-                </TertiaryButton>
-              )}
-            </div>
-          ))}
-        </div>
-      </Card>
+        <AssessmentCards register={register} errors={errors} />
 
-      {handleFilterPermission(
-        clientId as string,
-        APP_ACTIONS.EditAgensyForms
-      ) && (
-        <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
-          <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
-            <PrimaryButton
-              type="submit"
-              isLoading={postComprehensiveCarePlanMutation.isPending}
-              disabled={postComprehensiveCarePlanMutation.isPending}
-              className="sm:!w-fit w-full md:text-base text-sm"
-            >
-              Save Comprehensive Care Plan
-            </PrimaryButton>
+        <GoalsForAssessmentCard
+          register={register}
+          errors={errors}
+          watch={watch}
+          setValue={setValue}
+        />
+
+        <FocusedRecommendationsCard
+          register={register}
+          errors={errors}
+          watch={watch}
+          setValue={setValue}
+          focusedRecommendationsFields={focusedRecommendationsFields}
+          appendFocusedRecommendation={appendFocusedRecommendation}
+          removeFocusedRecommendation={removeFocusedRecommendation}
+        />
+
+        <TextAreaCards register={register} errors={errors} />
+
+        <MedicationsCard
+          register={register}
+          errors={errors}
+          control={control}
+          medicationsFields={medicationsFields}
+          appendMedication={appendMedication}
+          removeMedication={removeMedication}
+        />
+
+        <AllergiesCard
+          register={register}
+          errors={errors}
+          allergiesFields={allergiesFields}
+          appendAllergy={appendAllergy}
+          removeAllergy={removeAllergy}
+        />
+
+        <HealthcareProvidersCard
+          register={register}
+          errors={errors}
+          control={control}
+          healthcareProvidersFields={healthcareProvidersFields}
+          appendHealthcareProvider={appendHealthcareProvider}
+          removeHealthcareProvider={removeHealthcareProvider}
+        />
+
+        <FunctionalAdlsCard register={register} errors={errors} />
+
+        <FunctionalIadlsCard register={register} errors={errors} />
+
+        <HomeSafetyCard register={register} errors={errors} />
+
+        <MemoryAndReasoning register={register} errors={errors} />
+
+        <GeriatricDepression register={register} errors={errors} />
+
+        <NutritionalHealth register={register} errors={errors} />
+
+        <LegalAndFinancialCard register={register} errors={errors} />
+
+        <CaregiverSupport register={register} errors={errors} />
+
+        <Card
+          title="Next Steps - Care Recipient"
+          buttonText={<ICONS.plus size={16} />}
+          onButtonClick={() => {
+            // @ts-expect-error - TODO: fix this
+            appendNextStepCareRecipient("");
+          }}
+          ariaLabel="Add Care Recipient Step"
+          showButton={true}
+        >
+          <div className="space-y-4 w-full">
+            {nextStepCareRecipientFields.map((field, index) => (
+              <div key={field.id} className="flex items-center gap-3 w-full">
+                <Input
+                  label={`Step ${index + 1}`}
+                  mainClassname="w-full"
+                  register={register(`nextStepCareRecipient.${index}`)}
+                  error={errors.nextStepCareRecipient?.[index]?.message}
+                  placeholder="Physical therapy sessions, medication review, etc."
+                />
+                {nextStepCareRecipientFields.length > 1 && (
+                  <TertiaryButton
+                    type="button"
+                    onClick={() => removeNextStepCareRecipient(index)}
+                    className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <ICONS.delete />
+                  </TertiaryButton>
+                )}
+              </div>
+            ))}
           </div>
-        </div>
-      )}
-    </form>
+        </Card>
+
+        <Card
+          title="Next Steps - Care Partner"
+          buttonText={<ICONS.plus size={16} />}
+          onButtonClick={() => {
+            // @ts-expect-error - TODO: fix this
+            appendNextStepCarePartner("");
+          }}
+          ariaLabel="Add Care Partner Step"
+          showButton={true}
+        >
+          <div className="mb-2 text-xs italic text-gray-500">
+            (All next steps are optional and will be completed at the request of
+            the care recipient.)
+          </div>
+          <div className="space-y-4 w-full">
+            {nextStepCarePartnerFields.map((field, index) => (
+              <div key={field.id} className="flex items-center gap-3 w-full">
+                <Input
+                  label={`Step ${index + 1}`}
+                  register={register(`nextStepCarePartner.${index}`)}
+                  error={errors.nextStepCarePartner?.[index]?.message}
+                  placeholder="Family caregiver training, schedule coordination, etc."
+                  mainClassname="w-full"
+                />
+                {nextStepCarePartnerFields.length > 1 && (
+                  <TertiaryButton
+                    type="button"
+                    onClick={() => removeNextStepCarePartner(index)}
+                    className="text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <ICONS.delete />
+                  </TertiaryButton>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {handleFilterPermission(
+          clientId as string,
+          APP_ACTIONS.EditAgensyForms
+        ) && (
+          <div className="bg-basicWhite/90 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-sm transition-all duration-300 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-end gap-4 p-6">
+              <PrimaryButton
+                type="submit"
+                isLoading={postComprehensiveCarePlanMutation.isPending}
+                disabled={postComprehensiveCarePlanMutation.isPending}
+                className="sm:!w-fit w-full md:text-base text-sm"
+              >
+                Save Comprehensive Care Plan
+              </PrimaryButton>
+            </div>
+          </div>
+        )}
+      </form>
+      <StickyScrollToTop />
+    </>
   );
 };

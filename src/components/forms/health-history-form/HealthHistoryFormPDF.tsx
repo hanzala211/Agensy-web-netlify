@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
   headerField: {
     flex: 1,
     marginRight: 10,
+    marginBottom: 5,
   },
   headerFieldLast: {
     flex: 1,
@@ -171,21 +172,6 @@ const Field = ({
   );
 };
 
-const HeaderField = ({
-  label,
-  children,
-}: {
-  label: string;
-  children?: React.ReactNode;
-}) => (
-  <View style={styles.headerField}>
-    <Text style={styles.headerLabel}>{label}</Text>
-    <View style={styles.headerInput}>
-      <Text>{children ?? " "}</Text>
-    </View>
-  </View>
-);
-
 const MedicationField = ({
   medications,
   label,
@@ -206,9 +192,13 @@ const MedicationField = ({
             m.prescribingDoctor ? `, ${m.prescribingDoctor}` : ""
           }`
       )
-      ?.join("; ") || "";
+      ?.join("\n") || "";
 
-  return <Field label={label}>{medicationText}</Field>;
+  return (
+    <Field label={label} isMultiLine>
+      {medicationText}
+    </Field>
+  );
 };
 
 const HealthHistoryFormPDF: React.FC<{
@@ -241,17 +231,21 @@ const HealthHistoryFormPDF: React.FC<{
 
         {/* Main Form Container */}
         <View style={styles.mainFormContainer}>
-          {/* Header Section - Name and Date of Birth */}
-          <View style={styles.headerSection}>
-            <HeaderField label="Name:">
-              {data?.firstName && data?.lastName
-                ? `${data.firstName} ${data.lastName}`
-                : data?.firstName || data?.lastName || ""}
-            </HeaderField>
-            <HeaderField label="Date of Birth:">
-              {data?.dateOfBirth || ""}
-            </HeaderField>
-          </View>
+          {/* Name Field */}
+          <Field label="Name:">
+            {(() => {
+              const firstName = data?.firstName || "";
+              const lastName = data?.lastName || "";
+              const fullName =
+                firstName && lastName
+                  ? `${firstName} ${lastName}`
+                  : firstName || lastName || "";
+              return fullName;
+            })()}
+          </Field>
+
+          {/* Date of Birth Field */}
+          <Field label="Date of Birth:">{data?.dateOfBirth || ""}</Field>
 
           {/* Date Field */}
           <Field label="Date">{data?.healthHistoryDate || ""}</Field>
@@ -292,7 +286,7 @@ const HealthHistoryFormPDF: React.FC<{
           </Field>
 
           {/* Specialty Provider */}
-          <Field label="Specialty Provider">
+          <Field label="Specialty Provider" isMultiLine>
             {(data?.providers ?? [])
               .filter(
                 (provider) =>
@@ -311,7 +305,7 @@ const HealthHistoryFormPDF: React.FC<{
                     provider.notes ? `, ${provider.notes}` : ""
                   }${provider.follow_up ? `, ${provider.follow_up}` : ""}`
               )
-              .join("; ") || ""}
+              .join("\n") || ""}
           </Field>
 
           {/* Medication Started */}

@@ -7,6 +7,7 @@ import {
   Input,
   PrimaryButton,
   TextArea,
+  StickyScrollToTop,
 } from "@agensy/components";
 import {
   importantPeopleInLifeFormSchema,
@@ -708,6 +709,7 @@ export const ImportantPeopleInLife = () => {
           </div>
         )}
       </form>
+      <StickyScrollToTop />
     </div>
   );
 };

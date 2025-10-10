@@ -7,6 +7,7 @@ import {
   CommonLoader,
   DatePickerField,
   PrimaryButton,
+  StickyScrollToTop,
 } from "@agensy/components";
 import { APP_ACTIONS, ROUTES } from "@agensy/constants";
 import { useAuthContext, useClientContext } from "@agensy/context";
@@ -485,6 +486,7 @@ export const EssentialDocumentForAging = () => {
           )}
         </form>
       )}
+      <StickyScrollToTop />
     </div>
   );
 };

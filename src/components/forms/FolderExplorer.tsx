@@ -715,7 +715,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
             <h3 className={`font-semibold text-gray-800 w-full`}>
               {isShowingFileContent ? (
                 <div className="flex items-center justify-between sm:flex-row flex-col w-full gap-3">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <div className="flex items-center gap-2 min-w-0 w-[230px] flex-1">
                     <ICONS.fileAlt className="text-gray-600 flex-shrink-0" />
                     <span className="truncate">{fileContent?.name}</span>
                   </div>
