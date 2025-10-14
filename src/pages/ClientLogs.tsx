@@ -62,7 +62,7 @@ export const ClientLogs: React.FC = () => {
       value: user.id as string,
     }));
     return [{ label: "All", value: "all" }, ...users];
-  }, [clientId]);
+  }, [clientId, queryClient]);
 
   useEffect(() => {
     const resp = auditLogsResponse as AuditLogsApiResponse | undefined;
@@ -104,6 +104,7 @@ export const ClientLogs: React.FC = () => {
         setSecondDateValue={setTo}
         firstDateLabel="From"
         secondDateLabel="To"
+        customFilterWidth="2xl:w-40"
       />
 
       <div className="space-y-4">

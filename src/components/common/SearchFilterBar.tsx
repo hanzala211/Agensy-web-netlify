@@ -33,6 +33,7 @@ interface SearchFilterBarProps {
   setSecondDateValue?: React.Dispatch<React.SetStateAction<string>>;
   firstDateLabel?: string;
   secondDateLabel?: string;
+  customFilterWidth?: string;
 }
 
 export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
@@ -62,6 +63,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
   setSecondDateValue,
   firstDateLabel = "From",
   secondDateLabel = "To",
+  customFilterWidth,
 }) => {
   return (
     <div className="mb-6">
@@ -73,7 +75,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
         } gap-3`}
       >
         {searchPlaceholder && searchValue !== undefined && setSearchValue && (
-          <div className="w-full xl:w-[55rem]">
+          <div className="w-full 2xl:w-[40rem]">
             <StatefulInput
               icon={ICONS.search}
               placeholder={searchPlaceholder}
@@ -95,7 +97,9 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
           {showExtraFilter && (
             <div
               className={`w-full ${
-                showDatePicker && searchPlaceholder
+                customFilterWidth
+                  ? customFilterWidth
+                  : showDatePicker && searchPlaceholder
                   ? "2xl:w-48"
                   : !searchPlaceholder
                   ? "w-full"
@@ -114,7 +118,9 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
 
           <div
             className={`w-full ${
-              showDatePicker && searchPlaceholder
+              customFilterWidth
+                ? customFilterWidth
+                : showDatePicker && searchPlaceholder
                 ? "2xl:w-48"
                 : !searchPlaceholder
                 ? "w-full"
@@ -132,7 +138,9 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
 
           <div
             className={`w-full ${
-              showDatePicker && searchPlaceholder
+              customFilterWidth
+                ? customFilterWidth
+                : showDatePicker && searchPlaceholder
                 ? "2xl:w-48"
                 : !searchPlaceholder
                 ? "w-full"
@@ -161,7 +169,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
         )}
         {showDatePicker && (
           <StatefulDatePicker
-            divClass={`${searchPlaceholder ? "" : "2xl:!w-[26.5rem]"}`}
+            divClass={`${searchPlaceholder ? "" : "2xl:!w-[22rem]"}`}
             value={firstDateValue as string}
             setValue={
               setFirstDateValue as React.Dispatch<React.SetStateAction<string>>
@@ -173,7 +181,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
         )}
         {showDatePicker && (
           <StatefulDatePicker
-            divClass={`${searchPlaceholder ? "" : "2xl:!w-[26.5rem]"}`}
+            divClass={`${searchPlaceholder ? "" : "2xl:!w-[22rem]"}`}
             value={secondDateValue as string}
             setValue={
               setSecondDateValue as React.Dispatch<React.SetStateAction<string>>
