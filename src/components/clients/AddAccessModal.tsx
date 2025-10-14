@@ -80,6 +80,14 @@ export const AddAccessModal: React.FC<AddAccessModalProps> = ({
       footer={
         <div className="flex gap-4 justify-end">
           <PrimaryButton
+            onClick={handleClose}
+            type="button"
+            className="w-fit bg-white !text-basicBlue border border-basicBlue hover:bg-blue-50"
+            isLoading={false}
+          >
+            Cancel
+          </PrimaryButton>
+          <PrimaryButton
             onClick={() => inputRef.current?.click()}
             type="button"
             className="w-fit"
@@ -87,14 +95,6 @@ export const AddAccessModal: React.FC<AddAccessModalProps> = ({
             disabled={isLoading}
           >
             Add User
-          </PrimaryButton>
-          <PrimaryButton
-            onClick={handleClose}
-            type="button"
-            className="w-fit bg-white !text-basicBlue border border-basicBlue hover:bg-blue-50"
-            isLoading={false}
-          >
-            Cancel
           </PrimaryButton>
         </div>
       }
