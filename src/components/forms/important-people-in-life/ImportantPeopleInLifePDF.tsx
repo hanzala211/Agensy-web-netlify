@@ -9,7 +9,7 @@ import {
 } from "@react-pdf/renderer";
 import type { ImportantPeopleInLifeFormData } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
-import logo from "@agensy/assets/logo.png";
+import logo from "@agensy/assets/logo.jpg";
 import { RELATIONSHIP_TO_CLIENT } from "@agensy/constants";
 
 const BORDER = "#1f3d7a";

@@ -29,9 +29,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
   return (
     <div
-      className={`flex flex-col md:flex-row justify-between items-start md:items-center ${className}`}
+      className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-3 ${className}`}
     >
-      <H1 className="text-xl md:my-4 sm:text-2xl md:text-3xl flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+      <H1 className="text-lg sm:text-xl md:text-2xl flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
         {showBackButton && (
           <button
             onClick={() =>
@@ -42,16 +42,16 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               )
             }
             title="Back"
-            className="bg-basicBlue h-[25px] w-[25px] sm:h-[30px] sm:w-[30px] flex-shrink-0 flex items-center justify-center text-[12px] sm:text-[15px] rounded-full"
+            className="h-[32px] w-[32px] flex-shrink-0 flex items-center justify-center rounded-full transition-all duration-300"
           >
-            <ICONS.fullLeftArrow color={COLORS.basicWhite} />
+            <ICONS.fullLeftArrow color={COLORS.primaryColor} size={18} />
           </button>
         )}
-        <span className="flex-1 leading-tight">{title}</span>
+        <h1 className="flex-1 leading-tight text-[24px]">{title}</h1>
       </H1>
       {showButton && (
         <PrimaryButton
-          className="mt-4 md:mt-0 md:w-auto"
+          className="mt-2 md:mt-0 md:w-auto !min-h-[40px] !text-[14px] !px-3 !py-0"
           onClick={onButtonClick}
           aria_label={buttonAriaLabel}
           disabled={disabled}

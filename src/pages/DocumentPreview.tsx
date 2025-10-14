@@ -152,17 +152,20 @@ export const DocumentPreview: React.FC = () => {
         <Card>
           <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
             <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 {params.clientId && (
                   <button
                     onClick={handleClickBack}
                     title="Back"
-                    className="bg-basicBlue h-[25px] w-[25px] sm:h-[30px] sm:w-[30px] flex-shrink-0 flex items-center justify-center text-[12px] sm:text-[15px] rounded-full"
+                    className="h-[32px] w-[32px] flex-shrink-0 flex items-center justify-center rounded-full transition-all duration-300"
                   >
-                    <ICONS.fullLeftArrow color={COLORS.basicWhite} />
+                    <ICONS.fullLeftArrow
+                      color={COLORS.primaryColor}
+                      size={18}
+                    />
                   </button>
                 )}
-                <H1 className="mb-1">{document?.title}</H1>
+                <H1>{document?.title}</H1>
               </div>
               <div className="text-gray-500 text-sm">
                 <span className="font-medium">Category:</span> {categoryName}

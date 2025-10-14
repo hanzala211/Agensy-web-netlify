@@ -1,6 +1,7 @@
 import React from "react";
 import type { IconType } from "react-icons";
 import { ICONS } from "@agensy/constants";
+import { Select as AntSelect } from "antd";
 
 interface SelectOption {
   label: string;
@@ -18,13 +19,13 @@ interface StatefulSelectProps {
   className?: string;
   value?: string;
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onSelectChange?: (value: string) => void;
   name?: string;
 }
 
 export const StatefulSelect: React.FC<StatefulSelectProps> = ({
   label,
   data,
-  aria_label = "select",
   labelOption,
   icon: Icon,
   iconSize,
@@ -32,8 +33,30 @@ export const StatefulSelect: React.FC<StatefulSelectProps> = ({
   className = "",
   value,
   onChange,
+  onSelectChange,
   name,
 }) => {
+  const options = [
+    ...(labelOption ? [{ label: labelOption, value: "" }] : []),
+    ...data.map((item) => ({
+      label: item.label,
+      value: item.value,
+    })),
+  ];
+
+  const handleChange = (newValue: string) => {
+    if (onSelectChange) {
+      onSelectChange(newValue);
+    }
+    if (onChange) {
+      // Create a synthetic event for backward compatibility
+      const syntheticEvent = {
+        target: { value: newValue, name: name || "" },
+      } as React.ChangeEvent<HTMLSelectElement>;
+      onChange(syntheticEvent);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex flex-col gap-2 relative w-full">
@@ -45,35 +68,23 @@ export const StatefulSelect: React.FC<StatefulSelectProps> = ({
             {label}
           </label>
         )}
-        <div className="relative">
-          <select
-            id={name || label}
-            name={name}
-            aria-label={aria_label}
-            value={value}
-            onChange={onChange}
-            className={`text-darkGray  bg-lightGray placeholder:text-darkGray font-normal p-2 border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200 appearance-none ${className} ${
-              Icon ? "pl-10" : "pr-8"
-            }`}
-          >
-            {labelOption && <option value="">{labelOption}</option>}
-            {data.map((item, index) => (
-              <option key={index} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-          {Icon && (
-            <Icon
-              className="absolute top-1/2 pointer-events-none -translate-y-1/2 left-3"
-              size={iconSize}
-              color={iconColor}
-            />
-          )}
-          {!Icon && (
-            <ICONS.downArrow className="absolute pointer-events-none top-1/2 -translate-y-1/2 right-3" />
-          )}
-        </div>
+        <AntSelect
+          value={value || undefined}
+          onChange={handleChange}
+          //   @ts-expect-error - AntD Select types
+          options={options}
+          placeholder={labelOption}
+          className={`${className} w-full`}
+          style={{ width: "100%" }}
+          size="large"
+          suffixIcon={
+            Icon ? (
+              <Icon size={iconSize || 16} color={iconColor || "#6B7280"} />
+            ) : (
+              <ICONS.downArrow size={16} />
+            )
+          }
+        />
       </div>
     </div>
   );

@@ -32,6 +32,7 @@ import {
 import { useAuthContext, useClientContext } from "@agensy/context";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnesthesiaSection } from "./AnesthesiaSection";
+import { SurgicalHistorySection } from "./SurgicalHistorySection";
 
 const defaultValues: HealthHistoryFormData = {
   firstName: "",
@@ -39,6 +40,11 @@ const defaultValues: HealthHistoryFormData = {
   diagnoses: [
     {
       diagnosis: "",
+    },
+  ],
+  surgicalHistory: [
+    {
+      surgicalHistory: "",
     },
   ],
   medicationsStarted: [
@@ -216,6 +222,11 @@ export const HealthHistoryForm: React.FC = () => {
     name: "anesthesia",
   });
 
+  const surgicalHistoryArray = useFieldArray({
+    control,
+    name: "surgicalHistory",
+  });
+
   const onSubmit = useCallback(
     (data: HealthHistoryFormData) => {
       const medicationsStarted = data.medicationsStarted?.map((item) => {
@@ -267,6 +278,10 @@ export const HealthHistoryForm: React.FC = () => {
           diagnoses: StringUtils.filterAndJoinWithCommas(
             data.diagnoses,
             (diagnoses) => diagnoses.diagnosis || ""
+          ),
+          surgical_history: StringUtils.filterAndJoinWithCommas(
+            data.surgicalHistory,
+            (surgicalHistory) => surgicalHistory.surgicalHistory || ""
           ),
         },
         medications: [
@@ -454,6 +469,15 @@ export const HealthHistoryForm: React.FC = () => {
                 ?.split(", ")
                 ?.map((anesthesia: string) => ({
                   anesthesia: anesthesia || "",
+                }))
+            : [],
+        surgicalHistory:
+          healthHistoryForm?.medical_info?.surgical_history &&
+          healthHistoryForm?.medical_info?.surgical_history.length > 0
+            ? healthHistoryForm?.medical_info?.surgical_history
+                ?.split(", ")
+                ?.map((surgicalHistory: string) => ({
+                  surgicalHistory: surgicalHistory || "",
                 }))
             : [],
       });
@@ -656,6 +680,13 @@ export const HealthHistoryForm: React.FC = () => {
           register={register}
           errors={errors}
           anesthesiaArray={anesthesiaArray}
+        />
+
+        <SurgicalHistorySection
+          register={register}
+          control={control}
+          errors={errors}
+          surgicalHistoryArray={surgicalHistoryArray}
         />
 
         {/* Healthcare Provider Section */}

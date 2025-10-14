@@ -9,7 +9,7 @@ import {
 } from "@react-pdf/renderer";
 import type { HealthHistoryFormData } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
-import logo from "@agensy/assets/logo.png";
+import logo from "@agensy/assets/logo.jpg";
 
 const BORDER = "#1f3d7a";
 const BORDER_LITE = "#c5d2f2";
@@ -46,14 +46,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 
-  // Main form container with border
   mainFormContainer: {
     borderWidth: 2,
     borderColor: BORDER,
     marginTop: 10,
   },
 
-  // Header section for name and DOB
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -81,12 +79,12 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
 
-  // Two-column layout for main form fields
   fieldRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: BORDER_LITE,
     minHeight: 30,
+    flexWrap: "nowrap",
   },
   label: {
     width: "35%",
@@ -106,7 +104,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // Multi-line fields
   multiLineField: {
     minHeight: 60,
   },
@@ -117,18 +114,16 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
 
-  // Large text areas
   largeTextArea: {
-    minHeight: 100,
+    minHeight: 150,
   },
   largeTextValue: {
     flex: 1,
     padding: 6,
     backgroundColor: "#ffffff",
-    minHeight: 90,
+    minHeight: 140,
   },
 
-  // Medication sections
   medicationSection: {
     borderBottomWidth: 1,
     borderBottomColor: BORDER_LITE,
@@ -165,9 +160,11 @@ const Field = ({
   ];
 
   return (
-    <View style={fieldStyle}>
+    <View style={fieldStyle} wrap={false}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <Text style={valueStyle}>{children ?? " "}</Text>
+      <View style={valueStyle}>
+        <Text>{children ?? " "}</Text>
+      </View>
     </View>
   );
 };
@@ -195,7 +192,7 @@ const MedicationField = ({
       ?.join("\n") || "";
 
   return (
-    <Field label={label} isMultiLine>
+    <Field label={label} isLargeTextArea>
       {medicationText}
     </Field>
   );
@@ -328,6 +325,14 @@ const HealthHistoryFormPDF: React.FC<{
             {(data?.anesthesia ?? [])
               .filter((a) => a?.anesthesia)
               .map((a) => a.anesthesia)
+              .join(", ") || ""}
+          </Field>
+
+          {/* Surgical History */}
+          <Field label="Surgical History" isMultiLine>
+            {(data?.surgicalHistory ?? [])
+              .filter((s) => s?.surgicalHistory)
+              .map((s) => s.surgicalHistory)
               .join(", ") || ""}
           </Field>
 

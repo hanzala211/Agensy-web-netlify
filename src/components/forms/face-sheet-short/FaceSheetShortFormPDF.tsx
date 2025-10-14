@@ -15,7 +15,7 @@ import {
   STATES,
 } from "@agensy/constants";
 import { DateUtils } from "@agensy/utils";
-import logo from "@agensy/assets/logo.png";
+import logo from "@agensy/assets/logo.jpg";
 
 const BORDER = "#1f3d7a";
 const BORDER_LITE = "#c5d2f2";
@@ -389,7 +389,7 @@ const FaceSheetShortFormPDF: React.FC<{
                     m.medicationName ?? "",
                     m.dosage ?? "",
                     m.purpose ?? "",
-                    m.prescriber ?? "",
+                    m.prescribingDoctor ?? "",
                     m.refillDue ?? "",
                     m.frequency ?? "",
                   ]}

@@ -445,7 +445,7 @@ export const faceSheetShortFormSchema = z.object({
         medicationName: z.string().optional(),
         dosage: z.string().optional(),
         purpose: z.string().optional(),
-        prescriber: z.string().optional(),
+        prescribingDoctor: z.string().optional(),
         refillDue: z.string().optional(),
         id: z.string().optional().nullable().nullish(),
         frequency: z.string().optional(),
@@ -604,7 +604,7 @@ export const faceSheetLongFormSchema = z
           purpose: z.string().optional(),
           id: z.string().optional().nullable().nullish(),
           frequency: z.string().optional(),
-          prescriber: z.string().optional(),
+          prescribingDoctor: z.string().optional(),
           refillDue: z.string().optional(),
         })
       )
@@ -718,6 +718,14 @@ export const healthHistoryFormSchema = z.object({
     .array(
       z.object({
         anesthesia: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  surgicalHistory: z
+    .array(
+      z.object({
+        surgicalHistory: z.string().optional(),
       })
     )
     .optional(),
@@ -2708,11 +2716,41 @@ export const vitalsTrackerFormSchema = z.object({
     .array(
       z.object({
         date: z.string().optional(),
-        heartRate: z.string().optional(),
-        oxygen: z.string().optional(),
-        bloodPressure: z.string().optional(),
-        temperature: z.string().optional(),
-        weight: z.string().optional(),
+        heartRate: z
+          .string()
+          .optional()
+          .refine(
+            (val) => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 999.9),
+            "Heart rate must be between 0 and 999.9"
+          ),
+        oxygen: z
+          .string()
+          .optional()
+          .refine(
+            (val) => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100),
+            "Oxygen must be between 0 and 100%"
+          ),
+        bloodPressure: z
+          .string()
+          .optional()
+          .refine(
+            (val) => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 999.9),
+            "Blood pressure must be between 0 and 999.9"
+          ),
+        temperature: z
+          .string()
+          .optional()
+          .refine(
+            (val) => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 999.9),
+            "Temperature must be between 0 and 999.9"
+          ),
+        weight: z
+          .string()
+          .optional()
+          .refine(
+            (val) => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 999.9),
+            "Weight must be between 0 and 999.9"
+          ),
         other: z.string().optional(),
         id: z.string().optional().nullable().nullish(),
       })

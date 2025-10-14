@@ -8,7 +8,7 @@ export const AuthLayout: React.FC = () => {
 
   if (userData) return <Navigate to={`/`} />;
 
-  return (  
+  return (
     <React.Fragment>
       <div className="min-h-screen w-full flex flex-col md:flex-row">
         <div className="hidden md:flex md:w-1/2 bg-primaryColor items-center justify-center p-8">
@@ -16,7 +16,7 @@ export const AuthLayout: React.FC = () => {
             <img
               src={IMAGES.logo}
               alt="Logo"
-              className="w-24 h-24 mx-auto mb-6"
+              className="w-48 h-20 mx-auto mb-6"
             />
             <h1 className="text-3xl font-bold text-white mb-4">
               Welcome to Agensy

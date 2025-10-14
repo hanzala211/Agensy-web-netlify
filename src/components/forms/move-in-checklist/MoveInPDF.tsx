@@ -11,7 +11,7 @@ import {
 } from "@react-pdf/renderer";
 import type { ChecklistField } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
-import logo from "@agensy/assets/logo.png";
+import logo from "@agensy/assets/logo.jpg";
 import { moveInSchema } from "@agensy/config";
 
 const BORDER = "#1f3d7a";
@@ -217,11 +217,11 @@ interface ChecklistFormData {
 }
 
 interface MoveInPDFProps {
-  data?: ChecklistFormData & { 
+  data?: ChecklistFormData & {
     firstName?: string;
     lastName?: string;
     dateOfBirth?: string;
-    last_update: { updatedAt: string } 
+    last_update: { updatedAt: string };
   };
   schema?: ChecklistField[];
 }
@@ -530,7 +530,9 @@ export const MoveInPDF: React.FC<MoveInPDFProps> = ({
               )}
               {data?.dateOfBirth && (
                 <Text style={{ marginTop: 4 }}>
-                  {`Date of Birth: ${DateUtils.formatDateToRequiredFormat(data.dateOfBirth)}`}
+                  {`Date of Birth: ${DateUtils.formatDateToRequiredFormat(
+                    data.dateOfBirth
+                  )}`}
                 </Text>
               )}
             </View>

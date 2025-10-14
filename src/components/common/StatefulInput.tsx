@@ -14,6 +14,7 @@ interface StatefulInputProps {
   value?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
+  min?: string;
 }
 
 export const StatefulInput: React.FC<StatefulInputProps> = ({
@@ -28,6 +29,7 @@ export const StatefulInput: React.FC<StatefulInputProps> = ({
   value,
   onChange,
   error,
+  min,
 }) => {
   return (
     <div className="space-y-2">
@@ -44,6 +46,7 @@ export const StatefulInput: React.FC<StatefulInputProps> = ({
                   border-[1px] border-mediumGray !font-normal placeholder:!text-darkGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition  -all duration-200 ${inputClassname} ${
             Icon ? "pl-10" : ""
           }`}
+          min={min}
         />
         {Icon && (
           <Icon

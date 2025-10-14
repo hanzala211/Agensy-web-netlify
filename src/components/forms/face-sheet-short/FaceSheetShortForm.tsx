@@ -310,7 +310,7 @@ export const FaceSheetShortForm: React.FC = () => {
               medicationName: medication.medication_name || "",
               dosage: medication.dosage || "",
               purpose: medication.purpose || "",
-              prescriber: medication.prescribing_doctor || "",
+              prescribingDoctor: medication.prescribing_doctor || "",
               refillDue: medication?.refill_due
                 ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
                 : "",
@@ -380,7 +380,9 @@ export const FaceSheetShortForm: React.FC = () => {
           purpose: item.purpose ? item.purpose : null,
           medication_name: item.medicationName ? item.medicationName : null,
           dosage: item.dosage ? item.dosage : null,
-          prescribing_doctor: item.prescriber ? item.prescriber : null,
+          prescribing_doctor: item.prescribingDoctor
+            ? item.prescribingDoctor
+            : null,
           id: item?.id,
           frequency: item.frequency ? item.frequency : null,
         };

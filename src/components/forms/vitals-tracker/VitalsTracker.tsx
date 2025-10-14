@@ -141,7 +141,9 @@ export const VitalsTracker = () => {
           id: vital.id ? String(vital.id) : null,
           date: vital.date ? DateUtils.changetoISO(vital.date) : null,
           heart_rate: vital.heartRate ? vital.heartRate : null,
-          blood_pressure: vital.bloodPressure ? vital.bloodPressure : null,
+          blood_pressure: vital.bloodPressure
+            ? String(vital.bloodPressure)
+            : null,
           temperature: vital.temperature ? vital.temperature : null,
           weight: vital.weight ? vital.weight : null,
           oxygen_saturation: vital.oxygen ? vital.oxygen : null,
@@ -307,7 +309,7 @@ export const VitalsTracker = () => {
     {
       key: "bloodPressure",
       label: "Blood Pressure",
-      type: "text",
+      type: "number",
       placeholder: "mmHg",
     },
     {

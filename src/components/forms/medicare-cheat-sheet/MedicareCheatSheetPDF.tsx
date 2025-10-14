@@ -11,7 +11,7 @@ import {
 } from "@react-pdf/renderer";
 import type { ChecklistField } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
-import logo from "@agensy/assets/logo.png";
+import logo from "@agensy/assets/logo.jpg";
 import { medicareCheatSheetSchema } from "@agensy/config";
 
 const BORDER = "#1f3d7a";
@@ -293,11 +293,7 @@ const GroupField: React.FC<{
         </View>
       </View>
       {childFields.map((childField) => (
-        <FieldRenderer
-          key={childField.id}
-          field={childField}
-          schema={schema}
-        />
+        <FieldRenderer key={childField.id} field={childField} schema={schema} />
       ))}
     </View>
   );
@@ -331,10 +327,10 @@ const LinkField: React.FC<{
     if (match.index > lastIndex) {
       segments.push({ text: field.label.slice(lastIndex, match.index) });
     }
-    
+
     // Add the URL segment
     segments.push({ text: match[1], url: match[1] });
-    
+
     lastIndex = match.index + match[1].length;
   }
 
@@ -371,11 +367,7 @@ const FieldRenderer: React.FC<{
 
   if (field.type === "group") {
     return (
-      <GroupField
-        field={field}
-        schema={schema}
-        nestingLevel={nestingLevel}
-      />
+      <GroupField field={field} schema={schema} nestingLevel={nestingLevel} />
     );
   }
 
@@ -401,7 +393,8 @@ const MedicareComparisonTable: React.FC = () => {
       hmo: "Included",
     },
     {
-      feature: "Referrals (PCP has to send a referral to a specialist for you to be able to schedule an app!)",
+      feature:
+        "Referrals (PCP has to send a referral to a specialist for you to be able to schedule an app!)",
       traditional: "No referrals needed",
       ppo: "No referrals needed",
       hmo: "Referrals needed",
@@ -419,7 +412,8 @@ const MedicareComparisonTable: React.FC = () => {
       hmo: "Restrictions apply",
     },
     {
-      feature: "Service Area (can I use it out of state if I'm traveling or visiting relatives?)",
+      feature:
+        "Service Area (can I use it out of state if I'm traveling or visiting relatives?)",
       traditional: "Nationwide",
       ppo: "May be restricted to particular service areas",
       hmo: "May be restricted to particular service areas",
@@ -453,7 +447,10 @@ const MedicareComparisonTable: React.FC = () => {
           </View>
         </View>
         {tableData.map((row, index) => (
-          <View key={index} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+          <View
+            key={index}
+            style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}
+          >
             <View style={{ flexDirection: "row" }}>
               <Text style={[styles.tableCellFirst, { flex: 2 }]}>
                 {row.feature}
@@ -461,12 +458,8 @@ const MedicareComparisonTable: React.FC = () => {
               <Text style={[styles.tableCell, { flex: 2 }]}>
                 {row.traditional}
               </Text>
-              <Text style={[styles.tableCell, { flex: 2 }]}>
-                {row.ppo}
-              </Text>
-              <Text style={[styles.tableCellLast, { flex: 2 }]}>
-                {row.hmo}
-              </Text>
+              <Text style={[styles.tableCell, { flex: 2 }]}>{row.ppo}</Text>
+              <Text style={[styles.tableCellLast, { flex: 2 }]}>{row.hmo}</Text>
             </View>
           </View>
         ))}
@@ -475,9 +468,10 @@ const MedicareComparisonTable: React.FC = () => {
   );
 };
 
-export const MedicareCheatSheetPDF: React.FC<
-  MedicareCheatSheetPDFProps
-> = ({ data, schema = medicareCheatSheetSchema }) => {
+export const MedicareCheatSheetPDF: React.FC<MedicareCheatSheetPDFProps> = ({
+  data,
+  schema = medicareCheatSheetSchema,
+}) => {
   const headings = schema.filter((field) => field.type === "heading");
 
   return (
@@ -510,11 +504,7 @@ export const MedicareCheatSheetPDF: React.FC<
             <View key={heading.id} style={styles.section}>
               <Text style={styles.sectionTitle}>{heading.label}</Text>
               {rootFields.map((field) => (
-                <FieldRenderer
-                  key={field.id}
-                  field={field}
-                  schema={schema}
-                />
+                <FieldRenderer key={field.id} field={field} schema={schema} />
               ))}
             </View>
           );

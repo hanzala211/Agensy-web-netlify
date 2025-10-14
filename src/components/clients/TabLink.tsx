@@ -26,12 +26,12 @@ export const TabLink: React.FC<TabLinkProps> = ({
         className={({ isActive: linkIsActive }) => {
           const isActiveLink = end ? isRootPath : linkIsActive;
           return `
-            py-2 px-3 md:py-3 md:px-5 font-medium text-xs lg:text-sm transition-colors duration-200
+            py-3 px-4 md:py-3.5 md:px-5 font-medium text-sm transition-all duration-300
             relative flex items-center justify-center flex-1 text-center
             ${
               isActiveLink
-                ? "text-primary font-semibold"
-                : "text-gray-600 hover:text-primary"
+                ? "text-primaryColor font-semibold"
+                : "text-gray-600 hover:text-primaryColor"
             }
             ${className}
           `;
@@ -43,8 +43,10 @@ export const TabLink: React.FC<TabLinkProps> = ({
             <React.Fragment>
               {children}
               <div
-                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-primaryColor transition-[width] duration-300 ease-out ${
-                  isActiveLink ? "w-full" : "w-0"
+                className={`absolute bottom-0 left-0 right-0 h-[3px] bg-primaryColor transition-all duration-300 ease-out ${
+                  isActiveLink
+                    ? "opacity-100 scale-x-100"
+                    : "opacity-0 scale-x-0"
                 }`}
               />
             </React.Fragment>

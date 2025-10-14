@@ -9,7 +9,7 @@ import {
 } from "@react-pdf/renderer";
 import type { ComprehensiveCarePlanFormData } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
-import logo from "@agensy/assets/logo.png";
+import logo from "@agensy/assets/logo.jpg";
 
 const BORDER = "#1f3d7a";
 const BORDER_LITE = "#c5d2f2";

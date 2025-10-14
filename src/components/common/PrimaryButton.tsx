@@ -35,11 +35,13 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       form={form}
       type={type}
       title={aria_label}
-      className={`${className} text-basicWhite ${
-        isLoading || disabled
-          ? "bg-basicBlue"
-          : "bg-primaryColor hover:text-blue-500 border border-blue-200 hover:bg-blue-50 hover:border-blue-300"
-      } px-4 py-3 min-h-[48px] w-full text-[18px] font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryColor touch-manipulation`}
+      className={`${className} inline-flex items-center justify-center gap-2.5 px-6 py-3 min-h-[48px] w-full text-[16px] font-semibold rounded-lg transition-all duration-300 ease-in-out focus:outline-none touch-manipulation ${
+        isLoading
+          ? "bg-primaryColor text-white cursor-wait opacity-70 shadow-[0_0_12px_rgba(0,0,0,0.1)]"
+          : disabled
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-60 shadow-[0_0_10px_rgba(0,0,0,0.08)]"
+          : "bg-primaryColor text-white shadow-[0_0_12px_rgba(0,0,0,0.1)] hover:shadow-[0_0_18px_rgba(0,0,0,0.15)] hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+      }`}
     >
       {!isLoading ? children : <CommonLoader color={loaderColor} />}
     </button>

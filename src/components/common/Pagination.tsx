@@ -13,12 +13,12 @@ export const Pagination: React.FC<PaginationProps> = ({
   onNextPage,
 }) => {
   return (
-    <div className="flex items-center justify-between border-t border-mediumGray pt-4">
+    <div className="flex items-center justify-between border-t border-gray-100 pt-5">
       <button
-        className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
           currentPage > 1
-            ? "text-primaryColor hover:bg-lightGray"
-            : "text-slateGrey cursor-not-allowed"
+            ? "text-primaryColor hover:bg-gray-100 hover:shadow-[0_0_8px_rgba(0,0,0,0.06)]"
+            : "text-gray-400 cursor-not-allowed opacity-60"
         }`}
         onClick={onPrevPage}
         disabled={currentPage <= 1}
@@ -27,15 +27,18 @@ export const Pagination: React.FC<PaginationProps> = ({
         <span>Previous</span>
       </button>
 
-      <span className="text-sm text-darkGray">
-        Page {currentPage} of {totalPages}
-      </span>
+      <div className="px-4 py-2 bg-gray-50 rounded-lg">
+        <span className="text-sm font-medium text-gray-700">
+          Page <span className="text-primaryColor">{currentPage}</span> of{" "}
+          {totalPages}
+        </span>
+      </div>
 
       <button
-        className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ${
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
           currentPage < totalPages
-            ? "text-primaryColor hover:bg-lightGray"
-            : "text-slateGrey cursor-not-allowed"
+            ? "text-primaryColor hover:bg-gray-100 hover:shadow-[0_0_8px_rgba(0,0,0,0.06)]"
+            : "text-gray-400 cursor-not-allowed opacity-60"
         }`}
         onClick={onNextPage}
         disabled={currentPage >= totalPages}

@@ -402,7 +402,7 @@ export const FaceSheetLongForm: React.FC = () => {
               medicationName: medication.medication_name || "",
               dosage: medication.dosage || "",
               purpose: medication.purpose || "",
-              prescriber: medication.prescribing_doctor || "",
+              prescribingDoctor: medication.prescribing_doctor || "",
               refillDue: medication.refill_due
                 ? DateUtils.formatDateToRequiredFormat(medication.refill_due)
                 : "",
@@ -585,7 +585,9 @@ export const FaceSheetLongForm: React.FC = () => {
           dosage: item.dosage ? item.dosage : null,
           id: item?.id,
           frequency: item.frequency ? item.frequency : null,
-          prescribing_doctor: item.prescriber ? item.prescriber : null,
+          prescribing_doctor: item.prescribingDoctor
+            ? item.prescribingDoctor
+            : null,
           refill_due: item.refillDue
             ? DateUtils.changetoISO(item.refillDue)
             : null,
@@ -606,7 +608,9 @@ export const FaceSheetLongForm: React.FC = () => {
               ? item.specialty_custom && item.specialty_custom.trim() !== ""
                 ? item.specialty_custom
                 : null
-              : item.specialty,
+              : item.specialty
+              ? item.specialty
+              : null,
           address: item.address ? item.address : null,
           phone: item.phone ? item.phone : null,
           last_visit: item.lastVisit

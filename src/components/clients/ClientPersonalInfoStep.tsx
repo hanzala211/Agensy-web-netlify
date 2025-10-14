@@ -33,7 +33,7 @@ export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
       {showLabel && (
         <h3 className="text-lg font-medium">Personal Information</h3>
       )}
-      <div className="bg-gray-50 p-5 rounded-lg shadow-sm">
+      <div className="p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <Input
             label="First Name"
@@ -72,14 +72,15 @@ export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
             data={MARITAL_STATUS_OPTIONS}
             labelOption="Select status"
           />
-
-          <Select
-            control={control}
-            name="livingSituation"
-            label="Living Situation"
-            data={LIVING_SITUATION_OPTIONS}
-            labelOption="Select living situation"
-          />
+          <div className={`${!hasAdminRole ? "md:col-span-2" : ""}`}>
+            <Select
+              control={control}
+              name="livingSituation"
+              label="Living Situation"
+              data={LIVING_SITUATION_OPTIONS}
+              labelOption="Select living situation"
+            />
+          </div>
           {hasAdminRole && (
             <Select
               control={control}
@@ -127,6 +128,7 @@ export const ClientPersonalInfoStep: React.FC<ClientPersonalInfoStepProps> = ({
             label="ZIP Code"
             register={register("zipCode")}
             error={errors.zipCode?.message}
+            mainClassname="md:col-span-2"
           />
         </div>
       </div>

@@ -17,7 +17,7 @@ export const BorderedCard: React.FC<BorderedCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`${className} p-5 bg-gradient-to-r from-white to-gray-50 border-l-4 border-blue-500 border-t border-r border-b rounded-lg shadow-sm hover:shadow-sm transition-all duration-300`}
+      className={`${className} p-5 bg-white rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.15)] transition-all duration-300`}
       style={style}
     >
       {children}

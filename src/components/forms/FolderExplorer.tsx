@@ -647,7 +647,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
       console.error("Error creating PDF document:", error);
       return null;
     }
-  }, [params.formSlug, openedFileData]);
+  }, [params.formSlug, openedFileData, queryClient, selectedClient?.id]);
 
   const showOCRButton = useMemo(() => {
     return (
@@ -665,12 +665,12 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
       <div
         key={item.id}
         className={`
-          flex flex-col items-center p-4 sm:p-6 rounded-xl cursor-pointer transition-all duration-200
-          hover:bg-blue-50 hover:shadow-md border-2 border-transparent
+          flex flex-col items-center p-4 sm:p-6 rounded-xl cursor-pointer transition-all duration-300
+          bg-white shadow-[0_0_10px_rgba(0,0,0,0.08)] hover:shadow-[0_0_15px_rgba(0,0,0,0.12)]
           ${
             isSelected
-              ? "bg-blue-50 border-blue-200 shadow-md"
-              : "hover:border-blue-100"
+              ? "ring-2 ring-blue-400 shadow-[0_0_15px_rgba(66,133,244,0.2)]"
+              : "hover:ring-1 hover:ring-gray-200"
           }
         `}
         onClick={() => handleItemClick(item)}
@@ -683,11 +683,11 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
             } drop-shadow-sm sm:w-16 sm:h-16 w-12 h-12`}
           />
         </div>
-        <span className="text-xs sm:text-sm font-medium text-gray-800 text-center leading-tight">
+        <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center leading-tight">
           {item.name}
         </span>
         {item.children && item.children.length > 0 && (
-          <span className="text-xs text-gray-500 mt-1">
+          <span className="text-xs text-gray-600 mt-1 font-medium">
             {item.children.length} items
           </span>
         )}
@@ -696,8 +696,8 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   };
 
   return (
-    <div className="!p-0 overflow-hidden border-2 border-gray-200 rounded-lg w-full">
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b">
+    <div className="!p-0 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.15)] transition-all duration-300 w-full">
+      <div className="bg-white px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
         <div className="flex items-center justify-between sm:flex-row flex-col gap-3">
           <div
             className={`flex items-center sm:gap-3 ${
@@ -707,7 +707,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
             {showBackButton && (
               <button
                 onClick={handleBackButtonClick}
-                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 focus:outline-none"
               >
                 <ICONS.leftArrow size={18} className="text-gray-600" />
               </button>
@@ -821,11 +821,11 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
           )}
           {!isShowingFileContent && currentPath.length === 0 && showLabel && (
             <div className="text-sm text-gray-700">
-              <span className="hidden sm:inline font-[600]">
+              <span className="hidden sm:inline font-semibold">
                 Start with{" "}
                 <button
                   onClick={handleCareRecipientQuestionnaireClick}
-                  className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                  className="text-blue-600 hover:text-blue-700 underline cursor-pointer transition-all duration-300"
                 >
                   Care Recipient Questionnaire
                 </button>{" "}
@@ -835,7 +835,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                 Start with{" "}
                 <button
                   onClick={handleCareRecipientQuestionnaireClick}
-                  className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                  className="text-blue-600 hover:text-blue-700 underline cursor-pointer transition-all duration-300"
                 >
                   Care Recipient Questionnaire
                 </button>
@@ -845,18 +845,18 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
         </div>
         {!isShowingFileContent && currentPath.length > 0 && (
           <div className="mt-2 flex items-center justify-between sm:flex-row flex-col sm:gap-0 gap-4">
-            <div className="text-xs text-gray-400 flex flex-wrap items-center gap-1 min-w-0">
+            <div className="text-xs text-gray-500 flex flex-wrap items-center gap-1 min-w-0">
               <span
-                className="hover:text-blue-600 cursor-pointer transition-colors whitespace-nowrap"
+                className="hover:text-blue-600 cursor-pointer transition-all duration-300 whitespace-nowrap font-medium"
                 onClick={() => onPathClick?.(-1)}
               >
                 Agensy Forms
               </span>
               {currentPath.map((pathSegment, index) => (
                 <React.Fragment key={index}>
-                  <span className="text-gray-300 flex-shrink-0">{">"}</span>
+                  <span className="text-gray-400 flex-shrink-0">{">"}</span>
                   <span
-                    className="hover:text-blue-600 cursor-pointer transition-colors break-words max-w-[120px] sm:max-w-[150px] truncate"
+                    className="hover:text-blue-600 cursor-pointer transition-all duration-300 break-words max-w-[120px] sm:max-w-[150px] truncate font-medium"
                     onClick={() => onPathClick?.(index)}
                     title={pathSegment}
                   >
@@ -895,9 +895,9 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               ) && (
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                   {isCreatingMedicalTemplate ? (
-                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 shadow-[0_0_8px_rgba(0,0,0,0.08)]">
                       <CommonLoader size={16} />
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-600 font-medium">
                         Creating Template...
                       </span>
                     </div>
@@ -928,10 +928,10 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                 size={40}
                 className="text-gray-300 mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12 w-10 h-10"
               />
-              <p className="text-gray-500 font-medium text-sm sm:text-base">
+              <p className="text-gray-600 font-semibold text-sm sm:text-base">
                 This folder is empty
               </p>
-              <p className="text-xs sm:text-sm text-gray-400 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 No items to display
               </p>
             </div>

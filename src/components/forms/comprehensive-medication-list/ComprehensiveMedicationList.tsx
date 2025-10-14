@@ -8,8 +8,13 @@ import {
   DatePickerField,
   CommonLoader,
   StickyScrollToTop,
+  Select,
 } from "@agensy/components";
-import { APP_ACTIONS, ICONS } from "@agensy/constants";
+import {
+  APP_ACTIONS,
+  ICONS,
+  MEDICATION_FREQUENCY_OPTIONS,
+} from "@agensy/constants";
 import {
   comprehensiveMedicationListSchema,
   type ClientMedications,
@@ -446,15 +451,12 @@ export const ComprehensiveMedicationList = () => {
                           errors.medications?.[originalIndex]?.dosage?.message
                         }
                       />
-                      <Input
+                      <Select
+                        data={MEDICATION_FREQUENCY_OPTIONS}
                         label="Frequency"
-                        register={register(
-                          `medications.${originalIndex}.frequency`
-                        )}
-                        error={
-                          errors.medications?.[originalIndex]?.frequency
-                            ?.message
-                        }
+                        control={control}
+                        name={`medications.${originalIndex}.frequency`}
+                        labelOption="Select Frequency"
                       />
                       <Input
                         label="Used to Treat"

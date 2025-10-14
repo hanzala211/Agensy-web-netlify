@@ -163,8 +163,8 @@ export const ClientCard: React.FC<ClientCardProps> = ({
               className={`text-primaryColor ${
                 !isPrimaryUserSubscribed
                   ? "opacity-50 cursor-not-allowed"
-                  : "hover:text-basicBlue"
-              } transition-colors duration-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryColor py-1 px-2 rounded-md mr-2`}
+                  : "hover:text-basicBlue hover:ring-primaryColor hover:ring-2"
+              } transition-all duration-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryColor py-1 px-2 rounded-md mr-2`}
               onClick={onViewProfile}
               aria-label={`View ${
                 showStatus ? "profile" : "appointments"
@@ -196,10 +196,10 @@ export const ClientCard: React.FC<ClientCardProps> = ({
                     !isPrimaryUserSubscribed
                       ? "opacity-50 cursor-not-allowed"
                       : "opacity-100 cursor-pointer"
-                  } font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-colors duration-200 ${
+                  } font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-all duration-200 ${
                     client.active
-                      ? "text-basicRed hover:text-darkRed focus:ring-basicRed"
-                      : "text-darkGreen hover:text-darkGreen focus:ring-darkGreen"
+                      ? "text-basicRed hover:text-darkRed focus:ring-basicRed hover:ring-basicRed hover:ring-2"
+                      : "text-darkGreen hover:text-darkGreen focus:ring-darkGreen hover:ring-darkGreen hover:ring-2"
                   }`}
                   onClick={() => {
                     if (!client.active) {
@@ -234,7 +234,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
                   deleteClientMutation.isPending || !isPrimaryUserSubscribed
                 }
                 onClick={() => setIsDeleteModalOpen(true)}
-                className={`text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-colors duration-200 text-basicRed hover:text-darkRed focus:ring-basicRed ${
+                className={`text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 py-1 px-2 rounded-md transition-all duration-200 text-basicRed hover:text-darkRed focus:ring-basicRed hover:ring-basicRed hover:ring-2 ${
                   deleteClientMutation.isPending || !isPrimaryUserSubscribed
                     ? "opacity-50 cursor-not-allowed"
                     : ""

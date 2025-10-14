@@ -267,7 +267,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
             ? {
                 follow_up: medicalAppointmentTemplate
                   .healthcare_provider_template.healthcare_provider_follow_up
-                  ? DateUtils.formatDateToRequiredFormat(
+                  ? DateUtils.formatDateTime(
                       medicalAppointmentTemplate.healthcare_provider_template
                         .healthcare_provider_follow_up
                     )
@@ -362,7 +362,9 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         referrals:
           medicalAppointmentTemplate?.medical_template?.referrals || "",
         follow_up: medicalAppointmentTemplate?.medical_template?.follow_up
-          ? medicalAppointmentTemplate?.medical_template.follow_up
+          ? DateUtils.formatDateToRequiredFormat(
+              medicalAppointmentTemplate?.medical_template.follow_up
+            )
           : "",
         report_given_to:
           medicalAppointmentTemplate?.medical_template?.report_given_to || "",
@@ -491,7 +493,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
               ? data.healthcareProvider.notes
               : null,
             healthcare_provider_follow_up: data.healthcareProvider.follow_up
-              ? data.healthcareProvider.follow_up
+              ? DateUtils.changetoISO(data.healthcareProvider.follow_up)
               : null,
             healthcare_provider_specialty:
               data.healthcareProvider.specialty === "Other"
@@ -835,6 +837,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
                     label="Follow-up"
                     name="healthcareProvider.follow_up"
                     control={control}
+                    showTime={true}
                   />
                   <div className="md:col-span-2">
                     <TextArea

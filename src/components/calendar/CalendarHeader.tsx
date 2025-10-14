@@ -1,5 +1,5 @@
 import React from "react";
-import { TertiaryButton, AntdBadge, StatefulSelect } from "@agensy/components";
+import { AntdBadge, StatefulSelect } from "@agensy/components";
 import { APPOINTMENT_TYPE_FILTERS, ICONS } from "@agensy/constants";
 import { CalendarUtils } from "@agensy/utils";
 import type { Client, ViewMode } from "@agensy/types";
@@ -31,32 +31,42 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   const { clients } = useAuthContext();
 
   return (
-    <div className="flex items-center 2xl:justify-between 2xl:flex-row flex-col gap-4 xl:gap-0 mb-4">
-      <div className="flex items-baseline gap-4 w-full justify-between 2xl:justify-start 2xl:w-fit">
-        <h2 className="text-xl font-semibold">
+    <div className="flex items-center 2xl:justify-between 2xl:flex-row flex-col gap-4 mb-6">
+      <div className="flex items-center gap-4 w-full justify-between 2xl:justify-start 2xl:w-fit">
+        <h2 className="text-[18px] font-semibold text-gray-800">
           {CalendarUtils.getHeaderDate(currentDate, viewMode)}
         </h2>
-        <div className="flex gap-2">
-          <TertiaryButton
+        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+          <button
             onClick={() => onViewModeChange("month")}
-            className={`px-3 py-1 ${viewMode === "month" ? "bg-gray-100" : ""}`}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 ${
+              viewMode === "month"
+                ? "bg-white text-primaryColor shadow-[0_0_8px_rgba(0,0,0,0.08)]"
+                : "text-gray-600 hover:text-primaryColor"
+            }`}
           >
             Month
-          </TertiaryButton>
-          <TertiaryButton
+          </button>
+          <button
             onClick={() => onViewModeChange("week")}
-            className={`px-3 py-1 md:block hidden ${
-              viewMode === "week" ? "bg-gray-100" : ""
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 md:block hidden ${
+              viewMode === "week"
+                ? "bg-white text-primaryColor shadow-[0_0_8px_rgba(0,0,0,0.08)]"
+                : "text-gray-600 hover:text-primaryColor"
             }`}
           >
             Week
-          </TertiaryButton>
-          <TertiaryButton
+          </button>
+          <button
             onClick={() => onViewModeChange("day")}
-            className={`px-3 py-1 ${viewMode === "day" ? "bg-gray-100" : ""}`}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 ${
+              viewMode === "day"
+                ? "bg-white text-primaryColor shadow-[0_0_8px_rgba(0,0,0,0.08)]"
+                : "text-gray-600 hover:text-primaryColor"
+            }`}
           >
             Day
-          </TertiaryButton>
+          </button>
         </div>
       </div>
       <div className="flex 2xl:flex-row w-full 2xl:w-fit flex-col gap-2">
@@ -73,7 +83,6 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                 value: client.id as string,
               })) || []),
             ]}
-            className="!p-2 !h-10 !w-full"
           />
         </div>
         <div className="w-full 2xl:w-48">
@@ -83,13 +92,12 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
             data={APPOINTMENT_TYPE_FILTERS}
-            className="!p-2 !h-10"
           />
         </div>
       </div>
-      <div className="flex items-center 2xl:flex-row w-full 2xl:w-fit mt-4 2xl:mt-0 flex-col md:gap-6">
-        <div className="flex gap-2 w-full 2xl:w-fit">
-          <div className="sm:grid w-full 2xl:grid-cols-2 grid-cols-4 place-items-center  2xl:place-items-start gap-3 hidden">
+      <div className="flex items-center 2xl:flex-row w-full 2xl:w-fit mt-4 2xl:mt-0 flex-col gap-4">
+        <div className="flex gap-3 w-full 2xl:w-fit">
+          <div className="sm:grid w-full 2xl:grid-cols-2 grid-cols-4 place-items-center 2xl:place-items-start gap-3 hidden">
             <AntdBadge status="default" size="large" text="Past Appointment" />
             <AntdBadge status="error" size="large" text="Cancelled" />
             <AntdBadge
@@ -101,18 +109,18 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           </div>
         </div>
         <div className="flex gap-2 2xl:justify-normal justify-between 2xl:w-fit w-full">
-          <TertiaryButton
+          <button
             onClick={onPrevious}
-            className="flex items-center justify-center w-12 h-12 p-0"
+            className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:text-primaryColor hover:bg-gray-100 transition-all duration-300 focus:outline-none"
           >
-            <ICONS.leftArrow size={17} />
-          </TertiaryButton>
-          <TertiaryButton
+            <ICONS.leftArrow size={20} />
+          </button>
+          <button
             onClick={onNext}
-            className="flex items-center justify-center w-12 h-12 p-0"
+            className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:text-primaryColor hover:bg-gray-100 transition-all duration-300 focus:outline-none"
           >
-            <ICONS.rightArrow size={17} />
-          </TertiaryButton>
+            <ICONS.rightArrow size={20} />
+          </button>
         </div>
       </div>
     </div>

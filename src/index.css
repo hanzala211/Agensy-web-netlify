@@ -2,248 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ——— Open Sans ——— */
-@font-face {
-  font-family: "OpenSans";
-  font-style: normal;
-  font-weight: 300;
-  src: url("/assets/fonts/OpenSans-Light.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: italic;
-  font-weight: 300;
-  src: url("/assets/fonts/OpenSans-LightItalic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: normal;
-  font-weight: 400;
-  src: url("/assets/fonts/OpenSans-Regular.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: italic;
-  font-weight: 400;
-  src: url("/assets/fonts/OpenSans-Italic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: normal;
-  font-weight: 500;
-  src: url("/assets/fonts/OpenSans-Medium.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: italic;
-  font-weight: 500;
-  src: url("/assets/fonts/OpenSans-MediumItalic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: normal;
-  font-weight: 600;
-  src: url("/assets/fonts/OpenSans-SemiBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: italic;
-  font-weight: 600;
-  src: url("/assets/fonts/OpenSans-SemiBoldItalic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: normal;
-  font-weight: 700;
-  src: url("/assets/fonts/OpenSans-Bold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: italic;
-  font-weight: 700;
-  src: url("/assets/fonts/OpenSans-BoldItalic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: normal;
-  font-weight: 800;
-  src: url("/assets/fonts/OpenSans-ExtraBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans";
-  font-style: italic;
-  font-weight: 800;
-  src: url("/assets/fonts/OpenSans-ExtraBoldItalic.ttf") format("truetype");
-}
-
-/* ——— Open Sans Condensed ——— */
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: normal;
-  font-weight: 300;
-  src: url("/assets/fonts/OpenSans_Condensed-Light.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: italic;
-  font-weight: 300;
-  src: url("/assets/fonts/OpenSans_Condensed-LightItalic.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: normal;
-  font-weight: 400;
-  src: url("/assets/fonts/OpenSans_Condensed-Regular.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: italic;
-  font-weight: 400;
-  src: url("/assets/fonts/OpenSans_Condensed-Italic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: normal;
-  font-weight: 500;
-  src: url("/assets/fonts/OpenSans_Condensed-Medium.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: italic;
-  font-weight: 500;
-  src: url("/assets/fonts/OpenSans_Condensed-MediumItalic.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: normal;
-  font-weight: 600;
-  src: url("/assets/fonts/OpenSans_Condensed-SemiBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: italic;
-  font-weight: 600;
-  src: url("/assets/fonts/OpenSans_Condensed-SemiBoldItalic.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: normal;
-  font-weight: 700;
-  src: url("/assets/fonts/OpenSans_Condensed-Bold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: italic;
-  font-weight: 700;
-  src: url("/assets/fonts/OpenSans_Condensed-BoldItalic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: normal;
-  font-weight: 800;
-  src: url("/assets/fonts/OpenSans_Condensed-ExtraBold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans Condensed";
-  font-style: italic;
-  font-weight: 800;
-  src: url("/assets/fonts/OpenSans_Condensed-ExtraBoldItalic.ttf")
-    format("truetype");
-}
-
-/* ——— Open Sans SemiCondensed ——— */
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: normal;
-  font-weight: 300;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-Light.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: italic;
-  font-weight: 300;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-LightItalic.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: normal;
-  font-weight: 400;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-Regular.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: italic;
-  font-weight: 400;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-Italic.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: normal;
-  font-weight: 500;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-Medium.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: italic;
-  font-weight: 500;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-MediumItalic.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: normal;
-  font-weight: 600;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-SemiBold.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: italic;
-  font-weight: 600;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-SemiBoldItalic.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: normal;
-  font-weight: 700;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-Bold.ttf") format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: italic;
-  font-weight: 700;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-BoldItalic.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: normal;
-  font-weight: 800;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-ExtraBold.ttf")
-    format("truetype");
-}
-@font-face {
-  font-family: "OpenSans SemiCondensed";
-  font-style: italic;
-  font-weight: 800;
-  src: url("/assets/fonts/OpenSans_SemiCondensed-ExtraBoldItalic.ttf")
-    format("truetype");
-}
-
 body {
-  font-family: "OpenSans", sans-serif;
   margin: 0;
   padding: 0;
   font-weight: 400;
   color: "#333333";
   overflow: hidden;
   background-color: #fff;
+  font-size: 14px;
+  font-family: "Inter";
 }
 
 .ant-picker-outlined > .ant-picker-input > input {
@@ -292,28 +59,74 @@ body {
 .ant-select-selector {
   color: #333333 !important;
   background-color: #f5f7fa !important;
-  padding: 0.5rem !important;
-  height: 40px !important;
-  border: 1px solid #d8dee5 !important;
+  padding: 0.325rem 0.5rem !important;
+  height: auto !important;
+  min-height: 42px !important;
+  border: 1px solid #e5e7eb !important;
   border-radius: 0.75rem !important;
   width: 100% !important;
   outline: none !important;
-  transition: all 0.2s !important;
-  font-size: 16px !important;
+  transition: all 0.3s !important;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ant-select-selection-search-input {
+  height: 100% !important;
+}
+
+.ant-select-selection-item {
+  line-height: 1.5 !important;
+  color: #333333 !important;
+}
+
+.ant-select-focused .ant-select-selection-item,
+.ant-select:focus-within .ant-select-selection-item {
+  color: #333333 !important;
 }
 
 .ant-select-selection-placeholder {
   color: #333333 !important;
-  opacity: 0.5 !important;
+  opacity: 1 !important;
 }
 
+.ant-select:hover .ant-select-selector {
+  border-color: #d1d5db !important;
+}
+
+.ant-select-focused .ant-select-selector,
 .ant-select:focus-within .ant-select-selector {
   border-color: #4285f4 !important;
-  box-shadow: 0 1px 2px 0 rgba(59, 130, 246, 0.2) !important;
+  box-shadow: 0 0 8px rgba(66, 133, 244, 0.15) !important;
 }
 
 .ant-select-arrow {
-  margin-top: -2px !important;
+  color: #6b7280 !important;
+}
+
+.ant-select-dropdown {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1) !important;
+  padding: 0.25rem !important;
+}
+
+.ant-select-item {
+  border-radius: 0.375rem !important;
+  padding: 0.5rem 0.75rem !important;
+  margin: 0.125rem 0 !important;
+  transition: all 0.2s !important;
+  font-size: 14px !important;
+}
+
+.ant-select-item-option-active {
+  background-color: #f3f4f6 !important;
+}
+
+.ant-select-item-option-selected {
+  background-color: #f3f4f6 !important;
+  color: #333333 !important;
+  font-weight: 500 !important;
 }
 
 input[type="checkbox"] {

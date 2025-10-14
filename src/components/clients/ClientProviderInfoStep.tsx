@@ -20,7 +20,7 @@ export const ClientProviderInfoStep = <T extends FieldValues>({
       {showLabel && (
         <h3 className={`text-lg mt-3 font-medium`}>Healthcare Information</h3>
       )}
-      <div className="bg-gray-50 p-5 grid md:grid-cols-2 gap-5 rounded-lg shadow-sm">
+      <div className="p-5 grid md:grid-cols-2 gap-5">
         <Input
           label="Preferred Hospital Name"
           register={register("preferred_hospital" as Path<T>)}
@@ -52,18 +52,18 @@ export const ClientProviderInfoStep = <T extends FieldValues>({
           label="Pharmacy Phone"
           name={"pharmacy_phone" as Path<T>}
         />
-        <div className="md:col-span-2">
-          <Input
-            label="Pharmacy Address"
-            register={register("pharmacy_address" as Path<T>)}
-            error={errors.pharmacy_address?.message as string}
-          />
-        </div>
-        <PhoneNumberInput
-          control={control}
-          label="Pharmacy Fax"
-          name={"pharmacy_fax" as Path<T>}
+        <Input
+          label="Pharmacy Address"
+          register={register("pharmacy_address" as Path<T>)}
+          error={errors.pharmacy_address?.message as string}
         />
+        {
+          <PhoneNumberInput
+            control={control}
+            label="Pharmacy Fax"
+            name={"pharmacy_fax" as Path<T>}
+          />
+        }
       </div>
     </div>
   );

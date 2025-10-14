@@ -39,7 +39,7 @@ export const Sidebar: React.FC = () => {
       <PrimaryButton
         ref={sideBarButtonRef}
         className={`md:hidden fixed top-4 left-4 p-3 min-w-[48px] min-h-[48px] z-50 transition-all duration-300
-          bg-white rounded-full shadow-lg touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/30 active:shadow-md ${
+          bg-white rounded-lg shadow-[0_0_12px_rgba(0,0,0,0.1)] hover:shadow-[0_0_18px_rgba(0,0,0,0.15)] touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/30 ${
             isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
         onClick={() => setIsOpen(!isOpen)}
@@ -56,15 +56,10 @@ export const Sidebar: React.FC = () => {
           } md:translate-x-0 md:flex
           bg-white shadow-lg border-r border-gray-100`}
       >
-        <div className="flex items-center justify-between px-6 py-6">
-          <div className="flex items-center">
-            <img src={IMAGES.logo} alt="Logo" className="w-9 h-9 mr-3" />
-            <h1 className="text-lg font-semibold text-darkGray tracking-wide">
-              Agensy
-            </h1>
-          </div>
+        <div className="flex items-center justify-center py-6">
+          <img src={IMAGES.logo} alt="Logo" className="w-[150px] block" />
           <button
-            className="md:hidden text-darkGray hover:text-primaryColor transition-colors p-2.5 min-w-[44px] min-h-[44px] rounded-md touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20 active:bg-lightGray/10"
+            className="md:hidden text-darkGray hover:text-primaryColor hover:shadow-[0_0_8px_rgba(0,0,0,0.06)] transition-all duration-300 p-2.5 min-w-[44px] min-h-[44px] rounded-lg touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20"
             onClick={() => setIsOpen(false)}
             aria-label="Close sidebar"
           >
@@ -104,7 +99,7 @@ export const Sidebar: React.FC = () => {
         </div>
         <div className="p-4 border-t border-gray-100">
           <div
-            className="flex items-center p-2 rounded-full cursor-pointer hover:bg-lightGray transition-all mb-3"
+            className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-lightGray hover:shadow-[0_0_10px_rgba(0,0,0,0.06)] transition-all duration-300 mb-3"
             onClick={() => navigate(ROUTES.settings)}
             role="button"
             tabIndex={0}
@@ -115,10 +110,10 @@ export const Sidebar: React.FC = () => {
                 <img
                   src={file ? URL.createObjectURL(file) : userData.avatar}
                   alt="profile"
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="w-12 h-12 rounded-full object-cover shadow-[0_0_8px_rgba(0,0,0,0.1)]"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white flex items-center justify-center text-sm font-medium shadow-sm">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white flex items-center justify-center text-sm font-medium shadow-[0_0_8px_rgba(0,0,0,0.1)]">
                   {(userData?.first_name?.[0]?.toUpperCase() || "") +
                     (userData?.last_name?.[0]?.toUpperCase() || "")}
                 </div>
@@ -133,7 +128,7 @@ export const Sidebar: React.FC = () => {
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-4 py-3 min-h-[48px] rounded-full text-darkGray hover:bg-lightGray hover:text-primaryColor transition-all touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20 active:bg-lightGray/80"
+            className="w-full flex items-center gap-2 px-4 py-3 min-h-[48px] rounded-lg text-darkGray hover:bg-lightGray hover:text-primaryColor hover:shadow-[0_0_8px_rgba(0,0,0,0.06)] transition-all duration-300 touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20"
             aria-label="Logout from account"
           >
             <ICONS.logoutIcon size={18} />

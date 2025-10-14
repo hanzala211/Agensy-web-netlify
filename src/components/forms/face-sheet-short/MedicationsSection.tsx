@@ -44,7 +44,7 @@ export const MedicationsSection = <T extends FieldValues>({
           medicationName: "",
           dosage: "",
           purpose: "",
-          prescriber: "",
+          prescribingDoctor: "",
           refillDue: "",
         })
       }
@@ -84,11 +84,12 @@ export const MedicationsSection = <T extends FieldValues>({
                 <Input
                   label="Prescriber"
                   register={register(
-                    `medications.${index}.prescriber` as Path<T>
+                    `medications.${index}.prescribingDoctor` as Path<T>
                   )}
                   error={
                     // @ts-expect-error - TODO: fix this
-                    errors.medications?.[index]?.prescriber?.message as string
+                    errors.medications?.[index]?.prescribingDoctor
+                      ?.message as string
                   }
                 />
                 <Select

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Controller } from "react-hook-form";
 import type { Control, FieldValues, Path } from "react-hook-form";
 import type { IconType } from "react-icons";
+import { Select as AntSelect } from "antd";
 
 interface SelectProps<T extends FieldValues> {
   control: Control<T>;
@@ -29,7 +30,6 @@ export const Select = <T extends FieldValues>({
   name,
   label,
   data,
-  aria_label = "select",
   labelOption,
   icon: Icon,
   size,
@@ -61,6 +61,19 @@ export const Select = <T extends FieldValues>({
             setError(error?.message || "");
             setSelectedValue(field.value || "");
 
+            const options = [
+              ...(labelOption ? [{ label: labelOption, value: "" }] : []),
+              ...data
+                .filter((item) => item && item.value !== undefined)
+                .map((item) => ({
+                  label: item.label,
+                  value: item.value || "",
+                })),
+              ...(showButton
+                ? [{ label: buttonLabel, value: "add-new-one" }]
+                : []),
+            ];
+
             return (
               <div
                 className={`flex gap-2 ${
@@ -80,32 +93,21 @@ export const Select = <T extends FieldValues>({
                       : "w-full"
                   }`}
                 >
-                  <select
-                    id={label}
-                    aria-label={aria_label}
-                    {...field}
-                    className={`${className} text-darkGray bg-lightGray placeholder:text-darkGray p-2
-                      border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
-                  >
-                    {labelOption && <option value="">{labelOption}</option>}
-                    {data
-                      .filter((item) => item && item.value !== undefined)
-                      .map((item, index) => (
-                        <option key={index} value={item.value || ""}>
-                          {item.label}
-                        </option>
-                      ))}
-                    {showButton && (
-                      <option value="add-new-one">{buttonLabel}</option>
-                    )}
-                  </select>
-                  {Icon && (
-                    <Icon
-                      className="absolute top-1/2 -translate-y-1/2 left-3"
-                      size={size}
-                      color={color}
-                    />
-                  )}
+                  <AntSelect
+                    value={field.value || undefined}
+                    onChange={field.onChange}
+                    //  @ts-expect-error - AntD Select types
+                    options={options}
+                    placeholder={labelOption}
+                    className={`${className} w-full`}
+                    style={{ width: "100%" }}
+                    size="large"
+                    suffixIcon={
+                      Icon ? (
+                        <Icon size={size || 16} color={color || "#6B7280"} />
+                      ) : undefined
+                    }
+                  />
                 </div>
 
                 {/* Conditional text input */}

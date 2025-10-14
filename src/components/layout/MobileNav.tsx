@@ -97,15 +97,12 @@ export const MobileNav: React.FC = () => {
   return (
     <React.Fragment>
       <header
-        className="md:hidden sticky top-0 z-40 bg-white shadow-md h-[56px]"
+        className="md:hidden sticky top-0 z-40 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] h-[60px]"
         ref={headerRef}
       >
-        <div className="px-4 py-3 flex items-center justify-between bg-basicWhite h-full">
+        <div className="px-5 py-3 flex items-center justify-between bg-white h-full">
           <div className="flex items-center">
-            <img src={IMAGES.logo} alt="Logo" className="w-8 h-8 mr-2" />
-            <h1 className="text-base font-semibold text-primaryColor">
-              Agensy
-            </h1>
+            <img src={IMAGES.logo} alt="Logo" className="w-[110px] h-auto" />
           </div>
 
           <div className="flex items-center gap-3">
@@ -113,7 +110,7 @@ export const MobileNav: React.FC = () => {
               <button
                 aria-label="profile"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white text-sm font-medium shadow-sm hover:shadow-md transition-shadow touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryColor/50"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white text-sm font-medium shadow-[0_0_8px_rgba(0,0,0,0.1)] hover:shadow-[0_0_12px_rgba(0,0,0,0.15)] transition-all duration-300 touch-manipulation focus:outline-none"
               >
                 <div>
                   {userData?.avatar ? (
@@ -123,7 +120,7 @@ export const MobileNav: React.FC = () => {
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white flex items-center justify-center text-sm font-medium shadow-sm">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white flex items-center justify-center text-sm font-medium">
                       {(userData?.first_name?.[0]?.toUpperCase() || "") +
                         (userData?.last_name?.[0]?.toUpperCase() || "")}
                     </div>
@@ -132,13 +129,13 @@ export const MobileNav: React.FC = () => {
               </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-darkGray line-clamp-2 truncate max-w-[9rem] overflow-hidden">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.12)] py-2 z-50 border border-gray-100">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-darkGray line-clamp-2 truncate max-w-[9rem] overflow-hidden">
                       {userData?.first_name} {userData?.last_name}
                     </p>
                     <p
-                      className="text-xs text-slateGrey truncate"
+                      className="text-xs text-slateGrey truncate mt-0.5"
                       title={userData?.email}
                     >
                       {userData?.email}
@@ -146,14 +143,14 @@ export const MobileNav: React.FC = () => {
                   </div>
                   <button
                     onClick={() => navigate(ROUTES.settings)}
-                    className="w-full text-left px-4 py-3 min-h-[44px] text-sm text-darkGray hover:bg-lightGray hover:text-primaryColor active:bg-lightGray/80 touch-manipulation focus:outline-none focus:bg-lightGray/30"
+                    className="w-full text-left px-4 py-2.5 min-h-[44px] text-sm text-darkGray hover:bg-gray-100 hover:text-primaryColor transition-all duration-300 touch-manipulation focus:outline-none"
                     aria-label="Go to settings"
                   >
                     Settings
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-3 min-h-[44px] text-sm text-darkGray hover:bg-lightGray hover:text-primaryColor active:bg-lightGray/80 touch-manipulation focus:outline-none focus:bg-lightGray/30"
+                    className="w-full text-left px-4 py-2.5 min-h-[44px] text-sm text-darkGray hover:bg-gray-100 hover:text-primaryColor transition-all duration-300 touch-manipulation focus:outline-none"
                     aria-label="Logout from account"
                   >
                     Logout
@@ -163,7 +160,7 @@ export const MobileNav: React.FC = () => {
             </div>
 
             <button
-              className="nav-toggle-button p-2.5 min-w-[44px] min-h-[44px] rounded-md text-primaryColor hover:bg-lightGray transition-colors touch-manipulation active:bg-lightGray/80 focus:outline-none focus:ring-2 focus:ring-primaryColor/20"
+              className="nav-toggle-button p-2.5 min-w-[44px] min-h-[44px] rounded-lg text-primaryColor hover:bg-gray-100 transition-all duration-300 touch-manipulation focus:outline-none"
               onClick={() => {
                 setIsNavExpanded(!isNavExpanded);
                 if (!isNavExpanded) setIsProfileOpen(false);
@@ -182,10 +179,10 @@ export const MobileNav: React.FC = () => {
           </div>
         </div>
         <div
-          className={`fixed inset-x-0 bottom-0 bg-darkGray/50 z-10 md:hidden transition-opacity duration-200 ${
+          className={`fixed inset-x-0 bottom-0 bg-black/30 backdrop-blur-sm z-10 md:hidden transition-all duration-300 ${
             isNavExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
-          style={{ top: `56px` }}
+          style={{ top: `60px` }}
           onClick={() => setIsNavExpanded(false)}
           aria-label="Close navigation menu"
           role="button"
@@ -194,13 +191,13 @@ export const MobileNav: React.FC = () => {
 
         <div
           ref={navRef}
-          className={`absolute left-0 right-0 bg-white shadow-lg z-20 transition-all duration-200 overflow-hidden border-t border-gray-100 ${
+          className={`absolute left-0 right-0 bg-white shadow-[0_4px_15px_rgba(0,0,0,0.1)] z-20 transition-all duration-300 overflow-hidden border-t border-gray-100 ${
             isNavExpanded
               ? "max-h-[80vh] overflow-y-auto opacity-100"
               : "max-h-0 opacity-0"
           }`}
         >
-          <div className="px-4 pb-6 pt-5 bg-basicWhite">
+          <div className="px-5 pb-6 pt-5 bg-white">
             {NAV_SECTIONS.map((section) => (
               <div
                 key={section.id}

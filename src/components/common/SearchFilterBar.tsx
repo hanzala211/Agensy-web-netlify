@@ -64,16 +64,16 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
   secondDateLabel = "To",
 }) => {
   return (
-    <div className="rounded-xl mb-6">
+    <div className="mb-6">
       <div
         className={`flex flex-col ${
           showDatePicker
             ? "2xl:flex-row 2xl:items-end"
             : "xl:flex-row xl:items-end"
-        } gap-4`}
+        } gap-3`}
       >
         {searchPlaceholder && searchValue !== undefined && setSearchValue && (
-          <div className="flex-1">
+          <div className="w-full xl:w-[55rem]">
             <StatefulInput
               icon={ICONS.search}
               placeholder={searchPlaceholder}
@@ -90,7 +90,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
             showDatePicker
               ? "2xl:flex-row 2xl:items-end"
               : "xl:flex-row xl:items-end"
-          } gap-4`}
+          } gap-3`}
         >
           {showExtraFilter && (
             <div
@@ -150,7 +150,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
         </div>
         {showButton && (
           <PrimaryButton
-            className="!px-6 xl:!w-fit py-3 rounded-xl text-sm font-medium shadow-sm flex items-center justify-center gap-1"
+            className="xl:!w-fit !min-h-[40px] !text-[14px] !px-4 !py-2"
             onClick={onButtonClick}
             aria_label={
               typeof buttonText === "string" ? (buttonText as string) : "Add"

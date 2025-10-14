@@ -21,11 +21,11 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     <NavLink
       to={link}
       className={({ isActive }) =>
-        `group flex items-center gap-3 px-4 py-2.5 min-h-[48px] rounded-full transition-all duration-200 ${
+        `group relative flex items-center gap-3 px-4 py-3 min-h-[48px] rounded-lg transition-all duration-300 ${
           isActive
-            ? "bg-primaryColor/10 text-primaryColor font-medium"
-            : "text-darkGray hover:bg-lightGray"
-        } touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20`
+            ? "text-primaryColor font-medium outline-none border-none"
+            : "text-darkGray hover:text-primaryColor/70"
+        } touch-manipulation focus-visible:outline-none active:!outline-none [&:focus]:outline-none`
       }
       onClick={onClick}
       aria-label={`${label} (current page)`}
@@ -33,12 +33,15 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     >
       {({ isActive }) => (
         <React.Fragment>
+          {isActive && (
+            <div className="absolute -right-3 top-0 bottom-0 w-1 bg-primaryColor rounded-l-full" />
+          )}
           <div
             className={`${
               isActive
                 ? "text-primaryColor"
                 : "text-slateGrey group-hover:text-primaryColor/70"
-            } transition-colors duration-200 flex-shrink-0`}
+            } transition-colors duration-300 flex-shrink-0`}
             aria-hidden="true"
           >
             {isIconType ? (

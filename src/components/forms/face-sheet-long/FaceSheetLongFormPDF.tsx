@@ -20,7 +20,7 @@ import {
   LIVING_SITUATION_OPTIONS,
   STATES,
 } from "@agensy/constants";
-import logo from "@agensy/assets/logo.png";
+import logo from "@agensy/assets/logo.jpg";
 
 const BORDER = "#1f3d7a";
 const BORDER_LITE = "#c5d2f2";
@@ -436,7 +436,7 @@ const FaceSheetLongFormPDF: React.FC<{
                 m.dosage,
                 m.purpose,
                 m.frequency,
-                m.prescriber,
+                m.prescribingDoctor,
                 m.refillDue,
               ]}
               last={i === arr.length - 1}

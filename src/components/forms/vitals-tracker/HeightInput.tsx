@@ -24,6 +24,10 @@ export const HeightInput = ({ value, onChange }: HeightInputProps) => {
   const handleFeetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFeet = e.target.value;
     const feetNum = parseInt(newFeet) || 0;
+
+    // Prevent negative values
+    if (feetNum < 0) return;
+
     setFeet(newFeet);
 
     // Convert to format and update parent
@@ -34,6 +38,9 @@ export const HeightInput = ({ value, onChange }: HeightInputProps) => {
   const handleInchesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newInches = e.target.value;
     const inchesNum = parseInt(newInches) || 0;
+
+    // Prevent negative values
+    if (inchesNum < 0) return;
 
     if (inchesNum >= 12) {
       // Convert to next foot
@@ -65,6 +72,7 @@ export const HeightInput = ({ value, onChange }: HeightInputProps) => {
           onChange={handleFeetChange}
           placeholder="0"
           inputClassname="w-10 sm:w-12 text-center text-sm"
+          min="0"
         />
         <span className="text-gray-600 font-medium text-sm">'</span>
       </div>
@@ -76,6 +84,7 @@ export const HeightInput = ({ value, onChange }: HeightInputProps) => {
           onChange={handleInchesChange}
           placeholder="0"
           inputClassname="w-10 sm:w-12 text-center text-sm"
+          min="0"
         />
         <span className="text-gray-600 font-medium text-sm">''</span>
       </div>

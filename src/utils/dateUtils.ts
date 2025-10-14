@@ -1,5 +1,7 @@
 import { DATE_FOMRAT } from "@agensy/constants";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 export const formatRelativeTime = (isoDate: string): string => {
   const date = dayjs(isoDate);
@@ -41,12 +43,12 @@ export const formatDateToRequiredFormat = (
   if (!isoDateString) {
     return "";
   }
-  const date = dayjs(isoDateString);
+  const date = dayjs.utc(isoDateString).local();
   return date.format(format || DATE_FOMRAT);
 };
 
 export const formatDateTime = (isoDateString: string): string => {
-  const date = dayjs(isoDateString);
+  const date = dayjs.utc(isoDateString).local();
   return date.format(`${DATE_FOMRAT} hh:mm A`);
 };
 
