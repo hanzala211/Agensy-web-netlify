@@ -43,6 +43,7 @@ import {
   SettingOutlined,
   FileTextOutlined,
   LogoutOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import {
   FaUserDoctor,
@@ -120,5 +121,6 @@ export const ICONS = {
   fileAlt: FaFileAlt,
   rightSolid: BiSolidRightArrow,
   upload: IoIosCloudUpload,
-  uploadDoc: FaUpload
+  uploadDoc: FaUpload,
+  info: InfoCircleOutlined,
 };

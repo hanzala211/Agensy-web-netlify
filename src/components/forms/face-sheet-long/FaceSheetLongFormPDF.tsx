@@ -181,9 +181,7 @@ const FaceSheetLongFormPDF: React.FC<{
         {data.dateOfBirth && (
           <Field label="Date of Birth">{data.dateOfBirth}</Field>
         )}
-        {data.phoneNumber && (
-          <Field label="Phone Number">{data.phoneNumber}</Field>
-        )}
+        {data.phone && <Field label="Phone Number">{data.phone}</Field>}
         {data.city && <Field label="City">{data.city}</Field>}
         {data.state && (
           <Field label="State">

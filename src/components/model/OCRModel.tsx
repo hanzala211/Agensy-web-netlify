@@ -64,12 +64,8 @@ export const OCRModel: React.FC<OCRModelProps> = ({
       const structuredData = mappedFields.map((field: MappedField) => {
         const formattedKey = StringUtils.formatKeyLabel(field.field);
 
-        // Map medicareNumbers to medicare
-        const mappedKey =
-          field.label === "medicareNumbers" ? "idNumber" : field.label;
-
         return {
-          key: mappedKey,
+          key: field.label,
           value: field.value,
           label: formattedKey,
         };
@@ -479,6 +475,19 @@ export const OCRModel: React.FC<OCRModelProps> = ({
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex items-start space-x-2 sm:space-x-3">
+          <span className="text-blue-600 flex-shrink-0 mt-0.5 text-base sm:text-lg">
+            <ICONS.info className="w-4 h-4 sm:w-5 sm:h-5" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm text-blue-900 leading-relaxed">
+              <span className="font-medium">How OCR population works:</span> The
+              extracted data will be matched against your form fields.
+              Duplicates and already-populated fields will be skipped. Only
+              fields that exist and are empty in your form will be populated.
+            </p>
+          </div>
+        </div>
         <div className="space-y-4">
           <div className="bg-gray-100 rounded-lg p-4">
             {selectedImage && !isPDF ? (
@@ -795,8 +804,8 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                         handleFieldChange(field.key, date)
                       }
                     />
-                  ) : field.key.includes("phone") ||
-                    field.key.includes("fax") ? (
+                  ) : field.key.toLowerCase().includes("phone") ||
+                    field.key.toLowerCase().includes("fax") ? (
                     <StatefulPhoneInput
                       value={field.value || ""}
                       onChange={(e) => handleFieldChange(field.key, e)}

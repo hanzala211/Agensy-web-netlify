@@ -65,7 +65,7 @@ const defaultValues = {
   city: "",
   state: "",
   zip: "",
-  phoneNumber: "",
+  phone: "",
   dateOfBirth: "",
   ssn: "",
   codeStatus: "",
@@ -694,7 +694,7 @@ export const FaceSheetLongForm: React.FC = () => {
           date_of_birth: data.dateOfBirth
             ? DateUtils.changetoISO(data.dateOfBirth)
             : null,
-          phone: data.phoneNumber ? data.phoneNumber : null,
+          phone: data.phone ? data.phone : null,
           preferred_hospital: data.hospitalPreference
             ? data.hospitalPreference
             : null,

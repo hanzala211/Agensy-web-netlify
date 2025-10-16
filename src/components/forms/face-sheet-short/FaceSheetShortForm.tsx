@@ -49,7 +49,7 @@ const defaultValues = {
   city: "",
   state: "",
   zip: "",
-  phoneNumber: "",
+  phone: "",
   dateOfBirth: "",
   ssn: "",
   codeStatus: "",
@@ -226,7 +226,7 @@ export const FaceSheetShortForm: React.FC = () => {
         city: faceSheetShortForm?.client_info?.city || "",
         state: faceSheetShortForm?.client_info?.state || "",
         zip: faceSheetShortForm?.client_info?.zip || "",
-        phoneNumber: faceSheetShortForm?.client_info?.phone || "",
+        phone: faceSheetShortForm?.client_info?.phone || "",
         dateOfBirth: faceSheetShortForm?.client_info?.date_of_birth
           ? DateUtils.formatDateToRequiredFormat(
               faceSheetShortForm?.client_info?.date_of_birth
@@ -438,7 +438,7 @@ export const FaceSheetShortForm: React.FC = () => {
           date_of_birth: data.dateOfBirth
             ? DateUtils.changetoISO(data.dateOfBirth)
             : null,
-          phone: data.phoneNumber ? data.phoneNumber : null,
+          phone: data.phone ? data.phone : null,
           preferred_hospital: data.hospitalPreference
             ? data.hospitalPreference
             : null,

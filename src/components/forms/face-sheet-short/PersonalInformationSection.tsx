@@ -46,7 +46,7 @@ export const PersonalInformationSection = <T extends FieldValues>({
         <PhoneNumberInput
           label="Phone Number"
           control={control}
-          name={"phoneNumber" as Path<T>}
+          name={"phone" as Path<T>}
         />
         <DatePickerField
           control={control}

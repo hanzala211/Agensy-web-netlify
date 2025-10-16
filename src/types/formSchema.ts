@@ -380,7 +380,7 @@ export const faceSheetShortFormSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   zip: z.string().optional(),
-  phoneNumber: z.string().optional(),
+  phone: z.string().optional(),
   dateOfBirth: z.string().optional(),
   ssn: z.string().optional(),
 
@@ -490,7 +490,7 @@ export const faceSheetLongFormSchema = z
     state: z.string().optional(),
     zip: z.string().optional(),
     preferredName: z.string().optional(),
-    phoneNumber: z.string().optional(),
+    phone: z.string().optional(),
     dateOfBirth: z.string().optional(),
     ssn: z.string().optional(),
 
