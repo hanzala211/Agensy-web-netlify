@@ -31,7 +31,7 @@ export const AuthLayout: React.FC = () => {
           <div className="flex items-center justify-center min-h-screen p-4">
             <div className="bg-basicWhite rounded-xl shadow-lg md:p-8 p-6 w-full max-w-xl">
               <div className="md:hidden flex justify-center mb-6">
-                <img src={IMAGES.authBg} alt="Logo" className="w-48 h-18" />
+                <img src={IMAGES.logo} alt="Logo" className="w-48 h-18" />
               </div>
               <Outlet />
             </div>
