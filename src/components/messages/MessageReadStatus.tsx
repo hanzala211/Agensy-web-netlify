@@ -48,10 +48,11 @@ export const MessageReadStatus: React.FC<MessageReadStatusProps> = ({
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
         <h4 className="text-sm font-semibold text-darkGray flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          Read by
+          Read Receipts
         </h4>
         <span className="text-xs text-slateGrey">
-          {readStatuses.length} recipient{readStatuses.length !== 1 ? "s" : ""}
+          {readStatuses.length}{" "}
+          {readStatuses.length !== 1 ? "recipients" : "recipient"}
         </span>
       </div>
 
