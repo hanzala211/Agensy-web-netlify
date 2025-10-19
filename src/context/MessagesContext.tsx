@@ -707,6 +707,128 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             return thread;
           })
         );
+
+        // Update query cache with the updated thread data
+        queryClient.setQueryData(
+          ["threads"],
+          (oldData: Thread[] | undefined) => {
+            if (!oldData) return oldData;
+
+            const currentThread = threadsRef.current.find(
+              (t) => t.id === data.threadId
+            );
+            if (currentThread) {
+              const updatedThread = {
+                ...currentThread,
+                messages:
+                  currentThread.messages?.map((msg) => {
+                    if (
+                      msg.message === data.message.message &&
+                      msg.sender_id === data.message.sender_id &&
+                      msg.thread_id === data.message.thread_id &&
+                      msg.id &&
+                      typeof msg.id === "string" &&
+                      msg.id.match(/^\d+$/) &&
+                      msg.id.length >= 10
+                    ) {
+                      return {
+                        ...msg,
+                        id: data.message.message_id,
+                        createdAt: new Date(data.message.createdAt),
+                        read_by: [
+                          {
+                            user_id: data.message.sender_id,
+                            read_at: new Date(
+                              data.message.createdAt
+                            ).toISOString(),
+                          },
+                        ],
+                      };
+                    }
+                    return msg;
+                  }) || [],
+              };
+              const otherThreads = oldData.filter(
+                (t) => t.id !== data.threadId
+              );
+              return [updatedThread, ...otherThreads];
+            }
+            return oldData;
+          }
+        );
+
+        // Update single thread query cache if it exists
+        queryClient.setQueryData(
+          ["thread", data.threadId],
+          (oldData: Thread | undefined) => {
+            if (!oldData) return oldData;
+            const currentThread = threadsRef.current.find(
+              (t) => t.id === data.threadId
+            );
+            if (currentThread) {
+              return {
+                ...currentThread,
+                messages:
+                  currentThread.messages?.map((msg) => {
+                    if (
+                      msg.message === data.message.message &&
+                      msg.sender_id === data.message.sender_id &&
+                      msg.thread_id === data.message.thread_id &&
+                      msg.id &&
+                      typeof msg.id === "string" &&
+                      msg.id.match(/^\d+$/) &&
+                      msg.id.length >= 10
+                    ) {
+                      return {
+                        ...msg,
+                        id: data.message.message_id,
+                        createdAt: new Date(data.message.createdAt),
+                        read_by: [
+                          {
+                            user_id: data.message.sender_id,
+                            read_at: new Date(
+                              data.message.createdAt
+                            ).toISOString(),
+                          },
+                        ],
+                      };
+                    }
+                    return msg;
+                  }) || [],
+              };
+            }
+            return {
+              ...oldData,
+              messages:
+                oldData.messages?.map((msg) => {
+                  if (
+                    msg.message === data.message.message &&
+                    msg.sender_id === data.message.sender_id &&
+                    msg.thread_id === data.message.thread_id &&
+                    msg.id &&
+                    typeof msg.id === "string" &&
+                    msg.id.match(/^\d+$/) &&
+                    msg.id.length >= 10
+                  ) {
+                    return {
+                      ...msg,
+                      id: data.message.message_id,
+                      createdAt: new Date(data.message.createdAt),
+                      read_by: [
+                        {
+                          user_id: data.message.sender_id,
+                          read_at: new Date(
+                            data.message.createdAt
+                          ).toISOString(),
+                        },
+                      ],
+                    };
+                  }
+                  return msg;
+                }) || [],
+            };
+          }
+        );
       }
     );
   }, [socket, userData?.id]);
@@ -828,6 +950,23 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const updateThreadWithFullData = (thread: Thread) => {
+    setThreads((prev) => {
+      const existingThreadIndex = prev.findIndex((t) => t.id === thread.id);
+
+      if (existingThreadIndex !== -1) {
+        const updatedThreads = [...prev];
+        updatedThreads[existingThreadIndex] = {
+          ...thread,
+          has_unread_messages: prev[existingThreadIndex].has_unread_messages,
+        };
+        return updatedThreads;
+      } else {
+        return [thread, ...prev];
+      }
+    });
+  };
+
   const navigateToExistingThread = (
     threadId: string,
     navigate: (path: string) => void
@@ -915,6 +1054,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         setPendingThreadData,
         clearPendingThreadData,
         addThreadToList,
+        updateThreadWithFullData,
         navigateToExistingThread,
         existingThreadData,
         setExistingThreadData,

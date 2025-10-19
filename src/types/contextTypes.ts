@@ -130,6 +130,7 @@ export interface MessagesContextType {
   >;
   clearPendingThreadData: () => void;
   addThreadToList: (thread: Thread) => void;
+  updateThreadWithFullData: (thread: Thread) => void;
   navigateToExistingThread: (
     threadId: string,
     navigate: (path: string) => void

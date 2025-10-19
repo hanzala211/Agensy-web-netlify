@@ -28,6 +28,7 @@ export const ChatPage: React.FC = () => {
     setCurrentThreadMessages,
     pendingThreadData,
     addThreadToList,
+    updateThreadWithFullData,
     typingUsers,
   } = useMessagesContext();
   const prevPendingThreadData = useRef(pendingThreadData);
@@ -70,6 +71,7 @@ export const ChatPage: React.FC = () => {
         })
       );
       setCurrentThreadMessages(messagesWithReadBy);
+      updateThreadWithFullData(threadData);
       addThreadToList(threadData);
       setIsSilentFetch(false);
     }
