@@ -12,7 +12,12 @@ import type {
   Note,
   Thread,
 } from "./schemas";
-import type { OCRField, OpenedFileData } from "./otherSchemas";
+import type {
+  OCRField,
+  OpenedFileData,
+  PendingThreadData,
+  TypingUsers,
+} from "./otherSchemas";
 
 export interface AuthContextType {
   userData: IUser | null;
@@ -118,9 +123,30 @@ export interface MessagesContextType {
     thread: string,
     senderID: string
   ) => void;
-  updateThreadAndNavigateToExistingOne: (
-    thread: Thread,
-    navigate: () => void
-  ) => void;
   updateThreadsSorting: () => void;
+  pendingThreadData: PendingThreadData | null;
+  setPendingThreadData: React.Dispatch<
+    React.SetStateAction<PendingThreadData | null>
+  >;
+  clearPendingThreadData: () => void;
+  addThreadToList: (thread: Thread) => void;
+  navigateToExistingThread: (
+    threadId: string,
+    navigate: (path: string) => void
+  ) => void;
+  existingThreadData: {
+    threadId: string;
+    clientId?: string;
+  } | null;
+  setExistingThreadData: React.Dispatch<
+    React.SetStateAction<{
+      threadId: string;
+      clientId?: string;
+    } | null>
+  >;
+  clearExistingThreadData: () => void;
+  markMessageAsRead: (messageId: string, threadId: string) => void;
+  typingUsers: TypingUsers;
+  emitTypingStart: (threadId: string) => void;
+  emitTypingStop: (threadId: string) => void;
 }

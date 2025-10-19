@@ -116,45 +116,46 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
             />
           </div>
         )}
-        {watch("type") === "client" && showType && (
-          <div>
-            <label className="text-neutralGray mb-2 block">
-              Select Care Recipient
-            </label>
-            <Controller
-              name="client_id"
-              control={control}
-              render={({ field: { value, onChange, ...field } }) => (
-                <Select
-                  {...field}
-                  value={value || undefined}
-                  onChange={onChange}
-                  showSearch
-                  placeholder="Search to Select Care Recipient"
-                  optionFilterProp="value"
-                  style={{ width: "100%" }}
-                  filterOption={(
-                    input: string,
-                    option: { label: string; value: string }
-                  ) =>
-                    (option?.label ?? "")
-                      .toLowerCase()
-                      .includes(input.toLowerCase())
-                  }
-                  // @ts-expect-error - Antd types are not compatible with our types
-                  options={
-                    clients?.map((client: Client) => ({
-                      label: `${client.first_name} ${client.last_name}`,
-                      value: client.id as string,
-                    })) || []
-                  }
-                />
-              )}
-            />
-          </div>
-        )}
+        {(watch("type") === "client" || watch("type") === "general") &&
+          showType && (
+            <div>
+              <label className="text-darkGray mb-2 block font-medium">
+                Select Care Recipient
+              </label>
+              <Controller
+                name="client_id"
+                control={control}
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Select
+                    {...field}
+                    value={value || undefined}
+                    onChange={onChange}
+                    showSearch
+                    placeholder="Search to Select Care Recipient"
+                    optionFilterProp="value"
+                    style={{ width: "100%" }}
+                    filterOption={(
+                      input: string,
+                      option: { label: string; value: string }
+                    ) =>
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    // @ts-expect-error - Antd types are not compatible with our types
+                    options={
+                      clients?.map((client: Client) => ({
+                        label: `${client.first_name} ${client.last_name}`,
+                        value: client.id as string,
+                      })) || []
+                    }
+                  />
+                )}
+              />
+            </div>
+          )}
         <div>
-          <label className="text-neutralGray mb-2 block">
+          <label className="text-darkGray mb-2 block font-medium">
             Select Recipient
           </label>
           <Controller

@@ -75,3 +75,20 @@ export interface ConfidenceScore {
     description: number;
   };
 }
+
+export interface TypingUsers {
+  [threadId: string]: {
+    [userId: string]: {
+      user_id: string;
+      is_typing: boolean;
+      user_name?: string;
+    };
+  };
+}
+
+export interface PendingThreadData {
+  id: string;
+  type: "general" | "client";
+  participants_ids: string[];
+  client_id?: string;
+}

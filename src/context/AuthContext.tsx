@@ -29,8 +29,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [file, setFile] = useState<File | null>(null);
   const [accessUsers, setAccessUsers] = useState<IUser[]>([]);
   const queryClient = useQueryClient();
-  const { connectSocket } = useSocketContext();
+  const { connectSocket, socket } = useSocketContext();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const updateUserOnlineStatus = (userId: string, isOnline: boolean) => {
+    setAccessUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId ? { ...user, is_online: isOnline } : user
+      )
+    );
+  };
+
+  const setInitialOnlineUsers = (onlineUserIds: string[]) => {
+    setAccessUsers((prev) =>
+      prev.map((user) => ({
+        ...user,
+        is_online: onlineUserIds.includes(user.id as string),
+      }))
+    );
+  };
 
   useEffect(() => {
     loadAuth();
@@ -44,6 +61,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setIsLoggingOut(false);
     }
   }, [userData]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("allOnlineUsers", (data: { onlineUsers: string[] }) => {
+        console.log(
+          "📤 [SOCKET] Received initial online users:",
+          data.onlineUsers
+        );
+        setInitialOnlineUsers(data.onlineUsers);
+      });
+
+      socket.on("userOnline", (data: { userId: string }) => {
+        console.log("🟢 [SOCKET] User came online:", data.userId);
+        updateUserOnlineStatus(data.userId, true);
+      });
+
+      socket.on("userOffline", (data: { userId: string }) => {
+        console.log("🔴 [SOCKET] User went offline:", data.userId);
+        updateUserOnlineStatus(data.userId, false);
+      });
+
+      return () => {
+        socket.off("allOnlineUsers");
+        socket.off("userOnline");
+        socket.off("userOffline");
+      };
+    }
+  }, [socket, setInitialOnlineUsers, updateUserOnlineStatus]);
 
   const loadAuth = async () => {
     if (isLoggingOut) {

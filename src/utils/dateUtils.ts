@@ -35,6 +35,38 @@ export const formatRelativeTime = (isoDate: string): string => {
     return `${years} ${years === 1 ? "year" : "years"} ago`;
   }
 };
+export const formatRelativeTimeShort = (isoDate: string): string => {
+  const date = dayjs(isoDate);
+  const now = dayjs();
+  const diffMinutes = now.diff(date, "minute");
+  const diffHours = now.diff(date, "hour");
+  const diffDays = now.diff(date, "day");
+
+  if (diffMinutes < 1) {
+    return "Just now";
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes} ${diffMinutes === 1 ? "min" : "mins"} ago`;
+  } else if (diffHours < 24) {
+    return `${diffHours} ${diffHours === 1 ? "hr" : "hrs"} ago`;
+  } else if (diffDays === 0) {
+    return "Today";
+  } else if (diffDays === 1) {
+    return "Yesterday";
+  } else if (diffDays < 7) {
+    return `${diffDays} ${diffDays === 1 ? "day" : "days"}`;
+  } else if (diffDays < 14) {
+    return "1 week ago";
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
+  } else if (diffDays < 365) {
+    const months = Math.floor(diffDays / 30);
+    return `${months} ${months === 1 ? "month" : "months"} ago`;
+  } else {
+    const years = Math.floor(diffDays / 365);
+    return `${years} ${years === 1 ? "year" : "years"} ago`;
+  }
+};
 
 export const formatDateToRequiredFormat = (
   isoDateString: string,

@@ -2,19 +2,20 @@ import React, { useEffect, useMemo, useState } from "react";
 import type { AddThreadFormData, Thread } from "@agensy/types";
 import { AddThreadModal, ThreadList } from "@agensy/components";
 import { ICONS, ROUTES } from "@agensy/constants";
-import { useMessagesContext } from "@agensy/context";
+import { useAuthContext, useMessagesContext } from "@agensy/context";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-import { useCreateThread } from "@agensy/api";
-import { toast } from "@agensy/utils";
+import { v4 as uuidv4 } from "uuid";
 
 export const ClientMessages: React.FC = () => {
-  const createThreadMutation = useCreateThread();
   const params = useParams();
+  const { userData } = useAuthContext();
   const {
     showThreadList,
     setShowThreadList,
     threads,
-    updateThreadAndNavigateToExistingOne,
+    setPendingThreadData,
+    setCurrentThreadMessages,
+    setSelectedThread,
   } = useMessagesContext();
   const [isAddThreadModalOpen, setIsAddThreadModalOpen] =
     useState<boolean>(false);
@@ -43,29 +44,31 @@ export const ClientMessages: React.FC = () => {
   }, [window.innerWidth, params.threadId]);
 
   useEffect(() => {
-    if (createThreadMutation.status === "success") {
-      setIsAddThreadModalOpen(false);
-      updateThreadAndNavigateToExistingOne(
-        createThreadMutation.data as Thread,
-        () => {
-          navigate(
-            `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}/${createThreadMutation.data?.id}`
-          );
-        }
-      );
-    } else if (createThreadMutation.status === "error") {
-      toast.error("Failed to create thread");
+    if (!params.threadId) {
+      setSelectedThread(null);
+      setCurrentThreadMessages([]);
     }
-  }, [createThreadMutation.status]);
+  }, [params.threadId]);
 
   const handleAddThread = (data: AddThreadFormData) => {
-    const postData = {
-      type: data.type,
-      participant_id: data.participant_id,
-      client_id: data.type === "client" ? data.client_id : null,
-      sub_type: "one-to-one",
-    };
-    createThreadMutation.mutate(postData);
+    const threadId = uuidv4();
+
+    // Clear previous thread data before creating new thread
+    setCurrentThreadMessages([]);
+    setSelectedThread(null);
+
+    // Set pending thread data for the first message
+    setPendingThreadData({
+      id: threadId,
+      type: data.type as "general" | "client",
+      participants_ids: [userData?.id as string, data.participant_id],
+      client_id: data.client_id,
+    });
+
+    setIsAddThreadModalOpen(false);
+    navigate(
+      `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}/${threadId}`
+    );
   };
 
   const handleThreadClick = (thread: Thread) => {
@@ -73,37 +76,39 @@ export const ClientMessages: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-270px)] rounded-xl overflow-hidden border">
-      <div
-        className={`
-        ${
-          showThreadList ? "flex" : "hidden"
-        } w-full lg:w-1/3 border-r   border-b relative inset-0 z-10`}
-      >
-        <ThreadList
-          onThreadClick={handleThreadClick}
-          selectedThreadId={params.threadId}
-          onAddThread={() => setIsAddThreadModalOpen(true)}
-          threads={clientThreads}
-          showBadge={false}
-        />
-      </div>
+    <div className="h-[calc(100vh-270px)] flex flex-col bg-gray-50 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.1)]">
+      <div className="flex flex-1 overflow-hidden">
+        <div
+          className={`
+          ${
+            showThreadList ? "flex" : "hidden"
+          } w-full lg:w-1/3 border-r border-gray-200 relative bg-white flex flex-col`}
+        >
+          <ThreadList
+            onThreadClick={handleThreadClick}
+            selectedThreadId={params.threadId}
+            onAddThread={() => setIsAddThreadModalOpen(true)}
+            threads={clientThreads}
+            showBadge={false}
+          />
+        </div>
 
-      <div className="flex-1 flex flex-col w-full lg:w-2/3">
-        {params.threadId ? (
-          <Outlet />
-        ) : (
-          <div
-            className={`flex-1 flex items-center ${
-              params.threadId ? "" : "lg:flex hidden"
-            } justify-center text-gray-500`}
-          >
-            <div className="text-center p-4">
-              <ICONS.chat className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">Select a chat to start messaging</p>
+        <div className="flex-1 flex flex-col w-full lg:w-2/3 bg-white">
+          {params.threadId ? (
+            <Outlet />
+          ) : (
+            <div
+              className={`flex-1 flex items-center ${
+                params.threadId ? "" : "lg:flex hidden"
+              } justify-center text-gray-500`}
+            >
+              <div className="text-center p-4">
+                <ICONS.chat className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <p className="text-lg">Select a chat to start messaging</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <AddThreadModal
@@ -111,7 +116,6 @@ export const ClientMessages: React.FC = () => {
         isOpen={isAddThreadModalOpen}
         onClose={() => setIsAddThreadModalOpen(false)}
         onSubmit={handleAddThread}
-        isLoading={createThreadMutation.isPending}
       />
     </div>
   );

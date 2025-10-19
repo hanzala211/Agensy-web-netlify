@@ -16,6 +16,7 @@ export interface IUser extends BaseSchema {
   phone?: string;
   avatar?: string;
   subscription_status?: "active" | "inactive" | "canceled";
+  is_online?: boolean;
   Roles?: {
     client_id: string;
     role: string;
@@ -196,10 +197,15 @@ export interface Appointment extends BaseSchema {
 export interface Message extends BaseSchema {
   thread_id: string;
   sender_id: string;
-  content: string;
+  message: string;
+  message_id?: string;
   read_at?: Date;
   thread?: Thread;
   sender?: IUser;
+  read_by?: {
+    read_at: string;
+    user_id: string;
+  }[];
 }
 
 export interface Thread extends BaseSchema {
@@ -215,7 +221,7 @@ export interface Thread extends BaseSchema {
   created_by: string;
   messages?: Message[];
   client?: Client | null;
-  participants: IUser[];
+  Participants_ids: string[];
   has_unread_messages?: boolean;
 }
 

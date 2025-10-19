@@ -44,6 +44,7 @@ import {
   FileTextOutlined,
   LogoutOutlined,
   InfoCircleOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import {
   FaUserDoctor,
@@ -55,6 +56,7 @@ import { IoIosCloudUpload, IoMdAddCircle } from "react-icons/io";
 import {
   IoChatbubbleOutline,
   IoCheckmarkOutline,
+  IoCheckmarkDoneOutline,
   IoHomeSharp,
   IoPersonAdd,
 } from "react-icons/io5";
@@ -114,6 +116,7 @@ export const ICONS = {
   share: FiShare2,
   dollar: BiDollar,
   check: IoCheckmarkOutline,
+  doubleCheck: IoCheckmarkDoneOutline,
   subscription: MdPayment,
   chat: IoChatbubbleOutline,
   folder: FaFolder,
@@ -123,4 +126,5 @@ export const ICONS = {
   upload: IoIosCloudUpload,
   uploadDoc: FaUpload,
   info: InfoCircleOutlined,
+  moreVertical: MoreOutlined,
 };
