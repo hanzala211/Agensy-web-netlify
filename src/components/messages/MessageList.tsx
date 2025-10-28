@@ -320,22 +320,9 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
                       onDoubleClick={() => handleDoubleClick(message)}
                     >
                       <div className="flex flex-col gap-1 pb-5">
-                        {message.message && (
-                          <p
-                            className="sm:text-[12px] text-[10px] pr-12 sm:pr-14 whitespace-pre-wrap max-w-full"
-                            style={{
-                              wordBreak: "break-all",
-                              overflowWrap: "anywhere",
-                              wordWrap: "break-word",
-                            }}
-                          >
-                            {message.message}
-                          </p>
-                        )}
-
                         {/* File Preview */}
                         {message.file_url && message.file_name && (
-                          <div className="mt-2 mb-4">
+                          <div className="mb-2">
                             {getFileType(message.file_name) === "image" && (
                               <div
                                 className="relative w-52 h-36 bg-white rounded-lg overflow-hidden shadow-sm cursor-pointer"
@@ -533,6 +520,19 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
                               </div>
                             )}
                           </div>
+                        )}
+
+                        {message.message && (
+                          <p
+                            className="sm:text-[12px] text-[10px] pr-12 sm:pr-14 whitespace-pre-wrap max-w-full"
+                            style={{
+                              wordBreak: "break-all",
+                              overflowWrap: "anywhere",
+                              wordWrap: "break-word",
+                            }}
+                          >
+                            {message.message}
+                          </p>
                         )}
 
                         <span
