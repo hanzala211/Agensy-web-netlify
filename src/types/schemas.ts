@@ -206,6 +206,9 @@ export interface Message extends BaseSchema {
     read_at: string;
     user_id: string;
   }[];
+  file_key?: string;
+  file_url?: string;
+  file_name?: string;
 }
 
 export interface Thread extends BaseSchema {
@@ -216,13 +219,17 @@ export interface Thread extends BaseSchema {
   last_message_time?: Date;
   last_message_sender_id?: string;
   client_id?: string;
-  type: "general" | "client";
-  subType: "one-to-one" | "group";
+  type: "general" | "client" | "broadcast";
   created_by: string;
   messages?: Message[];
   client?: Client | null;
-  Participants_ids: string[];
+  participants_ids: string[];
   has_unread_messages?: boolean;
+  unread_count?: number;
+  name?: string;
+  participants?: IUser[];
+  left_participants?: IUser[];
+  left_participants_ids?: string[];
 }
 
 export interface BillingHistory extends BaseSchema {

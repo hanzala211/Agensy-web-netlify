@@ -1,3 +1,5 @@
+import type { IUser } from "./schemas";
+
 export type MedicalHistoryArrayField =
   | "diagnoses"
   | "allergies"
@@ -88,7 +90,12 @@ export interface TypingUsers {
 
 export interface PendingThreadData {
   id: string;
-  type: "general" | "client";
   participants_ids: string[];
   client_id?: string;
+  name?: string;
+  type?: "general" | "client" | "broadcast";
+  participants?: IUser[];
+  created_by?: string;
+  left_participants?: IUser[];
+  left_participants_ids?: string[];
 }

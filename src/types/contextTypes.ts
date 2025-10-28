@@ -40,6 +40,7 @@ export interface AuthContextType {
   handleFilterPermission: (clientId: string, appAction: string) => boolean;
   isPrimaryUserSubscriptionActive: (clientId: string) => boolean;
   isLoggingOut: boolean;
+  loadAllUsers: () => void;
 }
 
 export interface ClientContextType {
@@ -111,17 +112,23 @@ export interface MessagesContextType {
   updateThreads: (
     threadId: string,
     lastMessageSender: string,
-    message: string
+    message: string,
+    fileData?: { file_url: string; file_name: string; file_key: number },
+    messageId?: string
   ) => void;
   updateSelectedThread: (
     threadId: string,
     lastMessageSender: string,
-    message: string
+    message: string,
+    fileData?: { file_url: string; file_name: string; file_key: number },
+    messageId?: string
   ) => void;
   updateCurrentThreadMessages: (
     message: string,
     thread: string,
-    senderID: string
+    senderID: string,
+    fileData?: { file_url: string; file_name: string; file_key: number },
+    messageId?: string
   ) => void;
   updateThreadsSorting: () => void;
   pendingThreadData: PendingThreadData | null;
@@ -131,23 +138,11 @@ export interface MessagesContextType {
   clearPendingThreadData: () => void;
   addThreadToList: (thread: Thread) => void;
   updateThreadWithFullData: (thread: Thread) => void;
-  navigateToExistingThread: (
-    threadId: string,
-    navigate: (path: string) => void
-  ) => void;
-  existingThreadData: {
-    threadId: string;
-    clientId?: string;
-  } | null;
-  setExistingThreadData: React.Dispatch<
-    React.SetStateAction<{
-      threadId: string;
-      clientId?: string;
-    } | null>
-  >;
-  clearExistingThreadData: () => void;
-  markMessageAsRead: (messageId: string, threadId: string) => void;
+  markMessageAsRead: (threadId: string) => void;
   typingUsers: TypingUsers;
   emitTypingStart: (threadId: string) => void;
   emitTypingStop: (threadId: string) => void;
+  deleteMessage: (messageId: string, threadId: string) => void;
+  leaveThread: (threadId: string) => void;
+  deleteThread: (threadId: string) => void;
 }

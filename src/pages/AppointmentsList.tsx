@@ -93,7 +93,6 @@ export const AppointmentsList: React.FC = () => {
         setFirstDateValue={setFrom}
         secondDateValue={to}
         setSecondDateValue={setTo}
-        applyWidth={false}
       />
 
       <div className="space-y-4">

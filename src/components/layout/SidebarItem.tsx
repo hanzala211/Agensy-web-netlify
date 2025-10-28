@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import type { ElementType } from "react";
 import React from "react";
+import { UnreadCountBadge } from "@agensy/components";
 
 interface SidebarItemProps {
   link: string;
@@ -8,6 +9,7 @@ interface SidebarItemProps {
   label: string;
   onClick?: () => void;
   isIconType?: boolean;
+  unreadCount?: number;
 }
 
 export const SidebarItem: React.FC<SidebarItemProps> = ({
@@ -16,6 +18,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   label,
   onClick,
   isIconType = false,
+  unreadCount,
 }) => {
   return (
     <NavLink
@@ -51,6 +54,14 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
             )}
           </div>
           <span className="text-sm">{label}</span>
+          {unreadCount !== undefined && unreadCount > 0 && (
+            <div className="absolute top-1/2 -translate-y-1/2 right-3">
+              <UnreadCountBadge
+                count={unreadCount}
+                className="!min-w-[16px] !h-[16px] !text-[11px]"
+              />
+            </div>
+          )}
         </React.Fragment>
       )}
     </NavLink>

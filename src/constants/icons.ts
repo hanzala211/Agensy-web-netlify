@@ -5,6 +5,7 @@ import {
   FaClock,
   FaDownload,
   FaFax,
+  FaPaperclip,
   FaPhone,
   FaPills,
   FaRegEye,
@@ -30,9 +31,11 @@ import {
   MdMailOutline,
   MdMenu,
   MdOutlineEditNote,
+  MdOutlineGroups3,
   MdPayment,
 } from "react-icons/md";
 import { RxDropdownMenu } from "react-icons/rx";
+import { HiSpeakerWave } from "react-icons/hi2";
 import { TbPassword } from "react-icons/tb";
 import {
   UserOutlined,
@@ -59,6 +62,8 @@ import {
   IoCheckmarkDoneOutline,
   IoHomeSharp,
   IoPersonAdd,
+  IoSend,
+  IoExitOutline,
 } from "react-icons/io5";
 import { CiMedicalCross } from "react-icons/ci";
 import { GrDocumentText } from "react-icons/gr";
@@ -127,4 +132,9 @@ export const ICONS = {
   uploadDoc: FaUpload,
   info: InfoCircleOutlined,
   moreVertical: MoreOutlined,
+  clip: FaPaperclip,
+  send: IoSend,
+  group: MdOutlineGroups3,
+  exit: IoExitOutline,
+  broadcast: HiSpeakerWave,
 };

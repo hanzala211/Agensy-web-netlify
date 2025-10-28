@@ -63,7 +63,6 @@ export const OCRModel: React.FC<OCRModelProps> = ({
 
       const structuredData = mappedFields.map((field: MappedField) => {
         const formattedKey = StringUtils.formatKeyLabel(field.field);
-
         return {
           key: field.label,
           value: field.value,

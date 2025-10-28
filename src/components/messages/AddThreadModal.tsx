@@ -1,60 +1,92 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useMemo, useRef } from "react";
-import { Modal, PrimaryButton, RadioInput } from "@agensy/components";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Modal, PrimaryButton, Select } from "@agensy/components";
 import { addThreadFormSchema, type AddThreadFormData } from "@agensy/types";
-import type { AccessInfo, Client, IUser } from "@agensy/types";
+import type { Client } from "@agensy/types";
 import { useAuthContext } from "@agensy/context";
-import { Select } from "antd";
+import { useGetThreadByParticipantsMutation } from "@agensy/api";
 import { useParams } from "react-router-dom";
+import { MultiSelectParticipant } from "@agensy/components";
+import { ROLES } from "@agensy/constants";
 
 interface AddThreadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: AddThreadFormData) => void;
+  onExistingThreadFound?: (threadId: string) => void;
   isLoading?: boolean;
   showType?: boolean;
+  defaultType?: "message" | "broadcast";
+  showBroadCastOption?: boolean;
 }
 
 export const AddThreadModal: React.FC<AddThreadModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  onExistingThreadFound,
   isLoading = false,
   showType = true,
+  defaultType = "message",
+  showBroadCastOption = false,
 }) => {
   const { accessUsers, clients, userData } = useAuthContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const params = useParams();
+  const isAdmin = userData?.Roles?.some((role) => role.role === ROLES.ADMIN);
+  const [messageType, setMessageType] = useState<"message" | "broadcast">(
+    defaultType
+  );
 
-  const { handleSubmit, control, reset, watch, register, setValue } =
+  const { handleSubmit, control, reset, watch, setValue } =
     useForm<AddThreadFormData>({
       resolver: zodResolver(addThreadFormSchema),
       defaultValues: {
-        type: showType ? "general" : "client",
-        participant_id: "",
-        client_id: "",
+        type: params.clientId ? "client" : showType ? "general" : "client",
+        participant_ids: [],
+        client_id: params.clientId || "",
       },
     });
 
+  const clientsData = useMemo(() => {
+    return (
+      clients?.map((client: Client) => ({
+        label: `${client.first_name} ${client.last_name}`,
+        value: client.id as string,
+      })) || []
+    );
+  }, [clients]);
+
+  const getThreadByParticipantsMutation = useGetThreadByParticipantsMutation();
+
+  const currentType = watch("type");
+  const currentClientId = watch("client_id");
   useEffect(() => {
-    if (watch("type") !== "client") {
+    if (messageType === "broadcast") {
+      setValue("participant_ids", []);
       setValue("client_id", "");
+      setValue("type", "broadcast");
+    } else {
+      setValue("type", "message");
     }
-  }, [watch("type")]);
+    if (currentClientId) {
+      setValue("type", "client");
+    }
+  }, [messageType, currentClientId]);
 
   useEffect(() => {
-    if (watch("client_id")) {
-      setValue("participant_id", "");
+    if (currentClientId) {
+      setValue("participant_ids", []);
     }
-  }, [watch("client_id")]);
+  }, [currentClientId]);
 
   useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
         reset({
-          type: showType ? "general" : "client",
-          participant_id: "",
+          type: params.clientId ? "client" : showType ? "general" : "client",
+          participant_ids: [],
           client_id: params.clientId || "",
         });
       }, 300);
@@ -66,134 +98,183 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
     onClose();
   };
 
-  const handleFormSubmit = (data: AddThreadFormData) => {
+  const handleFormSubmit = async (data: AddThreadFormData) => {
+    if (messageType === "broadcast") {
+      if (!userData?.id) {
+        return;
+      }
+      setMessageType("message");
+      onClose();
+
+      if (onSubmit) {
+        onSubmit({
+          type: "broadcast",
+          participant_ids: [],
+          client_id: "",
+        });
+      }
+
+      return;
+    }
+
+    const participantIds = data.participant_ids || [];
+
+    if (participantIds.length === 0 || !userData?.id) {
+      return;
+    }
+
+    const participants = [userData.id, ...participantIds].sort();
+
+    try {
+      const existingThread = await getThreadByParticipantsMutation.mutateAsync({
+        participants: participants as string[],
+        clientId: data.client_id || undefined,
+        type: (data.client_id ? "client" : "general") as "client" | "general",
+      });
+      console.log(existingThread);
+
+      if (existingThread && onExistingThreadFound) {
+        onExistingThreadFound(existingThread.id);
+        onClose();
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking for existing thread:", error);
+    }
+
     if (onSubmit) {
-      onSubmit(data);
+      onSubmit({
+        ...data,
+        type: (data.client_id ? "client" : "general") as "client" | "general",
+      });
     }
   };
 
   const users = useMemo(() => {
-    return (
-      (watch("client_id") &&
-        clients
-          ?.find((client) => client.id === watch("client_id"))
-          ?.Users.filter((user) => user.id !== userData?.id)) ||
-      []
-    );
-  }, [clients, watch("client_id")]);
+    const hasAccessToClient = (clientId: string): boolean => {
+      if (!userData?.Roles) return false;
+      return userData.Roles.some((role) => role.client_id === clientId);
+    };
 
+    if (currentClientId) {
+      if (!hasAccessToClient(currentClientId)) {
+        return [];
+      }
+      return (
+        accessUsers?.filter(
+          (user) =>
+            user.id !== userData?.id &&
+            (user.Roles || user.UserRoles)?.some(
+              (role) => role.client_id === currentClientId
+            )
+        ) || []
+      );
+    }
+
+    // General thread - show all users
+    return accessUsers?.filter((user) => user.id !== userData?.id) || [];
+  }, [clients, currentClientId, currentType, accessUsers, userData]);
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Start Messaging"
-      maxWidth="max-w-lg"
-      height={showType ? "sm:h-[29rem] h-[27rem]" : "h-[20rem]"}
+      title=""
+      maxWidth="max-w-md"
+      height="h-auto"
+      footerClass="!p-3"
       footer={
         <PrimaryButton
           onClick={() => inputRef.current?.click()}
           type="button"
-          className="w-fit"
-          isLoading={isLoading}
-          disabled={isLoading}
+          className="w-fit !text-[14px] !min-h-[40px]"
+          isLoading={isLoading || getThreadByParticipantsMutation.isPending}
+          disabled={isLoading || getThreadByParticipantsMutation.isPending}
         >
-          Start Messaging
+          {messageType === "broadcast" ? "Start Broadcast" : "Start Messaging"}
         </PrimaryButton>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
-        {showType && (
-          <div className="flex items-center justify-around">
-            <RadioInput
-              register={register("type")}
-              label="General"
-              value="general"
-            />
-            <RadioInput
-              register={register("type")}
-              label="Care Recipient"
-              value="client"
-            />
+        {isAdmin && showBroadCastOption && (
+          <div className="border border-gray-200 w-[85%] rounded-lg p-1 ml-6 flex gap-1 mb-4">
+            <button
+              type="button"
+              onClick={() => setMessageType("message")}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                messageType === "message"
+                  ? "bg-primaryColor text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              New Message
+            </button>
+            <button
+              type="button"
+              onClick={() => setMessageType("broadcast")}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                messageType === "broadcast"
+                  ? "bg-primaryColor text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              Broadcast
+            </button>
           </div>
         )}
-        {(watch("type") === "client" || watch("type") === "general") &&
-          showType && (
+
+        {messageType === "broadcast" && (
+          <div className="text-center py-4">
+            <p className="text-gray-600 text-sm">
+              Broadcast messages will be sent to all users. You can compose your
+              message on the next page.
+            </p>
+          </div>
+        )}
+
+        {messageType === "message" && (
+          <>
+            {showType && (
+              <div>
+                <label className="text-darkGray mb-2 block font-medium">
+                  Re: (Optional)
+                </label>
+                <Select
+                  control={control}
+                  name="client_id"
+                  label=""
+                  data={clientsData}
+                  labelOption="Search to Select Care Recipient (Optional)"
+                  className="w-full"
+                  showSearch
+                />
+              </div>
+            )}
+
             <div>
               <label className="text-darkGray mb-2 block font-medium">
-                Select Care Recipient
+                To:
               </label>
               <Controller
-                name="client_id"
+                name="participant_ids"
                 control={control}
                 render={({ field: { value, onChange, ...field } }) => (
-                  <Select
+                  <MultiSelectParticipant
                     {...field}
-                    value={value || undefined}
+                    value={value || []}
                     onChange={onChange}
-                    showSearch
-                    placeholder="Search to Select Care Recipient"
-                    optionFilterProp="value"
-                    style={{ width: "100%" }}
-                    filterOption={(
-                      input: string,
-                      option: { label: string; value: string }
-                    ) =>
-                      (option?.label ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    // @ts-expect-error - Antd types are not compatible with our types
-                    options={
-                      clients?.map((client: Client) => ({
-                        label: `${client.first_name} ${client.last_name}`,
-                        value: client.id as string,
-                      })) || []
-                    }
+                    placeholder="Start typing names..."
+                    options={users}
+                    allowClear={true}
+                    className="w-full"
+                    clientId={currentClientId}
+                    accessUsers={accessUsers}
+                    userData={userData || undefined}
                   />
                 )}
               />
             </div>
-          )}
-        <div>
-          <label className="text-darkGray mb-2 block font-medium">
-            Select Recipient
-          </label>
-          <Controller
-            name="participant_id"
-            control={control}
-            render={({ field: { value, onChange, ...field } }) => (
-              <Select
-                {...field}
-                value={value || undefined}
-                onChange={onChange}
-                showSearch
-                style={{ width: "100%" }}
-                placeholder="Send Message to"
-                optionFilterProp="value"
-                filterOption={(
-                  input: string,
-                  option: { label: string; value: string }
-                ) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                // @ts-expect-error - Antd types are not compatible with our types
-                options={
-                  users.length > 0 || watch("client_id")
-                    ? users?.map((user: AccessInfo) => ({
-                        label: `${user.first_name} ${user.last_name}`,
-                        value: user.id as string,
-                      }))
-                    : accessUsers?.map((user: IUser) => ({
-                        label: `${user.first_name} ${user.last_name}`,
-                        value: user.id as string,
-                      })) || []
-                }
-              />
-            )}
-          />
-        </div>
+          </>
+        )}
 
         <input type="submit" ref={inputRef} className="hidden" />
       </form>

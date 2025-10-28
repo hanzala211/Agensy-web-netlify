@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import type { AddThreadFormData, Thread } from "@agensy/types";
+import type { AddThreadFormData, IUser, Thread } from "@agensy/types";
 import { AddThreadModal, ThreadList } from "@agensy/components";
 import { ICONS, ROUTES } from "@agensy/constants";
 import { useAuthContext, useMessagesContext } from "@agensy/context";
@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export const ClientMessages: React.FC = () => {
   const params = useParams();
-  const { userData } = useAuthContext();
+  const { userData, accessUsers } = useAuthContext();
   const {
     showThreadList,
     setShowThreadList,
@@ -53,18 +53,29 @@ export const ClientMessages: React.FC = () => {
   const handleAddThread = (data: AddThreadFormData) => {
     const threadId = uuidv4();
 
-    // Clear previous thread data before creating new thread
     setCurrentThreadMessages([]);
     setSelectedThread(null);
 
-    // Set pending thread data for the first message
     setPendingThreadData({
       id: threadId,
-      type: data.type as "general" | "client",
-      participants_ids: [userData?.id as string, data.participant_id],
+      participants_ids: [
+        userData?.id as string,
+        ...(data.participant_ids || []),
+      ],
       client_id: data.client_id,
+      participants: data.participant_ids?.map(
+        (id) => accessUsers?.find((user) => user.id === id) as IUser
+      ),
+      created_by: userData?.id as string,
     });
 
+    setIsAddThreadModalOpen(false);
+    navigate(
+      `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}/${threadId}`
+    );
+  };
+
+  const handleExistingThreadFound = (threadId: string) => {
     setIsAddThreadModalOpen(false);
     navigate(
       `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}/${threadId}`
@@ -89,7 +100,6 @@ export const ClientMessages: React.FC = () => {
             selectedThreadId={params.threadId}
             onAddThread={() => setIsAddThreadModalOpen(true)}
             threads={clientThreads}
-            showBadge={false}
           />
         </div>
 
@@ -116,6 +126,7 @@ export const ClientMessages: React.FC = () => {
         isOpen={isAddThreadModalOpen}
         onClose={() => setIsAddThreadModalOpen(false)}
         onSubmit={handleAddThread}
+        onExistingThreadFound={handleExistingThreadFound}
       />
     </div>
   );

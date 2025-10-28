@@ -102,7 +102,7 @@ export const PersonalInfoCard: React.FC = () => {
         </div>
       </Card>
       <AddClientModal
-        title="Edit Client Profile"
+        title="Edit Care Recipient Profile"
         isOpen={isEditModalOpen}
         setIsOpen={setIsEditModalOpen}
         btnText="Save Changes"

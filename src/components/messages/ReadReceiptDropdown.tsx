@@ -18,7 +18,7 @@ export const ReadReceiptDropdown: React.FC<ReadReceiptDropdownProps> = ({
   const { accessUsers } = useAuthContext();
 
   const participants =
-    thread.Participants_ids?.filter((id) => id !== message.sender_id) || [];
+    thread.participants_ids?.filter((id) => id !== message.sender_id) || [];
   const readStatuses = participants.map((participantId) => {
     const user = accessUsers?.find((u) => u.id === participantId);
     const readBy = message.read_by?.find((r) => r.user_id === participantId);

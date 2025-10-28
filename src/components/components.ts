@@ -151,3 +151,4 @@ export * from "./model/DiagnosisSelectionModal";
 export * from "./model/AllergySelectionModal";
 export * from "./common/StickyScrollToTop";
 export * from "./common/UnreadCountBadge";
+export * from "./common/MultiSelectParticipant";

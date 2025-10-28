@@ -513,7 +513,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
           <PrimaryButton
             onClick={handleCancel}
             type="button"
-            className="w-fit bg-white !text-basicBlue border border-basicBlue hover:!text-basicWhite hover:bg-blue-50"
+            className="w-fit bg-white !text-basicBlue hover:!text-basicWhite border border-basicBlue hover:bg-blue-50"
             isLoading={false}
           >
             Cancel

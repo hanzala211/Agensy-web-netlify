@@ -82,7 +82,7 @@ export const AddAccessModal: React.FC<AddAccessModalProps> = ({
           <PrimaryButton
             onClick={handleClose}
             type="button"
-            className="w-fit bg-white !text-basicBlue border border-basicBlue hover:bg-blue-50 hover:!text-basicWhite"
+            className="w-fit bg-white !text-basicBlue hover:!text-basicWhite border border-basicBlue hover:bg-blue-50"
             isLoading={false}
           >
             Cancel

@@ -9,6 +9,7 @@ interface ModalProps {
   maxWidth?: string;
   footer?: React.ReactNode;
   height?: string;
+  footerClass?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -19,6 +20,7 @@ export const Modal: React.FC<ModalProps> = ({
   maxWidth = "max-w-3xl",
   footer,
   height = "h-[90vh]",
+  footerClass = "",
 }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -47,13 +49,23 @@ export const Modal: React.FC<ModalProps> = ({
       />
 
       <div
-        className={`relative z-[500] bg-white rounded-lg shadow-[0_0_25px_rgba(0,0,0,0.15)] w-full ${maxWidth} flex flex-col ${height} m-4`}
+        className={`relative z-[500] bg-white rounded-lg shadow-[0_0_25px_rgba(0,0,0,0.15)] w-full ${maxWidth} flex flex-col ${height} sm:m-4`}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 z-10 rounded-t-lg">
-          <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
+        <div
+          className={`flex items-center justify-between ${
+            title
+              ? "border-b border-gray-100 p-6"
+              : "absolute top-2 right-2 z-20"
+          } bg-basicWhite rounded-t-xl`}
+        >
+          {title && (
+            <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
+          )}
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none"
+            className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
+              title ? "" : "bg-white"
+            }`}
             aria-label="Close modal"
           >
             <IoCloseOutline size={22} />
@@ -63,7 +75,9 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6">{children}</div>
 
         {footer && (
-          <div className="px-6 py-4 border-t border-gray-100 sticky bottom-0 bg-white z-10 rounded-b-lg">
+          <div
+            className={`px-6 py-4 border-t border-gray-100 sticky bottom-0 bg-white z-10 rounded-b-lg ${footerClass}`}
+          >
             {footer}
           </div>
         )}

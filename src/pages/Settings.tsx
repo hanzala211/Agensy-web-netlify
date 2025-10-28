@@ -7,7 +7,7 @@ export const Settings = () => {
   const { userData } = useAuthContext();
   const isAdmin = userData?.role === ROLES.ADMIN;
   return (
-    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full md:px-8 px-4 py-6">
+    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
       <PageHeader
         className={`mb-2`}
         title="Settings"

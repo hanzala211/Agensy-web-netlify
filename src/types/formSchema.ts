@@ -356,17 +356,54 @@ export const passwordSchema = z
 
 export type PasswordFormData = z.infer<typeof passwordSchema>;
 
-export const addThreadFormSchema = z.object({
-  client_id: z
-    .string()
-    .min(1, "Care Recipient is Required")
-    .transform((val) => (val ? trimString(val) : val)),
-  type: z.string().min(1, "Type is Required").transform(trimString),
-  participant_id: z
-    .string()
-    .min(1, "Participant ID is Required")
-    .transform(trimString),
-});
+export const addThreadFormSchema = z
+  .object({
+    client_id: z
+      .string()
+      .optional()
+      .transform((val) => (val ? trimString(val) : val)),
+    type: z.string().min(1, "Type is Required").transform(trimString),
+    participant_ids: z.array(z.string()).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "broadcast") {
+        return (
+          !data.client_id &&
+          (!data.participant_ids || data.participant_ids.length === 0)
+        );
+      }
+      return true;
+    },
+    {
+      message: "Broadcast messages cannot have participants or clients",
+      path: ["participant_ids"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.type !== "broadcast" && data.type !== "client") {
+        return data.participant_ids && data.participant_ids.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "At least one participant is required",
+      path: ["participant_ids"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.type === "client") {
+        return data.client_id && data.client_id.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Care Recipient is Required",
+      path: ["client_id"],
+    }
+  );
 
 export type AddThreadFormData = z.infer<typeof addThreadFormSchema>;
 

@@ -1,21 +1,35 @@
 import { useGetSingleThreadQuery } from "@agensy/api";
-import { CommonLoader, MessageForm, MessageList } from "@agensy/components";
-import { ICONS, ROUTES } from "@agensy/constants";
+import {
+  CommonLoader,
+  ConfirmationModal,
+  MessageForm,
+  MessageList,
+} from "@agensy/components";
+import { ICONS, ROUTES, ROLES } from "@agensy/constants";
 import { useAuthContext, useMessagesContext } from "@agensy/context";
-import type { Message } from "@agensy/types";
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import type { IUser, Message, PendingThreadData, Thread } from "@agensy/types";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export const ChatPage: React.FC = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const { accessUsers } = useAuthContext();
-  const [isSilentFetch, setIsSilentFetch] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [cachedUser, setCachedUser] = useState<any>(null);
+  const { accessUsers, clients } = useAuthContext();
+  const [cachedUser, setCachedUser] = useState<IUser | null>(null);
+  const [cachedGroupName, setCachedGroupName] = useState<string>("");
+  const [cachedBroadcastName, setCachedBroadcastName] = useState<string>("");
+  const [cachedThreadType, setCachedThreadType] = useState<
+    "one-to-one" | "group" | "broadcast" | null
+  >(null);
   const {
     data: threadData,
-    isLoading: isThreadLoading,
+    isFetching: isThreadLoading,
     status: getThreadStatus,
     error: threadError,
     refetch: loadThread,
@@ -30,28 +44,104 @@ export const ChatPage: React.FC = () => {
     addThreadToList,
     updateThreadWithFullData,
     typingUsers,
+    leaveThread,
+    deleteThread,
   } = useMessagesContext();
-  const prevPendingThreadData = useRef(pendingThreadData);
-  const selectedUser = useMemo(() => {
-    if (pendingThreadData) {
-      const otherParticipantId = pendingThreadData.participants_ids.find(
-        (id) => id !== userData?.id
+  const [confirmLeave, setConfirmLeave] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const isAdmin = userData?.Roles?.some((role) => role.role === ROLES.ADMIN);
+
+  const isCurrentlyLoading = useCallback((): boolean => {
+    return (
+      isThreadLoading && !pendingThreadData && !cachedUser && !cachedThreadType
+    );
+  }, [isThreadLoading, pendingThreadData, cachedUser, cachedThreadType]);
+
+  const clearCachedData = () => {
+    setCachedUser(null);
+    setCachedGroupName("");
+    setCachedBroadcastName("");
+    setCachedThreadType(null);
+  };
+
+  const formatGroupParticipantNames = (
+    thread: Thread | PendingThreadData
+  ): string => {
+    if (!thread.participants) return "Group Chat";
+
+    const participantNames = thread.participants
+      .filter((participant) => {
+        const isCurrentUser = participant.id === userData?.id;
+        const isLeftParticipant =
+          "left_participants_ids" in thread &&
+          thread.left_participants_ids?.includes(participant.id as string);
+        return !isCurrentUser && !isLeftParticipant;
+      })
+      .map((participant) => participant.first_name)
+      .join(", ")
+      .concat(", You");
+
+    if (participantNames && participantNames.length > 30) {
+      return participantNames.substring(0, 30) + "...";
+    }
+    return participantNames || "Group Chat";
+  };
+
+  const processThreadForUser = useCallback(
+    (thread: Thread | PendingThreadData): IUser | null => {
+      if (!thread) return null;
+
+      if (thread.type === "broadcast") {
+        setCachedThreadType("broadcast");
+        setCachedBroadcastName(thread.name || "Agensy Broadcast");
+        return null;
+      }
+
+      const isOneToOne = thread.participants_ids.length <= 2;
+      setCachedThreadType(isOneToOne ? "one-to-one" : "group");
+
+      // For groups, return null
+      if (!isOneToOne) {
+        return null;
+      }
+
+      // Find the other participant for one-to-one chats
+      const otherParticipantId = thread.participants_ids.find(
+        (id: string) => id !== userData?.id
       );
-      const user = accessUsers?.find((user) => user.id === otherParticipantId);
+      const user = thread?.participants?.find(
+        (u: IUser) => u.id === otherParticipantId
+      );
+
       if (user) {
         setCachedUser(user);
       }
-      return user;
+
+      return user || null;
+    },
+    [userData?.id]
+  );
+
+  const selectedUser = useMemo(() => {
+    if (selectedThread && !pendingThreadData) {
+      return processThreadForUser(selectedThread);
     }
 
-    if (cachedUser) {
+    if (pendingThreadData && !selectedThread) {
+      return processThreadForUser(pendingThreadData);
+    }
+
+    if (cachedUser && cachedThreadType === "one-to-one") {
       return cachedUser;
     }
 
     return accessUsers?.find(
       (participant) =>
         participant.id !== userData?.id &&
-        selectedThread?.Participants_ids.includes(participant.id as string)
+        selectedThread?.participants_ids.includes(participant.id as string)
     );
   }, [
     selectedThread,
@@ -59,7 +149,187 @@ export const ChatPage: React.FC = () => {
     pendingThreadData,
     userData?.id,
     cachedUser,
+    cachedThreadType,
   ]);
+
+  const getThreadDisplayName = () => {
+    const currentThread = selectedThread || pendingThreadData;
+
+    if (cachedThreadType === "broadcast") {
+      return cachedBroadcastName || "Broadcast";
+    }
+
+    if (
+      currentThread &&
+      "type" in currentThread &&
+      currentThread.type === "broadcast"
+    ) {
+      return currentThread.name || "Broadcast";
+    }
+
+    if (cachedThreadType === "one-to-one" && cachedUser) {
+      return `${cachedUser.first_name} ${cachedUser.last_name}`;
+    }
+
+    if (cachedThreadType === "group") {
+      if (cachedGroupName) {
+        return cachedGroupName;
+      }
+      if (currentThread) {
+        return currentThread.name || formatGroupParticipantNames(currentThread);
+      }
+    }
+
+    // Fallback: determine type from current thread
+    if (currentThread) {
+      const isGroupChat = currentThread.participants_ids?.length > 2;
+
+      if (isGroupChat) {
+        return currentThread.name || formatGroupParticipantNames(currentThread);
+      } else {
+        return selectedUser
+          ? `${selectedUser.first_name} ${selectedUser.last_name}`
+          : "";
+      }
+    }
+
+    return cachedGroupName || "";
+  };
+
+  const selectedClient = useMemo(() => {
+    const currentThread = selectedThread || pendingThreadData;
+    if (currentThread) {
+      if (selectedThread?.type === "client" && selectedThread?.client_id) {
+        return clients?.find((c) => c.id === selectedThread.client_id);
+      }
+      if (pendingThreadData?.client_id) {
+        return clients?.find((c) => c.id === pendingThreadData.client_id);
+      }
+    }
+    return null;
+  }, [selectedThread, pendingThreadData, clients]);
+
+  // Permission logic for delete button
+  const canDeleteThread = () => {
+    const currentThread = selectedThread || pendingThreadData;
+    if (!currentThread) return false;
+
+    // Admin can delete any thread
+    if (isAdmin) return true;
+
+    // Broadcast: only admin can delete (already covered above)
+    if (currentThread.type === "broadcast") return false;
+
+    // One-to-one: anyone can delete
+    if (currentThread.participants_ids.length <= 2) return true;
+
+    // Group: creator or primary user (family admin) can delete
+    const isCreator = currentThread.created_by === userData?.id;
+    return isCreator;
+  };
+
+  // Click-outside handler for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleDeleteThread = () => {
+    const currentThread = selectedThread || pendingThreadData;
+
+    if (!currentThread) return;
+
+    clearCachedData();
+
+    deleteThread(currentThread.id as string);
+
+    if (params.clientId) {
+      navigate(
+        `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}`
+      );
+    } else {
+      navigate(`${ROUTES.messages}`);
+    }
+
+    setConfirmDelete(false);
+    setShowDropdown(false);
+    setSelectedThread(null);
+    setShowThreadList(true);
+  };
+
+  useEffect(() => {
+    if (params.threadId && selectedThread && pendingThreadData) {
+      const isSameThread =
+        selectedThread.id === params.threadId &&
+        pendingThreadData.id === params.threadId;
+      if (!isSameThread) {
+        clearCachedData();
+      }
+    } else if (params.threadId && !pendingThreadData && !selectedThread) {
+      clearCachedData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.threadId]);
+
+  useEffect(() => {
+    const currentThread = selectedThread || pendingThreadData;
+    if (currentThread) {
+      if (currentThread.type === "broadcast") {
+        setCachedThreadType("broadcast");
+        setCachedBroadcastName(currentThread.name || "Broadcast");
+        return;
+      }
+
+      const isOneToOne = currentThread.participants_ids.length <= 2;
+      setCachedThreadType(isOneToOne ? "one-to-one" : "group");
+
+      if (isOneToOne) {
+        if (cachedGroupName) {
+          setCachedGroupName("");
+        }
+      } else {
+        if (currentThread.name) {
+          setCachedGroupName(currentThread.name);
+        } else if (!cachedGroupName) {
+          const participantNames = currentThread.participants
+            ?.filter((participant) => {
+              const isCurrentUser = participant.id === userData?.id;
+              const isLeftParticipant =
+                "left_participants_ids" in currentThread &&
+                currentThread.left_participants_ids?.includes(
+                  participant.id as string
+                );
+              return !isCurrentUser && !isLeftParticipant;
+            })
+            .map((participant) => participant.first_name)
+            .join(", ")
+            .concat(", You");
+
+          const groupName =
+            participantNames && participantNames.length > 30
+              ? participantNames.substring(0, 30) + "..."
+              : participantNames || "Group Chat";
+
+          setCachedGroupName(groupName);
+        }
+      }
+    }
+  }, [selectedThread, pendingThreadData, userData?.id, cachedGroupName]);
+
+  useEffect(() => {
+    if (params.threadId && !pendingThreadData) {
+      loadThread();
+    }
+  }, [params.threadId, pendingThreadData]);
 
   useEffect(() => {
     if (getThreadStatus === "success" && threadData) {
@@ -73,32 +343,20 @@ export const ChatPage: React.FC = () => {
       setCurrentThreadMessages(messagesWithReadBy);
       updateThreadWithFullData(threadData);
       addThreadToList(threadData);
-      setIsSilentFetch(false);
     }
   }, [getThreadStatus, threadData]);
-
-  useEffect(() => {
-    if (params.threadId && !pendingThreadData) {
-      loadThread();
-    }
-  }, [params.threadId, pendingThreadData]);
-
-  useEffect(() => {
-    if (
-      prevPendingThreadData.current &&
-      !pendingThreadData &&
-      params.threadId
-    ) {
-      setIsSilentFetch(true);
-    }
-    prevPendingThreadData.current = pendingThreadData;
-  }, [pendingThreadData, params.threadId]);
 
   useEffect(() => {
     if (threadError && !pendingThreadData) {
       navigate(`${ROUTES.messages}`);
     }
-  }, [threadError]);
+  }, [threadError, pendingThreadData]);
+
+  useEffect(() => {
+    return () => {
+      clearCachedData();
+    };
+  }, []);
 
   const renderTypingIndicator = () => {
     const currentThreadId = selectedThread?.id || pendingThreadData?.id;
@@ -112,7 +370,9 @@ export const ChatPage: React.FC = () => {
       const typingUserIds = Object.keys(threadTypingUsers);
       const typingUserNames = typingUserIds
         .map((userId) => {
-          const typingUser = accessUsers?.find((u) => u.id === userId);
+          const typingUser = (
+            selectedThread || pendingThreadData
+          )?.participants?.find((u) => u.id === userId);
           return typingUser
             ? `${typingUser.first_name} ${typingUser.last_name}`
             : "Someone";
@@ -136,7 +396,32 @@ export const ChatPage: React.FC = () => {
     return null;
   };
 
+  const handleLeaveThread = () => {
+    const currentThread = selectedThread || pendingThreadData;
+
+    if (!currentThread) return;
+
+    clearCachedData();
+
+    leaveThread(currentThread.id as string);
+
+    if (params.clientId) {
+      navigate(
+        `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}`
+      );
+    } else {
+      navigate(`${ROUTES.messages}`);
+    }
+
+    setConfirmLeave(false);
+    setSelectedThread(null);
+    setShowThreadList(true);
+  };
+
   const handleBack = () => {
+    // Clear cached data when navigating away
+    clearCachedData();
+
     if (!params.clientId) {
       navigate(`${ROUTES.messages}`);
       setShowThreadList(true);
@@ -161,58 +446,122 @@ export const ChatPage: React.FC = () => {
             <ICONS.leftArrow />
           </button>
           <div className="flex-shrink-0 relative">
-            {selectedUser ? (
-              selectedUser?.avatar ? (
-                <img
-                  src={selectedUser?.avatar}
-                  alt="profile"
-                  className="w-12 h-12 rounded-full object-cover shadow-sm"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white flex items-center justify-center text-sm font-medium shadow-sm">
-                  <div className="w-full h-full flex items-center text-lg justify-center">
-                    {(selectedUser?.first_name?.[0]?.toUpperCase() || "") +
-                      (selectedUser?.last_name?.[0]?.toUpperCase() || "")}
-                  </div>
+            {!isCurrentlyLoading() ? (
+              pendingThreadData?.type === "broadcast" ||
+              selectedThread?.type === "broadcast" ||
+              cachedThreadType === "broadcast" ? (
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primaryColor to-blue-700 text-white flex items-center justify-center text-sm font-medium shadow-sm">
+                  <ICONS.broadcast className="w-6 h-6" />
                 </div>
+              ) : cachedThreadType === "one-to-one" && selectedUser ? (
+                selectedUser?.avatar ? (
+                  <img
+                    src={selectedUser?.avatar}
+                    alt="profile"
+                    className="w-12 h-12 rounded-full object-cover shadow-sm"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white flex items-center justify-center text-sm font-medium shadow-sm">
+                    <div className="w-full h-full flex items-center text-lg justify-center">
+                      {(selectedUser?.first_name?.[0]?.toUpperCase() || "") +
+                        (selectedUser?.last_name?.[0]?.toUpperCase() || "")}
+                    </div>
+                  </div>
+                )
+              ) : cachedThreadType === "group" ? (
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue text-white flex items-center justify-center text-sm font-medium shadow-sm">
+                  <ICONS.group className="w-6 h-6" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
               )
             ) : (
               <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
             )}
-            {/* Online status indicator */}
-            {selectedUser && (
-              <div
-                className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white rounded-full shadow-sm ${
-                  selectedUser.is_online ? "bg-green-500" : "bg-gray-400"
-                }`}
-              ></div>
-            )}
+            {/* Show online status only for 1-on-1 chats */}
+            {!isCurrentlyLoading() &&
+              cachedThreadType === "one-to-one" &&
+              selectedUser && (
+                <div
+                  className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white rounded-full shadow-sm ${
+                    selectedUser.is_online ? "bg-green-500" : "bg-gray-400"
+                  }`}
+                ></div>
+              )}
           </div>
           <div className="flex-1 min-w-0">
-            {selectedUser ? (
-              <h3 className="font-medium truncate text-darkGray">
-                {selectedUser?.first_name} {selectedUser?.last_name}
-              </h3>
+            {!isCurrentlyLoading() ? (
+              <div className="flex flex-col">
+                <h3 className="font-medium truncate text-darkGray">
+                  {getThreadDisplayName()}
+                </h3>
+                {selectedClient && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    <span className="font-bold">Re:</span>{" "}
+                    {selectedClient.first_name} {selectedClient.last_name}
+                  </p>
+                )}
+              </div>
             ) : (
               <div className="h-5 bg-gray-200 rounded animate-pulse w-32"></div>
             )}
           </div>
+
+          {/* Dropdown Menu for thread actions - Only show if at least one option is available */}
+          {(cachedThreadType === "group" || canDeleteThread()) && (
+            <div ref={dropdownRef} className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primaryColor focus:ring-offset-2 flex items-center justify-center"
+                title="Thread options"
+              >
+                <ICONS.moreVertical />
+              </button>
+
+              {showDropdown && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
+                  {cachedThreadType === "group" && (
+                    <button
+                      onClick={() => {
+                        setShowDropdown(false);
+                        setConfirmLeave(true);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2 text-gray-700"
+                    >
+                      <ICONS.exit className="w-4 h-4" />
+                      <span>Leave Group</span>
+                    </button>
+                  )}
+
+                  {canDeleteThread() && (
+                    <button
+                      onClick={() => {
+                        setShowDropdown(false);
+                        setConfirmDelete(true);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-red-50 transition-colors duration-200 flex items-center gap-2 text-red-600"
+                    >
+                      <ICONS.delete className="w-4 h-4" />
+                      <span>Delete Thread</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
-            {isThreadLoading &&
-            !pendingThreadData &&
-            !threadData &&
-            !selectedThread &&
-            !isSilentFetch ? (
+            {isCurrentlyLoading() ? (
               <div className="flex items-center justify-center h-full">
                 <CommonLoader />
               </div>
             ) : !threadData &&
               !pendingThreadData &&
               !selectedThread &&
-              !cachedUser ? (
+              !cachedUser &&
+              !isThreadLoading ? (
               <div className="flex items-center justify-center h-full text-gray-500">
                 <p>Thread not found or you don't have access to it</p>
               </div>
@@ -224,18 +573,52 @@ export const ChatPage: React.FC = () => {
           {/* Typing indicator above input */}
           {renderTypingIndicator()}
 
-          <MessageForm
-            onSendMessage={() => {}}
-            isLoading={
-              isThreadLoading &&
-              !pendingThreadData &&
-              !threadData &&
-              !selectedThread &&
-              !isSilentFetch
-            }
-          />
+          {(!selectedThread ||
+            (selectedThread && selectedThread.type !== "broadcast")) &&
+            !(pendingThreadData && pendingThreadData.type === "broadcast") && (
+              <MessageForm
+                onSendMessage={() => {}}
+                isLoading={isCurrentlyLoading()}
+              />
+            )}
+
+          {/* Show message form for admin in broadcast, read-only message for non-admins */}
+          {(selectedThread && selectedThread.type === "broadcast") ||
+          (pendingThreadData && pendingThreadData.type === "broadcast") ? (
+            isAdmin ? (
+              <MessageForm
+                onSendMessage={() => {}}
+                isLoading={isCurrentlyLoading()}
+              />
+            ) : (
+              <div className="px-4 py-3 border-t bg-primaryColor text-center">
+                <p className="text-sm text-white font-medium">
+                  This is a broadcast announcement. Replies are not permitted.
+                </p>
+              </div>
+            )
+          ) : null}
         </div>
       </div>
+      <ConfirmationModal
+        title="Leave Group"
+        isModalOpen={confirmLeave}
+        onOk={handleLeaveThread}
+        onCancel={() => setConfirmLeave(false)}
+      >
+        <p>Are you sure you want to leave this group?</p>
+      </ConfirmationModal>
+      <ConfirmationModal
+        title="Delete Thread"
+        isModalOpen={confirmDelete}
+        onOk={handleDeleteThread}
+        onCancel={() => setConfirmDelete(false)}
+      >
+        <p>
+          Are you sure you want to delete this thread? This will permanently
+          delete the thread and all messages for all participants.
+        </p>
+      </ConfirmationModal>
     </React.Fragment>
   );
 };

@@ -1,4 +1,5 @@
 import type {
+  IUser,
   Message,
   MessagesContextType,
   PendingThreadData,
@@ -6,13 +7,12 @@ import type {
   TypingUsers,
 } from "@agensy/types";
 import { createContext, useContext, useEffect, useState, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useSocketContext } from "./SocketContext";
 import { useLocation } from "react-router-dom";
 import { useAuthContext } from "./AuthContext";
 import { useGetAllThreadsQuery } from "@agensy/api";
-import { toast } from "@agensy/utils";
-import { ROUTES } from "@agensy/constants";
+import dayjs from "dayjs";
+import { sortBy } from "lodash";
 
 const MessagesContext = createContext<MessagesContextType | undefined>(
   undefined
@@ -23,7 +23,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { userData } = useAuthContext();
   const location = useLocation();
-  const queryClient = useQueryClient();
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [showThreadList, setShowThreadList] = useState<boolean>(true);
   const [currentThreadMessages, setCurrentThreadMessages] = useState<Message[]>(
@@ -32,22 +31,23 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [threads, setThreads] = useState<Thread[]>([]);
   const [pendingThreadData, setPendingThreadData] =
     useState<PendingThreadData | null>(null);
-  const [existingThreadData, setExistingThreadData] = useState<{
-    threadId: string;
-    clientId?: string;
-  } | null>(null);
   const [typingUsers, setTypingUsers] = useState<TypingUsers>({});
   const selectedThreadRef = useRef<Thread | null>(null);
-  const threadsRef = useRef<Thread[]>([]);
+  const currentMessagesRef = useRef<Message[]>([]);
   const { socket } = useSocketContext();
   const {
     data: threadsData,
-    isLoading: isThreadsLoading,
+    isFetching: isThreadsLoading,
     refetch: loadThreads,
+    status: threadsFetchStatus,
   } = useGetAllThreadsQuery();
 
   useEffect(() => {
-    if (userData) loadThreads();
+    currentMessagesRef.current = currentThreadMessages;
+  }, [currentThreadMessages]);
+
+  useEffect(() => {
+    if (userData && threadsFetchStatus === "pending") loadThreads();
   }, [userData]);
 
   useEffect(() => {
@@ -57,15 +57,9 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [threadsData]);
 
-  // Keep ref in sync with selectedThread state
   useEffect(() => {
     selectedThreadRef.current = selectedThread;
   }, [selectedThread]);
-
-  // Keep ref in sync with threads state
-  useEffect(() => {
-    threadsRef.current = threads;
-  }, [threads]);
 
   useEffect(() => {
     if (
@@ -80,7 +74,12 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     socket?.on(
       "receiveMessage",
-      (data: { threadId: string; message: Message }) => {
+      (data: {
+        threadId: string;
+        message: Message;
+        threadType: string;
+        participants: IUser[];
+      }) => {
         console.log(data);
         setThreads((prev) => {
           const existingThread = prev.find((t) => t.id === data.threadId);
@@ -88,54 +87,63 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
           if (existingThread) {
             return prev.map((thread) => {
               if (thread.id === data.threadId) {
+                let lastMessage = data.message.message;
+                if (!lastMessage && data.message.file_name) {
+                  lastMessage = data.message.file_name;
+                }
+
                 return {
                   ...thread,
-                  messages: [...(thread.messages || []), data.message],
                   has_unread_messages: true,
-                  last_message: data.message.message,
+                  last_message: lastMessage,
                   last_message_time: data.message.createdAt,
                   last_message_sender_id: data.message.sender_id,
+                  unread_count: (thread.unread_count || 0) + 1,
+                  participants: data.participants,
+                  participants_ids: data.participants.map(
+                    (participant) => participant.id as string
+                  ),
                 };
               }
               return thread;
             });
+          }
+
+          let lastMessage = data.message.message;
+          if (!lastMessage && data.message.file_name) {
+            lastMessage = data.message.file_name;
           }
 
           const newThread: Thread = {
             id: data.threadId,
             user_id: data.message.sender_id,
+            participants: data.participants,
             started_at: new Date(),
-            type: data.message.thread?.type || "general", // Default type
-            subType: "one-to-one", // Default subType
+            type: data.threadType as "general" | "client",
             created_by: data.message.sender_id,
-            messages: [data.message],
             has_unread_messages: true,
-            last_message: data.message.message,
+            last_message: lastMessage,
             last_message_time: data.message.createdAt,
             last_message_sender_id: data.message.sender_id,
-            Participants_ids: [data.message.sender_id, userData?.id as string],
+            participants_ids: data.participants.map(
+              (item) => item.id as string
+            ),
             client: null,
+            unread_count: 1,
           };
           return [...prev, newThread];
         });
 
-        setSelectedThread((prev) => {
-          if (!prev) return prev;
-          return prev.id === data?.threadId
-            ? {
-                ...prev,
-                messages: [...(prev.messages || []), data.message],
-              }
-            : prev;
-        });
-
         setCurrentThreadMessages((prev) => {
           if (
             prev &&
             data.message.sender_id !== userData?.id &&
-            prev.find((m) => m.thread_id === data.message.thread_id)
+            prev.find((m) => m.thread_id === data.threadId)
           ) {
-            return [...(prev || []), data.message];
+            return [
+              ...(prev || []),
+              { ...data.message, id: data.message.message_id as string },
+            ];
           }
           return prev;
         });
@@ -145,390 +153,51 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         if (
           currentThreadId === data.threadId &&
           data.message.sender_id !== userData?.id &&
-          data.message.message_id &&
-          (data.message.message_id as string).length > 10 &&
-          !(data.message.message_id as string).match(/^\d+$/) &&
-          data.message.message_id !== "null" &&
-          data.message.message_id !== "undefined"
+          data.message.message_id
         ) {
           setTimeout(() => {
-            markMessageAsRead(data.message.message_id as string, data.threadId);
+            markMessageAsRead(data.threadId);
           }, 300);
         }
 
         updateThreadsSorting();
-
-        // Update query cache with the updated thread data
-        queryClient.setQueryData(
-          ["threads"],
-          (oldData: Thread[] | undefined) => {
-            if (!oldData) return oldData;
-
-            const currentThread = threadsRef.current.find(
-              (t) => t.id === data.threadId
-            );
-            if (currentThread) {
-              const updatedThread = {
-                ...currentThread,
-                messages: [...(currentThread.messages || []), data.message],
-                has_unread_messages: true,
-                last_message: data.message.message,
-                last_message_time: data.message.createdAt,
-                last_message_sender_id: data.message.sender_id,
-              };
-              const otherThreads = oldData.filter(
-                (t) => t.id !== data.threadId
-              );
-              return [updatedThread, ...otherThreads];
-            }
-            const newThread: Thread = {
-              id: data.threadId,
-              user_id: data.message.sender_id,
-              started_at: new Date(),
-              type: data.message.thread?.type || "general",
-              subType: "one-to-one",
-              created_by: data.message.sender_id,
-              messages: [data.message],
-              has_unread_messages: true,
-              last_message: data.message.message,
-              last_message_time: data.message.createdAt,
-              last_message_sender_id: data.message.sender_id,
-              Participants_ids: [
-                data.message.sender_id,
-                userData?.id as string,
-              ],
-              client: null,
-            };
-            return [newThread, ...oldData];
-          }
-        );
-
-        queryClient.setQueryData(
-          ["thread", data.threadId],
-          (oldData: Thread | undefined) => {
-            if (!oldData) return oldData;
-            const currentThread = threadsRef.current.find(
-              (t) => t.id === data.threadId
-            );
-            if (currentThread) {
-              return {
-                ...currentThread,
-                messages: [...(currentThread.messages || []), data.message],
-                has_unread_messages: true,
-                last_message: data.message.message,
-                last_message_time: data.message.createdAt,
-                last_message_sender_id: data.message.sender_id,
-              };
-            }
-            return {
-              ...oldData,
-              messages: [...(oldData.messages || []), data.message],
-              has_unread_messages: true,
-              last_message: data.message.message,
-              last_message_time: data.message.createdAt,
-              last_message_sender_id: data.message.sender_id,
-            };
-          }
-        );
-      }
-    );
-
-    // Handle existing thread notification
-    socket?.on(
-      "messageSentToExistingThread",
-      (data: {
-        threadId: string;
-        message: Message;
-        isExistingThread: boolean;
-        originalThreadId: string;
-      }) => {
-        setThreads((prev) => {
-          const existingThread = prev.find((t) => t.id === data.threadId);
-
-          if (existingThread) {
-            return prev.map((thread) => {
-              if (thread.id === data.threadId) {
-                return {
-                  ...thread,
-                  messages: [...(thread.messages || []), data.message],
-                  has_unread_messages: true,
-                  last_message: data.message.message,
-                  last_message_time: data.message.createdAt,
-                  last_message_sender_id: data.message.sender_id,
-                };
-              }
-              return thread;
-            });
-          } else {
-            const newThread: Thread = {
-              id: data.threadId,
-              user_id: data.message.sender_id,
-              started_at: new Date(),
-              type: data.message.thread?.type || "general",
-              subType: "one-to-one",
-              created_by: data.message.sender_id,
-              messages: [data.message],
-              has_unread_messages: true,
-              last_message: data.message.message,
-              last_message_time: data.message.createdAt,
-              last_message_sender_id: data.message.sender_id,
-              Participants_ids: [
-                data.message.sender_id,
-                userData?.id as string,
-              ],
-              client: null,
-            };
-            return [newThread, ...prev];
-          }
-        });
-
-        setSelectedThread((prev) => {
-          if (!prev) return prev;
-          return prev.id === data?.threadId
-            ? {
-                ...prev,
-                messages: [...(prev.messages || []), data.message],
-              }
-            : prev;
-        });
-
-        setCurrentThreadMessages((prev) => {
-          if (
-            prev &&
-            data.message.sender_id !== userData?.id &&
-            prev.find((m) => m.thread_id === data.message.thread_id)
-          ) {
-            return [...(prev || []), data.message];
-          }
-          return prev;
-        });
-
-        const currentThreadId = selectedThreadRef.current?.id;
-        if (
-          currentThreadId === data.threadId &&
-          data.message.sender_id !== userData?.id &&
-          data.message.message_id &&
-          (data.message.message_id as string).length > 10 &&
-          !(data.message.message_id as string).match(/^\d+$/) &&
-          data.message.message_id !== "null" &&
-          data.message.message_id !== "undefined"
-        ) {
-          // Add a small delay to ensure the message is processed
-          setTimeout(() => {
-            markMessageAsRead(data.message.message_id as string, data.threadId);
-          }, 300);
-        }
-
-        setPendingThreadData(null);
-
-        setExistingThreadData({
-          threadId: data.threadId,
-          clientId: data.message.thread?.client_id,
-        });
-
-        updateThreadsSorting();
-
-        // Update query cache with the updated thread data
-        queryClient.setQueryData(
-          ["threads"],
-          (oldData: Thread[] | undefined) => {
-            if (!oldData) return oldData;
-            const currentThread = threadsRef.current.find(
-              (t) => t.id === data.threadId
-            );
-            if (currentThread) {
-              const updatedThread = {
-                ...currentThread,
-                messages: [...(currentThread.messages || []), data.message],
-                has_unread_messages: true,
-                last_message: data.message.message,
-                last_message_time: data.message.createdAt,
-                last_message_sender_id: data.message.sender_id,
-              };
-              const otherThreads = oldData.filter(
-                (t) => t.id !== data.threadId
-              );
-              return [updatedThread, ...otherThreads];
-            } else {
-              const newThread: Thread = {
-                id: data.threadId,
-                user_id: data.message.sender_id,
-                started_at: new Date(),
-                type: data.message.thread?.type || "general",
-                subType: "one-to-one",
-                created_by: data.message.sender_id,
-                messages: [data.message],
-                has_unread_messages: true,
-                last_message: data.message.message,
-                last_message_time: data.message.createdAt,
-                last_message_sender_id: data.message.sender_id,
-                Participants_ids: [
-                  data.message.sender_id,
-                  userData?.id as string,
-                ],
-                client: null,
-              };
-              return [newThread, ...oldData];
-            }
-          }
-        );
-
-        // Update single thread query cache if it exists
-        queryClient.setQueryData(
-          ["thread", data.threadId],
-          (oldData: Thread | undefined) => {
-            if (!oldData) return oldData;
-            const currentThread = threadsRef.current.find(
-              (t) => t.id === data.threadId
-            );
-            if (currentThread) {
-              return {
-                ...currentThread,
-                messages: [...(currentThread.messages || []), data.message],
-                has_unread_messages: true,
-                last_message: data.message.message,
-                last_message_time: data.message.createdAt,
-                last_message_sender_id: data.message.sender_id,
-              };
-            }
-            return {
-              ...oldData,
-              messages: [...(oldData.messages || []), data.message],
-              has_unread_messages: true,
-              last_message: data.message.message,
-              last_message_time: data.message.createdAt,
-              last_message_sender_id: data.message.sender_id,
-            };
-          }
-        );
       }
     );
 
     // Listen for message read status events
     socket?.on(
       "messageRead",
-      (data: {
-        messageId: string;
-        threadId: string;
-        readBy: string;
-        readAt: Date;
-        message: Message;
-      }) => {
-        console.log("📖 [SOCKET] Message read by another user:", data);
+      (data: { threadId: string; readBy: string; readAt: Date }) => {
+        console.log("📖 [SOCKET] Messages read by another user:", data);
 
-        // Update current thread messages
+        // Helper function to add read status to a message
+        const addReadStatus = (msg: Message) => {
+          const existingReadBy = msg.read_by || [];
+          const isAlreadyRead = existingReadBy.some(
+            (read) => read.user_id === data.readBy
+          );
+
+          if (!isAlreadyRead) {
+            return {
+              ...msg,
+              read_by: [
+                ...existingReadBy,
+                {
+                  user_id: data.readBy,
+                  read_at:
+                    new Date(data.readAt).toISOString() ||
+                    new Date().toISOString(),
+                },
+              ],
+            };
+          }
+          return msg;
+        };
+
+        // Update current thread messages - mark all messages as read by the user
         setCurrentThreadMessages((prev) => {
-          const updated = prev.map((msg) => {
-            const msgId =
-              (msg as Message & { message_id?: string }).message_id || msg.id;
-
-            if (msgId === data.messageId) {
-              return { ...msg, read_by: data.message.read_by };
-            }
-            return msg;
-          });
-
-          return updated;
+          return prev.map(addReadStatus);
         });
-
-        // Update selected thread messages
-        setSelectedThread((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            messages:
-              prev.messages?.map((msg) =>
-                ((msg as Message & { message_id?: string }).message_id ||
-                  msg.id) === data.messageId
-                  ? { ...msg, read_by: data.message.read_by }
-                  : msg
-              ) || [],
-          };
-        });
-
-        // Update threads list
-        setThreads((prev) =>
-          prev.map((thread) => {
-            if (thread.id === data.threadId) {
-              return {
-                ...thread,
-                messages:
-                  thread.messages?.map((msg) =>
-                    ((msg as Message & { message_id?: string }).message_id ||
-                      msg.id) === data.messageId
-                      ? { ...msg, read_by: data.message.read_by }
-                      : msg
-                  ) || [],
-              };
-            }
-            return thread;
-          })
-        );
-      }
-    );
-
-    // Listen for confirmation when current user marks message as read
-    socket?.on(
-      "messageMarkedAsRead",
-      (data: {
-        messageId: string;
-        threadId: string;
-        readBy: string;
-        readAt: Date;
-        message: Message;
-      }) => {
-        console.log(
-          "✅ [SOCKET] Message marked as read by current user:",
-          data
-        );
-
-        // Update current thread messages
-        setCurrentThreadMessages((prev) => {
-          const updated = prev.map((msg) => {
-            const msgId =
-              (msg as Message & { message_id?: string }).message_id || msg.id;
-
-            if (msgId === data.messageId) {
-              return { ...msg, read_by: data.message.read_by };
-            }
-            return msg;
-          });
-
-          return updated;
-        });
-
-        setSelectedThread((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            messages:
-              prev.messages?.map((msg) =>
-                ((msg as Message & { message_id?: string }).message_id ||
-                  msg.id) === data.messageId
-                  ? { ...msg, read_by: data.message.read_by }
-                  : msg
-              ) || [],
-          };
-        });
-
-        // Update threads list
-        setThreads((prev) =>
-          prev.map((thread) => {
-            if (thread.id === data.threadId) {
-              return {
-                ...thread,
-                messages:
-                  thread.messages?.map((msg) =>
-                    ((msg as Message & { message_id?: string }).message_id ||
-                      msg.id) === data.messageId
-                      ? { ...msg, read_by: data.message.read_by }
-                      : msg
-                  ) || [],
-              };
-            }
-            return thread;
-          })
-        );
       }
     );
 
@@ -546,16 +215,12 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
           }
 
           if (data.is_typing) {
-            // Add or update typing user
             newTypingUsers[data.thread_id][data.user_id] = {
               user_id: data.user_id,
               is_typing: true,
             };
           } else {
-            // Remove typing user
             delete newTypingUsers[data.thread_id][data.user_id];
-
-            // Clean up empty thread objects
             if (Object.keys(newTypingUsers[data.thread_id]).length === 0) {
               delete newTypingUsers[data.thread_id];
             }
@@ -566,102 +231,111 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     );
 
-    // Listen for messageSent event to update temporary message ID with server ID
+    // Listen for broadcast messages
     socket?.on(
-      "messageSent",
+      "receiveBroadcast",
       (data: {
-        threadId: string;
-        message: {
-          message: string;
-          message_id: string;
-          sender_id: string;
-          thread_id: string;
-          createdAt: Date;
-          sender?: {
-            id: string;
-            first_name: string;
-            last_name: string;
-            avatar?: string;
-            email: string;
-          };
-          thread?: {
-            id: string;
-            type: string;
-            client_id?: string;
-          };
-        };
+        id: string;
+        thread_type: string;
+        thread_name: string;
+        message: string;
+        message_id: string;
+        sender_id: string;
+        file_url?: string;
+        file_name?: string;
+        file_key?: string;
+        createdAt: Date;
       }) => {
-        console.log("✅ [SOCKET] Message sent confirmation received:", data);
+        console.log("📢 [SOCKET] Received broadcast:", data);
 
-        setCurrentThreadMessages((prev) => {
-          return prev.map((msg) => {
-            if (
-              msg.message === data.message.message &&
-              msg.sender_id === data.message.sender_id &&
-              msg.thread_id === data.message.thread_id &&
-              msg.id &&
-              typeof msg.id === "string" &&
-              msg.id.match(/^\d+$/) &&
-              msg.id.length >= 10
-            ) {
-              console.log(
-                "🔄 [SOCKET] Updating temporary message ID:",
-                msg.id,
-                "->",
-                data.message.message_id
-              );
-              return {
-                ...msg,
-                id: data.message.message_id,
-                createdAt: new Date(data.message.createdAt),
-                read_by: [
-                  {
-                    user_id: data.message.sender_id,
-                    read_at: new Date(data.message.createdAt).toISOString(),
-                  },
-                ],
-              };
-            }
-            return msg;
-          });
+        const threadName = data.thread_name || "System Announcement";
+        let lastMessage = data.message;
+        if (!lastMessage && data.file_name) {
+          lastMessage = data.file_name;
+        }
+
+        setThreads((prev) => {
+          const existingThread = prev.find((t) => t.id === data.id);
+
+          if (existingThread) {
+            return prev.map((thread) => {
+              if (thread.id === data.id) {
+                return {
+                  ...thread,
+                  has_unread_messages: true,
+                  last_message: lastMessage,
+                  last_message_time: data.createdAt,
+                  last_message_sender_id: data.sender_id,
+                  unread_count: (thread.unread_count || 0) + 1,
+                  name: threadName,
+                };
+              }
+              return thread;
+            });
+          }
+
+          const newThread: Thread = {
+            id: data.id,
+            user_id: data.sender_id,
+            participants: [],
+            started_at: new Date(),
+            type: "broadcast",
+            created_by: data.sender_id,
+            has_unread_messages: true,
+            last_message: lastMessage,
+            last_message_time: data.createdAt,
+            last_message_sender_id: data.sender_id,
+            participants_ids: [],
+            client: null,
+            unread_count: 1,
+            name: threadName,
+          };
+          return [...prev, newThread];
         });
 
-        setSelectedThread((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            messages:
-              prev.messages?.map((msg) => {
-                if (
-                  msg.message === data.message.message &&
-                  msg.sender_id === data.message.sender_id &&
-                  msg.thread_id === data.message.thread_id &&
-                  msg.id &&
-                  typeof msg.id === "string" &&
-                  msg.id.match(/^\d+$/) &&
-                  msg.id.length >= 10
-                ) {
-                  console.log(
-                    "🔄 [SOCKET] Updating selected thread message ID:",
-                    msg.id,
-                    "->",
-                    data.message.message_id
-                  );
-                  return {
-                    ...msg,
-                    id: data.message.message_id,
-                    createdAt: new Date(data.message.createdAt),
-                    read_by: [
-                      {
-                        user_id: data.message.sender_id,
-                        read_at: new Date(data.message.createdAt).toISOString(),
-                      },
-                    ],
-                  };
-                }
-                return msg;
-              }) || [],
-          };
+        setCurrentThreadMessages((prev) => {
+          const currentThreadId = selectedThreadRef.current?.id;
+          if (currentThreadId === data.id) {
+            return [
+              ...(prev || []),
+              {
+                id: data.message_id,
+                message_id: data.message_id,
+                thread_id: data.id,
+                sender_id: data.sender_id,
+                message: data.message,
+                createdAt: data.createdAt,
+                file_url: data.file_url,
+                file_name: data.file_name,
+                file_key: data.file_key?.toString(),
+              },
+            ];
+          }
+          return prev;
+        });
+
+        updateThreadsSorting();
+      }
+    );
+
+    // Listen for message deletion events
+    socket?.on(
+      "messageDeleted",
+      (data: {
+        messageId: string;
+        threadId: string;
+        deletedBy: string;
+        deletedAt: Date;
+        lastMessage: string;
+      }) => {
+        console.log("🗑️ [SOCKET] Message deleted:", data);
+
+        setCurrentThreadMessages(() => {
+          const filteredMessages = currentMessagesRef.current.filter(
+            (msg) => msg.id !== data.messageId
+          );
+          console.log(filteredMessages);
+          return filteredMessages;
         });
 
         setThreads((prev) =>
@@ -669,181 +343,156 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             if (thread.id === data.threadId) {
               return {
                 ...thread,
-                messages:
-                  thread.messages?.map((msg) => {
-                    if (
-                      msg.message === data.message.message &&
-                      msg.sender_id === data.message.sender_id &&
-                      msg.thread_id === data.message.thread_id &&
-                      msg.id &&
-                      typeof msg.id === "string" &&
-                      msg.id.match(/^\d+$/) &&
-                      msg.id.length >= 10
-                    ) {
-                      console.log(
-                        "🔄 [SOCKET] Updating thread message ID:",
-                        msg.id,
-                        "->",
-                        data.message.message_id
-                      );
-                      return {
-                        ...msg,
-                        id: data.message.message_id,
-                        createdAt: new Date(data.message.createdAt),
-                        read_by: [
-                          {
-                            user_id: data.message.sender_id,
-                            read_at: new Date(
-                              data.message.createdAt
-                            ).toISOString(),
-                          },
-                        ],
-                      };
-                    }
-                    return msg;
-                  }) || [],
+                last_message: data.lastMessage,
               };
             }
             return thread;
           })
         );
-
-        // Update query cache with the updated thread data
-        queryClient.setQueryData(
-          ["threads"],
-          (oldData: Thread[] | undefined) => {
-            if (!oldData) return oldData;
-
-            const currentThread = threadsRef.current.find(
-              (t) => t.id === data.threadId
-            );
-            if (currentThread) {
-              const updatedThread = {
-                ...currentThread,
-                messages:
-                  currentThread.messages?.map((msg) => {
-                    if (
-                      msg.message === data.message.message &&
-                      msg.sender_id === data.message.sender_id &&
-                      msg.thread_id === data.message.thread_id &&
-                      msg.id &&
-                      typeof msg.id === "string" &&
-                      msg.id.match(/^\d+$/) &&
-                      msg.id.length >= 10
-                    ) {
-                      return {
-                        ...msg,
-                        id: data.message.message_id,
-                        createdAt: new Date(data.message.createdAt),
-                        read_by: [
-                          {
-                            user_id: data.message.sender_id,
-                            read_at: new Date(
-                              data.message.createdAt
-                            ).toISOString(),
-                          },
-                        ],
-                      };
-                    }
-                    return msg;
-                  }) || [],
-              };
-              const otherThreads = oldData.filter(
-                (t) => t.id !== data.threadId
-              );
-              return [updatedThread, ...otherThreads];
-            }
-            return oldData;
-          }
-        );
-
-        // Update single thread query cache if it exists
-        queryClient.setQueryData(
-          ["thread", data.threadId],
-          (oldData: Thread | undefined) => {
-            if (!oldData) return oldData;
-            const currentThread = threadsRef.current.find(
-              (t) => t.id === data.threadId
-            );
-            if (currentThread) {
-              return {
-                ...currentThread,
-                messages:
-                  currentThread.messages?.map((msg) => {
-                    if (
-                      msg.message === data.message.message &&
-                      msg.sender_id === data.message.sender_id &&
-                      msg.thread_id === data.message.thread_id &&
-                      msg.id &&
-                      typeof msg.id === "string" &&
-                      msg.id.match(/^\d+$/) &&
-                      msg.id.length >= 10
-                    ) {
-                      return {
-                        ...msg,
-                        id: data.message.message_id,
-                        createdAt: new Date(data.message.createdAt),
-                        read_by: [
-                          {
-                            user_id: data.message.sender_id,
-                            read_at: new Date(
-                              data.message.createdAt
-                            ).toISOString(),
-                          },
-                        ],
-                      };
-                    }
-                    return msg;
-                  }) || [],
-              };
-            }
-            return {
-              ...oldData,
-              messages:
-                oldData.messages?.map((msg) => {
-                  if (
-                    msg.message === data.message.message &&
-                    msg.sender_id === data.message.sender_id &&
-                    msg.thread_id === data.message.thread_id &&
-                    msg.id &&
-                    typeof msg.id === "string" &&
-                    msg.id.match(/^\d+$/) &&
-                    msg.id.length >= 10
-                  ) {
-                    return {
-                      ...msg,
-                      id: data.message.message_id,
-                      createdAt: new Date(data.message.createdAt),
-                      read_by: [
-                        {
-                          user_id: data.message.sender_id,
-                          read_at: new Date(
-                            data.message.createdAt
-                          ).toISOString(),
-                        },
-                      ],
-                    };
-                  }
-                  return msg;
-                }) || [],
-            };
-          }
-        );
       }
     );
+
+    // Listen for user left thread events
+    socket?.on(
+      "userLeftThread",
+      (data: {
+        threadId: string;
+        userId: string;
+        participants: string[];
+        leftAt: Date;
+        leftParticipants: string[];
+      }) => {
+        console.log("🚪 [SOCKET] User left thread:", data);
+
+        if (data.userId === userData?.id) {
+          setThreads((prev) =>
+            prev.filter((thread) => thread.id !== data.threadId)
+          );
+
+          if (selectedThreadRef.current?.id === data.threadId) {
+            setSelectedThread(null);
+            setCurrentThreadMessages([]);
+          }
+        } else {
+          setThreads((prev) =>
+            prev.map((thread) => {
+              if (thread.id === data.threadId) {
+                const leavingUser = thread.participants?.find(
+                  (p) => p.id === data.userId
+                );
+
+                const updatedParticipants = thread.participants?.filter(
+                  (p) => p.id !== data.userId
+                );
+
+                const updatedLeftParticipants = leavingUser
+                  ? [
+                      ...(thread.left_participants || []),
+                      ...(thread.left_participants?.some(
+                        (p) => p.id === data.userId
+                      )
+                        ? []
+                        : [leavingUser]),
+                    ]
+                  : thread.left_participants?.filter(
+                      (p) => p.id !== data.userId
+                    );
+
+                return {
+                  ...thread,
+                  participants_ids: data.participants,
+                  participants: updatedParticipants,
+                  left_participants_ids: data.leftParticipants,
+                  left_participants: updatedLeftParticipants,
+                };
+              }
+              return thread;
+            })
+          );
+
+          if (selectedThreadRef.current?.id === data.threadId) {
+            setSelectedThread((prev) => {
+              if (!prev) return prev;
+
+              const leavingUser = prev.participants?.find(
+                (p) => p.id === data.userId
+              );
+
+              const updatedParticipants = prev.participants?.filter(
+                (p) => p.id !== data.userId
+              );
+
+              const updatedLeftParticipants = leavingUser
+                ? [
+                    ...(prev.left_participants || []),
+                    ...(prev.left_participants?.some(
+                      (p) => p.id === data.userId
+                    )
+                      ? []
+                      : [leavingUser]),
+                  ]
+                : prev.left_participants?.filter((p) => p.id !== data.userId);
+
+              return {
+                ...prev,
+                participants_ids: data.participants,
+                participants: updatedParticipants,
+                left_participants_ids: data.leftParticipants,
+                left_participants: updatedLeftParticipants,
+              };
+            });
+          }
+        }
+      }
+    );
+
+    // Listen for thread deletion events
+    socket?.on(
+      "threadDeleted",
+      (data: { threadId: string; deletedBy: string; deletedAt: Date }) => {
+        console.log("🗑️ [SOCKET] Thread deleted:", data);
+
+        // Remove thread from threads array
+        setThreads((prev) =>
+          prev.filter((thread) => thread.id !== data.threadId)
+        );
+
+        // Clear selected thread if it's the deleted one
+        if (selectedThreadRef.current?.id === data.threadId) {
+          setSelectedThread(null);
+          setCurrentThreadMessages([]);
+        }
+      }
+    );
+
+    return () => {
+      socket?.off("userTyping");
+      socket?.off("messageDeleted");
+      socket?.off("receiveMessage");
+      socket?.off("userLeftThread");
+      socket?.off("receiveBroadcast");
+      socket?.off("threadDeleted");
+    };
   }, [socket, userData?.id]);
 
   const updateThreads = (
     threadId: string,
     lastMessageSender: string,
-    message: string
+    message: string,
+    fileData?: { file_url: string; file_name: string; file_key: number },
+    messageId?: string
   ) => {
     setThreads((prev) => {
       return prev.map((t) => {
         if (t.id === threadId) {
+          let lastMessage = message.trim();
+          if (!lastMessage && fileData?.file_name) {
+            lastMessage = fileData.file_name;
+          }
+
           return {
             ...t,
-            last_message: message.trim(),
+            last_message: lastMessage,
             last_message_time: new Date(),
             last_message_sender_id: lastMessageSender,
             messages: [
@@ -852,9 +501,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
                 message: message.trim(),
                 sender_id: lastMessageSender,
                 thread_id: threadId as string,
-                id: Date.now().toString(),
+                id: messageId || Date.now().toString(),
+                message_id: messageId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                file_url: fileData?.file_url,
+                file_name: fileData?.file_name,
+                file_key: fileData?.file_key?.toString(),
               },
             ],
           };
@@ -867,10 +520,18 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateSelectedThread = (
     threadId: string,
     lastMessageSender: string,
-    message: string
+    message: string,
+    fileData?: { file_url: string; file_name: string; file_key: number },
+    messageId?: string
   ) => {
     setSelectedThread((prev) => {
       if (!prev) return prev;
+
+      let lastMessage = message.trim();
+      if (!lastMessage && fileData?.file_name) {
+        lastMessage = fileData.file_name;
+      }
+
       return {
         ...prev,
         messages: [
@@ -879,12 +540,16 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             message: message.trim(),
             sender_id: lastMessageSender,
             thread_id: threadId as string,
-            id: Date.now().toString(),
+            id: messageId || Date.now().toString(),
+            message_id: messageId,
             createdAt: new Date(),
             updatedAt: new Date(),
+            file_url: fileData?.file_url,
+            file_name: fileData?.file_name,
+            file_key: fileData?.file_key?.toString(),
           },
         ],
-        last_message: message.trim(),
+        last_message: lastMessage,
         last_message_time: new Date(),
         last_message_sender_id: lastMessageSender,
       };
@@ -894,45 +559,47 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateCurrentThreadMessages = (
     message: string,
     thread: string,
-    senderID: string
+    senderID: string,
+    fileData?: { file_url: string; file_name: string; file_key: number },
+    messageId?: string
   ) => {
+    console.log("Sender in current thread message:", senderID);
     setCurrentThreadMessages((prev) => [
       ...(prev || []),
       {
         message: message.trim(),
         sender_id: senderID,
         thread_id: thread,
-        id: Date.now().toString(),
+        id: messageId || Date.now().toString(),
+        message_id: messageId,
         createdAt: new Date(),
         updatedAt: new Date(),
-        read_by: [], // Initialize empty read_by array
+        read_by: [
+          {
+            user_id: senderID,
+            read_at: new Date().toISOString(),
+          },
+        ],
+        file_url: fileData?.file_url,
+        file_name: fileData?.file_name,
+        file_key: fileData?.file_key?.toString(),
       },
     ]);
   };
 
   const updateThreadsSorting = () => {
     setThreads((prev) => {
-      return prev.sort((a, b) => {
-        if (!a.last_message_time && !b.last_message_time) return 0;
-        if (!a.last_message_time) return 1;
-        if (!b.last_message_time) return -1;
-        return (
-          new Date(String(b.last_message_time)).getTime() -
-          new Date(String(a.last_message_time)).getTime()
-        );
+      return sortBy(prev, (thread) => {
+        if (!thread.last_message_time) return Infinity;
+        return -dayjs(thread.last_message_time).valueOf();
       });
     });
   };
 
   const updateParamThreads = (threads: Thread[]) => {
-    return threads.sort((a, b) => {
-      if (!a.last_message_time && !b.last_message_time) return 0;
-      if (!a.last_message_time) return 1;
-      if (!b.last_message_time) return -1;
-      return (
-        new Date(String(b.last_message_time)).getTime() -
-        new Date(String(a.last_message_time)).getTime()
-      );
+    return sortBy(threads, (thread) => {
+      if (!thread.last_message_time) return Infinity;
+      return -dayjs(thread.last_message_time).valueOf();
     });
   };
 
@@ -967,47 +634,21 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  const navigateToExistingThread = (
-    threadId: string,
-    navigate: (path: string) => void
-  ) => {
-    setPendingThreadData(null);
-
-    const currentPath = location.pathname;
-
-    if (
-      currentPath.includes(`/${ROUTES.clients}/`) &&
-      currentPath.includes(`/${ROUTES.clientMessages}`)
-    ) {
-      const pathParts = currentPath.split("/");
-      const clientIndex = pathParts.findIndex(
-        (part) => part === ROUTES.clients
-      );
-      const currentClientId = pathParts[clientIndex + 1];
-
-      if (currentClientId) {
-        navigate(
-          `/${ROUTES.clients}/${currentClientId}/${ROUTES.clientMessages}/${threadId}`
-        );
-      } else {
-        navigate(`${ROUTES.messages}/${threadId}`);
-      }
-    } else {
-      navigate(`${ROUTES.messages}/${threadId}`);
-    }
-
-    toast.success("Redirected to existing conversation");
-  };
-
-  const clearExistingThreadData = () => {
-    setExistingThreadData(null);
-  };
-
-  const markMessageAsRead = (messageId: string, threadId: string) => {
+  const markMessageAsRead = (threadId: string) => {
     if (socket && userData?.id) {
-      console.log("📤 [SOCKET] Marking message as read:", messageId);
+      console.log("📤 [SOCKET] Marking message as read");
+      setThreads((prev) =>
+        prev.map((thread) => {
+          if (thread.id === threadId) {
+            return {
+              ...thread,
+              unread_count: 0,
+            };
+          }
+          return thread;
+        })
+      );
       socket.emit("markMessageAsRead", {
-        message_id: messageId,
         thread_id: threadId,
         user_id: userData.id,
       });
@@ -1028,6 +669,82 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     if (socket && userData?.id) {
       console.log("📤 [SOCKET] Emitting typing stop:", threadId);
       socket.emit("typingStop", {
+        thread_id: threadId,
+        user_id: userData.id,
+      });
+    }
+  };
+
+  const deleteMessage = (messageId: string, threadId: string) => {
+    if (socket && userData?.id) {
+      console.log("🗑️ [SOCKET] Emitting delete message:", {
+        messageId,
+        threadId,
+      });
+      const lastMessage =
+        currentThreadMessages[currentThreadMessages.length - 1];
+      const isLastMessage = lastMessage?.id === messageId;
+      const isLastMessageMine = lastMessage?.sender_id === userData.id;
+
+      setCurrentThreadMessages((prev) => {
+        const filteredMessages = prev.filter((msg) => msg.id !== messageId);
+        currentMessagesRef.current = filteredMessages;
+        return filteredMessages;
+      });
+
+      if (isLastMessage && isLastMessageMine) {
+        setThreads((prev) =>
+          prev.map((thread) => {
+            if (thread.id === threadId) {
+              return {
+                ...thread,
+                last_message: "This message is deleted",
+              };
+            }
+            return thread;
+          })
+        );
+      }
+
+      socket.emit("deleteMessage", {
+        message_id: messageId,
+        thread_id: threadId,
+        user_id: userData.id,
+        last_message: isLastMessage,
+      });
+    }
+  };
+
+  const leaveThread = (threadId: string) => {
+    if (socket && userData?.id) {
+      console.log("🚪 [SOCKET] Emitting leave thread:", threadId);
+
+      setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
+
+      if (selectedThreadRef.current?.id === threadId) {
+        setSelectedThread(null);
+        setCurrentThreadMessages([]);
+      }
+
+      socket.emit("leaveThread", {
+        thread_id: threadId,
+        user_id: userData.id,
+      });
+    }
+  };
+
+  const deleteThread = (threadId: string) => {
+    if (socket && userData?.id) {
+      console.log("🗑️ [SOCKET] Emitting delete thread:", threadId);
+
+      setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
+
+      if (selectedThreadRef.current?.id === threadId) {
+        setSelectedThread(null);
+        setCurrentThreadMessages([]);
+      }
+
+      socket.emit("deleteThread", {
         thread_id: threadId,
         user_id: userData.id,
       });
@@ -1055,14 +772,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         clearPendingThreadData,
         addThreadToList,
         updateThreadWithFullData,
-        navigateToExistingThread,
-        existingThreadData,
-        setExistingThreadData,
-        clearExistingThreadData,
         markMessageAsRead,
         typingUsers,
         emitTypingStart,
         emitTypingStop,
+        deleteMessage,
+        leaveThread,
+        deleteThread,
       }}
     >
       {children}

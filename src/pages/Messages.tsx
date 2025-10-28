@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { AddThreadFormData, Thread } from "@agensy/types";
+import type { AddThreadFormData, IUser, Thread } from "@agensy/types";
 import { AddThreadModal, ThreadList } from "@agensy/components";
 import { ICONS, ROUTES } from "@agensy/constants";
 import { useAuthContext, useMessagesContext } from "@agensy/context";
@@ -8,21 +8,18 @@ import { v4 as uuidv4 } from "uuid";
 
 export const Messages: React.FC = () => {
   const params = useParams();
-  const { userData } = useAuthContext();
+  const { userData, accessUsers } = useAuthContext();
   const {
     showThreadList,
     setShowThreadList,
     threads,
     setPendingThreadData,
-    existingThreadData,
-    clearExistingThreadData,
-    navigateToExistingThread,
     setCurrentThreadMessages,
     setSelectedThread,
-    selectedThread,
   } = useMessagesContext();
   const [isAddThreadModalOpen, setIsAddThreadModalOpen] =
     useState<boolean>(false);
+  const [isNavigating, setIsNavigating] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,17 +29,12 @@ export const Messages: React.FC = () => {
   }, [params.threadId, setShowThreadList]);
 
   useEffect(() => {
-    if (existingThreadData) {
-      navigateToExistingThread(existingThreadData.threadId, navigate);
-      clearExistingThreadData();
-    }
-  }, [existingThreadData]);
-
-  useEffect(() => {
     if (!params.threadId) {
       setSelectedThread(null);
       setCurrentThreadMessages([]);
     }
+    // Reset navigation state when params change
+    setIsNavigating(false);
   }, [params.threadId]);
 
   const handleAddThread = (data: AddThreadFormData) => {
@@ -51,18 +43,43 @@ export const Messages: React.FC = () => {
     setCurrentThreadMessages([]);
     setSelectedThread(null);
 
-    setPendingThreadData({
-      id: threadId,
-      type: data.type as "general" | "client",
-      participants_ids: [userData?.id as string, data.participant_id],
-      client_id: data.client_id,
-    });
+    // Handle broadcast type
+    if (data.type === "broadcast") {
+      setPendingThreadData({
+        id: threadId,
+        participants_ids: [userData?.id as string],
+        type: "broadcast",
+        name: "Agensy Broadcast",
+        participants: [userData as IUser],
+        created_by: userData?.id as string,
+      });
+    } else {
+      // Handle regular thread creation
+      setPendingThreadData({
+        id: threadId,
+        participants_ids: [
+          userData?.id as string,
+          ...(data.participant_ids || []),
+        ],
+        client_id: data.client_id,
+        participants: data.participant_ids
+          ?.sort((a, b) => (a || "").localeCompare(b || ""))
+          .map((id) => accessUsers?.find((user) => user.id === id) as IUser),
+        created_by: userData?.id as string,
+      });
+    }
 
     setIsAddThreadModalOpen(false);
     navigate(`${ROUTES.messages}/${threadId}`);
   };
 
+  const handleExistingThreadFound = (threadId: string) => {
+    setIsAddThreadModalOpen(false);
+    navigate(`${ROUTES.messages}/${threadId}`);
+  };
+
   const handleThreadClick = (thread: Thread) => {
+    setIsNavigating(true);
     navigate(`${ROUTES.messages}/${thread.id}`);
   };
 
@@ -79,13 +96,14 @@ export const Messages: React.FC = () => {
             <ThreadList
               selectedThreadId={params.threadId}
               onAddThread={() => setIsAddThreadModalOpen(true)}
+              className="pt-[calc(60px+1.25rem)]"
               threads={threads}
               onThreadClick={handleThreadClick}
             />
           </div>
 
           <div className="flex-1 flex flex-col w-full md:w-2/3 bg-white">
-            {selectedThread || params.threadId ? (
+            {params.threadId || isNavigating ? (
               <Outlet />
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -102,6 +120,8 @@ export const Messages: React.FC = () => {
         isOpen={isAddThreadModalOpen}
         onClose={() => setIsAddThreadModalOpen(false)}
         onSubmit={handleAddThread}
+        onExistingThreadFound={handleExistingThreadFound}
+        showBroadCastOption={true}
       />
     </React.Fragment>
   );

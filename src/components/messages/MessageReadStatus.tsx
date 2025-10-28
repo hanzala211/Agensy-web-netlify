@@ -1,9 +1,9 @@
 import React from "react";
 import type { Message, Thread } from "@agensy/types";
 import { ICONS } from "@agensy/constants";
-import { useAuthContext } from "@agensy/context";
 import { Dropdown } from "antd";
 import { DateUtils } from "@agensy/utils";
+import dayjs from "dayjs";
 
 interface MessageReadStatusProps {
   message: Message;
@@ -16,9 +16,7 @@ export const MessageReadStatus: React.FC<MessageReadStatusProps> = ({
   thread,
   currentUserId,
 }) => {
-  const { accessUsers } = useAuthContext();
-
-  const participantsCount = thread.Participants_ids?.length || 0;
+  const participantsCount = thread.participants_ids?.length || 0;
   const readByCount = (message.read_by || []).length;
   const allRead = readByCount >= participantsCount;
 
@@ -26,77 +24,91 @@ export const MessageReadStatus: React.FC<MessageReadStatusProps> = ({
     return null;
   }
 
-  const participants =
-    thread.Participants_ids?.filter((id) => id !== message.sender_id) || [];
+  const allParticipants = [
+    ...(thread.participants || []),
+    ...(thread.left_participants || []),
+  ];
 
-  const readStatuses = participants.map((participantId) => {
-    const user = accessUsers?.find((u) => u.id === participantId);
-    const readBy = (message.read_by || []).find(
-      (r) => r.user_id === participantId
-    );
+  const currentParticipantIds = (thread.participants_ids || []).filter(
+    (id) => id !== message.sender_id
+  );
 
-    return {
-      userId: participantId,
-      user: user,
-      hasRead: !!readBy,
-      readAt: readBy?.read_at,
-    };
-  });
+  const leftParticipantIds = (thread.left_participants_ids || []).filter(
+    (id) => {
+      const hasRead = (message.read_by || []).some((r) => r.user_id === id);
+      return hasRead;
+    }
+  );
+
+  const allParticipantIds = [...currentParticipantIds, ...leftParticipantIds];
+
+  const readStatuses = allParticipantIds
+    .map((participantId) => {
+      const user = allParticipants.find((u) => u.id === participantId);
+      const readBy = (message.read_by || []).find(
+        (r) => r.user_id === participantId
+      );
+
+      const isLeftParticipant =
+        thread.left_participants_ids?.includes(participantId);
+
+      return {
+        userId: participantId,
+        user: user,
+        hasRead: !!readBy,
+        readAt: readBy?.read_at,
+        isLeft: isLeftParticipant,
+      };
+    })
+    .sort((a, b) => {
+      if (a.hasRead && !b.hasRead) return -1;
+      if (!a.hasRead && b.hasRead) return 1;
+
+      if (a.hasRead && b.hasRead) {
+        if (!a.readAt && !b.readAt) return 0;
+        if (!a.readAt) return 1;
+        if (!b.readAt) return -1;
+        return dayjs(b.readAt).valueOf() - dayjs(a.readAt).valueOf();
+      }
+
+      return 0;
+    });
 
   const dropdownContent = (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-4 min-w-[320px] max-w-[360px] backdrop-blur-sm">
-      <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
-        <h4 className="text-sm font-semibold text-darkGray flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          Read Receipts
-        </h4>
-        <span className="text-xs text-slateGrey">
-          {readStatuses.length}{" "}
-          {readStatuses.length !== 1 ? "recipients" : "recipient"}
-        </span>
-      </div>
-
-      <div className="space-y-3 max-h-[300px] overflow-y-auto">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-2 min-w-[250px] max-w-[280px] backdrop-blur-sm">
+      <div className="space-y-3 max-h-[230px] overflow-y-auto">
         {readStatuses.map((status) => (
           <div
             key={status.userId}
-            className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-transparent hover:border-gray-100"
+            className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-transparent hover:border-gray-100"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primaryColor to-basicBlue flex items-center justify-center shadow-sm flex-shrink-0">
-                {status.user?.avatar ? (
-                  <img
-                    src={status.user.avatar}
-                    alt={`${status.user.first_name} ${status.user.last_name}`}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="text-sm font-semibold text-white">
-                    {(status.user?.first_name?.[0] || "") +
-                      (status.user?.last_name?.[0] || "")}
-                  </span>
-                )}
-              </div>
-
               <div className="flex flex-col min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-darkGray truncate">
-                    {status.user
-                      ? `${status.user.first_name} ${status.user.last_name}`
-                      : "Unknown User"}
-                  </span>
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-[12px] font-medium text-darkGray truncate">
+                      {status.user
+                        ? `${status.user.first_name} ${status.user.last_name}`
+                        : "Unknown User"}
+                    </span>
+                    {status.isLeft && (
+                      <span className="text-[9px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium flex-shrink-0">
+                        Left
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                     {status.hasRead ? (
                       <div className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-full">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-xs font-medium text-green-600">
+                        <span className="text-[10px] font-medium text-green-600">
                           Read
                         </span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-full">
                         <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                        <span className="text-xs text-slateGrey">
+                        <span className="text-[10px] text-slateGrey">
                           Delivered
                         </span>
                       </div>
@@ -104,7 +116,7 @@ export const MessageReadStatus: React.FC<MessageReadStatusProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {status.user?.is_online && (
+                  {status.user?.is_online && !status.isLeft && (
                     <span className="text-xs text-green-600 font-medium">
                       Online
                     </span>
@@ -133,13 +145,13 @@ export const MessageReadStatus: React.FC<MessageReadStatusProps> = ({
       placement="topRight"
     >
       <div
-        className="flex items-center cursor-pointer hover:bg-gray-50 rounded-lg p-1 transition-colors duration-200"
+        className="flex items-center cursor-pointer rounded-lg p-1 transition-colors duration-200"
         title={allRead ? "Read by all" : "Delivered"}
       >
         <div className="flex">
           <ICONS.doubleCheck
-            className={`w-4 h-4 ${
-              allRead ? "text-green-500" : "text-gray-400"
+            className={`sm:w-4 sm:h-4 w-3 h-3 ${
+              allRead ? "text-green-400" : "text-gray-100"
             }`}
           />
         </div>

@@ -47,7 +47,7 @@ export const ClientAccess: React.FC = () => {
   const [isEditAccessModalOpen, setIsEditAccessModalOpen] =
     useState<boolean>(false);
   const [editData, setEditData] = useState<AccessInfo | null>(null);
-  const { handleFilterPermission } = useAuthContext();
+  const { handleFilterPermission, loadAllUsers } = useAuthContext();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -67,6 +67,8 @@ export const ClientAccess: React.FC = () => {
           };
         }
       );
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      loadAllUsers();
     } else if (addClientAccessMutation.status === "error") {
       toast.error("Failed to add user", String(addClientAccessMutation.error));
     }
@@ -102,6 +104,7 @@ export const ClientAccess: React.FC = () => {
           };
         }
       );
+      loadAllUsers();
     } else if (deleteClientAccessMutation.status === "error") {
       toast.error(
         "Failed to delete user",
@@ -117,8 +120,13 @@ export const ClientAccess: React.FC = () => {
         editClientAccessMutation.variables.userId,
         editClientAccessMutation.data
       );
+      queryClient.invalidateQueries({
+        queryKey: ["client", params.clientId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
       setIsEditAccessModalOpen(false);
       setEditData(null);
+      loadAllUsers();
     } else if (editClientAccessMutation.status === "error") {
       toast.error(
         "Failed to update user",

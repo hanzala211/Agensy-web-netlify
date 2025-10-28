@@ -40,15 +40,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     );
   };
 
-  const setInitialOnlineUsers = (onlineUserIds: string[]) => {
-    setAccessUsers((prev) =>
-      prev.map((user) => ({
-        ...user,
-        is_online: onlineUserIds.includes(user.id as string),
-      }))
-    );
-  };
-
   useEffect(() => {
     loadAuth();
   }, [clients, isLoggingOut]);
@@ -64,14 +55,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     if (socket) {
-      socket.on("allOnlineUsers", (data: { onlineUsers: string[] }) => {
-        console.log(
-          "📤 [SOCKET] Received initial online users:",
-          data.onlineUsers
-        );
-        setInitialOnlineUsers(data.onlineUsers);
-      });
-
       socket.on("userOnline", (data: { userId: string }) => {
         console.log("🟢 [SOCKET] User came online:", data.userId);
         updateUserOnlineStatus(data.userId, true);
@@ -83,12 +66,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       return () => {
-        socket.off("allOnlineUsers");
         socket.off("userOnline");
         socket.off("userOffline");
       };
     }
-  }, [socket, setInitialOnlineUsers, updateUserOnlineStatus]);
+  }, [socket, updateUserOnlineStatus]);
 
   const loadAuth = async () => {
     if (isLoggingOut) {
@@ -192,6 +174,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         handleFilterPermission,
         isPrimaryUserSubscriptionActive,
         isLoggingOut,
+        loadAllUsers,
       }}
     >
       {children}

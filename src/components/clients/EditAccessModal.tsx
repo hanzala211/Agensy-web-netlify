@@ -69,7 +69,7 @@ export const EditAccessModal: React.FC<EditAccessModalProps> = ({
         first_name: editData.first_name,
         last_name: editData.last_name,
         relation: editData.relation,
-        phone: editData.phone,
+        phone: editData.phone ? editData.phone : "",
         role: editData.UserRoles?.role,
       });
     }
@@ -97,6 +97,15 @@ export const EditAccessModal: React.FC<EditAccessModalProps> = ({
       height="h-[90%]"
       footer={
         <div className="flex gap-4 justify-end">
+          {" "}
+          <PrimaryButton
+            onClick={handleClose}
+            type="button"
+            className="w-fit bg-white !text-basicBlue hover:!text-basicWhite border border-basicBlue hover:bg-blue-50"
+            isLoading={false}
+          >
+            Cancel
+          </PrimaryButton>
           <PrimaryButton
             onClick={() => inputRef.current?.click()}
             type="button"
@@ -105,14 +114,6 @@ export const EditAccessModal: React.FC<EditAccessModalProps> = ({
             disabled={isLoading}
           >
             Edit User
-          </PrimaryButton>
-          <PrimaryButton
-            onClick={handleClose}
-            type="button"
-            className="w-fit bg-white !text-basicBlue border border-basicBlue hover:bg-blue-50"
-            isLoading={false}
-          >
-            Cancel
           </PrimaryButton>
         </div>
       }

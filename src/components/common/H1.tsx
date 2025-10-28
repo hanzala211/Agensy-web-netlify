@@ -6,7 +6,7 @@ interface H1Props {
 export const H1: React.FC<H1Props> = ({ children, className }) => {
   return (
     <h1
-      className={`${className} md:text-[22px] font-semibold text-darkGray text-[18px]`}
+      className={`${className} md:text-[36px] font-semibold text-darkGray text-[24px]`}
     >
       {children}
     </h1>

@@ -23,6 +23,8 @@ interface SelectProps<T extends FieldValues> {
   textInputTriggerValue?: string;
   textInputName?: Path<T>;
   textInputPlaceholder?: string;
+  optionFilterProp?: string;
+  showSearch?: boolean;
 }
 
 export const Select = <T extends FieldValues>({
@@ -42,6 +44,8 @@ export const Select = <T extends FieldValues>({
   textInputTriggerValue = "add-new-one",
   textInputName,
   textInputPlaceholder = "Enter custom value",
+  optionFilterProp = "",
+  showSearch = false,
 }: SelectProps<T>) => {
   const [error, setError] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
@@ -100,6 +104,15 @@ export const Select = <T extends FieldValues>({
                     options={options}
                     placeholder={labelOption}
                     className={`${className} w-full`}
+                    optionFilterProp={optionFilterProp || "label"}
+                    filterOption={(
+                      input: string,
+                      option: { label?: string; value?: string }
+                    ) =>
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
                     style={{ width: "100%" }}
                     size="large"
                     suffixIcon={
@@ -107,6 +120,7 @@ export const Select = <T extends FieldValues>({
                         <Icon size={size || 16} color={color || "#6B7280"} />
                       ) : undefined
                     }
+                    showSearch={showSearch}
                   />
                 </div>
 
