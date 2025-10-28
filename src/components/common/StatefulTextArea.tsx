@@ -47,7 +47,7 @@ export const StatefulTextArea: React.FC<StatefulTextAreaProps> = ({
           value={displayValue}
           onChange={handleChange}
           rows={rows}
-          className={`text-darkGray bg-lightGray placeholder:text-darkGray p-2 border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200 ${className}`}
+          className={`text-darkGray bg-lightGray placeholder:text-darkGray p-2 border-[1px] border-mediumGray rounded-md w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200 ${className}`}
         />
       </div>
       {error && <ErrorMessage error={error} />}

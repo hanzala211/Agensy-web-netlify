@@ -106,7 +106,7 @@ export const ClientLogs: React.FC = () => {
         secondDateLabel="To"
       />
 
-      <div className="space-y-4">
+      <div className="space-y-1">
         {isAuditLogsFetching ? (
           <div className="flex justify-center items-center h-screen">
             <CommonLoader />

@@ -59,8 +59,8 @@ export const PhoneNumberInput = <T extends FieldValues>({
                 enableSearch={true}
                 disableCountryCode={false}
                 preferredCountries={["us"]}
-                inputClass="!w-full !rounded-lg focus:outline-none focus:!border-blue-500 transition-all duration-200 !bg-lightGray !border-mediumGray !py-5 !pl-16 focus-within:!outline-none !border-basicBlack !border-[1px] !text-[15px] !font-medium"
-                buttonClass="bg-transparent border-none outline-none focus:outline-none !rounded-lg focus:outline-none focus:!border-blue-500  transition-all duration-200 !bg-white !py-2 !px-2 focus-within:outline-none border-basicBlack border-[1px]"
+                inputClass="!w-full !rounded-md focus:outline-none focus:!border-blue-500 transition-all duration-200 !bg-lightGray !border-mediumGray !py-5 !pl-16 focus-within:!outline-none !border-basicBlack !border-[1px] !text-[15px] !font-medium"
+                buttonClass="bg-transparent border-none outline-none focus:outline-none !rounded-md focus:outline-none focus:!border-blue-500  transition-all duration-200 !bg-white !py-2 !px-2 focus-within:outline-none border-basicBlack border-[1px]"
                 specialLabel=""
               />
               <ErrorMessage error={error?.message || ""} />

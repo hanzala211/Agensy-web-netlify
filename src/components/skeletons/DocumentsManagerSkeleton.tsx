@@ -34,7 +34,7 @@ export const DocumentsManagerSkeleton: React.FC<
       </div>
 
       {/* Document cards skeleton */}
-      <div className="space-y-7">
+      <div className="space-y-2">
         {Array.from({ length: itemsCount }).map((_, index) => (
           <div key={index} className="border border-mediumGray p-4 rounded-lg">
             <div className="flex items-start xl:flex-row flex-col justify-between">

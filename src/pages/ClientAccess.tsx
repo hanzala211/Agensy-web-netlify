@@ -273,7 +273,7 @@ export const ClientAccess: React.FC = () => {
         onButtonClick={() => setIsAddAccessModalOpen(true)}
       />
 
-      <div className="mt-8 space-y-6">
+      <div className="mt-8 space-y-1">
         {!paginatedAccess || paginatedAccess.length === 0 ? (
           <EmptyStateCard
             onClick={() => {

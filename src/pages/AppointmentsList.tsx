@@ -95,7 +95,7 @@ export const AppointmentsList: React.FC = () => {
         setSecondDateValue={setTo}
       />
 
-      <div className="space-y-4">
+      <div className="space-y-1">
         {paginatedAppointments.length === 0 ? (
           <EmptyStateCard
             ICON={ICONS.plus}

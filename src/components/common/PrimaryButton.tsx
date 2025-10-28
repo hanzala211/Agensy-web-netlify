@@ -35,7 +35,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       form={form}
       type={type}
       title={aria_label}
-      className={`${className} inline-flex items-center justify-center gap-2.5 px-6 py-3 min-h-[48px] w-full text-[16px] font-semibold rounded-lg transition-all duration-300 ease-in-out focus:outline-none touch-manipulation ${
+      className={`${className} inline-flex items-center justify-center gap-2.5 px-6 py-3 min-h-[48px] w-full text-[16px] font-semibold rounded-md transition-all duration-300 ease-in-out focus:outline-none touch-manipulation ${
         isLoading
           ? "bg-primaryColor text-white cursor-wait opacity-70 shadow-[0_0_12px_rgba(0,0,0,0.1)]"
           : disabled

@@ -162,7 +162,7 @@ export const Clients: React.FC = () => {
         sortData={CLIENTS_SORT_OPTIONS}
       />
 
-      <div className="space-y-4 mb-6">
+      <div className="space-y-1 mb-6">
         {isLoading ? (
           Array(5)
             .fill(null)

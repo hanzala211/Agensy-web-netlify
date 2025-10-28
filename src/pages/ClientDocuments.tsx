@@ -158,7 +158,7 @@ export const ClientDocuments: React.FC = () => {
         buttonText="Add Document"
         onButtonClick={() => setIsAddDocumentModalOpen(true)}
       />
-      <div className="mt-8 space-y-7 ">
+      <div className="mt-8 space-y-1">
         {!paginatedDocuments || paginatedDocuments.length === 0 ? (
           <EmptyStateCard
             onClick={() => {

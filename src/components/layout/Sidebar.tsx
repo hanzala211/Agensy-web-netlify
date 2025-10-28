@@ -114,7 +114,7 @@ export const Sidebar: React.FC = () => {
         </div>
         <div className="p-4 border-t border-gray-100">
           <div
-            className="flex items-center p-2 rounded-full cursor-pointer hover:bg-lightGray transition-all mb-3"
+            className="flex items-center p-2 rounded-md cursor-pointer hover:bg-lightGray transition-all mb-3"
             onClick={() => navigate(ROUTES.settings)}
             role="button"
             tabIndex={0}
@@ -143,7 +143,7 @@ export const Sidebar: React.FC = () => {
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-4 py-3 min-h-[48px] rounded-full text-darkGray hover:bg-lightGray hover:text-primaryColor transition-all touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20 active:bg-lightGray/80"
+            className="w-full flex items-center gap-2 px-4 py-3 min-h-[48px] !rounded-md text-darkGray hover:bg-lightGray hover:text-primaryColor transition-all touch-manipulation focus:outline-none focus:ring-2 focus:ring-primaryColor/20 active:bg-lightGray/80"
             aria-label="Logout from account"
           >
             <ICONS.logoutIcon size={18} />

@@ -26,9 +26,9 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
       className={({ isActive }) =>
         `group relative flex items-center gap-3 px-4 py-3 min-h-[48px] rounded-lg transition-all duration-300 ${
           isActive
-            ? "text-primaryColor font-medium outline-none border-none"
+            ? "text-primaryColor font-medium !border-none"
             : "text-darkGray hover:text-primaryColor/70"
-        } touch-manipulation focus-visible:outline-none active:!outline-none [&:focus]:outline-none`
+        } touch-manipulation`
       }
       onClick={onClick}
       aria-label={`${label} (current page)`}

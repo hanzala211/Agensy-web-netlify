@@ -142,7 +142,7 @@ export const DocumentsManager: React.FC = () => {
         filterLabel="Category"
         sortLabel="Sort by"
       />
-      <div className="mt-8 space-y-7 ">
+      <div className="mt-8 space-y-1 ">
         {!paginatedDocuments || paginatedDocuments.length === 0 ? (
           <EmptyStateCard
             onClick={() => {

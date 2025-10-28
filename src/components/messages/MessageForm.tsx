@@ -332,6 +332,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
             ? uploadFileData?.file_name
             : null,
           file_key: uploadFileData?.file_key ? uploadFileData?.file_key : null,
+          name: pendingThreadData.name ? pendingThreadData.name : null,
         });
       } else {
         socket.emit("sendMessage", {

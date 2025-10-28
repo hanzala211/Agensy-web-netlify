@@ -49,7 +49,7 @@ export const Messages: React.FC = () => {
         id: threadId,
         participants_ids: [userData?.id as string],
         type: "broadcast",
-        name: "Agensy Broadcast",
+        name: data.name || "Agensy Broadcast",
         participants: [userData as IUser],
         created_by: userData?.id as string,
       });

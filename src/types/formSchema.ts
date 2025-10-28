@@ -364,6 +364,7 @@ export const addThreadFormSchema = z
       .transform((val) => (val ? trimString(val) : val)),
     type: z.string().min(1, "Type is Required").transform(trimString),
     participant_ids: z.array(z.string()).optional(),
+    name: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -403,7 +404,16 @@ export const addThreadFormSchema = z
       message: "Care Recipient is Required",
       path: ["client_id"],
     }
-  );
+  )
+  .refine((data) => {
+    if (data.type === "broadcast") {
+      return data.name && data.name.length > 0;
+    }
+    return true;
+  }, {
+    message: "Name is Required",
+    path: ["name"],
+  });
 
 export type AddThreadFormData = z.infer<typeof addThreadFormSchema>;
 

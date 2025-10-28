@@ -1,7 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Modal, PrimaryButton, Select } from "@agensy/components";
+import { Input, Modal, PrimaryButton, Select } from "@agensy/components";
 import { addThreadFormSchema, type AddThreadFormData } from "@agensy/types";
 import type { Client } from "@agensy/types";
 import { useAuthContext } from "@agensy/context";
@@ -39,15 +39,23 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
     defaultType
   );
 
-  const { handleSubmit, control, reset, watch, setValue } =
-    useForm<AddThreadFormData>({
-      resolver: zodResolver(addThreadFormSchema),
-      defaultValues: {
-        type: params.clientId ? "client" : showType ? "general" : "client",
-        participant_ids: [],
-        client_id: params.clientId || "",
-      },
-    });
+  const {
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    setValue,
+    register,
+    formState: { errors },
+  } = useForm<AddThreadFormData>({
+    resolver: zodResolver(addThreadFormSchema),
+    defaultValues: {
+      type: params.clientId ? "client" : showType ? "general" : "client",
+      participant_ids: [],
+      client_id: params.clientId || "",
+      name: "",
+    },
+  });
 
   const clientsData = useMemo(() => {
     return (
@@ -69,6 +77,7 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
       setValue("type", "broadcast");
     } else {
       setValue("type", "message");
+      setValue("name", "");
     }
     if (currentClientId) {
       setValue("type", "client");
@@ -88,6 +97,7 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
           type: params.clientId ? "client" : showType ? "general" : "client",
           participant_ids: [],
           client_id: params.clientId || "",
+          name: "",
         });
       }, 300);
     }
@@ -112,6 +122,7 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
           type: "broadcast",
           participant_ids: [],
           client_id: "",
+          name: data.name || "",
         });
       }
 
@@ -226,12 +237,21 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
         )}
 
         {messageType === "broadcast" && (
-          <div className="text-center py-4">
-            <p className="text-gray-600 text-sm">
-              Broadcast messages will be sent to all users. You can compose your
-              message on the next page.
-            </p>
-          </div>
+          <>
+            <div>
+              <Input
+                register={register("name")}
+                error={errors.name?.message}
+                label="Name"
+              />
+            </div>
+            <div className="text-center py-2">
+              <p className="text-gray-600 text-sm">
+                Broadcast messages will be sent to all users. You can compose
+                your message on the next page.
+              </p>
+            </div>
+          </>
         )}
 
         {messageType === "message" && (

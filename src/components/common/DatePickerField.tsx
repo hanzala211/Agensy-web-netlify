@@ -62,7 +62,7 @@ export const DatePickerField = <T extends FieldValues>({
                   format={dateFormat}
                   placeholder={placeholder || dateFormat}
                   className={`${className} !text-darkGray !bg-lightGray p-2
-                  border-[1px] border-mediumGray rounded-xl font-semibold  w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+                  border-[1px] border-mediumGray !rounded-md font-semibold  w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
                   onChange={(date: any, dateString: string | string[]) => {
                     field.onChange(dateString);
                     setError(""); // Clear errors when valid date is selected from calendar
