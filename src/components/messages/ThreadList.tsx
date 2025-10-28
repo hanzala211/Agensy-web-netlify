@@ -217,7 +217,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                           {renderTypingIndicator(thread) ||
                             (thread.last_message && (
                               <div className="flex justify-between w-full items-baseline gap-2 sm:text-sm text-slateGrey text-xs mt-2 md:mt-0">
-                                <p className="max-w-sm truncate mt-0.5 sm:mt-1">
+                                <p className="max-w-xs truncate mt-0.5 sm:mt-1">
                                   {thread.type === "broadcast"
                                     ? "Broadcast: " + thread.last_message
                                     : thread.last_message_sender_id ===
