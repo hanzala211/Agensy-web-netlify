@@ -681,10 +681,11 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         messageId,
         threadId,
       });
-      const lastMessage =
-        currentThreadMessages[currentThreadMessages.length - 1];
+      const sortedMessages = [...currentThreadMessages].sort(
+        (a, b) => dayjs(a.createdAt).valueOf() - dayjs(b.createdAt).valueOf()
+      );
+      const lastMessage = sortedMessages[sortedMessages.length - 1];
       const isLastMessage = lastMessage?.id === messageId;
-      const isLastMessageMine = lastMessage?.sender_id === userData.id;
 
       setCurrentThreadMessages((prev) => {
         const filteredMessages = prev.filter((msg) => msg.id !== messageId);
@@ -692,7 +693,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         return filteredMessages;
       });
 
-      if (isLastMessage && isLastMessageMine) {
+      if (isLastMessage) {
         setThreads((prev) =>
           prev.map((thread) => {
             if (thread.id === threadId) {
@@ -705,6 +706,8 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
           })
         );
       }
+
+      console.log(isLastMessage);
 
       socket.emit("deleteMessage", {
         message_id: messageId,

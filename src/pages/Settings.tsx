@@ -15,7 +15,7 @@ export const Settings = () => {
         showButton={false}
       />
 
-      <div className="border-[1px] border-mediumGray px-2 sm:px-5 rounded-xl mt-4">
+      <div className="border-[1px] border-mediumGray px-2 sm:px-5 rounded-md mt-4">
         <div className="flex flex-wrap md:flex-nowrap border-b border-mediumGray w-full">
           <TabLink to={`${ROUTES.settings}`} end>
             Profile

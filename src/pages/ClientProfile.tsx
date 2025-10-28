@@ -101,7 +101,7 @@ export const ClientProfile: React.FC = () => {
             ?.UserRoles.role || "System Admin"
         )}
       />
-      <div className="border-[1px] border-mediumGray px-2 sm:px-5 rounded-xl mt-4">
+      <div className="border-[1px] border-mediumGray px-2 sm:px-5 rounded-md mt-4">
         <div className="flex flex-wrap lg:flex-nowrap border-b border-mediumGray w-full">
           <TabLink
             to={`/${ROUTES.clients}/${selectedClient?.id}/${ROUTES.clientOverview}`}
