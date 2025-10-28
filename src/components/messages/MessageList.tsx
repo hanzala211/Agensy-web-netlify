@@ -319,9 +319,16 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
                       } px-2.5 py-2 sm:px-3 sm:py-2`}
                       onDoubleClick={() => handleDoubleClick(message)}
                     >
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 pb-5">
                         {message.message && (
-                          <p className="sm:text-[12px] text-[10px] break-words pr-12 sm:pr-14 whitespace-pre-wrap">
+                          <p
+                            className="sm:text-[12px] text-[10px] pr-12 sm:pr-14 whitespace-pre-wrap max-w-full"
+                            style={{
+                              wordBreak: "break-all",
+                              overflowWrap: "anywhere",
+                              wordWrap: "break-word",
+                            }}
+                          >
                             {message.message}
                           </p>
                         )}
