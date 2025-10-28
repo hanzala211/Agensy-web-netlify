@@ -95,6 +95,7 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
 
   const handleClose = () => {
     reset();
+    setMessageType("message");
     onClose();
   };
 
@@ -135,6 +136,8 @@ export const AddThreadModal: React.FC<AddThreadModalProps> = ({
 
       if (existingThread && onExistingThreadFound) {
         onExistingThreadFound(existingThread.id);
+
+        setMessageType("message");
         onClose();
         return;
       }

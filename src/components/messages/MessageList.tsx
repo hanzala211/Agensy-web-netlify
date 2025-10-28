@@ -316,13 +316,13 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
                         isSender
                           ? "bg-primaryColor text-white rounded-tr-none mr-1 shadow-[0_4px_12px_rgba(42,107,184,0.2)]"
                           : "bg-basicWhite text-basicBlack border-[1px] border-gray-200 rounded-tl-none ml-1 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
-                      } px-2.5 py-2 sm:px-3 sm:py-2`}
+                      } px-2 py-1.5 sm:px-2.5 sm:py-2`}
                       onDoubleClick={() => handleDoubleClick(message)}
                     >
-                      <div className="flex flex-col gap-1 pb-5">
+                      <div className="flex flex-col gap-1 pb-2.5">
                         {/* File Preview */}
                         {message.file_url && message.file_name && (
-                          <div className="mb-2">
+                          <div className="mb-1">
                             {getFileType(message.file_name) === "image" && (
                               <div
                                 className="relative w-52 h-36 bg-white rounded-lg overflow-hidden shadow-sm cursor-pointer"
@@ -524,7 +524,7 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
 
                         {message.message && (
                           <p
-                            className="sm:text-[12px] text-[10px] pr-12 sm:pr-14 whitespace-pre-wrap max-w-full"
+                            className="sm:text-[12px] text-[10px] pr-10 sm:pr-12 whitespace-pre-wrap max-w-full"
                             style={{
                               wordBreak: "break-all",
                               overflowWrap: "anywhere",
@@ -536,8 +536,12 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
                         )}
 
                         <span
-                          className={`sm:text-[8px] text-[7px] opacity-70 absolute bottom-1.5 ${
-                            isSender ? "sm:right-6 right-5" : "right-1"
+                          className={`sm:text-[8px] text-[7px] opacity-70 absolute bottom-1 ${
+                            isSender ? "sm:right-5 right-4" : "right-1"
+                          } ${
+                            isSender && selectedThread?.type === "broadcast"
+                              ? "!right-2"
+                              : ""
                           }`}
                         >
                           {DateUtils.formatToTime(String(message.createdAt))}
@@ -545,7 +549,7 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
                         {isSender &&
                           selectedThread &&
                           selectedThread.type !== "broadcast" && (
-                            <div className="text-[8px] opacity-70 absolute bottom-0.5 right-[0.5px]">
+                            <div className="text-[8px] opacity-70 absolute bottom-0 right-[0.5px]">
                               <MessageReadStatus
                                 message={message}
                                 thread={selectedThread}
