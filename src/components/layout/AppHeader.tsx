@@ -134,7 +134,12 @@ export const AppHeader: React.FC = () => {
         <div className="flex items-center sm:gap-3 md:gap-4 lg:gap-6 min-w-0 flex-1">
           {/* Logo - Hidden on small mobile, shown on md+, stays on left edge */}
           <div className="hidden lg:flex items-center flex-shrink-0 lg:pl-6">
-            <img src={IMAGES.logo} alt="Agensy Logo" className="h-12 w-auto" />
+            <img
+              src={IMAGES.logo}
+              alt="Agensy Logo"
+              className="h-12 w-auto cursor-pointer"
+              onClick={() => navigate("/")}
+            />
           </div>
 
           {/* Mobile Menu Button */}
