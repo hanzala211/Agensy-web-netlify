@@ -136,6 +136,19 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
           return [...prev, newThread];
         });
 
+        setSelectedThread((prev) => {
+          if (prev?.id === data.threadId) {
+            return {
+              ...prev,
+              participants: data.participants,
+              participants_ids: data.participants.map(
+                (participant) => participant.id as string
+              ),
+            };
+          }
+          return prev;
+        });
+
         setCurrentThreadMessages((prev) => {
           if (
             prev &&
@@ -553,6 +566,17 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             file_name: fileData?.file_name,
             file_key: fileData?.file_key?.toString(),
           },
+        ],
+        participants: [
+          ...(prev.participants || []),
+          prev.participants?.some((item) => item.id === lastMessageSender) &&
+          userData
+            ? (userData as IUser)
+            : ({} as IUser),
+        ],
+        participants_ids: [
+          ...(prev.participants_ids || []),
+          lastMessageSender as string,
         ],
         last_message: lastMessage,
         last_message_time: new Date(),
