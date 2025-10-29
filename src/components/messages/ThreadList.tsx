@@ -25,7 +25,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   showHeader = true,
 }) => {
   const params = useParams();
-  const { userData, clients } = useAuthContext();
+  const { userData, clients, accessUsers } = useAuthContext();
   const {
     isThreadsLoading,
     setThreads,
@@ -209,6 +209,23 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                               className="shadow-[0_2px_4px_rgba(0,0,0,0.2)]"
                             />
                           </div>
+                          {thread.type !== "broadcast" &&
+                            thread.participants_ids.length <= 2 &&
+                            user &&
+                            (() => {
+                              const userOnlineStatus = accessUsers?.find(
+                                (item) => item.id === user.id
+                              )?.is_online;
+                              return (
+                                <div
+                                  className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white rounded-full shadow-sm ${
+                                    userOnlineStatus
+                                      ? "bg-green-500"
+                                      : "bg-gray-400"
+                                  }`}
+                                ></div>
+                              );
+                            })()}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] 2xl:grid-cols-[1.8fr_1.3fr] items-start sm:items-center">

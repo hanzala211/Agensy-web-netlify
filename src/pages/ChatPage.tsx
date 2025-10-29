@@ -120,9 +120,12 @@ export const ChatPage: React.FC = () => {
         setCachedUser(user);
       }
 
-      return user || null;
+      return {
+        ...user,
+        is_online: accessUsers.find((item) => item.id === user?.id)?.is_online,
+      } as IUser;
     },
-    [userData?.id]
+    [userData?.id, accessUsers]
   );
 
   const selectedUser = useMemo(() => {
