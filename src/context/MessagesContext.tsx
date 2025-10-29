@@ -329,7 +329,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         deletedBy: string;
         deletedAt: Date;
         lastMessage: string;
-        lastMessageSenderID: string;
+        lastMessageSenderId: string;
       }) => {
         console.log("🗑️ [SOCKET] Message deleted:", data);
 
@@ -347,7 +347,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
               return {
                 ...thread,
                 last_message: data.lastMessage,
-                last_message_sender_id: data.lastMessageSenderID as string,
+                last_message_sender_id: data.lastMessageSenderId as string,
               };
             }
             return thread;
