@@ -1,22 +1,33 @@
-import { PageHeader, TabLink } from "@agensy/components";
+import { TabLink } from "@agensy/components";
 import { ROLES, ROUTES } from "@agensy/constants";
-import { useAuthContext } from "@agensy/context";
+import { useAuthContext, useHeaderContext } from "@agensy/context";
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 export const Settings = () => {
+  const { setHeaderConfig } = useHeaderContext();
   const { userData } = useAuthContext();
   const isAdmin = userData?.role === ROLES.ADMIN;
-  return (
-    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
-      <PageHeader
-        className={`mb-2`}
-        title="Settings"
-        showBackButton={false}
-        showButton={false}
-      />
 
-      <div className="border-[1px] border-mediumGray px-2 sm:px-5 rounded-md mt-4">
-        <div className="flex flex-wrap md:flex-nowrap border-b border-mediumGray w-full">
+  useEffect(() => {
+    setHeaderConfig({
+      showBackButton: false,
+      showButton: false,
+      title: "Settings",
+    });
+  }, []);
+  return (
+    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-75px)] w-full px-4 py-6 pt-0">
+      <div
+        className={`${
+          isAdmin ? "" : "border-[1px] border-mediumGray mt-4"
+        } px-2 sm:px-5 rounded-md `}
+      >
+        <div
+          className={`${
+            isAdmin ? "hidden" : "flex border-b border-mediumGray"
+          } flex-wrap md:flex-nowrap w-full`}
+        >
           <TabLink to={`${ROUTES.settings}`} end>
             Profile
           </TabLink>

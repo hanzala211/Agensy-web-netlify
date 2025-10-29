@@ -107,7 +107,7 @@ export const MobileNav: React.FC = () => {
   return (
     <React.Fragment>
       <header
-        className="md:hidden sticky top-0 z-40 bg-white shadow-md h-[56px]"
+        className="lg:hidden sticky top-0 z-40 bg-white shadow-md h-[56px]"
         ref={headerRef}
       >
         <div className="px-4 py-3 flex items-center justify-between bg-basicWhite h-full">

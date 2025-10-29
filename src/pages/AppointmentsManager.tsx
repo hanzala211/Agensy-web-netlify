@@ -5,11 +5,10 @@ import {
 import {
   AddAppointmentModal,
   AppointmentsSkeleton,
-  PageHeader,
   TabLink,
 } from "@agensy/components";
 import { ROUTES } from "@agensy/constants";
-import { useAppointmentsContext } from "@agensy/context";
+import { useAppointmentsContext, useHeaderContext } from "@agensy/context";
 import type { AppointmentFormData } from "@agensy/types";
 import { DateUtils, toast } from "@agensy/utils";
 import type React from "react";
@@ -17,6 +16,7 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 export const AppointmentsManager: React.FC = () => {
+  const { setHeaderConfig } = useHeaderContext();
   const { setAppointments } = useAppointmentsContext();
   const {
     addAppointment,
@@ -31,6 +31,13 @@ export const AppointmentsManager: React.FC = () => {
   } = useGetClientAppointmentQuery();
 
   useEffect(() => {
+    setHeaderConfig({
+      title: "Appointments",
+      buttonAriaLabel: "Add Appointment",
+      buttonText: "Add Appointment",
+      showButton: true,
+      onButtonClick: () => setIsAddAppointmentModalOpen(true),
+    });
     loadAppointments();
   }, []);
 
@@ -75,14 +82,7 @@ export const AppointmentsManager: React.FC = () => {
   };
 
   return (
-    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
-      <PageHeader
-        title={`${"Appointments"}`}
-        showBackButton={false}
-        buttonText="Add Appointment"
-        buttonAriaLabel="Add Appointment"
-        onButtonClick={() => setIsAddAppointmentModalOpen(true)}
-      />
+    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-75px)] w-full px-4 py-6 pt-0">
       <AddAppointmentModal
         isOpen={isAddAppointmentModalOpen}
         onClose={() => setIsAddAppointmentModalOpen(false)}

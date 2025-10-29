@@ -13,6 +13,7 @@ export * from "./layout/SidebarItem";
 export * from "./layout/MobileNav";
 export * from "./layout/NavItem";
 export * from "./layout/PageHeader";
+export * from "./layout/AppHeader";
 export * from "./common/StatefulInput";
 export * from "./common/StatefulSelect";
 export * from "./clients/ClientCard";

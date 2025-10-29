@@ -394,14 +394,14 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
       <div
         className={`
           relative flex flex-wrap items-center gap-1 min-h-[42px] px-2 py-0
-          border border-gray-300 rounded-[0.7rem] bg-[#f5f7fa]
+          border border-gray-200 rounded-md bg-[#f5f7fa]
           ${disabled ? "bg-gray-50 cursor-not-allowed" : "cursor-text"}
           ${
             isOpen
               ? "border-[#4285f4] shadow-[0_0_8px_rgba(66,133,244,0.15)]"
               : ""
           }
-          hover:border-gray-400 focus-within:border-[#4285f4] focus-within:shadow-[0_0_8px_rgba(66,133,244,0.15)] transition-all duration-300
+          hover:border-gray-300 focus-within:border-[#4285f4] focus-within:shadow-[0_0_8px_rgba(66,133,244,0.15)] transition-all duration-300
           text-[#333333] text-sm font-normal
         `}
         onClick={(e) => {

@@ -123,7 +123,7 @@ export const DocumentsManager: React.FC = () => {
     <div className="w-full">
       <SearchFilterBar
         showExtraFilter={true}
-        extraFilterLabel="Upload Type"
+        extraFilterLabel=""
         extraFilter={uploadType}
         setExtraFilter={setUploadType}
         extraFilterData={DOCUMENT_UPLOAD_TYPE_OPTIONS}
@@ -139,8 +139,9 @@ export const DocumentsManager: React.FC = () => {
           ...DOCUMENT_CATEGORY_OPTIONS,
         ]}
         sortData={DOCUMENT_SORT_OPTIONS}
-        filterLabel="Category"
-        sortLabel="Sort by"
+        filterLabel=""
+        sortLabel=""
+        customFilterWidth="sm:!min-w-[210px] !min-w-full"
       />
       <div className="mt-8 space-y-1 ">
         {!paginatedDocuments || paginatedDocuments.length === 0 ? (

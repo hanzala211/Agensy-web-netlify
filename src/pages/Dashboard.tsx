@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   WelcomeDashboardCard,
   // ClientsDashboardCard,
@@ -7,9 +7,19 @@ import {
   // DocumentsDashboardCard,
   // DashboardWidget,
 } from "@agensy/components";
+import { useHeaderContext } from "@agensy/context";
 // import { ICONS } from "@agensy/constants";
 
 export const Dashboard: React.FC = () => {
+  const { setHeaderConfig } = useHeaderContext();
+
+  useEffect(() => {
+    setHeaderConfig({
+      title: "Dashboard",
+      showBackButton: false,
+      showButton: false,
+    });
+  }, []);
   return (
     <div className="overflow-y-auto py-6 h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[100dvh]">
       <div className="space-y-6 2xl:max-w-[90%] xl:max-w-5xl lg:max-w-3xl md:max-w-[33rem] max-w-[90%] mx-auto">

@@ -153,10 +153,11 @@ export const ClientDocuments: React.FC = () => {
           ...DOCUMENT_CATEGORY_OPTIONS,
         ]}
         sortData={DOCUMENT_SORT_OPTIONS}
-        filterLabel="Category"
-        sortLabel="Sort by"
+        filterLabel=""
+        sortLabel=""
         buttonText="Add Document"
         onButtonClick={() => setIsAddDocumentModalOpen(true)}
+        customFilterWidth="sm:!min-w-[200px] !min-w-full"
       />
       <div className="mt-8 space-y-1">
         {!paginatedDocuments || paginatedDocuments.length === 0 ? (

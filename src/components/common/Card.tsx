@@ -31,7 +31,7 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   return (
     <div
-      className={`bg-white rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.15)] transition-all duration-300 overflow-hidden h-full flex flex-col ${className}`}
+      className={`bg-white rounded-md shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.15)] transition-all duration-300 overflow-hidden h-full flex flex-col ${className}`}
     >
       {title && (
         <div className="px-6 pt-6 pb-4 border-b border-gray-100 flex justify-between items-center">

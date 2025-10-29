@@ -665,7 +665,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
       <div
         key={item.id}
         className={`
-          flex flex-col items-center p-4 sm:p-6 rounded-xl cursor-pointer transition-all duration-300
+          flex flex-col items-center p-4 sm:p-6 rounded-md cursor-pointer transition-all duration-300
           bg-white shadow-[0_0_10px_rgba(0,0,0,0.08)] hover:shadow-[0_0_15px_rgba(0,0,0,0.12)]
           ${
             isSelected
@@ -696,7 +696,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
   };
 
   return (
-    <div className="!p-0 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.15)] transition-all duration-300 w-full">
+    <div className="!p-0 overflow-hidden rounded-md shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.15)] transition-all duration-300 w-full">
       <div className="bg-white px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
         <div className="flex items-center justify-between sm:flex-row flex-col gap-3">
           <div
@@ -707,7 +707,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
             {showBackButton && (
               <button
                 onClick={handleBackButtonClick}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 focus:outline-none"
+                className="p-2 hover:bg-gray-100 rounded-md transition-all duration-300 focus:outline-none"
               >
                 <ICONS.leftArrow size={18} className="text-gray-600" />
               </button>
@@ -895,7 +895,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
               ) && (
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                   {isCreatingMedicalTemplate ? (
-                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 shadow-[0_0_8px_rgba(0,0,0,0.08)]">
+                    <div className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-md bg-gray-50 shadow-[0_0_8px_rgba(0,0,0,0.08)]">
                       <CommonLoader size={16} />
                       <span className="text-sm text-gray-600 font-medium">
                         Creating Template...

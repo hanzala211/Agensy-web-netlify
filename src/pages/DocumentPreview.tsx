@@ -147,7 +147,7 @@ export const DocumentPreview: React.FC = () => {
   };
 
   return (
-    <div className={`${params.clientId ? "" : "border-t-[2px]"}`}>
+    <div>
       <div className={`max-w-7xl mx-auto py-5 px-2`}>
         <Card>
           <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-6">

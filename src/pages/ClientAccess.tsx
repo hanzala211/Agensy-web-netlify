@@ -271,6 +271,7 @@ export const ClientAccess: React.FC = () => {
         sortLabel="Sort by"
         buttonText="Add User"
         onButtonClick={() => setIsAddAccessModalOpen(true)}
+        customFilterWidth="sm:!min-w-[210px] !min-w-full"
       />
 
       <div className="mt-8 space-y-1">

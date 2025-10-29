@@ -93,6 +93,7 @@ export const AppointmentsList: React.FC = () => {
         setFirstDateValue={setFrom}
         secondDateValue={to}
         setSecondDateValue={setTo}
+        customFilterWidth="sm:!min-w-[240px] !min-w-full"
       />
 
       <div className="space-y-1">

@@ -6,3 +6,4 @@ export * as CognitoUtils from "./authCognito";
 export * as DateUtils from "./dateUtils";
 export * as StringUtils from "./stringUtils";
 export * as CalendarUtils from "./calendarUtils";
+export * from "./routeTitles";

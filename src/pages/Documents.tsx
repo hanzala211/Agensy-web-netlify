@@ -2,8 +2,8 @@ import {
   useAddGeneralDocumentMutation,
   useAnalyzeGeneralDocumentMutation,
 } from "@agensy/api";
-import { AddDocumentModal, PageHeader } from "@agensy/components";
-import { useDocumentContext } from "@agensy/context";
+import { AddDocumentModal } from "@agensy/components";
+import { useDocumentContext, useHeaderContext } from "@agensy/context";
 import type {
   ConfidenceScore,
   Document,
@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 export const Documents: React.FC = () => {
+  const { setHeaderConfig } = useHeaderContext();
   const params = useParams();
   const addGeneralDocumentMutation = useAddGeneralDocumentMutation();
   const { isAddDocumentModalOpen, setIsAddDocumentModalOpen } =
@@ -24,6 +25,17 @@ export const Documents: React.FC = () => {
   const [analyzedDocRes, setAnalyzedDocRes] = useState<ConfidenceScore | null>(
     null
   );
+
+  useEffect(() => {
+    setHeaderConfig({
+      showBackButton: params.documentId ? true : false,
+      showButton: params.documentId ? false : true,
+      title: "Documents",
+      buttonAriaLabel: "Add Document",
+      buttonText: "Add Document",
+      onButtonClick: () => setIsAddDocumentModalOpen(true),
+    });
+  }, [params.documentId]);
 
   useEffect(() => {
     if (generalDocumentAnalyzeMutation.status === "success") {
@@ -66,14 +78,7 @@ export const Documents: React.FC = () => {
   }, [addGeneralDocumentMutation.status]);
 
   return (
-    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
-      <PageHeader
-        title="Documents"
-        showButton={params.documentId ? false : true}
-        buttonText="Add Document"
-        showBackButton={params.documentId ? true : false}
-        onButtonClick={() => setIsAddDocumentModalOpen(true)}
-      />
+    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-75px)] w-full px-4 py-6 pt-0">
       <main className="mt-8">
         <Outlet />
       </main>

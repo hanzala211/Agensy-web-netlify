@@ -58,7 +58,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`shadow-lg border-gray-100/60  bg-basicWhite/90 rounded-3xl borderhover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden h-full p-8`}
+        className={`shadow-lg border-gray-100/60  bg-basicWhite/90 rounded-md borderhover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden h-full p-8`}
       >
         <div className="space-y-6">
           <div>

@@ -13,6 +13,7 @@ interface ThreadListProps {
   threads: Thread[];
   onThreadClick: (thread: Thread) => void;
   className?: string;
+  showHeader?: boolean; // Show "Messaging" header with plus icon
 }
 
 export const ThreadList: React.FC<ThreadListProps> = ({
@@ -21,6 +22,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   threads,
   onThreadClick,
   className,
+  showHeader = true,
 }) => {
   const params = useParams();
   const { userData, clients } = useAuthContext();
@@ -92,19 +94,21 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   return (
     <React.Fragment>
       <div className="flex flex-col h-full w-full">
-        <div
-          className={`flex justify-between items-center p-[0.75rem] ${className} md:pt-5 border-b border-gray-200`}
-        >
-          <h2 className="text-lg sm:text-xl font-semibold text-darkGray">
-            Messaging
-          </h2>
-          <button
-            onClick={onAddThread}
-            className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primaryColor focus:ring-offset-2"
+        {showHeader && (
+          <div
+            className={`flex justify-between items-center p-[0.75rem] ${className} md:pt-5 border-b border-gray-200`}
           >
-            <ICONS.plus />
-          </button>
-        </div>
+            <h2 className="text-lg sm:text-xl font-semibold text-darkGray">
+              Messaging
+            </h2>
+            <button
+              onClick={onAddThread}
+              className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primaryColor focus:ring-offset-2"
+            >
+              <ICONS.plus />
+            </button>
+          </div>
+        )}
         <div className="flex-1 overflow-y-auto">
           <div className="flex flex-col gap-0 p-4">
             {isThreadsLoading ? (
@@ -207,16 +211,37 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr] xl:grid-cols-[3fr_2fr] 2xl:grid-cols-[1.8fr_1.3fr] items-start sm:items-center">
+                          <div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] 2xl:grid-cols-[1.8fr_1.3fr] items-start sm:items-center">
                             <div className="flex flex-col">
                               <h4 className="font-medium text-sm sm:text-base md:max-w-[300px] 2xl:max-w-xs max-w-[10rem] text-darkGray line-clamp-4">
                                 {getThreadDisplayName()}
                               </h4>
                             </div>
+                            {thread.type === "client" && client && (
+                              <div className="hidden xl:flex justify-end">
+                                <p className="text-xs text-gray-500 truncate max-w-[200px]">
+                                  <span className="font-bold">Re:</span>{" "}
+                                  {`${client.first_name} ${client.last_name}`
+                                    .length > 15
+                                    ? `${client.first_name} ${client.last_name}`.substring(
+                                        0,
+                                        15
+                                      ) + "..."
+                                    : `${client.first_name} ${client.last_name}`}
+                                </p>
+                              </div>
+                            )}
+                            {thread.type === "broadcast" && (
+                              <div className="hidden xl:flex justify-end">
+                                <p className="text-xs text-primaryColor font-semibold">
+                                  Broadcast
+                                </p>
+                              </div>
+                            )}
                           </div>
                           {renderTypingIndicator(thread) ||
                             (thread.last_message && (
-                              <div className="flex justify-between w-full items-baseline gap-2 sm:text-sm text-slateGrey text-xs mt-2 md:mt-0">
+                              <div className="flex flex-col sm:flex-row sm:justify-between w-full sm:items-baseline items-start gap-1 sm:gap-2 sm:text-sm text-slateGrey text-xs mt-2 md:mt-0">
                                 <p className="max-w-xs truncate mt-0.5 sm:mt-1">
                                   {thread.type === "broadcast"
                                     ? "Broadcast: " + thread.last_message
@@ -241,39 +266,37 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                                         );
                                       })()}
                                 </p>
-                                <p>
+                                <p className="sm:ml-auto">
                                   {DateUtils.formatRelativeTimeShort(
                                     String(thread.last_message_time)
                                   )}
                                 </p>
                               </div>
                             ))}
+                          {thread.type === "client" && client && (
+                            <div className="xl:hidden mt-2">
+                              <p className="text-xs text-gray-500 truncate">
+                                <span className="font-bold">Re:</span>{" "}
+                                {`${client.first_name} ${client.last_name}`
+                                  .length > 15
+                                  ? `${client.first_name} ${client.last_name}`.substring(
+                                      0,
+                                      15
+                                    ) + "..."
+                                  : `${client.first_name} ${client.last_name}`}
+                              </p>
+                            </div>
+                          )}
+                          {thread.type === "broadcast" && (
+                            <div className="xl:hidden mt-2">
+                              <p className="text-xs text-primaryColor font-semibold">
+                                Broadcast
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
-                    {thread.type === "client" && client && (
-                      <div className="absolute right-3 top-5">
-                        <p className="text-xs text-gray-500 mr-2 truncate max-w-[200px]">
-                          <span className="font-bold hidden xl:inline">
-                            Re:
-                          </span>{" "}
-                          {`${client.first_name} ${client.last_name}`.length >
-                          15
-                            ? `${client.first_name} ${client.last_name}`.substring(
-                                0,
-                                15
-                              ) + "..."
-                            : `${client.first_name} ${client.last_name}`}
-                        </p>
-                      </div>
-                    )}
-                    {thread.type === "broadcast" && (
-                      <div className="absolute right-3 top-5">
-                        <p className="text-xs text-primaryColor mr-2 font-semibold">
-                          Broadcast
-                        </p>
-                      </div>
-                    )}
                   </BorderedCard>
                 );
               })

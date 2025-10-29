@@ -3,7 +3,6 @@ import {
   ClientCard,
   AddClientModal,
   ClientSkeleton,
-  PageHeader,
   SearchFilterBar,
   Pagination,
   EmptyStateCard,
@@ -21,7 +20,11 @@ import { useNavigate } from "react-router-dom";
 import { useAddClientMutation } from "@agensy/api";
 import { DateUtils, toast } from "@agensy/utils";
 import { useClientManager } from "@agensy/hooks";
-import { useAuthContext, useClientContext } from "@agensy/context";
+import {
+  useAuthContext,
+  useClientContext,
+  useHeaderContext,
+} from "@agensy/context";
 
 export const Clients: React.FC = () => {
   const {
@@ -48,6 +51,34 @@ export const Clients: React.FC = () => {
   const [isAddClientModalOpen, setIsAddClientModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
+  const { setHeaderConfig } = useHeaderContext();
+
+  useEffect(() => {
+    setHeaderConfig({
+      showButton: true,
+      onButtonClick() {
+        if (
+          (userData?.subscription_status === SUBSCRIPTION_STATUSES.INACTIVE ||
+            userData?.subscription_status ===
+              SUBSCRIPTION_STATUSES.CANCELLED) &&
+          userData?.role !== ROLES.ADMIN
+        ) {
+          toast.error(
+            "Subscription Error!",
+            "Please upgrade your subscription to add a care recipient."
+          );
+          navigate("/settings/billing");
+          return;
+        }
+        setIsAddClientModalOpen(true);
+      },
+      showBackButton: false,
+      buttonText: "Add Care Recipient",
+      buttonAriaLabel: "Add new care recipient",
+      disabled: false,
+      title: "Care Recipients",
+    });
+  }, [userData]);
 
   useEffect(() => {
     loadClients();
@@ -127,31 +158,10 @@ export const Clients: React.FC = () => {
     setIsAddClientModalOpen(true);
   };
   return (
-    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
-      <PageHeader
-        title="Care Recipients"
-        buttonText="Add Care Recipient"
-        buttonAriaLabel="Add new care recipient"
-        onButtonClick={() => {
-          if (
-            (userData?.subscription_status === SUBSCRIPTION_STATUSES.INACTIVE ||
-              userData?.subscription_status ===
-                SUBSCRIPTION_STATUSES.CANCELLED) &&
-            userData?.role !== ROLES.ADMIN
-          ) {
-            toast.error(
-              "Subscription Error!",
-              "Please upgrade your subscription to add a care recipient."
-            );
-            navigate("/settings/billing");
-            return;
-          }
-          setIsAddClientModalOpen(true);
-        }}
-      />
-
+    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-75px)] w-full px-4 py-6">
       <SearchFilterBar
         searchPlaceholder="Search care recipients..."
+        customFilterWidth="sm:!min-w-[250px] !min-w-full"
         searchValue={searchTerm}
         setSearchValue={setSearchTerm}
         filterBy={filterBy}
@@ -159,7 +169,9 @@ export const Clients: React.FC = () => {
         sortBy={sortBy}
         setSortBy={setSortBy}
         filterData={CLIENTS_FILTERS}
+        filterLabel=""
         sortData={CLIENTS_SORT_OPTIONS}
+        sortLabel=""
       />
 
       <div className="space-y-1 mb-6">

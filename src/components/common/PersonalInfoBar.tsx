@@ -17,26 +17,35 @@ export const PersonalInfoBar: React.FC<PersonalInfoBarProps> = ({
   thirdLabel = "",
   thirdValue = "",
 }) => {
-  return (
-    <div className="flex flex-col md:flex-row gap-4 items-center place-items-center mt-4 w-full justify-between md:justify-start">
-      <p className="w-fit p-1">
-        {leftLabel}:{" "}
-        <span className="text-darkGray font-bold">{leftValue}</span>
-      </p>
-      <div className="bg-mediumGray md:w-fit w-full border-mediumGray p-[1px] md:py-5" />
-      <p>
-        {rightLabel}:{" "}
-        <span className="text-darkGray font-bold">{rightValue}</span>
-      </p>
-      {thirdLabel && (
-        <>
-          <div className="bg-mediumGray md:w-fit w-full border-mediumGray p-[1px] md:py-5" />
-          <p>
-            {thirdLabel}:{" "}
-            <span className="text-darkGray font-bold">{thirdValue}</span>
-          </p>
-        </>
+  const InfoItem: React.FC<{
+    label: string;
+    value: string;
+    showDivider?: boolean;
+  }> = ({ label, value, showDivider = true }) => (
+    <>
+      <div className="flex flex-col gap-1 flex-1 min-w-0">
+        <span className="text-xs sm:text-sm text-slateGrey font-medium uppercase tracking-wide">
+          {label}
+        </span>
+        <span className="text-sm sm:text-base text-darkGray font-semibold truncate">
+          {value}
+        </span>
+      </div>
+      {showDivider && (
+        <div className="hidden sm:block w-px h-12 bg-gray-200 mx-3 flex-shrink-0" />
       )}
+    </>
+  );
+
+  return (
+    <div className="bg-white rounded-md border border-gray-200 p-4 sm:p-5 mt-4 w-full">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:items-center w-full">
+        <InfoItem label={leftLabel} value={leftValue} />
+        <InfoItem label={rightLabel} value={rightValue} />
+        {thirdLabel && thirdValue && (
+          <InfoItem label={thirdLabel} value={thirdValue} showDivider={false} />
+        )}
+      </div>
     </div>
   );
 };

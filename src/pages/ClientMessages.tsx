@@ -87,7 +87,7 @@ export const ClientMessages: React.FC = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-270px)] flex flex-col bg-gray-50 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.1)]">
+    <div className="h-[calc(100vh-270px)] flex flex-col bg-gray-50 rounded-md overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.1)]">
       <div className="flex flex-1 overflow-hidden">
         <div
           className={`

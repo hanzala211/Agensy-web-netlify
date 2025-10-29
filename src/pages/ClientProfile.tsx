@@ -5,11 +5,14 @@ import {
 import {
   TabLink,
   ClientProfileSkeleton,
-  PageHeader,
   PersonalInfoBar,
 } from "@agensy/components";
 import { APP_ACTIONS, ROLE_MAP, ROUTES } from "@agensy/constants";
-import { useAuthContext, useClientContext } from "@agensy/context";
+import {
+  useAuthContext,
+  useClientContext,
+  useHeaderContext,
+} from "@agensy/context";
 import { DateUtils } from "@agensy/utils";
 import React, { useEffect } from "react";
 import {
@@ -21,6 +24,7 @@ import {
 } from "react-router-dom";
 
 export const ClientProfile: React.FC = () => {
+  const { setHeaderConfig } = useHeaderContext();
   const { handleFilterPermission, userData, isPrimaryUserSubscriptionActive } =
     useAuthContext();
   const location = useLocation();
@@ -36,6 +40,16 @@ export const ClientProfile: React.FC = () => {
   const careRecipientQuestionnaire = useGetCareRecipientQuestionnaire(
     params.clientId!
   );
+
+  useEffect(() => {
+    setHeaderConfig({
+      showBackButton: true,
+      title: isClientLoading
+        ? "Care Recipient: Loading..."
+        : `Care Recipient: ${selectedClient?.first_name} ${selectedClient?.last_name}`,
+      showButton: false,
+    });
+  }, [selectedClient]);
 
   useEffect(() => {
     loadClient();
@@ -61,13 +75,7 @@ export const ClientProfile: React.FC = () => {
   }
 
   return (
-    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[calc(100dvh)] w-full px-4 py-6">
-      <PageHeader
-        title={`Care Recipient: ${selectedClient?.first_name} ${selectedClient?.last_name}`}
-        showButton={false}
-        showBackButton={true}
-      />
-
+    <div className="overflow-y-auto h-[100dvh] max-h-[calc(100dvh-80px)] w-full px-4 py-6 pt-0">
       <PersonalInfoBar
         leftLabel="DOB"
         leftValue={

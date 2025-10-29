@@ -5,3 +5,4 @@ export * from "./DocumentContext";
 export * from "./AppointmentsContext";
 export * from "./MessagesContext";
 export * from "./SocketContext";
+export * from "./HeaderContext";

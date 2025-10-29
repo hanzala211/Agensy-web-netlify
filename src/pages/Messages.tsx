@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import type { AddThreadFormData, IUser, Thread } from "@agensy/types";
-import { AddThreadModal, ThreadList } from "@agensy/components";
+import {
+  AddThreadModal,
+  HEADER_HEIGHT_PX,
+  ThreadList,
+} from "@agensy/components";
 import { ICONS, ROUTES } from "@agensy/constants";
-import { useAuthContext, useMessagesContext } from "@agensy/context";
+import {
+  useAuthContext,
+  useHeaderContext,
+  useMessagesContext,
+} from "@agensy/context";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 export const Messages: React.FC = () => {
   const params = useParams();
+  const { setHeaderConfig } = useHeaderContext();
   const { userData, accessUsers } = useAuthContext();
   const {
     showThreadList,
@@ -21,6 +30,17 @@ export const Messages: React.FC = () => {
     useState<boolean>(false);
   const [isNavigating, setIsNavigating] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setHeaderConfig({
+      showButton: true,
+      title: "Messaging",
+      showBackButton: false,
+      buttonText: "Add Thread",
+      buttonAriaLabel: "Add new thread",
+      onButtonClick: () => setIsAddThreadModalOpen(true),
+    });
+  }, []);
 
   useEffect(() => {
     if (window.innerWidth < 1024 && params.threadId) {
@@ -85,13 +105,16 @@ export const Messages: React.FC = () => {
 
   return (
     <React.Fragment>
-      <div className="h-[calc(100vh-60px)] md:h-screen flex flex-col bg-gray-50">
+      <div className="h-[calc(100vh-72px)] flex flex-col bg-gray-50">
         <div className="flex flex-1 overflow-hidden">
           <div
+            style={{
+              marginTop: `${HEADER_HEIGHT_PX}px`,
+            }}
             className={`
             ${
               showThreadList ? "flex" : "hidden"
-            } w-full md:w-1/3 border-r border-gray-200 absolute md:relative inset-0 bg-white z-10 flex flex-col`}
+            } w-full md:w-1/3 border-r md:!mt-0 border-gray-200 absolute md:relative inset-0 bg-white z-10 flex flex-col`}
           >
             <ThreadList
               selectedThreadId={params.threadId}
@@ -99,6 +122,7 @@ export const Messages: React.FC = () => {
               className="pt-[calc(60px+1.25rem)]"
               threads={threads}
               onThreadClick={handleThreadClick}
+              showHeader={false}
             />
           </div>
 

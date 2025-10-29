@@ -104,6 +104,8 @@ export const ClientLogs: React.FC = () => {
         setSecondDateValue={setTo}
         firstDateLabel="From"
         secondDateLabel="To"
+        customFilterWidth="sm:!min-w-[210px] !min-w-full"
+        moveToNextLine={false}
       />
 
       <div className="space-y-1">
