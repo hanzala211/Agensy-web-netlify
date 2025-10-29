@@ -21,29 +21,29 @@ export const PersonalInfoBar: React.FC<PersonalInfoBarProps> = ({
     label: string;
     value: string;
     showDivider?: boolean;
-  }> = ({ label, value, showDivider = true }) => (
+  }> = ({ label, value, showDivider = false }) => (
     <>
-      <div className="flex flex-col gap-1 flex-1 min-w-0">
-        <span className="text-xs sm:text-sm text-slateGrey font-medium uppercase tracking-wide">
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0 px-3 sm:px-4 first:pl-0 last:pr-0">
+        <span className="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wider">
           {label}
         </span>
-        <span className="text-sm sm:text-base text-darkGray font-semibold truncate">
+        <span className="text-sm sm:text-base lg:text-lg text-darkGray font-semibold truncate leading-snug">
           {value}
         </span>
       </div>
       {showDivider && (
-        <div className="hidden sm:block w-px h-12 bg-gray-200 mx-3 flex-shrink-0" />
+        <div className="hidden sm:block w-px h-14 bg-gradient-to-b from-transparent via-gray-200 to-transparent mx-2 sm:mx-3 flex-shrink-0" />
       )}
     </>
   );
 
   return (
-    <div className="bg-white rounded-md border border-gray-200 p-4 sm:p-5 mt-4 w-full">
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:items-center w-full">
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow duration-200 p-5 sm:p-6 mt-4 w-full">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-2 sm:items-start w-full">
         <InfoItem label={leftLabel} value={leftValue} />
         <InfoItem label={rightLabel} value={rightValue} />
         {thirdLabel && thirdValue && (
-          <InfoItem label={thirdLabel} value={thirdValue} showDivider={false} />
+          <InfoItem label={thirdLabel} value={thirdValue} />
         )}
       </div>
     </div>

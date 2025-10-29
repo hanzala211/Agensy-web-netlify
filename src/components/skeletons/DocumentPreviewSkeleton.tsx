@@ -9,7 +9,7 @@ export const DocumentPreviewSkeleton: React.FC<
   DocumentPreviewSkeletonProps
 > = ({ hasClientId }) => {
   return (
-    <div className={`${hasClientId ? "" : "border-t-[2px]"}`}>
+    <div>
       <div className="w-full max-w-7xl mx-auto h-full flex flex-col gap-4 px-2 py-5">
         <Card>
           <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
