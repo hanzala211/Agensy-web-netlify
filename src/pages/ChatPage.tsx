@@ -7,7 +7,13 @@ import {
 } from "@agensy/components";
 import { ICONS, ROUTES, ROLES } from "@agensy/constants";
 import { useAuthContext, useMessagesContext } from "@agensy/context";
-import type { IUser, Message, PendingThreadData, Thread } from "@agensy/types";
+import type {
+  Client,
+  IUser,
+  Message,
+  PendingThreadData,
+  Thread,
+} from "@agensy/types";
 import React, {
   useCallback,
   useEffect,
@@ -22,6 +28,7 @@ export const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const { accessUsers, clients } = useAuthContext();
   const [cachedUser, setCachedUser] = useState<IUser | null>(null);
+  const [cachedClient, setCachedClient] = useState<Client | null>(null);
   const [cachedGroupName, setCachedGroupName] = useState<string>("");
   const [cachedBroadcastName, setCachedBroadcastName] = useState<string>("");
   const [cachedThreadType, setCachedThreadType] = useState<
@@ -62,6 +69,7 @@ export const ChatPage: React.FC = () => {
 
   const clearCachedData = () => {
     setCachedUser(null);
+    setCachedClient(null);
     setCachedGroupName("");
     setCachedBroadcastName("");
     setCachedThreadType(null);
@@ -209,8 +217,12 @@ export const ChatPage: React.FC = () => {
         return clients?.find((c) => c.id === pendingThreadData.client_id);
       }
     }
+    // Fallback to cached client
+    if (cachedClient) {
+      return cachedClient;
+    }
     return null;
-  }, [selectedThread, pendingThreadData, clients]);
+  }, [selectedThread, pendingThreadData, clients, cachedClient]);
 
   // Permission logic for delete button
   const canDeleteThread = () => {
@@ -292,6 +304,19 @@ export const ChatPage: React.FC = () => {
         return;
       }
 
+      // Cache client if thread has client_id, otherwise clear it
+      if (currentThread.client_id) {
+        const client = clients?.find((c) => c.id === currentThread.client_id);
+        if (client) {
+          setCachedClient(client);
+        } else {
+          setCachedClient(null);
+        }
+      } else {
+        // Clear cached client if current thread doesn't have client_id
+        setCachedClient(null);
+      }
+
       const isOneToOne = currentThread.participants_ids.length <= 2;
       setCachedThreadType(isOneToOne ? "one-to-one" : "group");
 
@@ -326,7 +351,13 @@ export const ChatPage: React.FC = () => {
         }
       }
     }
-  }, [selectedThread, pendingThreadData, userData?.id, cachedGroupName]);
+  }, [
+    selectedThread,
+    pendingThreadData,
+    userData?.id,
+    cachedGroupName,
+    clients,
+  ]);
 
   useEffect(() => {
     if (params.threadId && !pendingThreadData) {

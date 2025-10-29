@@ -8,11 +8,12 @@ import type {
 } from "@agensy/types";
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useSocketContext } from "./SocketContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "./AuthContext";
 import { useGetAllThreadsQuery } from "@agensy/api";
 import dayjs from "dayjs";
 import { sortBy } from "lodash";
+import { ROUTES } from "@agensy/constants";
 
 const MessagesContext = createContext<MessagesContextType | undefined>(
   undefined
@@ -21,6 +22,7 @@ const MessagesContext = createContext<MessagesContextType | undefined>(
 export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const navigate = useNavigate();
   const { userData } = useAuthContext();
   const location = useLocation();
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
@@ -327,6 +329,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         deletedBy: string;
         deletedAt: Date;
         lastMessage: string;
+        lastMessageSenderID: string;
       }) => {
         console.log("🗑️ [SOCKET] Message deleted:", data);
 
@@ -344,6 +347,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
               return {
                 ...thread,
                 last_message: data.lastMessage,
+                last_message_sender_id: data.lastMessageSenderID as string,
               };
             }
             return thread;
@@ -461,6 +465,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         if (selectedThreadRef.current?.id === data.threadId) {
           setSelectedThread(null);
           setCurrentThreadMessages([]);
+          navigate(ROUTES.messages);
         }
       }
     );
@@ -700,6 +705,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
               return {
                 ...thread,
                 last_message: "This message is deleted",
+                last_message_sender_id: userData?.id as string,
               };
             }
             return thread;
