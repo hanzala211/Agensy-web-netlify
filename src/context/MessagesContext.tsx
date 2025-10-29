@@ -343,6 +343,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         deletedAt: Date;
         lastMessage: string;
         lastMessageSenderId: string;
+        participants: IUser[];
       }) => {
         console.log("🗑️ [SOCKET] Message deleted:", data);
 
@@ -361,11 +362,27 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
                 ...thread,
                 last_message: data.lastMessage,
                 last_message_sender_id: data.lastMessageSenderId as string,
+                participants: data.participants,
+                participants_ids: data.participants.map(
+                  (participant) => participant.id as string
+                ),
               };
             }
             return thread;
           })
         );
+        setSelectedThread((prev) => {
+          if (prev?.id === data.threadId) {
+            return {
+              ...prev,
+              participants: data.participants,
+              participants_ids: data.participants.map(
+                (participant) => participant.id as string
+              ),
+            };
+          }
+          return prev;
+        });
       }
     );
 
@@ -513,13 +530,11 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             last_message: lastMessage,
             last_message_time: new Date(),
             last_message_sender_id: lastMessageSender,
-            participants: [
-              ...(t.participants || []),
-              t.participants?.some((item) => item.id === lastMessageSender) &&
-              userData
-                ? (userData as IUser)
-                : ({} as IUser),
-            ],
+            participants: t.participants?.some(
+              (item) => item.id === lastMessageSender
+            )
+              ? [...(t.participants || []), userData as IUser]
+              : [...(t.participants || [])],
             participants_ids: [
               ...(t.participants_ids || []),
               lastMessageSender as string,
@@ -578,13 +593,12 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             file_key: fileData?.file_key?.toString(),
           },
         ],
-        participants: [
-          ...(prev.participants || []),
-          prev.participants?.some((item) => item.id === lastMessageSender) &&
-          userData
-            ? (userData as IUser)
-            : ({} as IUser),
-        ],
+        participants: prev.participants?.some(
+          (item) => item.id === lastMessageSender
+        )
+          ? [...(prev.participants || []), userData as IUser]
+          : [...(prev.participants || [])],
+
         participants_ids: [
           ...(prev.participants_ids || []),
           lastMessageSender as string,
@@ -731,6 +745,44 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         const filteredMessages = prev.filter((msg) => msg.id !== messageId);
         currentMessagesRef.current = filteredMessages;
         return filteredMessages;
+      });
+
+      setThreads((prev) =>
+        prev.map((thread) => {
+          if (thread.id === threadId) {
+            return {
+              ...thread,
+              participants: thread.participants?.some(
+                (item) => item.id === userData.id
+              )
+                ? [...(thread.participants || [])]
+                : [...(thread.participants || []), userData as IUser],
+              participants_ids: [
+                ...(thread.participants_ids || []),
+                userData?.id as string,
+              ],
+            };
+          }
+          return thread;
+        })
+      );
+
+      setSelectedThread((prev) => {
+        if (prev?.id === threadId) {
+          return {
+            ...prev,
+            participants: prev.participants?.some(
+              (item) => item.id === userData.id
+            )
+              ? [...(prev.participants || [])]
+              : [...(prev.participants || []), userData as IUser],
+            participants_ids: [
+              ...(prev.participants_ids || []),
+              userData?.id as string,
+            ],
+          };
+        }
+        return prev;
       });
 
       if (isLastMessage) {

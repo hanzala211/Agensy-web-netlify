@@ -144,7 +144,7 @@ export const AppHeader: React.FC = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="nav-toggle-button lg:hidden p-2 min-w-[40px] min-h-[40px] rounded-md text-primaryColor hover:bg-lightGray transition-colors touch-manipulation active:bg-lightGray/80 focus:outline-none focus:ring-2 focus:ring-primaryColor/20 flex-shrink-0 flex items-center justify-center"
+            className="nav-toggle-button lg:hidden p-2 min-w-[40px] min-h-[40px] rounded-md text-primaryColor hover:bg-lightGray transition-colors touch-manipulation active:bg-lightGray/80 focus:outline-none focus:ring-2 focus:ring-primaryColor/20 flex-shrink-0 flex items-center justify-center mr-1"
             onClick={() => setIsNavExpanded(!isNavExpanded)}
             aria-label={
               isNavExpanded ? "Close navigation menu" : "Open navigation menu"
