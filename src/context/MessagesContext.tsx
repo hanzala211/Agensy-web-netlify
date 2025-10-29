@@ -513,6 +513,17 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             last_message: lastMessage,
             last_message_time: new Date(),
             last_message_sender_id: lastMessageSender,
+            participants: [
+              ...(t.participants || []),
+              t.participants?.some((item) => item.id === lastMessageSender) &&
+              userData
+                ? (userData as IUser)
+                : ({} as IUser),
+            ],
+            participants_ids: [
+              ...(t.participants_ids || []),
+              lastMessageSender as string,
+            ],
             messages: [
               ...(t.messages || []),
               {
