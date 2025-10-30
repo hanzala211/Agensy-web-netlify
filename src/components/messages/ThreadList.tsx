@@ -137,16 +137,14 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                     : null;
 
                 const getThreadDisplayName = () => {
+                  let displayName: string;
+
                   // Broadcast threads
                   if (thread.type === "broadcast") {
-                    return thread.name || "System Announcement";
-                  }
-
-                  if (thread.name) {
-                    return thread.name;
-                  }
-
-                  if (thread.participants_ids.length > 2) {
+                    displayName = thread.name || "System Announcement";
+                  } else if (thread.name) {
+                    displayName = thread.name;
+                  } else if (thread.participants_ids.length > 2) {
                     const participantNames = thread.participants
                       ?.filter(
                         (participant) =>
@@ -159,14 +157,17 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                       .join(", ")
                       .concat(", You");
 
-                    return participantNames && participantNames.length > 25
-                      ? participantNames.substring(0, 25) + "..."
-                      : participantNames;
+                    displayName = participantNames || "Unknown User";
+                  } else {
+                    displayName = user
+                      ? `${user.first_name} ${user.last_name}`
+                      : "Unknown User";
                   }
 
-                  return user
-                    ? `${user.first_name} ${user.last_name}`
-                    : "Unknown User";
+                  // Truncate to maximum 15 characters
+                  return displayName && displayName.length > 15
+                    ? displayName.substring(0, 15) + "..."
+                    : displayName;
                 };
 
                 return (
@@ -239,10 +240,10 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                                 <p className="text-xs text-gray-500 truncate max-w-[200px]">
                                   <span className="font-bold">Re:</span>{" "}
                                   {`${client.first_name} ${client.last_name}`
-                                    .length > 15
+                                    .length > 10
                                     ? `${client.first_name} ${client.last_name}`.substring(
                                         0,
-                                        15
+                                        10
                                       ) + "..."
                                     : `${client.first_name} ${client.last_name}`}
                                 </p>

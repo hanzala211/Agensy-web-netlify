@@ -44,6 +44,11 @@ export const AccessCard: React.FC<AccessCardProps> = ({
     [access.UserRoles.role]
   );
 
+  const truncateFullName = (firstName: string, lastName: string): string => {
+    const fullName = `${firstName} ${lastName}`;
+    return fullName.length > 30 ? fullName.substring(0, 30) + "..." : fullName;
+  };
+
   const handleDeleteUser = () => {
     setIsDeleteModalOpen(false);
     onDelete?.();
@@ -56,7 +61,7 @@ export const AccessCard: React.FC<AccessCardProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
             <div className="min-w-0 flex-1">
               <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2 text-gray-900 mb-1 truncate">
-                {access.first_name} {access.last_name}{" "}
+                {truncateFullName(access.first_name, access.last_name)}{" "}
                 {access.relation && (
                   <p className="text-gray-500">({relationship})</p>
                 )}
@@ -92,7 +97,12 @@ export const AccessCard: React.FC<AccessCardProps> = ({
                     Assigned by:
                   </span>
                   <span className="text-sm text-gray-600">
-                    {userData?.first_name} {userData?.last_name}
+                    {userData?.first_name && userData?.last_name
+                      ? truncateFullName(
+                          userData.first_name,
+                          userData.last_name
+                        )
+                      : ""}
                   </span>
                 </div>
               )}
@@ -130,8 +140,14 @@ export const AccessCard: React.FC<AccessCardProps> = ({
                 <ActionButtons
                   onDelete={() => setIsDeleteModalOpen(true)}
                   isDeleting={isDeleting}
-                  deleteLabel={`Remove contact ${access.first_name} ${access.last_name}`}
-                  editLabel={`Edit contact ${access.first_name} ${access.last_name}`}
+                  deleteLabel={`Remove contact ${truncateFullName(
+                    access.first_name,
+                    access.last_name
+                  )}`}
+                  editLabel={`Edit contact ${truncateFullName(
+                    access.first_name,
+                    access.last_name
+                  )}`}
                   onEdit={onEdit}
                 />
                 <ConfirmationModal

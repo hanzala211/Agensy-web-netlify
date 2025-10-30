@@ -44,6 +44,11 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
+  const truncateFullName = (firstName: string, lastName: string): string => {
+    const fullName = `${firstName} ${lastName}`;
+    return fullName.length > 30 ? fullName.substring(0, 30) + "..." : fullName;
+  };
+
   const getUserRoleForClient = (
     user: AccessInfo | IUser
   ): string | undefined => {
@@ -214,7 +219,7 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
 
     return {
       id: user.id as string,
-      label: `${user.first_name} ${user.last_name}`,
+      label: truncateFullName(user.first_name, user.last_name),
       value: user.id as string,
       type: "user" as const,
       role: getUserRoleForClient(user) as

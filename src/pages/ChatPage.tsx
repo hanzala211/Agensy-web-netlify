@@ -92,8 +92,8 @@ export const ChatPage: React.FC = () => {
       .join(", ")
       .concat(", You");
 
-    if (participantNames && participantNames.length > 30) {
-      return participantNames.substring(0, 30) + "...";
+    if (participantNames && participantNames.length > 15) {
+      return participantNames.substring(0, 15) + "...";
     }
     return participantNames || "Group Chat";
   };
@@ -165,46 +165,47 @@ export const ChatPage: React.FC = () => {
 
   const getThreadDisplayName = () => {
     const currentThread = selectedThread || pendingThreadData;
+    let displayName: string;
 
     if (cachedThreadType === "broadcast") {
-      return cachedBroadcastName || "Broadcast";
-    }
-
-    if (
+      displayName = cachedBroadcastName || "Broadcast";
+    } else if (
       currentThread &&
       "type" in currentThread &&
       currentThread.type === "broadcast"
     ) {
-      return currentThread.name || "Broadcast";
-    }
-
-    if (cachedThreadType === "one-to-one" && cachedUser) {
-      return `${cachedUser.first_name} ${cachedUser.last_name}`;
-    }
-
-    if (cachedThreadType === "group") {
+      displayName = currentThread.name || "Broadcast";
+    } else if (cachedThreadType === "one-to-one" && cachedUser) {
+      displayName = `${cachedUser.first_name} ${cachedUser.last_name}`;
+    } else if (cachedThreadType === "group") {
       if (cachedGroupName) {
-        return cachedGroupName;
+        displayName = cachedGroupName;
+      } else if (currentThread) {
+        displayName =
+          currentThread.name || formatGroupParticipantNames(currentThread);
+      } else {
+        displayName = "";
       }
-      if (currentThread) {
-        return currentThread.name || formatGroupParticipantNames(currentThread);
-      }
-    }
-
-    // Fallback: determine type from current thread
-    if (currentThread) {
+    } else if (currentThread) {
+      // Fallback: determine type from current thread
       const isGroupChat = currentThread.participants_ids?.length > 2;
 
       if (isGroupChat) {
-        return currentThread.name || formatGroupParticipantNames(currentThread);
+        displayName =
+          currentThread.name || formatGroupParticipantNames(currentThread);
       } else {
-        return selectedUser
+        displayName = selectedUser
           ? `${selectedUser.first_name} ${selectedUser.last_name}`
           : "";
       }
+    } else {
+      displayName = cachedGroupName || "";
     }
 
-    return cachedGroupName || "";
+    // Truncate to maximum 15 characters
+    return displayName && displayName.length > 15
+      ? displayName.substring(0, 15) + "..."
+      : displayName;
   };
 
   const selectedClient = useMemo(() => {
@@ -343,8 +344,8 @@ export const ChatPage: React.FC = () => {
             .concat(", You");
 
           const groupName =
-            participantNames && participantNames.length > 30
-              ? participantNames.substring(0, 30) + "..."
+            participantNames && participantNames.length > 15
+              ? participantNames.substring(0, 15) + "..."
               : participantNames || "Group Chat";
 
           setCachedGroupName(groupName);

@@ -153,7 +153,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
           if (
             prev &&
             data.message.sender_id !== userData?.id &&
-            prev.find((m) => m.thread_id === data.threadId)
+            selectedThreadRef.current?.id === data.threadId
           ) {
             return [
               ...(prev || []),
