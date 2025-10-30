@@ -123,6 +123,10 @@ export const ContactInfoCard: React.FC = () => {
     setIsDeleteModalOpen(true);
   };
 
+  const truncateText = (text: string): string => {
+    return text.length > 20 ? text.substring(0, 20) + "..." : text;
+  };
+
   return (
     <React.Fragment>
       <Card
@@ -159,12 +163,14 @@ export const ContactInfoCard: React.FC = () => {
                 >
                   <div>
                     <p>
-                      {item.first_name} {item.last_name}{" "}
-                      {item.relationship && "("}
-                      {StringUtils.capitalizeFirstLetter(item.relationship)}
-                      {item.relationship && ")"}
+                      {truncateText(`${item.first_name} ${item.last_name}`)}
+                      {item.relationship
+                        ? ` (${StringUtils.capitalizeFirstLetter(
+                            item.relationship
+                          )})`
+                        : ""}
                     </p>
-                    <p>{item.phone}</p>
+                    <p>{truncateText(item.phone || "")}</p>
                   </div>
                 </ContactItem>
               ))

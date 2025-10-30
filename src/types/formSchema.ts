@@ -405,15 +405,18 @@ export const addThreadFormSchema = z
       path: ["client_id"],
     }
   )
-  .refine((data) => {
-    if (data.type === "broadcast") {
-      return data.name && data.name.length > 0;
+  .refine(
+    (data) => {
+      if (data.type === "broadcast") {
+        return data.name && data.name.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Name is Required",
+      path: ["name"],
     }
-    return true;
-  }, {
-    message: "Name is Required",
-    path: ["name"],
-  });
+  );
 
 export type AddThreadFormData = z.infer<typeof addThreadFormSchema>;
 

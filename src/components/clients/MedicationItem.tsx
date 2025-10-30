@@ -25,6 +25,10 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
+  const truncateText = (text: string): string => {
+    return text.length > 30 ? text.substring(0, 30) + "..." : text;
+  };
+
   const handleDeleteMedication = () => {
     setIsDeleteModalOpen(false);
     onDelete?.(medication);
@@ -37,8 +41,8 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-700">
               <ICONS.medicine size={20} />
             </span>
-            <div className="md:text-xl text-sm font-semibold text-gray-800 break-words line-clamp-4">
-              {medication?.medication_name}
+            <div className="md:text-xl text-sm font-semibold text-gray-800 truncate">
+              {truncateText(medication?.medication_name || "")}
             </div>
             {medication.dosage && (
               <div className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-medium text-xs md:text-sm">

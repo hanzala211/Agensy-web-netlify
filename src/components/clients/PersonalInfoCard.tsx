@@ -14,6 +14,10 @@ export const PersonalInfoCard: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
+  const truncateText = (text: string): string => {
+    return text.length > 20 ? text.substring(0, 20) + "..." : text;
+  };
+
   useEffect(() => {
     if (updateClientMutation.status === "success") {
       setIsEditModalOpen(false);
@@ -67,36 +71,55 @@ export const PersonalInfoCard: React.FC = () => {
         <div className="space-y-6">
           {selectedClient?.address && (
             <InfoItem label="Address:">
-              <p>{selectedClient?.address}</p>
-              <p>
-                {selectedClient?.city} {selectedClient?.city && ","}{" "}
-                {selectedClient?.state} {selectedClient?.zip}
+              <p className="truncate">
+                {truncateText(selectedClient?.address)}
+              </p>
+              <p className="truncate">
+                {truncateText(
+                  `${selectedClient?.city || ""}${
+                    selectedClient?.city ? ", " : ""
+                  }${selectedClient?.state || ""} ${
+                    selectedClient?.zip || ""
+                  }`.trim()
+                )}
               </p>
             </InfoItem>
           )}
           {selectedClient?.living_situation && (
             <InfoItem label="Living Situation:">
-              {selectedClient?.living_situation
-                ? StringUtils.capitalizeFirstLetter(
-                    selectedClient.living_situation
-                  )
-                : ""}
+              <p className="truncate">
+                {selectedClient?.living_situation
+                  ? truncateText(
+                      StringUtils.capitalizeFirstLetter(
+                        selectedClient.living_situation
+                      )
+                    )
+                  : ""}
+              </p>
             </InfoItem>
           )}
 
           <InfoItem label="Gender:">
-            {selectedClient?.gender
-              ? StringUtils.capitalizeFirstLetter(selectedClient.gender)
-              : ""}
+            <p className="truncate">
+              {selectedClient?.gender
+                ? truncateText(
+                    StringUtils.capitalizeFirstLetter(selectedClient.gender)
+                  )
+                : ""}
+            </p>
           </InfoItem>
 
           {selectedClient?.marital_status && (
             <InfoItem label="Marital Status:">
-              {selectedClient?.marital_status
-                ? StringUtils.capitalizeFirstLetter(
-                    selectedClient.marital_status
-                  )
-                : ""}
+              <p className="truncate">
+                {selectedClient?.marital_status
+                  ? truncateText(
+                      StringUtils.capitalizeFirstLetter(
+                        selectedClient.marital_status
+                      )
+                    )
+                  : ""}
+              </p>
             </InfoItem>
           )}
         </div>
