@@ -72,7 +72,7 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
   const getFamilyAdminClientIds = (): string[] => {
     if (!userData?.Roles) return [];
     return userData.Roles.filter(
-      (role) => role.role === ROLES.PRIMARY_USER
+      (role) => role.role === ROLES.PRIMARY_USER || role.role === ROLES.ADMIN
     ).map((role) => role.client_id);
   };
 
@@ -82,7 +82,7 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
     if (!clientId) {
       return accessUsers
         .filter((user) =>
-          user.UserRoles?.some(
+          (user.UserRoles || user.Roles)?.some(
             (userRole) =>
               familyAdminClientIds.includes(userRole.client_id) &&
               userRole.role === ROLES.CAREGIVER
@@ -111,7 +111,7 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
     if (!clientId) {
       return accessUsers
         .filter((user) =>
-          user.UserRoles?.some(
+          (user.UserRoles || user.Roles)?.some(
             (userRole) =>
               familyAdminClientIds.includes(userRole.client_id) &&
               userRole.role === ROLES.FAMILY_MEMBER
