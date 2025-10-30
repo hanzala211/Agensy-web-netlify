@@ -533,12 +533,13 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             participants: t.participants?.some(
               (item) => item.id === lastMessageSender
             )
-              ? [...(t.participants || []), userData as IUser]
-              : [...(t.participants || [])],
-            participants_ids: [
-              ...(t.participants_ids || []),
-              lastMessageSender as string,
-            ],
+              ? [...(t.participants || [])]
+              : [...(t.participants || []), userData as IUser],
+            participants_ids: t.participants_ids?.includes(
+              lastMessageSender as string
+            )
+              ? [...(t.participants_ids || [])]
+              : [...(t.participants_ids || []), lastMessageSender as string],
             messages: [
               ...(t.messages || []),
               {
@@ -596,13 +597,14 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         participants: prev.participants?.some(
           (item) => item.id === lastMessageSender
         )
-          ? [...(prev.participants || []), userData as IUser]
-          : [...(prev.participants || [])],
+          ? [...(prev.participants || [])]
+          : [...(prev.participants || []), userData as IUser],
 
-        participants_ids: [
-          ...(prev.participants_ids || []),
-          lastMessageSender as string,
-        ],
+        participants_ids: prev.participants_ids?.includes(
+          lastMessageSender as string
+        )
+          ? [...(prev.participants_ids || [])]
+          : [...(prev.participants_ids || []), lastMessageSender as string],
         last_message: lastMessage,
         last_message_time: new Date(),
         last_message_sender_id: lastMessageSender,
@@ -757,10 +759,12 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
               )
                 ? [...(thread.participants || [])]
                 : [...(thread.participants || []), userData as IUser],
-              participants_ids: [
-                ...(thread.participants_ids || []),
-                userData?.id as string,
-              ],
+
+              participants_ids: thread.participants_ids?.includes(
+                userData.id as string
+              )
+                ? [...(thread.participants_ids || [])]
+                : [...(thread.participants_ids || []), userData.id as string],
             };
           }
           return thread;
@@ -776,10 +780,12 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
             )
               ? [...(prev.participants || [])]
               : [...(prev.participants || []), userData as IUser],
-            participants_ids: [
-              ...(prev.participants_ids || []),
-              userData?.id as string,
-            ],
+
+            participants_ids: prev.participants_ids?.includes(
+              userData.id as string
+            )
+              ? [...(prev.participants_ids || [])]
+              : [...(prev.participants_ids || []), userData.id as string],
           };
         }
         return prev;
