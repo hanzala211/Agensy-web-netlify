@@ -36,8 +36,8 @@ export const Messages: React.FC = () => {
       showButton: true,
       title: "Messaging",
       showBackButton: false,
-      buttonText: "Add Thread",
-      buttonAriaLabel: "Add new thread",
+      buttonText: "New Message",
+      buttonAriaLabel: "Start new chat",
       onButtonClick: () => setIsAddThreadModalOpen(true),
     });
   }, []);
