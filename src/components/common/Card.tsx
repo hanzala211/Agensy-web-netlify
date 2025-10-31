@@ -34,18 +34,18 @@ export const Card: React.FC<CardProps> = ({
       className={`bg-white rounded-md shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.15)] transition-all duration-300 overflow-hidden h-full flex flex-col ${className}`}
     >
       {title && (
-        <div className="px-6 pt-6 pb-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+        <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-gray-800 flex items-center">
             {title}
           </h2>
           {(buttonText || secondaryButtonText) &&
             (showButton || showSecondaryButton) && (
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 {secondaryButtonText && showSecondaryButton && (
                   <SecondaryButton
                     aria_label={ariaLabel}
                     onClick={onSecondaryButtonClick}
-                    className="hover:!bg-gray-100"
+                    className="hover:!bg-gray-100 !rounded-md"
                   >
                     {secondaryButtonText}
                   </SecondaryButton>
@@ -54,7 +54,7 @@ export const Card: React.FC<CardProps> = ({
                   <SecondaryButton
                     aria_label={ariaLabel}
                     onClick={onButtonClick}
-                    className="hover:!bg-gray-100"
+                    className="hover:!bg-gray-100 !rounded-md"
                   >
                     {buttonText}
                   </SecondaryButton>
@@ -64,7 +64,7 @@ export const Card: React.FC<CardProps> = ({
         </div>
       )}
 
-      <div className={`md:p-6 p-4 flex-1 ${childrenClasses}`}>{children}</div>
+      <div className={`md:p-4 p-3 flex-1 ${childrenClasses}`}>{children}</div>
     </div>
   );
 };

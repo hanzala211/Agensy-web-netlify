@@ -45,8 +45,8 @@ export const Sidebar: React.FC = () => {
           height: `calc(100dvh - ${HEADER_HEIGHT_PX}px)`,
         }}
       >
-        <div className="flex-1 overflow-y-auto py-5 px-3">
-          <div className="space-y-2">
+        <div className="flex-1 overflow-y-auto py-4 px-3">
+          <div className="space-y-1.5">
             <SidebarItem link={"/"} icon={ICONS.homeIcon} label="Dashboard" />
             <SidebarItem
               link={`/${ROUTES.clients}`}

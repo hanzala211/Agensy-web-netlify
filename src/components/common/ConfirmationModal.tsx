@@ -48,21 +48,21 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         onClick={onCancel}
       />
 
-      <div className="relative z-[500] bg-white rounded-lg shadow-[0_0_25px_rgba(0,0,0,0.15)] w-full max-w-md">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+      <div className="relative z-[500] bg-white rounded-md shadow-[0_0_25px_rgba(0,0,0,0.15)] w-full max-w-md">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
           <button
             onClick={onCancel}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none"
+            className="p-2 rounded-md hover:bg-gray-100 transition-all duration-300 focus:outline-none"
             aria-label="Close modal"
           >
             <IoCloseOutline size={22} />
           </button>
         </div>
 
-        <div className="p-6 text-gray-700">{children}</div>
+        <div className="md:p-4 p-3 text-gray-700">{children}</div>
 
-        <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">
+        <div className="px-4 py-3 border-t border-gray-100 flex gap-2.5 justify-end">
           <SecondaryButton
             onClick={onCancel}
             className="!min-h-[24px] !text-[13px] !px-6 !py-2 hover:!bg-gray-100 !w-auto !rounded-lg"

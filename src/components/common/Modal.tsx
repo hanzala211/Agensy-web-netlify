@@ -54,16 +54,16 @@ export const Modal: React.FC<ModalProps> = ({
         <div
           className={`flex items-center justify-between ${
             title
-              ? "border-b border-gray-100 p-6"
+              ? "border-b border-gray-100 px-4 pt-4 pb-3"
               : "absolute top-2 right-2 z-20"
           } bg-basicWhite rounded-t-xl`}
         >
           {title && (
-            <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
+            <h1 className="text-lg font-semibold text-gray-800">{title}</h1>
           )}
           <button
             onClick={onClose}
-            className={`p-2 rounded-full hover:bg-gray-100 transition-colors ${
+            className={`p-2 rounded-md hover:bg-gray-100 transition-colors ${
               title ? "" : "bg-white"
             }`}
             aria-label="Close modal"
@@ -72,11 +72,11 @@ export const Modal: React.FC<ModalProps> = ({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">{children}</div>
+        <div className="flex-1 overflow-y-auto md:p-5 p-3">{children}</div>
 
         {footer && (
           <div
-            className={`px-6 py-4 border-t border-gray-100 sticky bottom-0 bg-white z-10 rounded-b-lg ${footerClass}`}
+            className={`px-3 py-2.5 border-t border-gray-100 sticky bottom-0 bg-white z-10 rounded-b-lg ${footerClass}`}
           >
             {footer}
           </div>

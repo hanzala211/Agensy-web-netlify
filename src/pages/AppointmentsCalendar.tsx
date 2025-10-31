@@ -109,8 +109,8 @@ export const AppointmentsCalendar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="bg-white rounded-xl p-5 shadow-sm">
+    <div className="flex flex-col gap-4">
+      <div className="bg-white rounded-md border border-gray-200 md:p-4 p-3 shadow-sm">
         <CalendarHeader
           currentDate={currentDate}
           viewMode={viewMode}
@@ -127,7 +127,7 @@ export const AppointmentsCalendar: React.FC = () => {
           events={events}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: window.innerWidth > 768 ? 800 : 400 }}
+          style={{ height: window.innerWidth > 768 ? 600 : 350 }}
           view={viewMode}
           onView={(newView) => setViewMode(newView as ViewMode)}
           date={currentDate}

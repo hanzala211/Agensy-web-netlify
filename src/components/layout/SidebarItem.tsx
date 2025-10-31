@@ -24,7 +24,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     <NavLink
       to={link}
       className={({ isActive }) =>
-        `group relative flex items-center gap-3 px-4 py-3 min-h-[48px] rounded-lg transition-all duration-300 ${
+        `group relative flex items-center gap-2.5 px-3.5 py-2.5 min-h-[42px] rounded-md transition-all duration-300 ${
           isActive
             ? "text-primaryColor font-medium !border-none"
             : "text-darkGray hover:text-primaryColor/70"
@@ -48,14 +48,14 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
             aria-hidden="true"
           >
             {isIconType ? (
-              <img src={Icon as string} alt="" className="w-5 h-5" />
+              <img src={Icon as string} alt="" className="w-4 h-4" />
             ) : (
-              <Icon size={18} />
+              <Icon size={16} />
             )}
           </div>
           <span className="text-sm">{label}</span>
           {unreadCount !== undefined && unreadCount > 0 && (
-            <div className="absolute top-1/2 -translate-y-1/2 right-3">
+            <div className="absolute top-1/2 -translate-y-1/2 right-2.5">
               <UnreadCountBadge
                 count={unreadCount}
                 className="!min-w-[16px] !h-[16px] !text-[11px]"

@@ -22,7 +22,7 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       disabled={disabled}
       aria-label={aria_label}
       title={aria_label}
-      className={`${className} px-6 py-2 border border-gray-300 rounded-full transition-colors hover:bg-gray-50`}
+      className={`${className} px-3 py-1.5 text-sm border border-gray-300 rounded-full transition-colors hover:bg-gray-50`}
     >
       {children}
     </button>

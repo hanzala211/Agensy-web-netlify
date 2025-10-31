@@ -72,10 +72,10 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
   moveToNextLine = true,
 }) => {
   return (
-    <div className="mb-6">
-      <div className="bg-white rounded-md border border-gray-200 p-4 sm:p-5">
+    <div className="mb-4">
+      <div className="bg-white rounded-md border border-gray-200 md:p-4 p-3">
         {/* Main Search and Filter Row */}
-        <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-end">
+        <div className="flex flex-col xl:flex-row gap-3 items-start xl:items-end">
           {/* Search Input - Takes more space */}
           {searchPlaceholder && searchValue !== undefined && setSearchValue && (
             <div
@@ -89,14 +89,14 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
                 placeholder={searchPlaceholder}
                 value={searchValue}
                 onChange={(e) => setSearchValue?.(e.target.value)}
-                iconSize={18}
+                iconSize={16}
                 iconColor={COLORS.darkGray}
               />
             </div>
           )}
 
           {/* Filters Group */}
-          <div className="flex flex-col sm:flex-row gap-3 flex-1 xl:flex-initial xl:w-fit w-full">
+          <div className="flex flex-col sm:flex-row gap-2.5 flex-1 xl:flex-initial xl:w-fit w-full">
             {showExtraFilter && (
               <div
                 className={`w-full sm:flex-1 ${
@@ -147,7 +147,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
 
           {/* Date Pickers - On same line when moveToNextLine is false */}
           {showDatePicker && !moveToNextLine && (
-            <div className="flex sm:flex-row flex-col gap-3 flex-1 xl:flex-initial w-full xl:w-fit">
+            <div className="flex sm:flex-row flex-col gap-2.5 flex-1 xl:flex-initial w-full xl:w-fit">
               <div className="flex-1 min-w-0 sm:max-w-xs">
                 <StatefulDatePicker
                   divClass="w-full"
@@ -195,7 +195,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
 
         {/* Date Pickers - On next line when moveToNextLine is true */}
         {showDatePicker && moveToNextLine && (
-          <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row gap-2.5 mt-3 pt-3 border-t border-gray-100">
             <div className="flex-1 sm:max-w-xs">
               <StatefulDatePicker
                 divClass="w-full"

@@ -110,7 +110,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
           </div>
         )}
         <div className="flex-1 overflow-y-auto">
-          <div className="flex flex-col gap-0 p-4">
+          <div className="flex flex-col gap-0 p-1">
             {isThreadsLoading ? (
               <div className="h-full flex flex-col gap-5">
                 <CardSkeleton />
@@ -173,7 +173,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                 return (
                   <BorderedCard
                     key={thread.id}
-                    className={`cursor-pointer relative transition-colors duration-300 ${
+                    className={`cursor-pointer !p-4 relative transition-colors duration-300 ${
                       selectedThreadId === thread.id
                         ? "!bg-gradient-to-r !from-blue-50 !to-blue-50"
                         : ""

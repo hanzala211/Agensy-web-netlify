@@ -26,7 +26,7 @@ export const TabLink: React.FC<TabLinkProps> = ({
         className={({ isActive: linkIsActive }) => {
           const isActiveLink = end ? isRootPath : linkIsActive;
           return `
-            py-3 px-4 md:py-3.5 md:px-5 font-medium text-sm transition-all duration-300
+            py-2 px-3 md:py-2.5 md:px-4 font-medium text-sm transition-all duration-300
             relative flex items-center justify-center flex-1 text-center
             ${
               isActiveLink

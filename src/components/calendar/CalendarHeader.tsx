@@ -31,15 +31,15 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   const { clients } = useAuthContext();
 
   return (
-    <div className="flex items-center 2xl:justify-between 2xl:flex-row flex-col gap-4 mb-6">
-      <div className="flex items-center gap-4 w-full justify-between 2xl:justify-start 2xl:w-fit">
-        <h2 className="text-[18px] font-semibold text-gray-800">
+    <div className="flex items-center 2xl:justify-between 2xl:flex-row flex-col gap-3 mb-4">
+      <div className="flex items-center gap-3 w-full justify-between 2xl:justify-start 2xl:w-fit">
+        <h2 className="text-base font-semibold text-gray-800">
           {CalendarUtils.getHeaderDate(currentDate, viewMode)}
         </h2>
-        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-1.5 bg-gray-100 p-1 rounded-md">
           <button
             onClick={() => onViewModeChange("month")}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 ${
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-300 ${
               viewMode === "month"
                 ? "bg-white text-primaryColor shadow-[0_0_8px_rgba(0,0,0,0.08)]"
                 : "text-gray-600 hover:text-primaryColor"
@@ -49,7 +49,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           </button>
           <button
             onClick={() => onViewModeChange("week")}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 md:block hidden ${
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-300 md:block hidden ${
               viewMode === "week"
                 ? "bg-white text-primaryColor shadow-[0_0_8px_rgba(0,0,0,0.08)]"
                 : "text-gray-600 hover:text-primaryColor"
@@ -59,7 +59,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           </button>
           <button
             onClick={() => onViewModeChange("day")}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 ${
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-300 ${
               viewMode === "day"
                 ? "bg-white text-primaryColor shadow-[0_0_8px_rgba(0,0,0,0.08)]"
                 : "text-gray-600 hover:text-primaryColor"
@@ -95,7 +95,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           />
         </div>
       </div>
-      <div className="flex items-center 2xl:flex-row w-full 2xl:w-fit mt-4 2xl:mt-0 flex-col gap-4">
+      <div className="flex items-center 2xl:flex-row w-full 2xl:w-fit mt-3 2xl:mt-0 flex-col gap-3">
         <div className="flex gap-3 w-full 2xl:w-fit">
           <div className="sm:grid w-full 2xl:grid-cols-2 grid-cols-4 place-items-center 2xl:place-items-start gap-3 hidden">
             <AntdBadge status="default" size="large" text="Past Appointment" />

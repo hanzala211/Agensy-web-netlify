@@ -106,7 +106,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
           ? editClient.living_situation
           : "",
         familyAdminId: "",
-        showFamilyAdmin: hasAdminRole,
+        showFamilyAdmin: false,
       });
       setValue("isEdit", true);
     } else {
@@ -133,7 +133,7 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
         showFamilyAdmin: hasAdminRole,
       });
     }
-  }, [isOpen, reset, editClient]);
+  }, [isOpen, reset, editClient, hasAdminRole]);
 
   const handleClose = () => {
     setIsOpen(false);

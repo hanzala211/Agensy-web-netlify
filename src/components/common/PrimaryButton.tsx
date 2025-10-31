@@ -43,7 +43,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
           : "bg-primaryColor text-white shadow-[0_0_12px_rgba(0,0,0,0.1)] hover:shadow-[0_0_18px_rgba(0,0,0,0.15)] hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
       }`}
     >
-      {!isLoading ? children : <CommonLoader color={loaderColor} />}
+      {!isLoading ? children : <CommonLoader color={loaderColor} size={25} />}
     </button>
   );
 };
