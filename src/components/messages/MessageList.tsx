@@ -300,7 +300,15 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
                           {sender.avatar ? (
                             <img
                               src={sender.avatar}
-                              alt={`${sender.first_name} ${sender.last_name}`}
+                              alt={
+                                `${sender.first_name} ${sender.last_name}`
+                                  .length > 15
+                                  ? `${sender.first_name} ${sender.last_name}`.substring(
+                                      0,
+                                      15
+                                    ) + "..."
+                                  : `${sender.first_name} ${sender.last_name}`
+                              }
                               className="w-full h-full rounded-full object-cover"
                             />
                           ) : (

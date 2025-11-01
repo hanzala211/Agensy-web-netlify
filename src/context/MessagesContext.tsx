@@ -344,6 +344,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         lastMessage: string;
         lastMessageSenderId: string;
         participants: IUser[];
+        messageReadByUsers: string[];
       }) => {
         console.log("🗑️ [SOCKET] Message deleted:", data);
 
@@ -366,6 +367,11 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
                 participants_ids: data.participants.map(
                   (participant) => participant.id as string
                 ),
+                unread_count: data.messageReadByUsers.find(
+                  (item) => item === userData?.id
+                )
+                  ? thread.unread_count || 0
+                  : (thread.unread_count || 0) - 1,
               };
             }
             return thread;

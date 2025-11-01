@@ -46,9 +46,13 @@ export const ThreadList: React.FC<ThreadListProps> = ({
       const typingUserNames = typingUserIds
         .map((userId) => {
           const typingUser = thread.participants?.find((u) => u.id === userId);
-          return typingUser
-            ? `${typingUser.first_name} ${typingUser.last_name}`
-            : "Someone";
+          if (typingUser) {
+            const fullName = `${typingUser.first_name} ${typingUser.last_name}`;
+            return fullName.length > 15
+              ? fullName.substring(0, 15) + "..."
+              : fullName;
+          }
+          return "Someone";
         })
         .filter(
           (name) => name !== `${userData?.first_name} ${userData?.last_name}`
@@ -191,7 +195,15 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                             user?.avatar ? (
                             <img
                               src={user?.avatar}
-                              alt={`${user?.first_name} ${user?.last_name}`}
+                              alt={
+                                `${user?.first_name} ${user?.last_name}`
+                                  .length > 15
+                                  ? `${user?.first_name} ${user?.last_name}`.substring(
+                                      0,
+                                      15
+                                    ) + "..."
+                                  : `${user?.first_name} ${user?.last_name}`
+                              }
                               className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shadow-sm"
                             />
                           ) : thread.participants_ids.length <= 2 && user ? (
@@ -276,11 +288,18 @@ export const ThreadList: React.FC<ThreadListProps> = ({
                                             p.id ===
                                             thread.last_message_sender_id
                                         );
+                                        if (sender?.first_name) {
+                                          const senderName =
+                                            sender.first_name.length > 15
+                                              ? sender.first_name.substring(
+                                                  0,
+                                                  15
+                                                ) + "..."
+                                              : sender.first_name;
+                                          return `${senderName}: ${thread.last_message}`;
+                                        }
                                         return (
-                                          sender?.first_name +
-                                            ": " +
-                                            thread.last_message ||
-                                          "Unknown User"
+                                          thread.last_message || "Unknown User"
                                         );
                                       })()}
                                 </p>

@@ -408,9 +408,13 @@ export const ChatPage: React.FC = () => {
           const typingUser = (
             selectedThread || pendingThreadData
           )?.participants?.find((u) => u.id === userId);
-          return typingUser
-            ? `${typingUser.first_name} ${typingUser.last_name}`
-            : "Someone";
+          if (typingUser) {
+            const fullName = `${typingUser.first_name} ${typingUser.last_name}`;
+            return fullName.length > 15
+              ? fullName.substring(0, 15) + "..."
+              : fullName;
+          }
+          return "Someone";
         })
         .filter(
           (name) => name !== `${userData?.first_name} ${userData?.last_name}`
@@ -533,7 +537,13 @@ export const ChatPage: React.FC = () => {
                 {selectedClient && (
                   <p className="text-xs text-gray-500 mt-1">
                     <span className="font-bold">Re:</span>{" "}
-                    {selectedClient.first_name} {selectedClient.last_name}
+                    {`${selectedClient.first_name} ${selectedClient.last_name}`
+                      .length > 15
+                      ? `${selectedClient.first_name} ${selectedClient.last_name}`.substring(
+                          0,
+                          15
+                        ) + "..."
+                      : `${selectedClient.first_name} ${selectedClient.last_name}`}
                   </p>
                 )}
               </div>
