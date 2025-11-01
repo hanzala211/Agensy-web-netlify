@@ -86,6 +86,16 @@ export const DocumentPreview: React.FC = () => {
       : false;
   }, [document]);
 
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
+
   useEffect(() => {
     const convertHeicImage = async () => {
       if (document && isHeic && document.file_url && !convertedImageUrl) {
@@ -178,8 +188,8 @@ export const DocumentPreview: React.FC = () => {
                   Description: {document.description}
                 </span>
                 <span className="font-medium">
-                  By: {document?.uploadedBy?.first_name}{" "}
-                  {document?.uploadedBy?.last_name}
+                  By: {truncateName(document?.uploadedBy?.first_name)}{" "}
+                  {truncateName(document?.uploadedBy?.last_name)}
                 </span>
               </div>
               <div className="text-gray-500 text-sm">

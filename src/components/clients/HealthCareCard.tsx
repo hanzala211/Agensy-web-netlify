@@ -49,6 +49,16 @@ export const HealthCareCard: React.FC = () => {
     );
   }, [selectedClient]);
 
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
+
   const handleSubmit = (data: HospitalFormData) => {
     const postData = {
       preferred_hospital: data.preferred_hospital
@@ -89,7 +99,7 @@ export const HealthCareCard: React.FC = () => {
                 icon={<ICONS.doctor size={22} />}
               >
                 <p className="font-medium">
-                  {selectedHealthCareProvider?.provider_name}
+                  {truncateName(selectedHealthCareProvider?.provider_name)}
                 </p>
                 <p className="text-sm text-gray-600">
                   {selectedHealthCareProvider?.phone}

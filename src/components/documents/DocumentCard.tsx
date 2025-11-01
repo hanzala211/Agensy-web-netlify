@@ -29,6 +29,17 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   showActions = true,
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
+
   const formatFileSize = (bytes: number): string => {
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(2)} MB`;
@@ -83,14 +94,16 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
           <div className="text-sm text-gray-500">
             By:{" "}
             <span className="font-semibold">
-              {doc?.uploadedBy?.first_name} {doc?.uploadedBy?.last_name}
+              {truncateName(doc?.uploadedBy?.first_name)}{" "}
+              {truncateName(doc?.uploadedBy?.last_name)}
             </span>
           </div>
           {showClientName && (
             <div className="text-sm text-gray-500">
               Care Recipient:{" "}
               <span className="font-semibold">
-                {doc?.client?.first_name} {doc?.client?.last_name}
+                {truncateName(doc?.client?.first_name)}{" "}
+                {truncateName(doc?.client?.last_name)}
               </span>
             </div>
           )}

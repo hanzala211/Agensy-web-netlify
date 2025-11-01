@@ -68,6 +68,16 @@ export const ClientCard: React.FC<ClientCardProps> = ({
     updateClientStatusMutation.mutate({ id: String(client.id), status });
   };
 
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
+
   const formatRoleToProperStr = (str: string) => {
     return ROLE_MAP[str] || str;
   };
@@ -82,7 +92,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-2">
         <div className="md:col-span-1">
           <h2 className="text-lg font-semibold text-darkGray truncate">
-            {client.first_name} {client.last_name}
+            {truncateName(client.first_name)} {truncateName(client.last_name)}
           </h2>
           <div className="flex flex-row gap-4">
             <div className="mt-1 space-y-1 text-sm text-slateGrey">
@@ -116,9 +126,9 @@ export const ClientCard: React.FC<ClientCardProps> = ({
                     (item) => item.UserRoles.role === ROLES.PRIMARY_USER
                   );
                   return primaryUser
-                    ? `${primaryUser.first_name} ${primaryUser.last_name} ${
-                        primaryUser.id === userData?.id ? "(You)" : ""
-                      }`
+                    ? `${truncateName(primaryUser.first_name)} ${truncateName(
+                        primaryUser.last_name
+                      )} ${primaryUser.id === userData?.id ? "(You)" : ""}`
                     : "None";
                 })()}
               </p>
