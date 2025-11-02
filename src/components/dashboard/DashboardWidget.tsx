@@ -19,7 +19,7 @@ export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
           <p className="text-sm text-gray-500 mb-1">{title}</p>
           <h3 className="text-xl font-semibold">{value}</h3>
         </div>
-        <div className="text-2xl">{icon}</div>
+        <div className="text-xl">{icon}</div>
       </div>
     </Card>
   );

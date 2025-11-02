@@ -65,32 +65,32 @@ export const QuickStatsCard: React.FC<{ className?: string }> = ({
         <DashboardWidget
           title="Active Clients"
           value={activeClients}
-          icon={<ICONS.users className="text-blue-500" size={32} />}
+          icon={<ICONS.users className="text-blue-500" size={22} />}
         />
         <DashboardWidget
           title="Deactivated Clients"
           value={deactivatedClients}
-          icon={<ICONS.users className="text-orange-500" size={32} />}
+          icon={<ICONS.users className="text-orange-500" size={22} />}
         />
         <DashboardWidget
           title="Upcoming Appointments"
           value={upcomingCount || upcomingAppointments}
-          icon={<ICONS.calendar className="text-green-500" size={32} />}
+          icon={<ICONS.calendar className="text-green-500" size={22} />}
         />
         <DashboardWidget
           title="Unread Messages"
           value={actualUnreadCount || unreadMessages}
-          icon={<ICONS.messageIcon className="text-purple-500" size={32} />}
+          icon={<ICONS.messageIcon className="text-purple-500" size={22} />}
         />
         <DashboardWidget
           title="Recent Documents"
           value={recentDocsCount || recentDocuments}
-          icon={<ICONS.document className="text-indigo-500" size={32} />}
+          icon={<ICONS.document className="text-indigo-500" size={22} />}
         />
         <DashboardWidget
           title="Today's Appointments"
           value={todaysCount || todaysAppointments}
-          icon={<ICONS.clockCircle className="text-red-500" size={32} />}
+          icon={<ICONS.clockCircle className="text-red-500" size={22} />}
         />
       </div>
     </Card>

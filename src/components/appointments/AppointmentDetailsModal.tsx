@@ -39,7 +39,7 @@ export const AppointmentDetailsModal: React.FC<
       onClose={onClose}
       title="Appointment Details"
       maxWidth="max-w-4xl"
-      height="h-auto"
+      height="h-[90%] xl:h-auto"
     >
       <div className="space-y-8">
         {/* Header Section */}
