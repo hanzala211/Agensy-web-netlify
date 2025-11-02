@@ -403,8 +403,8 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 {getFileType(selectedFile) === "image" && (
                   <div className="relative w-full h-full">
                     {isConverting ? (
-                      <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center">
-                        <div className="bg-white rounded-lg p-4 shadow-lg text-center">
+                      <div className="absolute inset-0 bg-black bg-opacity-30 rounded-md flex items-center justify-center">
+                        <div className="bg-white rounded-md p-4 shadow-lg text-center">
                           <FiLoader className="animate-spin text-gray-600 w-6 h-6 mx-auto mb-2" />
                           <p className="text-sm text-gray-600 font-medium">
                             Converting HEIC image...
@@ -415,13 +415,13 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                       <img
                         src={convertedImage}
                         alt={selectedFile.name}
-                        className="w-full h-full rounded-lg border border-gray-200 object-contain"
+                        className="w-full h-full rounded-md border border-gray-200 object-contain"
                       />
                     ) : (
                       <img
                         src={URL.createObjectURL(selectedFile)}
                         alt={selectedFile.name}
-                        className="w-full h-full rounded-lg border border-gray-200 object-contain"
+                        className="w-full h-full rounded-md border border-gray-200 object-contain"
                         onLoad={() => {
                           URL.revokeObjectURL(
                             URL.createObjectURL(selectedFile)
@@ -454,7 +454,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 )}
 
                 {getFileType(selectedFile) === "pdf" && (
-                  <div className="relative border border-gray-200 rounded-lg overflow-hidden w-[200px] h-full">
+                  <div className="relative border border-gray-200 rounded-md overflow-hidden w-[200px] h-full">
                     <iframe
                       src={URL.createObjectURL(selectedFile)}
                       className="w-full h-full"
@@ -481,7 +481,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 )}
 
                 {getFileType(selectedFile) === "document" && (
-                  <div className="relative border border-gray-200 rounded-lg p-3 w-[200px] h-full">
+                  <div className="relative border border-gray-200 rounded-md p-3 w-[200px] h-full">
                     <div className="flex items-center gap-3">
                       <div className="flex-shrink-0">
                         <ICONS.clip color={COLORS.primaryColor} size={20} />
@@ -516,7 +516,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 )}
 
                 {getFileType(selectedFile) === "other" && (
-                  <div className="flex items-center justify-center gap-2 p-3 bg-gray-100 rounded-lg w-full h-full">
+                  <div className="flex items-center justify-center gap-2 p-3 bg-gray-100 rounded-md w-full h-full">
                     <ICONS.close />
                     <span className="text-sm text-gray-600">
                       File preview not available
@@ -536,7 +536,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
           onKeyDown={handleKeyDown}
           onBlur={handleTypingStop}
           placeholder="Type a message... (Shift+Enter for new line)"
-          className="flex-1 px-3 sm:px-4 py-2 overflow-auto text-sm sm:text-base !bg-lightGray border-[1px] border-mediumGray rounded-xl focus:outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 placeholder:!text-slateGrey transition-all duration-200 resize-none"
+          className="flex-1 px-3 sm:px-4 py-2 overflow-auto text-sm sm:text-base !bg-lightGray border-[1px] border-mediumGray rounded-md focus:outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 placeholder:!text-slateGrey transition-all duration-200 resize-none"
           rows={1}
           style={{
             minHeight: "70px",
