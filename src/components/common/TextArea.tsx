@@ -30,7 +30,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
           placeholder={placeholder}
           rows={rows}
           className={`${className} resize-none text-darkGray bg-lightGray placeholder:text-darkGray p-2
-          border-[1px] border-mediumGray rounded-xl w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
+          border-[1px] border-mediumGray rounded-md w-full outline-none focus-within:border-basicBlue focus-within:shadow-sm focus-within:shadow-blue-200 transition-all duration-200`}
         />
       </div>
       {error && <ErrorMessage error={error} />}

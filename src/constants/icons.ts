@@ -69,6 +69,7 @@ import { CiMedicalCross } from "react-icons/ci";
 import { GrDocumentText } from "react-icons/gr";
 import { BiDollar, BiSolidRightArrow } from "react-icons/bi";
 import { FaFolder, FaFolderOpen, FaFileAlt } from "react-icons/fa";
+import { RiRefreshLine } from "react-icons/ri";
 
 export const ICONS = {
   mail: MdMailOutline,
@@ -137,4 +138,5 @@ export const ICONS = {
   group: MdOutlineGroups3,
   exit: IoExitOutline,
   broadcast: HiSpeakerWave,
+  refresh: RiRefreshLine,
 };

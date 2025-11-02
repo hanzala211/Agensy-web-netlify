@@ -335,7 +335,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
     return (
       <div className="space-y-3">
-        <div className="bg-gray-100 rounded-lg p-4">
+        <div className="bg-gray-100 rounded-md p-4">
           {!isPDF ? (
             isConverting ? (
               <div className="flex h-[200px] flex-col items-center justify-center py-8">
@@ -352,7 +352,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
                   className="w-full h-auto max-h-80 object-contain rounded"
                 />
                 {isAnalyzing && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-md flex items-center justify-center">
                     <div className="flex flex-col items-center space-y-3">
                       <CommonLoader color="white" />
                       <p className="text-white text-sm font-medium">
@@ -362,10 +362,10 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
                   </div>
                 )}
                 {!isAnalyzing && (
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100">
                     <button
                       onClick={handleFileSelect}
-                      className="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-2"
+                      className="bg-white text-gray-800 px-4 py-2 rounded-md shadow-lg hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-2"
                     >
                       <svg
                         className="w-4 h-4 text-black"

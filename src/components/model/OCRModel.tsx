@@ -316,7 +316,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
 
     return (
       <div className="space-y-3 h-full">
-        <div className="bg-gray-100 h-full rounded-lg p-4">
+        <div className="bg-gray-100 h-full rounded-md p-4">
           {!isPDF ? (
             isConverting ? (
               <div className="flex h-[200px] flex-col items-center justify-center py-8">
@@ -332,10 +332,10 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                   alt="Uploaded document"
                   className="w-full h-auto max-h-80 object-contain rounded"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100">
                   <button
                     onClick={handleFileSelect}
-                    className="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-2"
+                    className="bg-white text-gray-800 px-4 py-2 rounded-md shadow-lg hover:bg-blue-200 transition-colors duration-200 flex items-center space-x-2"
                   >
                     <ICONS.edit className="w-4 h-4 text-black" />
                   </button>
@@ -354,7 +354,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
           <div className="flex justify-center">
             <button
               onClick={handleFileSelect}
-              className="bg-blue-400 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 transition-colors duration-200 flex items-center space-x-2"
+              className="bg-blue-400 text-white px-4 py-2 rounded-md shadow-lg hover:bg-blue-600 transition-colors duration-200 flex items-center space-x-2"
             >
               <ICONS.edit className="w-4 h-4" />
               <span>Change PDF</span>
@@ -383,7 +383,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
           Upload Document
         </label>
         <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+          className={`border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-all duration-200 ${
             isDragOver
               ? "border-blue-500 bg-blue-100"
               : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
@@ -474,7 +474,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex items-start space-x-2 sm:space-x-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 sm:p-4 flex items-start space-x-2 sm:space-x-3">
           <span className="text-blue-600 flex-shrink-0 mt-0.5 text-base sm:text-lg">
             <ICONS.info className="w-4 h-4 sm:w-5 sm:h-5" />
           </span>
@@ -488,7 +488,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
           </div>
         </div>
         <div className="space-y-4">
-          <div className="bg-gray-100 rounded-lg p-4">
+          <div className="bg-gray-100 rounded-md p-4">
             {selectedImage && !isPDF ? (
               <img
                 src={convertedImage || selectedImage}
@@ -520,7 +520,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                           (medication: ClientMedications, index: number) => (
                             <div
                               key={index}
-                              className="p-4 rounded-lg border border-gray-200"
+                              className="p-4 rounded-md border border-gray-200"
                             >
                               <div className="flex items-center justify-end mb-4">
                                 {field.value.length > 1 && (
@@ -672,7 +672,7 @@ export const OCRModel: React.FC<OCRModelProps> = ({
                           ) => (
                             <div
                               key={index}
-                              className="p-4 rounded-lg border border-gray-200"
+                              className="p-4 rounded-md border border-gray-200"
                             >
                               <div className="flex items-center justify-end mb-4">
                                 {field.value.length > 1 && (

@@ -40,6 +40,18 @@ export const Messages: React.FC = () => {
       buttonAriaLabel: "Start new chat",
       onButtonClick: () => setIsAddThreadModalOpen(true),
     });
+    return () => {
+      setHeaderConfig({
+        showButton: false,
+        title: "",
+        showBackButton: false,
+        buttonText: "",
+        buttonAriaLabel: "",
+      });
+      setPendingThreadData(null);
+      setSelectedThread(null);
+      setCurrentThreadMessages([]);
+    };
   }, []);
 
   useEffect(() => {
@@ -114,7 +126,7 @@ export const Messages: React.FC = () => {
             className={`
             ${
               showThreadList ? "flex" : "hidden"
-            } w-full md:w-1/3 border-r md:!mt-0 border-gray-200 absolute md:relative inset-0 bg-white z-10 flex flex-col`}
+            } w-full md:w-1/3 border-r md:!mt-0 !mt-0 border-gray-200 absolute md:relative inset-0 bg-white z-10 flex flex-col`}
           >
             <ThreadList
               selectedThreadId={params.threadId}

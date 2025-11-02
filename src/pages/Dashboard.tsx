@@ -1,14 +1,12 @@
 import React, { useEffect } from "react";
 import {
-  WelcomeDashboardCard,
-  // ClientsDashboardCard,
-  // AppointmentsDashboardCard,
-  // MessagesDashboardCard,
-  // DocumentsDashboardCard,
-  // DashboardWidget,
+  TodaysAppointmentsCard,
+  RecentMessagesCard,
+  QuickStatsCard,
+  QuickAccessCareRecipientsCard,
+  RecentDocumentsCard,
 } from "@agensy/components";
 import { useHeaderContext } from "@agensy/context";
-// import { ICONS } from "@agensy/constants";
 
 export const Dashboard: React.FC = () => {
   const { setHeaderConfig } = useHeaderContext();
@@ -20,34 +18,19 @@ export const Dashboard: React.FC = () => {
       showButton: false,
     });
   }, []);
+
   return (
-    <div className="overflow-y-auto py-6 h-[100dvh] max-h-[calc(100dvh-50px)] md:max-h-[100dvh]">
-      <div className="space-y-6 2xl:max-w-[90%] xl:max-w-5xl lg:max-w-3xl md:max-w-[33rem] max-w-[90%] mx-auto">
-        <WelcomeDashboardCard />
-        {/* <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <DashboardWidget
-            title="Total Clients"
-            value="248"
-            icon={<ICONS.users color="gray" />}
-          />
-          <DashboardWidget
-            title="Upcoming Appointments"
-            value="1"
-            icon={<ICONS.calendar color="gray" />}
-          />
-          <DashboardWidget
-            title="Total Documents"
-            value="6"
-            icon={<ICONS.document color="gray" />}
-          />
+    <div className="overflow-y-auto py-6 h-[100dvh] max-h-[calc(100dvh-75px)]">
+      <div className="space-y-4 xl:max-w-[95%] lg:max-w-3xl max-w-[90%] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <TodaysAppointmentsCard />
+          <RecentMessagesCard />
+          <QuickStatsCard className="md:col-span-2 xl:col-span-1" />
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <ClientsDashboardCard />
-          <AppointmentsDashboardCard />
-          <MessagesDashboardCard />
-          <DocumentsDashboardCard />
-        </div> */}
+        <QuickAccessCareRecipientsCard />
+
+        <RecentDocumentsCard />
       </div>
     </div>
   );

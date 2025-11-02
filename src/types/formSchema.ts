@@ -296,9 +296,15 @@ export type EditAccessFormData = z.infer<typeof editAccessSchema>;
 
 export const appointmentSchema = z
   .object({
-    title: z.string().transform(trimString),
+    title: z
+      .string()
+      .max(50, "Title must be less than 50 characters")
+      .transform(trimString),
     appointment_type: z.string().transform(trimString),
-    location: z.string().transform(trimString),
+    location: z
+      .string()
+      .max(100, "Location must be less than 100 characters")
+      .transform(trimString),
     start_time: z.string().transform(trimString),
     end_time: z.string().transform(trimString),
     notes: z

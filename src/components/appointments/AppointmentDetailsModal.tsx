@@ -23,6 +23,16 @@ export const AppointmentDetailsModal: React.FC<
     (type) => type.value === appointment.appointment_type
   );
 
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -47,10 +57,12 @@ export const AppointmentDetailsModal: React.FC<
                   appointment?.client_id,
                   appointment?.healthcare_provider_id
                 )
-                  ? filterHealthCareProvider(
-                      appointment?.client_id,
-                      appointment?.healthcare_provider_id
-                    )?.provider_name
+                  ? truncateName(
+                      filterHealthCareProvider(
+                        appointment?.client_id,
+                        appointment?.healthcare_provider_id
+                      )?.provider_name
+                    )
                   : "N/A"}
               </p>
             </div>
@@ -154,8 +166,12 @@ export const AppointmentDetailsModal: React.FC<
                 <div>
                   <p className="text-sm text-gray-500">Care Recipient</p>
                   <p className="font-medium text-gray-900">
-                    {filterClient(appointment.client_id)?.first_name}{" "}
-                    {filterClient(appointment.client_id)?.last_name}
+                    {truncateName(
+                      filterClient(appointment.client_id)?.first_name
+                    )}{" "}
+                    {truncateName(
+                      filterClient(appointment.client_id)?.last_name
+                    )}
                   </p>
                 </div>
               </div>
@@ -167,8 +183,8 @@ export const AppointmentDetailsModal: React.FC<
                   <div>
                     <p className="text-sm text-gray-500">Created by</p>
                     <p className="font-medium text-gray-900">
-                      {appointment.createdBy.first_name}{" "}
-                      {appointment.createdBy.last_name}
+                      {truncateName(appointment.createdBy.first_name)}{" "}
+                      {truncateName(appointment.createdBy.last_name)}
                     </p>
                   </div>
                 </div>

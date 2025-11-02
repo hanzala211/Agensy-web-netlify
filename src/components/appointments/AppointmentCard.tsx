@@ -36,6 +36,16 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
+
   const handleCancelAppointment = () => {
     setIsModalOpen(false);
     cancelClientAppointmentMutation.mutate({
@@ -68,18 +78,20 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <ICONS.calendar className="text-blue-500" />
-              <h3 className="font-semibold text-lg">
+              <h3 className="font-semibold text-lg truncate min-w-0">
                 {appointment.title ? appointment.title : "N/A"}{" "}
-                <span className="text-sm">
+                <span className="text-sm truncate">
                   (
                   {filterHealthCareProvider(
                     appointment?.client_id,
                     appointment?.healthcare_provider_id
                   )
-                    ? filterHealthCareProvider(
-                        appointment?.client_id,
-                        appointment?.healthcare_provider_id
-                      )?.provider_name
+                    ? truncateName(
+                        filterHealthCareProvider(
+                          appointment?.client_id,
+                          appointment?.healthcare_provider_id
+                        )?.provider_name
+                      )
                     : "N/A"}
                   )
                 </span>
@@ -132,18 +144,20 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             <div className="flex flex-col gap-2 text-gray-600">
               <div className="flex items-center gap-2 text-gray-600">
                 <ICONS.user className="text-gray-400" size={14} />
-                <span>
+                <span className="truncate">
                   Care Recipient:{" "}
-                  {filterClient(appointment.client_id)?.first_name}{" "}
-                  {filterClient(appointment.client_id)?.last_name}
+                  {truncateName(
+                    filterClient(appointment.client_id)?.first_name
+                  )}{" "}
+                  {truncateName(filterClient(appointment.client_id)?.last_name)}
                 </span>
               </div>
               {appointment.createdBy && (
                 <div className="flex items-center gap-2 text-gray-600">
                   <ICONS.user className="text-gray-400" size={14} />
-                  <span>
-                    Created by: {appointment.createdBy.first_name}{" "}
-                    {appointment.createdBy.last_name}
+                  <span className="truncate">
+                    Created by: {truncateName(appointment.createdBy.first_name)}{" "}
+                    {truncateName(appointment.createdBy.last_name)}
                   </span>
                 </div>
               )}

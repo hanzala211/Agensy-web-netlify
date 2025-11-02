@@ -13,7 +13,7 @@ export const DashboardWidget: React.FC<DashboardWidgetProps> = ({
   icon,
 }) => {
   return (
-    <Card className="border-gray-300">
+    <Card className="border-gray-300" childrenClasses="!p-3">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-gray-500 mb-1">{title}</p>

@@ -7,6 +7,7 @@ import {
   useHeaderContext,
   useAuthContext,
   useMessagesContext,
+  useActivityFeedContext,
 } from "@agensy/context";
 import { getPageTitle } from "@agensy/utils";
 import { RiFeedbackLine } from "react-icons/ri";
@@ -18,6 +19,7 @@ export const AppHeader: React.FC = () => {
   const navigate = useNavigate();
   const { headerConfig } = useHeaderContext();
   const { threads, setThreads } = useMessagesContext();
+  const { toggleActivityFeed, isActivityFeedOpen } = useActivityFeedContext();
   const {
     userData,
     handleLogout: handleLogoutAuth,
@@ -200,8 +202,11 @@ export const AppHeader: React.FC = () => {
 
           {/* Activity Feed Button - Always visible */}
           <SecondaryButton
-            className="rounded-md !py-2 !px-2.5 sm:p-2.5 flex items-center justify-center"
+            className={`rounded-md !py-2 !px-2.5 sm:p-2.5 flex items-center justify-center transition-all ${
+              isActivityFeedOpen ? "bg-primaryColor/10 text-primaryColor" : ""
+            }`}
             aria_label="Activity Feed"
+            onClick={toggleActivityFeed}
           >
             <RiFeedbackLine size={20} className="sm:w-5 sm:h-5" />
           </SecondaryButton>
