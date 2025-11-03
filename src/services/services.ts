@@ -14,3 +14,4 @@ export * as StripeService from "./stripe.service";
 export * as MessagesThreadService from "./messages.thread.service";
 export * as ClientAgensyFormsService from "./client.agensy-forms.service";
 export * as OCRService from "./ocr.service";
+export * as ActivityFeedService from "./activity.feed.service";

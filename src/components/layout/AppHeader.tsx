@@ -10,7 +10,6 @@ import {
   useActivityFeedContext,
 } from "@agensy/context";
 import { getPageTitle } from "@agensy/utils";
-import { RiFeedbackLine } from "react-icons/ri";
 
 const HEADER_HEIGHT = 72; // Fixed header height in pixels
 
@@ -208,7 +207,7 @@ export const AppHeader: React.FC = () => {
             aria_label="Activity Feed"
             onClick={toggleActivityFeed}
           >
-            <RiFeedbackLine size={20} className="sm:w-5 sm:h-5" />
+            <ICONS.activityFeed size={20} className="sm:w-5 sm:h-5" />
           </SecondaryButton>
 
           {/* Profile Dropdown */}

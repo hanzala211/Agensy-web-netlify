@@ -99,3 +99,5 @@ export interface PendingThreadData {
   left_participants?: IUser[];
   left_participants_ids?: string[];
 }
+
+export type FilterCategory = "all" | "documents" | "medical" | "appointments";

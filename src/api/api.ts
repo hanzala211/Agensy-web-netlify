@@ -14,3 +14,4 @@ export * from "./stripeApi";
 export * from "./messageThreadApi";
 export * from "./clientAgensyFormsApi";
 export * from "./ocrApi";
+export * from "./activityFeedApi";

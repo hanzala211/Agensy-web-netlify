@@ -298,8 +298,7 @@ export interface LogEntry {
 export interface ActivityFeedEvent extends BaseSchema {
   user_name: string; // Name of user who performed action
   client_name: string; // Name of client the activity relates to
-  category: "medical" | "messages" | "appointments" | "documents";
-  action_type: string; // Description of action
+  category: "medical" | "appointments" | "documents";
   description: string; // Full activity description
   timestamp: string; // Relative time string (e.g., "2 mins ago", "1 hour ago")
 }
