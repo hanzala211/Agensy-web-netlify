@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { ICONS } from "@agensy/constants";
+import { ICONS, ACTIVITY_ACTIONS } from "@agensy/constants";
 import { HEADER_HEIGHT_PX } from "@agensy/components";
-import { useActivityFeedContext, useClientContext } from "@agensy/context";
+import {
+  useActivityFeedContext,
+  useClientContext,
+  useSocketContext,
+} from "@agensy/context";
 import { useGetActivitiesQuery } from "@agensy/api";
 import { DateUtils } from "@agensy/utils";
 import type { ActivityFeedEvent, FilterCategory } from "@agensy/types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@agensy/constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ActivityApiResponse {
   id: string;
@@ -15,16 +20,24 @@ interface ActivityApiResponse {
   entity_id?: string;
   metadata?: {
     form_type?: string;
+    start_time?: string | null;
+    appointment_type?: string;
+    [key: string]: unknown;
   };
   user?: {
     first_name?: string;
     last_name?: string;
+    id?: string;
+    avatar?: string;
+    email?: string;
   };
   client?: {
     first_name?: string;
     last_name?: string;
+    id?: string;
   };
   category: "medical" | "appointments" | "documents";
+  action_type?: string;
   description: string;
   createdAt: string;
   updatedAt: string;
@@ -139,6 +152,7 @@ const transformActivity = (
   entity_type?: string;
   entity_id?: string;
   metadata?: { form_type?: string };
+  action_type?: string;
 } => {
   const user_name =
     `${activity.user?.first_name || ""} ${
@@ -163,6 +177,7 @@ const transformActivity = (
     entity_type: activity.entity_type,
     entity_id: activity.entity_id,
     metadata: activity.metadata,
+    action_type: activity.action_type,
   };
 };
 
@@ -180,29 +195,35 @@ const getCategoryIcon = (category: ActivityFeedEvent["category"]) => {
   }
 };
 
-const getCategoryColor = (category: ActivityFeedEvent["category"]) => {
-  switch (category) {
-    case "medical":
-      return "bg-lightRed";
+const getActionTypeColor = (actionType?: string) => {
+  if (!actionType) return "bg-lightGray";
 
-    case "appointments":
-      return "bg-lightGreen";
-    case "documents":
-      return "bg-lightBlue";
+  switch (actionType.toLowerCase()) {
+    case ACTIVITY_ACTIONS.CREATED:
+      return "bg-green-100";
+    case ACTIVITY_ACTIONS.UPDATED:
+      return "bg-blue-100";
+    case ACTIVITY_ACTIONS.DELETED:
+      return "bg-red-100";
+    case ACTIVITY_ACTIONS.CANCELLED:
+      return "bg-orange-100";
     default:
       return "bg-lightGray";
   }
 };
 
-const getCategoryIconColor = (category: ActivityFeedEvent["category"]) => {
-  switch (category) {
-    case "medical":
-      return "text-red-600";
+const getActionTypeIconColor = (actionType?: string) => {
+  if (!actionType) return "text-slateGrey";
 
-    case "appointments":
+  switch (actionType.toLowerCase()) {
+    case ACTIVITY_ACTIONS.CREATED:
       return "text-green-600";
-    case "documents":
-      return "text-primaryColor";
+    case ACTIVITY_ACTIONS.UPDATED:
+      return "text-blue-600";
+    case ACTIVITY_ACTIONS.DELETED:
+      return "text-red-600";
+    case ACTIVITY_ACTIONS.CANCELLED:
+      return "text-orange-600";
     default:
       return "text-slateGrey";
   }
@@ -219,10 +240,13 @@ const truncateName = (
 export const ActivityFeed: React.FC = () => {
   const { isActivityFeedOpen, closeActivityFeed } = useActivityFeedContext();
   const { selectedClient } = useClientContext();
+  const { socket } = useSocketContext();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<FilterCategory>("all");
   const [isMounted, setIsMounted] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const params = useParams();
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const {
@@ -233,9 +257,9 @@ export const ActivityFeed: React.FC = () => {
     fetchNextPage,
     refetch,
   } = useGetActivitiesQuery({
-    client_id: selectedClient?.id ? String(selectedClient.id) : undefined,
+    client_id: params.clientId ? String(params.clientId) : undefined,
     category: activeFilter === "all" ? undefined : activeFilter,
-    limit: 20,
+    limit: 50,
   });
 
   const allActivities = useMemo(() => {
@@ -287,6 +311,127 @@ export const ActivityFeed: React.FC = () => {
     }
   }, [activeFilter, selectedClient?.id, isActivityFeedOpen]);
 
+  useEffect(() => {
+    if (socket) {
+      const handleActivityFeedUpdate = (activityData: unknown) => {
+        console.log("🟢 [SOCKET] Activity feed update received:", activityData);
+
+        const activity = activityData as ActivityApiResponse;
+
+        if (!activity?.id || !activity?.category || !activity?.createdAt) {
+          return;
+        }
+
+        const normalizedActivity: ActivityApiResponse = {
+          ...activity,
+          user: activity.user || {},
+          client: activity.client || {},
+        };
+
+        const queryCache = queryClient.getQueryCache();
+        const allQueries = queryCache.getAll();
+
+        const activityQueries = allQueries.filter((query) => {
+          const queryKey = query.queryKey;
+          return (
+            Array.isArray(queryKey) &&
+            queryKey[0] === "activities" &&
+            queryKey[1]
+          );
+        });
+
+        activityQueries.forEach((query) => {
+          const params = query.queryKey[1] as {
+            client_id?: string;
+            category?: "medical" | "messages" | "appointments" | "documents";
+            limit?: number;
+            entity_type?: string;
+          };
+
+          const matchesClient =
+            !params.client_id ||
+            String(normalizedActivity.client_id) === String(params.client_id);
+          const matchesCategory =
+            !params.category || normalizedActivity.category === params.category;
+
+          if (matchesClient && matchesCategory) {
+            const currentData = queryClient.getQueryData<{
+              pages: Array<{
+                pagination: {
+                  page: number;
+                  limit: number;
+                  total: number;
+                  totalPages: number;
+                };
+                activities: ActivityApiResponse[];
+              }>;
+              pageParams: unknown[];
+            }>(query.queryKey);
+
+            if (currentData?.pages && currentData.pages.length > 0) {
+              const exists = currentData.pages.some((page) =>
+                page.activities.some((a) => a.id === normalizedActivity.id)
+              );
+
+              if (exists) {
+                console.log(
+                  `⚠️ [SOCKET] Activity ${normalizedActivity.id} already exists in cache, skipping.`
+                );
+                return;
+              }
+
+              console.log(
+                `🟢 [SOCKET] Updating query cache for query:`,
+                query.queryKey
+              );
+
+              const firstPage = { ...currentData.pages[0] };
+              const existingActivities = [...firstPage.activities];
+
+              const updatedActivities = [
+                normalizedActivity,
+                ...existingActivities,
+              ];
+
+              const limit = params.limit || 20;
+              const limitedActivities =
+                updatedActivities.length > limit
+                  ? updatedActivities.slice(0, limit)
+                  : updatedActivities;
+
+              const updatedFirstPage = {
+                ...firstPage,
+                activities: limitedActivities,
+                pagination: {
+                  ...firstPage.pagination,
+                  total: firstPage.pagination.total + 1,
+                },
+              };
+
+              queryClient.setQueryData(query.queryKey, {
+                ...currentData,
+                pages: [updatedFirstPage, ...currentData.pages.slice(1)],
+              });
+            } else {
+              console.log(
+                `⚠️ [SOCKET] Query data doesn't exist yet for query:`,
+                query.queryKey,
+                "- Invalidating to trigger refetch"
+              );
+              queryClient.invalidateQueries({ queryKey: query.queryKey });
+            }
+          }
+        });
+      };
+
+      socket.on("activityFeedUpdate", handleActivityFeedUpdate);
+
+      return () => {
+        socket.off("activityFeedUpdate", handleActivityFeedUpdate);
+      };
+    }
+  }, [socket, queryClient]);
+
   const filterTabs: { id: FilterCategory; label: string }[] = [
     { id: "all", label: "All" },
     { id: "documents", label: "Documents" },
@@ -337,9 +482,20 @@ export const ActivityFeed: React.FC = () => {
               : "opacity 0.25s ease-in, transform 0.25s ease-in",
           }}
         >
-          <h2 className="text-base sm:text-lg font-semibold text-darkGray">
-            Activity Feed
-          </h2>
+          <div>
+            <h2 className="text-base sm:text-lg font-semibold text-darkGray">
+              Activity Feed
+            </h2>
+            {params.clientId && (
+              <p className="text-sm text-slateGrey">
+                <span className="font-semibold">Re:</span>{" "}
+                {truncateName(
+                  `${selectedClient?.first_name} ${selectedClient?.last_name}`
+                )}
+              </p>
+            )}
+          </div>
+
           {/* Close button - visible on all screens */}
           <button
             onClick={closeActivityFeed}
@@ -399,16 +555,21 @@ export const ActivityFeed: React.FC = () => {
               <>
                 {allActivities.map((activity, index) => {
                   const Icon = getCategoryIcon(activity.category);
-                  const bgColor = getCategoryColor(activity.category);
-                  const iconColor = getCategoryIconColor(activity.category);
+                  const activityWithExtras = activity as ActivityFeedEvent & {
+                    client_id?: string;
+                    entity_type?: string;
+                    entity_id?: string;
+                    metadata?: { form_type?: string };
+                    action_type?: string;
+                  };
+                  const bgColor = getActionTypeColor(
+                    activityWithExtras.action_type
+                  );
+                  const iconColor = getActionTypeIconColor(
+                    activityWithExtras.action_type
+                  );
 
                   const handleActivityClick = () => {
-                    const activityWithExtras = activity as ActivityFeedEvent & {
-                      client_id?: string;
-                      entity_type?: string;
-                      entity_id?: string;
-                      metadata?: { form_type?: string };
-                    };
                     const entityType = activityWithExtras.entity_type;
                     const clientId =
                       activityWithExtras.client_id || selectedClient?.id;
@@ -470,9 +631,6 @@ export const ActivityFeed: React.FC = () => {
                     }
                   };
 
-                  const activityWithExtras = activity as ActivityFeedEvent & {
-                    entity_type?: string;
-                  };
                   const isClickable = !!activityWithExtras.entity_type;
 
                   return (
@@ -507,8 +665,13 @@ export const ActivityFeed: React.FC = () => {
                         <p className="text-sm text-darkGray leading-relaxed line-clamp-5 break-words">
                           {activity.description}
                         </p>
+                        {activityWithExtras.action_type && (
+                          <p className="text-xs text-slateGrey mt-1 font-medium capitalize">
+                            {activityWithExtras.action_type}
+                          </p>
+                        )}
                         <p className="text-xs text-slateGrey mt-1 font-medium">
-                          {truncateName(activity.client_name)}
+                          Re: {truncateName(activity.client_name)}
                         </p>
                         <p className="text-xs text-slateGrey mt-0.5">
                           {activity.timestamp}

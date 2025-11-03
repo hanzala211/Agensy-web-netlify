@@ -63,12 +63,12 @@ export const QuickStatsCard: React.FC<{ className?: string }> = ({
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <DashboardWidget
-          title="Active Clients"
+          title="Active Care Recipients"
           value={activeClients}
           icon={<ICONS.users className="text-blue-500" size={22} />}
         />
         <DashboardWidget
-          title="Deactivated Clients"
+          title="Deactivated Care Recipients"
           value={deactivatedClients}
           icon={<ICONS.users className="text-orange-500" size={22} />}
         />

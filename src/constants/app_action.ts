@@ -15,3 +15,10 @@ export const APP_ACTIONS = {
   OCRAccess: "OCRAccess",
   ClientContactAccess: "ClientContactAccess",
 };
+
+export const ACTIVITY_ACTIONS = {
+  CREATED: "created",
+  UPDATED: "updated",
+  DELETED: "deleted",
+  CANCELLED: "cancelled",
+};
