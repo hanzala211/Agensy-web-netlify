@@ -75,6 +75,16 @@ export const ProfileSettingCard: React.FC = () => {
     updateUserMutation.mutate(data);
   };
 
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
+
   return (
     <React.Fragment>
       <Card
@@ -134,7 +144,7 @@ export const ProfileSettingCard: React.FC = () => {
                 <div className="flex items-center gap-3 p-2 bg-lightGray rounded-xl">
                   <ICONS.user size={18} className="text-gray-500" />
                   <p className="text-darkGray">
-                    {userData?.first_name || "Not provided"}
+                    {truncateName(userData?.first_name) || "Not provided"}
                   </p>
                 </div>
               </div>
@@ -143,7 +153,7 @@ export const ProfileSettingCard: React.FC = () => {
                 <div className="flex items-center gap-3 p-2 bg-lightGray rounded-xl">
                   <ICONS.user size={18} className="text-gray-500" />
                   <p className="text-darkGray">
-                    {userData?.last_name || "Not provided"}
+                    {truncateName(userData?.last_name) || "Not provided"}
                   </p>
                 </div>
               </div>
