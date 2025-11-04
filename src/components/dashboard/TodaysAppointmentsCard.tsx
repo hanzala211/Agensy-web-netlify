@@ -15,7 +15,6 @@ import { useAddClientAppointmentMutation } from "@agensy/api";
 import { useAppointmentsContext } from "@agensy/context";
 import { toast } from "@agensy/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { isSameDay } from "date-fns";
 
 interface TodaysAppointmentsCardProps {
   appointments?: Array<{
@@ -106,17 +105,8 @@ export const TodaysAppointmentsCard: React.FC<TodaysAppointmentsCardProps> = ({
 
   useEffect(() => {
     if (addClientAppointmentMutation.status === "success") {
-      if (addClientAppointmentMutation.data) {
-        addAppointment(addClientAppointmentMutation.data);
-        const appointmentStartTime =
-          addClientAppointmentMutation.data.start_time;
-        if (
-          appointmentStartTime &&
-          isSameDay(new Date(appointmentStartTime), new Date())
-        ) {
-          queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-        }
-      }
+      addAppointment(addClientAppointmentMutation.data);
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       toast.success("Appointment added successfully");
       setIsAddAppointmentModalOpen(false);
     } else if (addClientAppointmentMutation.status === "error") {

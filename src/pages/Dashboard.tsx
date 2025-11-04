@@ -12,9 +12,15 @@ import { useGetDashboardData } from "@agensy/api";
 
 export const Dashboard: React.FC = () => {
   const { setHeaderConfig } = useHeaderContext();
-  const { data: dashboardData, isLoading, isError } = useGetDashboardData();
+  const {
+    data: dashboardData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetDashboardData();
 
   useEffect(() => {
+    refetch();
     setHeaderConfig({
       title: "Dashboard",
       showBackButton: false,
