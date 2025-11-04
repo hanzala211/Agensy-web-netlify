@@ -476,7 +476,7 @@ export const ChatPage: React.FC = () => {
 
   return (
     <React.Fragment>
-      <div className="flex flex-col h-[100dvh]">
+      <div className="flex flex-col h-full">
         <div className="flex items-center gap-2 p-3 sm:p-4 border-b border-gray-200 shadow-sm bg-white">
           <button
             onClick={handleBack}

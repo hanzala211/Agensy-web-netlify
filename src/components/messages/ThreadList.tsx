@@ -113,7 +113,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
             </button>
           </div>
         )}
-        <div className="flex-1 overflow-y-auto">
+        <div className="overflow-y-auto h-[calc(100dvh-72px)]">
           <div className="flex flex-col gap-0 p-1">
             {isThreadsLoading ? (
               <div className="h-full flex flex-col gap-5">
