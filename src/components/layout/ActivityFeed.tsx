@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { ICONS, ACTIVITY_ACTIONS } from "@agensy/constants";
+import {
+  ICONS,
+  ACTIVITY_ACTIONS,
+  ENTITY_TYPES,
+  FORM_TYPE_OPTIONS,
+} from "@agensy/constants";
 import { HEADER_HEIGHT_PX } from "@agensy/components";
 import {
   useActivityFeedContext,
@@ -227,6 +232,75 @@ const getActionTypeIconColor = (actionType?: string) => {
     default:
       return "text-slateGrey";
   }
+};
+
+const getEntityTypeLabel = (
+  entityType?: string,
+  category?: "medical" | "appointments" | "documents"
+): string => {
+  if (entityType) {
+    const formOption = FORM_TYPE_OPTIONS.find(
+      (option) => option.value === entityType
+    );
+    if (formOption) {
+      return formOption.label;
+    }
+
+    const entityLabelMap: Record<string, string> = {
+      [ENTITY_TYPES.APPOINTMENTS]: "Appointment",
+      [ENTITY_TYPES.DOCUMENTS]: "Document",
+      [ENTITY_TYPES.MEDICATION]: "Medication",
+      [ENTITY_TYPES.HEALTHCARE_PROVIDER]: "Healthcare Provider",
+      [ENTITY_TYPES.FACE_SHEET_SHORT]: "Face Sheet Short",
+      [ENTITY_TYPES.FACE_SHEET_LONG]: "Face Sheet Long",
+      [ENTITY_TYPES.HEALTH_HISTORY]: "Health History",
+      [ENTITY_TYPES.INITIAL_CARE_PLAN]: "Initial Care Plan",
+      [ENTITY_TYPES.COMPREHENSIVE_CARE_PLAN]: "Comprehensive Care Plan",
+    };
+
+    if (entityLabelMap[entityType]) {
+      return entityLabelMap[entityType];
+    }
+
+    return entityType
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  if (category) {
+    const categoryLabelMap: Record<string, string> = {
+      medical: "Medical",
+      appointments: "Appointment",
+      documents: "Document",
+    };
+    return (
+      categoryLabelMap[category] ||
+      category.charAt(0).toUpperCase() + category.slice(1)
+    );
+  }
+
+  return "";
+};
+
+const getActivityTitle = (
+  entityType?: string,
+  actionType?: string,
+  category?: "medical" | "appointments" | "documents"
+): string | null => {
+  const entityLabel = getEntityTypeLabel(entityType, category);
+
+  if (!entityLabel) {
+    return null;
+  }
+
+  if (actionType) {
+    const capitalizedActionType =
+      actionType.charAt(0).toUpperCase() + actionType.slice(1);
+    return `${entityLabel} ${capitalizedActionType}`;
+  }
+
+  return entityLabel;
 };
 
 const truncateName = (
@@ -662,14 +736,21 @@ export const ActivityFeed: React.FC = () => {
 
                       {/* Activity Content */}
                       <div className="flex-1 min-w-0">
+                        {(() => {
+                          const activityTitle = getActivityTitle(
+                            activityWithExtras.entity_type,
+                            activityWithExtras.action_type,
+                            activity.category
+                          );
+                          return activityTitle ? (
+                            <p className="text-sm font-semibold text-darkGray mb-1">
+                              {activityTitle}
+                            </p>
+                          ) : null;
+                        })()}
                         <p className="text-sm text-darkGray leading-relaxed line-clamp-5 break-words">
                           {activity.description}
                         </p>
-                        {activityWithExtras.action_type && (
-                          <p className="text-xs text-slateGrey mt-1 font-medium capitalize">
-                            {activityWithExtras.action_type}
-                          </p>
-                        )}
                         <p className="text-xs text-slateGrey mt-1 font-medium">
                           Re: {truncateName(activity.client_name)}
                         </p>

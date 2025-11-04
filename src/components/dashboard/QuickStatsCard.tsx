@@ -1,59 +1,35 @@
 import React from "react";
 import { Card, DashboardWidget } from "@agensy/components";
-import {
-  ICONS,
-  DASHBOARD_CLIENT_STATS,
-  DASHBOARD_TODAYS_APPOINTMENTS,
-  DASHBOARD_RECENT_MESSAGES,
-  DASHBOARD_RECENT_DOCUMENTS,
-} from "@agensy/constants";
+import { ICONS } from "@agensy/constants";
 
-export const QuickStatsCard: React.FC<{ className?: string }> = ({
+interface QuickStatsCardProps {
+  className?: string;
+  quickStats?: {
+    activeClients: number;
+    deactivatedClients: number;
+    upcomingAppointments: number;
+    unreadMessages: number;
+    recentDocuments: number;
+    todayAppointments: number;
+  };
+}
+
+export const QuickStatsCard: React.FC<QuickStatsCardProps> = ({
   className,
+  quickStats,
 }) => {
+  if (!quickStats) {
+    return null;
+  }
+
   const {
     activeClients,
     deactivatedClients,
     upcomingAppointments,
     unreadMessages,
     recentDocuments,
-    todaysAppointments,
-  } = DASHBOARD_CLIENT_STATS;
-
-  const now = new Date();
-  const upcomingCount = DASHBOARD_TODAYS_APPOINTMENTS.filter((appt) => {
-    if (!appt.active) return false;
-    const startTime = new Date(appt.start_time);
-    return startTime > now;
-  }).length;
-
-  const actualUnreadCount = DASHBOARD_RECENT_MESSAGES.reduce(
-    (total, thread) => {
-      return total + (thread.unread_count || 0);
-    },
-    0
-  );
-
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const recentDocsCount = DASHBOARD_RECENT_DOCUMENTS.filter((doc) => {
-    const docDate = new Date(doc.createdAt);
-    return docDate >= sevenDaysAgo;
-  }).length;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayEnd = new Date(today);
-  todayEnd.setDate(todayEnd.getDate() + 1);
-  const todaysCount = DASHBOARD_TODAYS_APPOINTMENTS.filter((appt) => {
-    const apptDate = new Date(appt.start_time);
-    apptDate.setHours(0, 0, 0, 0);
-    return (
-      apptDate.getTime() >= today.getTime() &&
-      apptDate.getTime() < todayEnd.getTime() &&
-      appt.active
-    );
-  }).length;
+    todayAppointments,
+  } = quickStats;
 
   return (
     <Card
@@ -74,22 +50,22 @@ export const QuickStatsCard: React.FC<{ className?: string }> = ({
         />
         <DashboardWidget
           title="Upcoming Appointments"
-          value={upcomingCount || upcomingAppointments}
+          value={upcomingAppointments}
           icon={<ICONS.calendar className="text-green-500" size={22} />}
         />
         <DashboardWidget
           title="Unread Messages"
-          value={actualUnreadCount || unreadMessages}
+          value={unreadMessages}
           icon={<ICONS.messageIcon className="text-purple-500" size={22} />}
         />
         <DashboardWidget
           title="Recent Documents"
-          value={recentDocsCount || recentDocuments}
+          value={recentDocuments}
           icon={<ICONS.document className="text-indigo-500" size={22} />}
         />
         <DashboardWidget
           title="Today's Appointments"
-          value={todaysCount || todaysAppointments}
+          value={todayAppointments}
           icon={<ICONS.clockCircle className="text-red-500" size={22} />}
         />
       </div>

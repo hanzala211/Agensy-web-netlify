@@ -5,7 +5,7 @@ import {
   AddDocumentModal,
   BorderedCard,
 } from "@agensy/components";
-import { ICONS, ROUTES, DASHBOARD_RECENT_DOCUMENTS } from "@agensy/constants";
+import { ICONS, ROUTES } from "@agensy/constants";
 import { useNavigate } from "react-router-dom";
 import { useDocumentContext } from "@agensy/context";
 import {
@@ -20,17 +20,52 @@ import type {
   Document,
 } from "@agensy/types";
 
-export const RecentDocumentsCard: React.FC = () => {
+interface RecentDocumentsCardProps {
+  documents?: Array<{
+    id: string;
+    title: string;
+    file_name: string;
+    file_type: string;
+    document_type: string;
+    file_size: number;
+    category: string;
+    createdAt: string;
+    uploadedBy: {
+      id: string;
+      first_name: string;
+      last_name: string;
+    };
+    client?: {
+      id: string;
+      first_name: string;
+      last_name: string;
+    } | null;
+  }>;
+}
+
+export const RecentDocumentsCard: React.FC<RecentDocumentsCardProps> = ({
+  documents = [],
+}) => {
   const navigate = useNavigate();
   const { setIsAddDocumentModalOpen, isAddDocumentModalOpen } =
     useDocumentContext();
-  const documents = DASHBOARD_RECENT_DOCUMENTS.slice(0, 3); // Limit to 3 most recent
+  const displayedDocuments = documents.slice(0, 4); // Limit to 4 most recent
   const addGeneralDocumentMutation = useAddGeneralDocumentMutation();
   const queryClient = useQueryClient();
   const generalDocumentAnalyzeMutation = useAnalyzeGeneralDocumentMutation();
   const [analyzedDocRes, setAnalyzedDocRes] = useState<ConfidenceScore | null>(
     null
   );
+
+  const truncateName = (
+    name: string | undefined,
+    maxLength: number = 15
+  ): string => {
+    if (!name) return "";
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
+  };
 
   const handleAddDocument = () => {
     setIsAddDocumentModalOpen(true);
@@ -69,6 +104,7 @@ export const RecentDocumentsCard: React.FC = () => {
         if (!old) return [addGeneralDocumentMutation.data];
         return [...old, addGeneralDocumentMutation.data];
       });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       setIsAddDocumentModalOpen(false);
       toast.success("Document added successfully");
     } else if (addGeneralDocumentMutation.status === "error") {
@@ -85,9 +121,9 @@ export const RecentDocumentsCard: React.FC = () => {
         onButtonClick={handleAddDocument}
         className="border-gray-300"
       >
-        {documents.length > 0 ? (
+        {displayedDocuments.length > 0 ? (
           <div className="space-y-1.5">
-            {documents.map((document) => (
+            {displayedDocuments.map((document) => (
               <BorderedCard key={document.id} className="!p-2">
                 <div
                   className="cursor-pointer"
@@ -116,10 +152,19 @@ export const RecentDocumentsCard: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <ICONS.user className="text-gray-400" size={14} />
                         <span>
-                          {document.uploadedBy?.first_name}{" "}
-                          {document.uploadedBy?.last_name}
+                          {truncateName(document.uploadedBy?.first_name)}{" "}
+                          {truncateName(document.uploadedBy?.last_name)}
                         </span>
                       </div>
+                      {document.client && (
+                        <div className="flex items-center gap-2">
+                          <ICONS.users className="text-gray-400" size={14} />
+                          <span>
+                            {truncateName(document.client.first_name)}{" "}
+                            {truncateName(document.client.last_name)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

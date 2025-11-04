@@ -5,23 +5,50 @@ import {
   AddThreadModal,
   BorderedCard,
 } from "@agensy/components";
-import { ICONS, ROUTES, DASHBOARD_RECENT_MESSAGES } from "@agensy/constants";
+import { ICONS, ROUTES } from "@agensy/constants";
 import { useNavigate } from "react-router-dom";
 import { DateUtils } from "@agensy/utils";
 import { useAuthContext, useMessagesContext } from "@agensy/context";
 import { v4 as uuidv4 } from "uuid";
 import type { AddThreadFormData, IUser } from "@agensy/types";
 
-export const RecentMessagesCard: React.FC = () => {
+interface RecentMessagesCardProps {
+  messages?: Array<{
+    id: string;
+    title: string | null;
+    type: "client" | "general" | "broadcast";
+    client_id: string | null;
+    client?: {
+      id: string;
+      first_name: string;
+      last_name: string;
+    } | null;
+    participants?: Array<{
+      id: string;
+      first_name: string;
+      last_name: string;
+      avatar?: string | null;
+      email?: string;
+    }>;
+    unread_count: number;
+    last_message: string | null;
+    last_message_time: string;
+  }>;
+}
+
+export const RecentMessagesCard: React.FC<RecentMessagesCardProps> = ({
+  messages = [],
+}) => {
   const navigate = useNavigate();
   const [isAddThreadModalOpen, setIsAddThreadModalOpen] =
     useState<boolean>(false);
-  const messages = DASHBOARD_RECENT_MESSAGES;
   const { userData, accessUsers } = useAuthContext();
   const { setPendingThreadData, setCurrentThreadMessages, setSelectedThread } =
     useMessagesContext();
 
-  const formatTimeAgo = (date: Date): string => {
+  const formatTimeAgo = (dateString: string | Date): string => {
+    const date =
+      typeof dateString === "string" ? new Date(dateString) : dateString;
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / (1000 * 60));
@@ -32,19 +59,47 @@ export const RecentMessagesCard: React.FC = () => {
       return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
     if (diffHours < 24)
       return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
-    return DateUtils.formatSimpleDate(date.toISOString());
+    return DateUtils.formatSimpleDate(
+      typeof dateString === "string" ? dateString : dateString.toISOString()
+    );
   };
 
   const getSenderName = (thread: (typeof messages)[0]): string => {
     let displayName: string;
-    if (thread.name) {
-      displayName = thread.name;
+
+    // Broadcast threads
+    if (thread.type === "broadcast") {
+      displayName = thread.title || "System Announcement";
+    } else if (thread.title) {
+      // Thread has a name
+      displayName = thread.title;
+    } else if (thread.participants && thread.participants.length > 2) {
+      // Group thread: show participant names (excluding current user)
+      const participantNames = thread.participants
+        ?.filter((participant) => participant.id !== userData?.id)
+        .map((participant) => participant.first_name)
+        .join(", ")
+        .concat(", You");
+
+      displayName = participantNames || "Unknown User";
     } else {
-      displayName = "Private Message";
+      // One-to-one thread: show the other user's name
+      const otherUser = thread.participants?.find(
+        (participant) => participant.id !== userData?.id
+      );
+
+      if (otherUser) {
+        displayName = `${otherUser.first_name} ${otherUser.last_name}`;
+      } else if (thread.client) {
+        // Fallback to client name if no other user found
+        displayName = `${thread.client.first_name} ${thread.client.last_name}`;
+      } else {
+        displayName = "Unknown User";
+      }
     }
 
     // Truncate to maximum 15 characters like ThreadList
-    return displayName.length > 15
+    return displayName && displayName.length > 15
       ? displayName.substring(0, 15) + "..."
       : displayName;
   };
@@ -116,7 +171,7 @@ export const RecentMessagesCard: React.FC = () => {
                       <h3 className="font-semibold text-lg text-gray-800 truncate min-w-0 flex-1">
                         {getSenderName(thread)}
                       </h3>
-                      {thread.has_unread_messages && thread.unread_count && (
+                      {thread.unread_count > 0 && thread.unread_count && (
                         <span className="bg-red-500 text-white text-xs font-medium rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 flex-shrink-0">
                           {thread.unread_count}
                         </span>
@@ -138,24 +193,43 @@ export const RecentMessagesCard: React.FC = () => {
                           size={14}
                         />
                         <span className="truncate">
-                          {formatTimeAgo(
-                            thread.last_message_time || thread.started_at
-                          )}
+                          {formatTimeAgo(thread.last_message_time)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <ICONS.group
-                          className="text-gray-400 flex-shrink-0"
-                          size={14}
-                        />
-                        <span className="truncate">
-                          {thread.type === "client"
-                            ? "Client Thread"
-                            : thread.name
-                            ? "Broadcast"
-                            : "General"}
-                        </span>
-                      </div>
+                      {(thread.type === "client" && thread.client) ||
+                      thread.type === "broadcast" ||
+                      (thread.participants &&
+                        thread.participants.length > 2) ? (
+                        <div className="flex items-center gap-2">
+                          <ICONS.group
+                            className="text-gray-400 flex-shrink-0"
+                            size={14}
+                          />
+                          <span className="truncate">
+                            {thread.type === "client" && thread.client ? (
+                              <>
+                                <span className="font-bold">Re:</span>{" "}
+                                {`${thread.client.first_name} ${thread.client.last_name}`
+                                  .length > 15
+                                  ? `${thread.client.first_name} ${thread.client.last_name}`.substring(
+                                      0,
+                                      15
+                                    ) + "..."
+                                  : `${thread.client.first_name} ${thread.client.last_name}`}
+                              </>
+                            ) : thread.type === "broadcast" ? (
+                              <span className="text-primaryColor font-semibold">
+                                Broadcast
+                              </span>
+                            ) : thread.participants &&
+                              thread.participants.length > 2 ? (
+                              "Group"
+                            ) : (
+                              ""
+                            )}
+                          </span>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 </div>

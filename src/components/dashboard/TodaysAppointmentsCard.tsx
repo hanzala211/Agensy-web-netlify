@@ -7,15 +7,43 @@ import {
   BorderedCard,
   AntdBadge,
 } from "@agensy/components";
-import { ICONS, DASHBOARD_TODAYS_APPOINTMENTS } from "@agensy/constants";
-import type { AppointmentFormData } from "@agensy/types";
+import { ICONS } from "@agensy/constants";
+import type { AppointmentFormData, IUser } from "@agensy/types";
 import { DateUtils } from "@agensy/utils";
 import type { Appointment } from "@agensy/types";
 import { useAddClientAppointmentMutation } from "@agensy/api";
 import { useAppointmentsContext } from "@agensy/context";
 import { toast } from "@agensy/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { isSameDay } from "date-fns";
 
-export const TodaysAppointmentsCard: React.FC = () => {
+interface TodaysAppointmentsCardProps {
+  appointments?: Array<{
+    id: string;
+    title: string | null;
+    appointment_type: string | null;
+    location: string | null;
+    start_time: string;
+    end_time: string | null;
+    created_by: string;
+    client?: {
+      id: string;
+      first_name: string;
+      last_name: string;
+      date_of_birth?: string | null;
+    } | null;
+    healthCareProvider?: {
+      id: string;
+      provider_name: string;
+      provider_type: string | null;
+      specialty: string | null;
+    } | null;
+  }>;
+}
+
+export const TodaysAppointmentsCard: React.FC<TodaysAppointmentsCardProps> = ({
+  appointments = [],
+}) => {
   const [isAddAppointmentModalOpen, setIsAddAppointmentModalOpen] =
     useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] =
@@ -23,17 +51,26 @@ export const TodaysAppointmentsCard: React.FC = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
   const addClientAppointmentMutation = useAddClientAppointmentMutation();
   const { addAppointment } = useAppointmentsContext();
+  const queryClient = useQueryClient();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const todaysAppointments = DASHBOARD_TODAYS_APPOINTMENTS.filter((appt) => {
-    const apptDate = new Date(appt.start_time);
-    apptDate.setHours(0, 0, 0, 0);
-    return apptDate.getTime() === today.getTime();
-  });
+  // Map API appointments to match Appointment type structure
+  const todaysAppointments = appointments.map((appt) => ({
+    id: appt.id,
+    title: appt.title || "",
+    appointment_type: appt.appointment_type || "",
+    location: appt.location || "",
+    start_time: appt.start_time,
+    end_time: appt.end_time || "",
+    all_day: false,
+    notes: "",
+    reminder_sent: false,
+    active: true, // Default to true since API doesn't provide this field
+    created_by: appt.created_by,
+    client_id: appt.client?.id || "",
+    healthcare_provider_id: appt.healthCareProvider?.id || "",
+    provider_id: appt.healthCareProvider?.id || "",
+    createdBy: {} as IUser,
+  })) as Appointment[];
 
   const handleAddAppointment = () => {
     setIsAddAppointmentModalOpen(true);
@@ -71,6 +108,14 @@ export const TodaysAppointmentsCard: React.FC = () => {
     if (addClientAppointmentMutation.status === "success") {
       if (addClientAppointmentMutation.data) {
         addAppointment(addClientAppointmentMutation.data);
+        const appointmentStartTime =
+          addClientAppointmentMutation.data.start_time;
+        if (
+          appointmentStartTime &&
+          isSameDay(new Date(appointmentStartTime), new Date())
+        ) {
+          queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+        }
       }
       toast.success("Appointment added successfully");
       setIsAddAppointmentModalOpen(false);
@@ -107,7 +152,8 @@ export const TodaysAppointmentsCard: React.FC = () => {
                           appointment.active
                             ? new Date().toISOString() <= appointment.start_time
                               ? "success"
-                              : new Date().toISOString() <= appointment.end_time
+                              : appointment.end_time &&
+                                new Date().toISOString() <= appointment.end_time
                               ? "processing"
                               : "default"
                             : "error"

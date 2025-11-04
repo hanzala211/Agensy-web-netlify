@@ -1,15 +1,21 @@
 import React from "react";
 import { Card, EmptyStateCard, BorderedCard } from "@agensy/components";
-import {
-  ICONS,
-  ROUTES,
-  DASHBOARD_QUICK_ACCESS_CLIENTS,
-} from "@agensy/constants";
+import { ICONS, ROUTES } from "@agensy/constants";
 import { useNavigate } from "react-router-dom";
 
-export const QuickAccessCareRecipientsCard: React.FC = () => {
+interface QuickAccessCareRecipientsCardProps {
+  clients?: Array<{
+    id: string;
+    first_name: string;
+    last_name: string;
+    date_of_birth: string | null;
+  }>;
+}
+
+export const QuickAccessCareRecipientsCard: React.FC<
+  QuickAccessCareRecipientsCardProps
+> = ({ clients = [] }) => {
   const navigate = useNavigate();
-  const clients = DASHBOARD_QUICK_ACCESS_CLIENTS;
 
   const getInitials = (firstName: string, lastName: string): string => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -63,7 +69,7 @@ export const QuickAccessCareRecipientsCard: React.FC = () => {
       showButton={false}
     >
       {clients.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {clients.map((client) => {
             const initials = getInitials(client.first_name, client.last_name);
             const age = getAge(client.date_of_birth);
