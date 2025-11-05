@@ -1,6 +1,12 @@
 import { getJwtToken } from "./authCognito";
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const removeEmptyValues = (value: unknown): unknown => {
   if (value === undefined || value === null) return undefined;
@@ -33,10 +39,12 @@ export const sendRequest = async (
 ): Promise<AxiosResponse> => {
   const { accessToken: token } = await getJwtToken();
   console.log("token: ", token);
+  const timezoneValue = dayjs().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
   const headers = { ...(configs.headers || {}) } as Record<string, string>;
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
+  headers["x-timezone"] = timezoneValue;
 
   const requestConfig: AxiosRequestConfig = {
     baseURL: import.meta.env.VITE_API_URL as string,

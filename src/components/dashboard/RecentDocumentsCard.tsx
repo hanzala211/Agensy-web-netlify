@@ -1,24 +1,12 @@
-import React, { useEffect, useState } from "react";
-import {
-  Card,
-  EmptyStateCard,
-  AddDocumentModal,
-  BorderedCard,
-} from "@agensy/components";
+import React, { useEffect } from "react";
+import { Card, EmptyStateCard, BorderedCard } from "@agensy/components";
 import { ICONS, ROUTES } from "@agensy/constants";
 import { useNavigate } from "react-router-dom";
 import { useDocumentContext } from "@agensy/context";
-import {
-  useAddGeneralDocumentMutation,
-  useAnalyzeGeneralDocumentMutation,
-} from "@agensy/api";
+import { useAddGeneralDocumentMutation } from "@agensy/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@agensy/utils";
-import type {
-  DocumentFormData,
-  ConfidenceScore,
-  Document,
-} from "@agensy/types";
+import type { Document } from "@agensy/types";
 
 interface RecentDocumentsCardProps {
   documents?: Array<{
@@ -47,15 +35,10 @@ export const RecentDocumentsCard: React.FC<RecentDocumentsCardProps> = ({
   documents = [],
 }) => {
   const navigate = useNavigate();
-  const { setIsAddDocumentModalOpen, isAddDocumentModalOpen } =
-    useDocumentContext();
+  const { setIsAddDocumentModalOpen } = useDocumentContext();
   const displayedDocuments = documents.slice(0, 4); // Limit to 4 most recent
   const addGeneralDocumentMutation = useAddGeneralDocumentMutation();
   const queryClient = useQueryClient();
-  const generalDocumentAnalyzeMutation = useAnalyzeGeneralDocumentMutation();
-  const [analyzedDocRes, setAnalyzedDocRes] = useState<ConfidenceScore | null>(
-    null
-  );
 
   const truncateName = (
     name: string | undefined,
@@ -66,37 +49,6 @@ export const RecentDocumentsCard: React.FC<RecentDocumentsCardProps> = ({
       ? name.substring(0, maxLength) + "..."
       : name;
   };
-
-  const handleAddDocument = () => {
-    setIsAddDocumentModalOpen(true);
-  };
-
-  const handleAnalyze = (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    toast.info("Analyzing document.");
-    generalDocumentAnalyzeMutation.mutate(formData);
-  };
-
-  const handleSubmit = (data: DocumentFormData) => {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("document_type", data.documentType);
-    formData.append("description", data.description ? data.description : "");
-    formData.append("file", data.file);
-    formData.append("category", data.documentType as string);
-    formData.append("primary_user_id", data.primaryUserId as string);
-    addGeneralDocumentMutation.mutate(formData);
-  };
-
-  useEffect(() => {
-    if (generalDocumentAnalyzeMutation.status === "success") {
-      setAnalyzedDocRes(generalDocumentAnalyzeMutation.data);
-      toast.success("Document analyzed successfully");
-    } else if (generalDocumentAnalyzeMutation.status === "error") {
-      toast.error("Failed to analyze document");
-    }
-  }, [generalDocumentAnalyzeMutation.status]);
 
   useEffect(() => {
     if (addGeneralDocumentMutation.status === "success") {
@@ -114,13 +66,7 @@ export const RecentDocumentsCard: React.FC<RecentDocumentsCardProps> = ({
 
   return (
     <>
-      <Card
-        title="Recent Documents"
-        buttonText={<ICONS.plus size={18} />}
-        ariaLabel="Add document"
-        onButtonClick={handleAddDocument}
-        className="border-gray-300"
-      >
+      <Card title="Recent Documents" className="border-gray-300">
         {displayedDocuments.length > 0 ? (
           <div className="space-y-1.5">
             {displayedDocuments.map((document) => (
@@ -172,23 +118,9 @@ export const RecentDocumentsCard: React.FC<RecentDocumentsCardProps> = ({
             ))}
           </div>
         ) : (
-          <EmptyStateCard
-            label="documents"
-            ICON={ICONS.document}
-            onClick={handleAddDocument}
-          />
+          <EmptyStateCard label="documents" ICON={ICONS.document} />
         )}
       </Card>
-      <AddDocumentModal
-        isOpen={isAddDocumentModalOpen}
-        onClose={() => setIsAddDocumentModalOpen(false)}
-        onSubmit={handleSubmit}
-        isLoading={addGeneralDocumentMutation.isPending}
-        handleAnalyze={handleAnalyze}
-        isAnalyzing={generalDocumentAnalyzeMutation.isPending}
-        analyzedDocRes={analyzedDocRes}
-        showPrimaryUser={true}
-      />
     </>
   );
 };

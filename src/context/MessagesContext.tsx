@@ -14,6 +14,7 @@ import { useGetAllThreadsQuery } from "@agensy/api";
 import dayjs from "dayjs";
 import { sortBy } from "lodash";
 import { ROUTES } from "@agensy/constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MessagesContext = createContext<MessagesContextType | undefined>(
   undefined
@@ -43,6 +44,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     refetch: loadThreads,
     status: threadsFetchStatus,
   } = useGetAllThreadsQuery();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     currentMessagesRef.current = currentThreadMessages;
@@ -83,6 +85,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         participants: IUser[];
       }) => {
         console.log(data);
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
         setThreads((prev) => {
           const existingThread = prev.find((t) => t.id === data.threadId);
 

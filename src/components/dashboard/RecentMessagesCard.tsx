@@ -46,24 +46,6 @@ export const RecentMessagesCard: React.FC<RecentMessagesCardProps> = ({
   const { setPendingThreadData, setCurrentThreadMessages, setSelectedThread } =
     useMessagesContext();
 
-  const formatTimeAgo = (dateString: string | Date): string => {
-    const date =
-      typeof dateString === "string" ? new Date(dateString) : dateString;
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60)
-      return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
-    if (diffHours < 24)
-      return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
-    return DateUtils.formatSimpleDate(
-      typeof dateString === "string" ? dateString : dateString.toISOString()
-    );
-  };
-
   const getSenderName = (thread: (typeof messages)[0]): string => {
     let displayName: string;
 
@@ -160,7 +142,7 @@ export const RecentMessagesCard: React.FC<RecentMessagesCardProps> = ({
       >
         {messages.length > 0 ? (
           <div className="space-y-1.5">
-            {messages.map((thread) => (
+            {messages.slice(0, 3).map((thread) => (
               <BorderedCard key={thread.id} className="!p-2">
                 <div
                   className="cursor-pointer"
@@ -193,7 +175,9 @@ export const RecentMessagesCard: React.FC<RecentMessagesCardProps> = ({
                           size={14}
                         />
                         <span className="truncate">
-                          {formatTimeAgo(thread.last_message_time)}
+                          {DateUtils.formatRelativeTimeShort(
+                            thread.last_message_time as string
+                          )}
                         </span>
                       </div>
                       {(thread.type === "client" && thread.client) ||
@@ -216,6 +200,7 @@ export const RecentMessagesCard: React.FC<RecentMessagesCardProps> = ({
                                       15
                                     ) + "..."
                                   : `${thread.client.first_name} ${thread.client.last_name}`}
+                                (Group)
                               </>
                             ) : thread.type === "broadcast" ? (
                               <span className="text-primaryColor font-semibold">
@@ -223,7 +208,7 @@ export const RecentMessagesCard: React.FC<RecentMessagesCardProps> = ({
                               </span>
                             ) : thread.participants &&
                               thread.participants.length > 2 ? (
-                              "Group"
+                              "General (Group)"
                             ) : (
                               ""
                             )}

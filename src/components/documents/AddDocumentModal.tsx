@@ -312,7 +312,9 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
 
   const primaryUsers = useMemo(() => {
     const filteredUsers = accessUsers.filter((user: IUser) => {
-      return user.UserRoles?.some((role) => role.role === ROLES.PRIMARY_USER);
+      return (user.UserRoles || user.Roles)?.some(
+        (role) => role.role === ROLES.PRIMARY_USER
+      );
     });
 
     const subscribedUsers = filteredUsers.filter(

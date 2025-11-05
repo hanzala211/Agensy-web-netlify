@@ -40,42 +40,65 @@ interface TodaysAppointmentsCardProps {
   }>;
 }
 
+type TodaysAppointmentItem = NonNullable<
+  TodaysAppointmentsCardProps["appointments"]
+>[number];
+
+type DashboardAppointment = Appointment & {
+  client: TodaysAppointmentItem["client"];
+};
+
 export const TodaysAppointmentsCard: React.FC<TodaysAppointmentsCardProps> = ({
   appointments = [],
 }) => {
   const [isAddAppointmentModalOpen, setIsAddAppointmentModalOpen] =
     useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] =
-    useState<Appointment | null>(null);
+    useState<DashboardAppointment | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
   const addClientAppointmentMutation = useAddClientAppointmentMutation();
   const { addAppointment } = useAppointmentsContext();
   const queryClient = useQueryClient();
 
   // Map API appointments to match Appointment type structure
-  const todaysAppointments = appointments.map((appt) => ({
-    id: appt.id,
-    title: appt.title || "",
-    appointment_type: appt.appointment_type || "",
-    location: appt.location || "",
-    start_time: appt.start_time,
-    end_time: appt.end_time || "",
-    all_day: false,
-    notes: "",
-    reminder_sent: false,
-    active: true, // Default to true since API doesn't provide this field
-    created_by: appt.created_by,
-    client_id: appt.client?.id || "",
-    healthcare_provider_id: appt.healthCareProvider?.id || "",
-    provider_id: appt.healthCareProvider?.id || "",
-    createdBy: {} as IUser,
-  })) as Appointment[];
+  const todaysAppointments: DashboardAppointment[] = appointments.map(
+    (appt) => ({
+      id: appt.id,
+      title: appt.title || "",
+      appointment_type: appt.appointment_type || "",
+      location: appt.location || "",
+      start_time: appt.start_time,
+      end_time: appt.end_time || "",
+      all_day: false,
+      notes: "",
+      reminder_sent: false,
+      active: true, // Default to true since API doesn't provide this field
+      created_by: appt.created_by,
+      client_id: appt.client?.id || "",
+      healthcare_provider_id: appt.healthCareProvider?.id || "",
+      provider_id: appt.healthCareProvider?.id || "",
+      createdBy: {} as IUser,
+      client: appt.client ?? null,
+    })
+  );
+
+  const formatClientName = (
+    client: DashboardAppointment["client"]
+  ): string | null => {
+    if (!client) return null;
+
+    const fullName = `${client.first_name} ${client.last_name}`.trim();
+
+    if (!fullName) return null;
+
+    return fullName.length > 15 ? `${fullName.substring(0, 15)}...` : fullName;
+  };
 
   const handleAddAppointment = () => {
     setIsAddAppointmentModalOpen(true);
   };
 
-  const handleAppointmentClick = (appointment: Appointment) => {
+  const handleAppointmentClick = (appointment: DashboardAppointment) => {
     setSelectedAppointment(appointment);
     setIsDetailsModalOpen(true);
   };
@@ -125,7 +148,7 @@ export const TodaysAppointmentsCard: React.FC<TodaysAppointmentsCardProps> = ({
       >
         {todaysAppointments.length > 0 ? (
           <div className="space-y-1.5">
-            {todaysAppointments.map((appointment) => (
+            {todaysAppointments.slice(0, 3).map((appointment) => (
               <BorderedCard key={appointment.id} className="!p-2">
                 <div
                   className="cursor-pointer "
@@ -166,6 +189,15 @@ export const TodaysAppointmentsCard: React.FC<TodaysAppointmentsCardProps> = ({
                           {appointment.location || "N/A"}
                         </span>
                       </div>
+                      {formatClientName(appointment.client) && (
+                        <div className="flex items-center gap-2">
+                          <ICONS.group className="text-gray-400" size={14} />
+                          <span className="truncate">
+                            <span className="font-bold">Client:</span>{" "}
+                            {formatClientName(appointment.client)}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2">
                         <ICONS.user className="text-gray-400" size={14} />
                         <span>
