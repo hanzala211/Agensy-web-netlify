@@ -44,7 +44,7 @@ export const QuickStatsCard: React.FC<QuickStatsCardProps> = ({
           icon={<ICONS.users className="text-blue-500" size={22} />}
         />
         <DashboardWidget
-          title="Deactivated Care Recipients"
+          title="Inactive Care Recipients"
           value={deactivatedClients}
           icon={<ICONS.users className="text-orange-500" size={22} />}
         />

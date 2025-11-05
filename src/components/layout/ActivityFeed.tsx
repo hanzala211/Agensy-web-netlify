@@ -295,6 +295,21 @@ const getActivityTitle = (
   }
 
   if (actionType) {
+    const normalizedActionType = actionType.toLowerCase();
+
+    // Special cases for created actions
+    if (normalizedActionType === ACTIVITY_ACTIONS.CREATED.toLowerCase()) {
+      if (
+        entityType === ENTITY_TYPES.APPOINTMENTS ||
+        category === "appointments"
+      ) {
+        return "Appointment Scheduled";
+      }
+      if (entityType === ENTITY_TYPES.DOCUMENTS || category === "documents") {
+        return "Document Uploaded";
+      }
+    }
+
     const capitalizedActionType =
       actionType.charAt(0).toUpperCase() + actionType.slice(1);
     return `${entityLabel} ${capitalizedActionType}`;
