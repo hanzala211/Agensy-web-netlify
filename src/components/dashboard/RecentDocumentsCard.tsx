@@ -118,7 +118,11 @@ export const RecentDocumentsCard: React.FC<RecentDocumentsCardProps> = ({
             ))}
           </div>
         ) : (
-          <EmptyStateCard label="documents" ICON={ICONS.document} />
+          <EmptyStateCard
+            label="documents"
+            ICON={ICONS.document}
+            showText={false}
+          />
         )}
       </Card>
     </>
