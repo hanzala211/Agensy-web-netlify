@@ -308,6 +308,12 @@ const getActivityTitle = (
       if (entityType === ENTITY_TYPES.DOCUMENTS || category === "documents") {
         return "Document Uploaded";
       }
+      if (entityType === ENTITY_TYPES.MEDICATION) {
+        return "Medication Added";
+      }
+      if (entityType === ENTITY_TYPES.HEALTHCARE_PROVIDER) {
+        return "Health Care Provider Added";
+      }
     }
 
     const capitalizedActionType =
