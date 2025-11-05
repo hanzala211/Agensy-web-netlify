@@ -193,7 +193,7 @@ export const TodaysAppointmentsCard: React.FC<TodaysAppointmentsCardProps> = ({
                         <div className="flex items-center gap-2">
                           <ICONS.group className="text-gray-400" size={14} />
                           <span className="truncate">
-                            <span className="font-bold">Client:</span>{" "}
+                            <span className="font-bold">Care Recipient:</span>{" "}
                             {formatClientName(appointment.client)}
                           </span>
                         </div>
