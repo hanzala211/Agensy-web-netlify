@@ -122,8 +122,10 @@ export const ClientNoteCard: React.FC = () => {
             selectedClient?.clientNotes?.map((item, index) => (
               <InfoItem key={index}>
                 <div className="flex items-start justify-between gap-4 flex-wrap sm:flex-nowrap">
-                  <div className="w-full sm:flex-1 space-y-2">
-                    <p>{item.text}</p>
+                  <div className="w-[90%] sm:flex-1 space-y-2">
+                    <p className="break-words whitespace-pre-wrap">
+                      {item.text}
+                    </p>
                     <p className="text-gray-600 text-[14px] mb-1">
                       {DateUtils.formatDateTime(String(item.updatedAt) || "") +
                         " " +

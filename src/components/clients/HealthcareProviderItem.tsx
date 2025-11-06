@@ -115,7 +115,7 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
 
             {provider?.notes && (
               <div className="mt-3 pt-3 border-t border-gray-200">
-                <p className="text-sm italic text-gray-700">
+                <p className="text-sm break-words whitespace-pre-wrap italic text-gray-700">
                   {provider?.notes}
                 </p>
               </div>

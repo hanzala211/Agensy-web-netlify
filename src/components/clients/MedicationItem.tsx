@@ -118,7 +118,7 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
           )}
           {medication?.notes && (
             <div className="mt-3 pt-3 border-t border-gray-200">
-              <p className="text-sm italic text-gray-600">
+              <p className="text-sm break-words whitespace-pre-wrap italic text-gray-600">
                 {medication?.notes}
               </p>
             </div>

@@ -138,7 +138,7 @@ export const Messages: React.FC = () => {
             />
           </div>
 
-          <div className="flex flex-col w-full md:w-2/3 bg-white">
+          <div className="flex flex-col w-full lg:w-2/3 bg-white">
             {params.threadId || isNavigating ? (
               <Outlet />
             ) : (

@@ -95,7 +95,7 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
       }
       return accessUsers
         .filter((user) =>
-          user.UserRoles?.some(
+          (user.UserRoles || user.Roles)?.some(
             (userRole) =>
               userRole.client_id === clientId &&
               userRole.role === ROLES.CAREGIVER
@@ -124,7 +124,7 @@ export const MultiSelectParticipant: React.FC<MultiSelectParticipantProps> = ({
       }
       return accessUsers
         .filter((user) =>
-          user.UserRoles?.some(
+          (user.UserRoles || user.Roles)?.some(
             (userRole) =>
               userRole.client_id === clientId &&
               userRole.role === ROLES.FAMILY_MEMBER

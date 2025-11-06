@@ -187,6 +187,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       "messageRead",
       (data: { threadId: string; readBy: string; readAt: Date }) => {
         console.log("📖 [SOCKET] Messages read by another user:", data);
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
 
         // Helper function to add read status to a message
         const addReadStatus = (msg: Message) => {
@@ -265,6 +266,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         createdAt: Date;
       }) => {
         console.log("📢 [SOCKET] Received broadcast:", data);
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
 
         const threadName = data.thread_name || "System Announcement";
         let lastMessage = data.message;
@@ -350,6 +352,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         messageReadByUsers: string[];
       }) => {
         console.log("🗑️ [SOCKET] Message deleted:", data);
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
 
         setCurrentThreadMessages(() => {
           const filteredMessages = currentMessagesRef.current.filter(
@@ -406,6 +409,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         leftParticipants: string[];
       }) => {
         console.log("🚪 [SOCKET] User left thread:", data);
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
 
         if (data.userId === userData?.id) {
           setThreads((prev) =>
@@ -494,6 +498,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       "threadDeleted",
       (data: { threadId: string; deletedBy: string; deletedAt: Date }) => {
         console.log("🗑️ [SOCKET] Thread deleted:", data);
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
 
         // Remove thread from threads array
         setThreads((prev) =>

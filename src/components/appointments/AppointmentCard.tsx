@@ -75,12 +75,12 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
     <BorderedCard>
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <div className="space-y-2 flex-1">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <ICONS.calendar className="text-blue-500" />
-              <h3 className="font-semibold text-lg truncate min-w-0">
-                {appointment.title ? appointment.title : "N/A"}{" "}
-                <span className="text-sm truncate">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <ICONS.calendar className="text-blue-500 flex-shrink-0" />
+              <h3 className="font-semibold text-lg break-words min-w-0">
+                {appointment.title ? truncateName(appointment.title) : "N/A"}{" "}
+                <span className="text-sm break-words">
                   (
                   {filterHealthCareProvider(
                     appointment?.client_id,
@@ -166,7 +166,9 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
           {appointment.notes && (
             <div className="flex items-center text-sm gap-2 text-gray-600">
-              <span>Notes: {appointment.notes}</span>
+              <p className="break-words whitespace-pre-wrap">
+                Notes: {truncateName(appointment.notes)}
+              </p>
             </div>
           )}
 
