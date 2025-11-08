@@ -73,7 +73,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
 }) => {
   return (
     <div className="mb-4">
-      <div className="bg-white rounded-md border border-gray-200 md:p-4 p-3">
+      <div className="bg-white rounded-md border border-gray-200 md2:p-4 p-3">
         {/* Main Search and Filter Row */}
         <div className="flex flex-col xl:flex-row gap-3 items-start xl:items-end">
           {/* Search Input - Takes more space */}
@@ -88,7 +88,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
                 label={label}
                 placeholder={searchPlaceholder}
                 value={searchValue}
-                onChange={(e) => setSearchValue?.(e.target.value)}
+                onChange={(e) => setSearchValue?.(e.target.value.trim())}
                 iconSize={16}
                 iconColor={COLORS.darkGray}
               />
@@ -96,11 +96,11 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
           )}
 
           {/* Filters Group */}
-          <div className="flex flex-col sm:flex-row gap-2.5 flex-1 xl:flex-initial xl:w-fit w-full">
+          <div className="flex flex-col md2:flex-row gap-2.5 flex-1 xl:flex-initial xl:w-fit w-full">
             {showExtraFilter && (
               <div
-                className={`w-full sm:flex-1 ${
-                  customFilterWidth || "sm:max-w-[180px] xl:max-w-[200px]"
+                className={`w-full md2:flex-1 ${
+                  customFilterWidth || "md2:max-w-[180px] xl:max-w-[200px]"
                 }`}
                 style={customFilterWidth ? { width: customFilterWidth } : {}}
               >
@@ -115,8 +115,8 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
             )}
 
             <div
-              className={`w-full sm:flex-1 ${
-                customFilterWidth || "sm:max-w-[180px] xl:max-w-[200px]"
+              className={`w-full md2:flex-1 ${
+                customFilterWidth || "md2:max-w-[180px] xl:max-w-[200px]"
               }`}
               style={customFilterWidth ? { width: customFilterWidth } : {}}
             >
@@ -130,8 +130,8 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
             </div>
 
             <div
-              className={`w-full sm:flex-1 ${
-                customFilterWidth || "sm:max-w-[180px] xl:max-w-[200px]"
+              className={`w-full md2:flex-1 ${
+                customFilterWidth || "md2:max-w-[180px] xl:max-w-[200px]"
               }`}
               style={customFilterWidth ? { width: customFilterWidth } : {}}
             >
@@ -147,8 +147,8 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
 
           {/* Date Pickers - On same line when moveToNextLine is false */}
           {showDatePicker && !moveToNextLine && (
-            <div className="flex sm:flex-row flex-col gap-2.5 flex-1 xl:flex-initial w-full xl:w-fit">
-              <div className="flex-1 min-w-0 sm:max-w-xs">
+            <div className="flex md2:flex-row flex-col gap-2.5 flex-1 xl:flex-initial w-full xl:w-fit">
+              <div className="flex-1 min-w-0 md2:max-w-xs">
                 <StatefulDatePicker
                   divClass="w-full"
                   value={firstDateValue as string}
@@ -162,7 +162,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
                   placeholder="Select Date"
                 />
               </div>
-              <div className="flex-1 min-w-0 sm:max-w-xs">
+              <div className="flex-1 min-w-0 md2:max-w-xs">
                 <StatefulDatePicker
                   divClass="w-full"
                   value={secondDateValue as string}

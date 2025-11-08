@@ -69,7 +69,11 @@ export const AppointmentsCalendar: React.FC = () => {
   const events = useMemo(() => {
     return filteredAppointments.map((appointment) => ({
       id: appointment.id,
-      title: appointment.title,
+      title: appointment.title
+        ? appointment.title.length > 15
+          ? appointment.title.substring(0, 15) + "..."
+          : appointment.title
+        : "N/A",
       start: new Date(appointment.start_time),
       end: new Date(appointment.end_time),
       appointment: appointment,
@@ -127,7 +131,10 @@ export const AppointmentsCalendar: React.FC = () => {
           events={events}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: window.innerWidth > 768 ? 600 : 350 }}
+          style={{
+            height: window.innerWidth > 768 ? 600 : 350,
+            width: window.innerWidth > 540 ? "auto" : 310,
+          }}
           view={viewMode}
           onView={(newView) => setViewMode(newView as ViewMode)}
           date={currentDate}

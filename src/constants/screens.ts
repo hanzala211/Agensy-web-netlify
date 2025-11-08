@@ -5,6 +5,7 @@ export const SCREENS = {
   sm: "640px",
   // Tablet — from 768px up to 1023px
   md: "768px",
+  md2: "850px",
   // Desktop — from 1024px up to 1279px
   lg: "1024px",
   // Large desktop — from 1280px up to 1535px

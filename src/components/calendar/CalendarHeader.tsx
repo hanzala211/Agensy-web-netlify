@@ -49,7 +49,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           </button>
           <button
             onClick={() => onViewModeChange("week")}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-300 md:block hidden ${
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-300 ${
               viewMode === "week"
                 ? "bg-white text-primaryColor shadow-[0_0_8px_rgba(0,0,0,0.08)]"
                 : "text-gray-600 hover:text-primaryColor"

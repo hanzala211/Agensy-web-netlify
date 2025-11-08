@@ -40,8 +40,16 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
   );
 
   const handleCellClick = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    const target = e.target as HTMLElement;
+    const isBadgeClick =
+      target.closest(".custom-badge-container") ||
+      target.closest(".ant-badge") ||
+      target.closest('[class*="cursor-pointer"]');
+
+    if (!isBadgeClick) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   };
 
   const handleAppointmentClick = (
@@ -67,6 +75,7 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
         className={`custom-badge-container relative z-10 ${
           viewMode === "month" ? "flex flex-col md:gap-2" : "hidden"
         }`}
+        onClick={(e) => e.stopPropagation()}
       >
         {dayAppointments.map((appointment: Appointment, index: number) => (
           <AntdBadge
@@ -83,6 +92,10 @@ const DateCellWrapper: React.FC<DateCellProps> = ({
             text={
               viewMode === "month" && window.innerWidth > 1024
                 ? appointment.title
+                  ? appointment.title.length > 15
+                    ? appointment.title.substring(0, 15) + "..."
+                    : appointment.title
+                  : "N/A"
                 : ""
             }
             size="small"
@@ -144,7 +157,13 @@ const TimeSlotWrapper: React.FC<TimeSlotProps> = ({
             }
             size="small"
             className={`!cursor-pointer ${index === 0 ? "mt-1" : ""}`}
-            text={appointment.title}
+            text={
+              appointment.title
+                ? appointment.title.length > 15
+                  ? appointment.title.substring(0, 15) + "..."
+                  : appointment.title
+                : "N/A"
+            }
             onClick={(e: React.MouseEvent) =>
               handleAppointmentClick(appointment, e)
             }
@@ -174,6 +193,7 @@ export const createCalendarComponents = (
       {...(props as TimeSlotProps)}
       appointments={appointments}
       onAppointmentClick={onAppointmentClick}
+      viewMode={viewMode}
     />
   ),
   toolbar: () => null,

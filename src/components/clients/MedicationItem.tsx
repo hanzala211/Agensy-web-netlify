@@ -36,7 +36,7 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
   return (
     <BorderedCard>
       <div className="flex flex-col gap-4 lg:flex-row items-start justify-between">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center flex-wrap gap-3">
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-700">
               <ICONS.medicine size={20} />
@@ -118,7 +118,7 @@ export const MedicationItem: React.FC<MedicationItemProps> = ({
           )}
           {medication?.notes && (
             <div className="mt-3 pt-3 border-t border-gray-200">
-              <p className="text-sm break-words whitespace-pre-wrap italic text-gray-600">
+              <p className="text-sm break-words whitespace-pre-line italic text-gray-600">
                 {medication?.notes}
               </p>
             </div>

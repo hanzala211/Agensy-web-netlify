@@ -63,7 +63,7 @@ export const Modal: React.FC<ModalProps> = ({
           )}
           <button
             onClick={onClose}
-            className={`p-2 rounded-md hover:bg-gray-100 transition-colors ${
+            className={`md:p-2 p-0.5 rounded-md hover:bg-gray-100 transition-colors ${
               title ? "" : "bg-white"
             }`}
             aria-label="Close modal"

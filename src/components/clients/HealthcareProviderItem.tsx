@@ -32,7 +32,7 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
         <div className="text-blue-500 p-2.5 bg-blue-50 rounded-full border border-blue-100/50 shadow-sm">
           <ICONS.doctor size={22} />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
             <div>
               <div className="text-lg font-medium text-gray-800">
@@ -115,7 +115,7 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
 
             {provider?.notes && (
               <div className="mt-3 pt-3 border-t border-gray-200">
-                <p className="text-sm break-words whitespace-pre-wrap italic text-gray-700">
+                <p className="text-sm break-words whitespace-pre-line italic text-gray-700">
                   {provider?.notes}
                 </p>
               </div>

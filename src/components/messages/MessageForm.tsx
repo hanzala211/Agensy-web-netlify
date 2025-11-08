@@ -98,7 +98,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !uploadFileMutation.isPending) {
       e.preventDefault();
       handleSubmit(e);
     }

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { Appointment } from "@agensy/types";
 import dayjs from "dayjs";
 
@@ -19,6 +19,7 @@ export const useAppointmentManager = ({
   const [clientFilter, setClientFilter] = useState<string>("all");
   const [from, setFrom] = useState<string>("");
   const [to, setTo] = useState<string>("");
+  const [dateError, setDateError] = useState<string>("");
 
   const filteredAppointments = useMemo(() => {
     return appointments.filter((appointment) => {
@@ -108,6 +109,75 @@ export const useAppointmentManager = ({
     }
   };
 
+  const setFromWithValidation = (
+    value: string | ((prev: string) => string)
+  ) => {
+    const newFrom = typeof value === "function" ? value(from) : value;
+
+    if (!newFrom || newFrom === "") {
+      setFrom("");
+      setDateError("");
+      return;
+    }
+
+    const fromDate = dayjs(newFrom);
+
+    // Validate that the date is valid
+    if (!fromDate.isValid()) {
+      setDateError("Please enter a valid date");
+      return;
+    }
+
+    if (to) {
+      const toDate = dayjs(to);
+
+      if (fromDate.isAfter(toDate) || fromDate.isSame(toDate, "day")) {
+        setDateError(
+          "From date must be before To date and cannot be the same date"
+        );
+        return;
+      }
+    }
+
+    setFrom(newFrom);
+    setDateError("");
+  };
+
+  const setToWithValidation = (value: string | ((prev: string) => string)) => {
+    const newTo = typeof value === "function" ? value(to) : value;
+
+    if (!newTo || newTo === "") {
+      setTo("");
+      setDateError("");
+      return;
+    }
+
+    const toDate = dayjs(newTo);
+
+    if (!toDate.isValid()) {
+      setDateError("Please enter a valid date");
+      return;
+    }
+
+    if (from) {
+      const fromDate = dayjs(from);
+
+      if (toDate.isBefore(fromDate) || toDate.isSame(fromDate, "day")) {
+        setDateError(
+          "To date must be after From date and cannot be the same date"
+        );
+        return;
+      }
+    }
+
+    setTo(newTo);
+    setDateError("");
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [from, to, sortBy, clientFilter]);
+
   return {
     searchTerm,
     setSearchTerm,
@@ -125,8 +195,9 @@ export const useAppointmentManager = ({
     clientFilter,
     setClientFilter,
     from,
-    setFrom,
+    setFrom: setFromWithValidation,
     to,
-    setTo,
+    setTo: setToWithValidation,
+    dateError,
   };
 };

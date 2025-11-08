@@ -175,7 +175,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
           {appointment.post_appointment_notes && (
             <div className="flex items-center text-sm gap-2 text-gray-600">
               <span>
-                Post Appointment Notes: {appointment.post_appointment_notes}
+                Post Appointment Notes:{" "}
+                {truncateName(appointment.post_appointment_notes)}
               </span>
             </div>
           )}
