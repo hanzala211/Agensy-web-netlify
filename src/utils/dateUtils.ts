@@ -131,3 +131,11 @@ export const changeMonthYearToISO = (date: string) => {
     return null;
   }
 };
+
+export const convertISOToDateFormat = (isoDateString: string): string => {
+  if (!isoDateString) {
+    return "";
+  }
+  const date = dayjs.utc(isoDateString).local();
+  return date.format(`${DATE_FOMRAT} hh:mm A`);
+};

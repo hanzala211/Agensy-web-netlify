@@ -88,7 +88,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
                 label={label}
                 placeholder={searchPlaceholder}
                 value={searchValue}
-                onChange={(e) => setSearchValue?.(e.target.value.trim())}
+                onChange={(e) => setSearchValue?.(e.target.value.trimStart())}
                 iconSize={16}
                 iconColor={COLORS.darkGray}
               />

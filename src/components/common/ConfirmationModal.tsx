@@ -65,7 +65,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <div className="px-4 py-3 border-t border-gray-100 flex gap-2.5 justify-end">
           <SecondaryButton
             onClick={onCancel}
-            className="!min-h-[24px] !text-[13px] !px-6 !py-2 hover:!bg-gray-100 !w-auto !rounded-lg"
+            className="!min-h-[24px] !text-[13px] !px-6 !py-2 hover:!bg-gray-100 !w-auto !rounded-md"
             aria_label={cancelText}
           >
             {cancelText}
@@ -73,7 +73,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <PrimaryButton
             onClick={onOk}
             isLoading={isLoading}
-            className="!min-h-[24px] !text-[13px] !px-6 !py-2 !w-auto"
+            className="!min-h-[24px] !rounded-md !text-[13px] !px-6 !py-2 !w-auto"
             aria_label={okText}
           >
             {okText}

@@ -27,19 +27,19 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
     onDelete?.(provider as HealthcareProvider);
   };
   return (
-    <BorderedCard>
-      <div className="flex items-start gap-4">
-        <div className="text-blue-500 p-2.5 bg-blue-50 rounded-full border border-blue-100/50 shadow-sm">
-          <ICONS.doctor size={22} />
+    <BorderedCard className="!p-2.5">
+      <div className="flex items-start gap-2">
+        <div className="text-blue-500 p-2 bg-blue-50 rounded-full border border-blue-100/50 shadow-sm">
+          <ICONS.doctor size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-start mb-2">
+          <div className="flex justify-between items-start mb-1">
             <div>
-              <div className="text-lg font-medium text-gray-800">
+              <div className="text-base font-medium text-gray-800">
                 {provider?.provider_name}
               </div>
               {provider?.specialty && (
-                <div className="text-sm font-medium text-blue-700 mb-1">
+                <div className="text-xs font-medium text-blue-700 mb-1">
                   {StringUtils.capitalizeFirstLetter(provider?.provider_type)}{" "}
                   {provider?.provider_type && provider?.specialty && "-"}{" "}
                   {provider?.specialty}
@@ -59,14 +59,14 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
             </div>
           </div>
 
-          <div className="space-y-2 text-gray-700">
+          <div className="space-y-1 text-gray-700">
             {provider?.address && (
               <div className="flex items-center gap-2">
                 <ICONS.home
                   size={16}
                   className="text-gray-400 mt-1 flex-shrink-0"
                 />
-                <span className="text-sm">{provider?.address}</span>
+                <span className="text-xs">{provider?.address}</span>
               </div>
             )}
 
@@ -76,19 +76,19 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
                   size={16}
                   className="text-gray-400 flex-shrink-0"
                 />
-                <span className="text-sm">{provider?.phone}</span>
+                <span className="text-xs">{provider?.phone}</span>
               </div>
             )}
 
             {provider?.fax && (
               <div className="flex items-center gap-2">
                 <ICONS.fax size={16} className="text-gray-400 flex-shrink-0" />
-                <span className="text-sm">Fax: {provider?.fax}</span>
+                <span className="text-xs">Fax: {provider?.fax}</span>
               </div>
             )}
 
             <div
-              className={`flex flex-wrap gap-x-4 gap-y-1 mt-3 pt-3 ${
+              className={`flex flex-wrap gap-x-4 gap-y-1 mt-2 pt-2 ${
                 provider?.last_visit || provider?.next_visit
                   ? "border-t border-gray-100"
                   : ""
@@ -114,8 +114,8 @@ export const HealthcareProviderItem: React.FC<HealthcareProviderProps> = ({
             </div>
 
             {provider?.notes && (
-              <div className="mt-3 pt-3 border-t border-gray-200">
-                <p className="text-sm break-words whitespace-pre-line italic text-gray-700">
+              <div className="mt-2 pt-2 border-t border-gray-200 overflow-x-hidden">
+                <p className="text-xs break-words break-all whitespace-pre-line italic text-gray-700 max-w-full">
                   {provider?.notes}
                 </p>
               </div>

@@ -12,7 +12,7 @@ export const MedicalInfoCard: React.FC = () => {
       {selectedClient?.medical?.diagnoses ||
       selectedClient?.medical?.allergies ||
       selectedClient?.code_status ? (
-        <div className="flex flex-col gap-6">
+        <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
           {selectedClient?.medical?.diagnoses && (
             <ItemList
               label="Diagnosis"

@@ -96,7 +96,8 @@ export const AppHeader: React.FC = () => {
           icon: ICONS.fileIcon,
           label: "Documents",
           path: ROUTES.documents,
-          isActiveFn: (path: string) => path.includes(ROUTES.documents),
+          isActiveFn: (path: string) =>
+            path.includes(ROUTES.documents) && !path.includes(ROUTES.clients),
         },
         {
           id: "appointments",

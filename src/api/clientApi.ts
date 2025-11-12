@@ -15,6 +15,29 @@ export const useGetClientsQuery = () => {
   });
 };
 
+export const useGetClientsWithFiltersQuery = (params?: {
+  status?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+}) => {
+  return useQuery({
+    queryKey: [
+      "clients",
+      "filtered",
+      params?.status,
+      params?.sortBy,
+      params?.sortOrder,
+      params?.page,
+      params?.limit,
+      params?.search,
+    ],
+    queryFn: async () => await ClientService.getClientsWithFilters(params),
+  });
+};
+
 export const useGetSingleClientQuery = (id: string) => {
   return useQuery({
     queryKey: ["client", id],

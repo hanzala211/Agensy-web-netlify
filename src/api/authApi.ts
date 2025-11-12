@@ -26,7 +26,7 @@ export const useSignInMutation = () => {
   return useMutation({
     mutationFn: async (data: Record<string, string>) => {
       const response = await CognitoUtils.signin(
-        data.email_address,
+        data.email_address?.toLowerCase(),
         data.password
       );
       if (response) {

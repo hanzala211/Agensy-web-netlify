@@ -14,8 +14,8 @@ export const InfoItem: React.FC<InfoItemProps> = ({
 }) => {
   return (
     <div className={`group flex flex-col ${className}`}>
-      {label && <H3 className="mb-2 font-bold text-[17px]">{label}</H3>}
-      <BorderedCard>{children}</BorderedCard>
+      {label && <H3 className="mb-1 font-bold text-sm">{label}</H3>}
+      <BorderedCard className="!p-2.5">{children}</BorderedCard>
     </div>
   );
 };

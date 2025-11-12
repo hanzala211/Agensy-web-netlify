@@ -170,6 +170,7 @@ export const HealthCareProviderCard: React.FC = () => {
   return (
     <React.Fragment>
       <Card
+        childrenClasses="!p-2"
         title="Healthcare Providers"
         buttonText={<ICONS.plus size={16} />}
         onButtonClick={() => setIsHealthCareModalOpen(true)}
@@ -179,7 +180,7 @@ export const HealthCareProviderCard: React.FC = () => {
           APP_ACTIONS.EditClientMedicalInfo
         )}
       >
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-1">
           {selectedClient?.healthcareProviders &&
           selectedClient?.healthcareProviders?.length > 0 ? (
             selectedClient?.healthcareProviders?.map((provider) => (

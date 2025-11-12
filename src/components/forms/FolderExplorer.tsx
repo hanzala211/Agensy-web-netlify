@@ -688,7 +688,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
         </span>
         {item.children && item.children.length > 0 && (
           <span className="text-xs text-gray-600 mt-1 font-medium">
-            {item.children.length} items
+            {item.children.length} {item.children.length > 1 ? "items" : "item"}
           </span>
         )}
       </div>
@@ -856,7 +856,7 @@ export const FolderExplorer: React.FC<FolderExplorerProps> = ({
                 <React.Fragment key={index}>
                   <span className="text-gray-400 flex-shrink-0">{">"}</span>
                   <span
-                    className="hover:text-blue-600 cursor-pointer transition-all duration-300 break-words max-w-[120px] sm:max-w-[150px] truncate font-medium"
+                    className={`${index === currentPath.length - 1 ? "" : "hover:text-blue-600 cursor-pointer"} transition-all duration-300 break-words max-w-[120px] sm:max-w-[150px] truncate font-medium`}
                     onClick={() => onPathClick?.(index)}
                     title={pathSegment}
                   >

@@ -68,7 +68,7 @@ export const PersonalInfoCard: React.FC = () => {
           APP_ACTIONS.EditClientBasicInfo
         )}
       >
-        <div className="space-y-6">
+        <div className="space-y-3 grid md:grid-cols-2 grid-cols-1 gap-3">
           {selectedClient?.address && (
             <InfoItem label="Address:">
               <p className="truncate">

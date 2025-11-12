@@ -29,7 +29,7 @@ export const ContactItem: React.FC<ContactItemProps> = ({
     >
       <div className="flex flex-col">
         <BorderedCard
-          className={`flex justify-between md:items-center ${
+          className={`flex !p-2.5 justify-between md:items-center ${
             type === "primary"
               ? ""
               : type === "secondary"

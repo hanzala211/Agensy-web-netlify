@@ -653,7 +653,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
       phone: provider.phone || "",
       notes: provider.notes || "",
       follow_up: provider.follow_up
-        ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
+        ? DateUtils.convertISOToDateFormat(provider.follow_up)
         : "",
       specialty: provider.specialty || "",
       providerType: provider.provider_type || "",
@@ -670,7 +670,7 @@ export const MedicalAppointmentTemplate: React.FC = () => {
         phone: provider.phone || "",
         notes: provider.notes || "",
         follow_up: provider.follow_up
-          ? DateUtils.formatDateToRequiredFormat(provider.follow_up)
+          ? DateUtils.convertISOToDateFormat(provider.follow_up)
           : "",
         specialty: provider.specialty || "",
         providerType: provider.provider_type || "",

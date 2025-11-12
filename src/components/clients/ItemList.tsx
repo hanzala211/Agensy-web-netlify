@@ -16,12 +16,14 @@ export const ItemList: React.FC<ItemListProps> = ({
     <React.Fragment>
       {items?.length > 0 && (
         <div className={`group flex flex-col ${className}`}>
-          <H3 className="mb-2 font-bold text-[17px]">{label}</H3>
-          <ul className={`space-y-1.5`}>
+          <H3 className="mb-0.5 font-bold text-[17px]">{label}</H3>
+          <ul className={`space-y-1.5 list-disc list-outside ml-5`}>
             {items?.map((item, index) => (
-              <BorderedCard key={index}>
-                <span className="font-medium">{item}</span>
-              </BorderedCard>
+              <li key={index}>
+                <BorderedCard className="!py-1.5 !px-2">
+                  <span className="font-medium">{item}</span>
+                </BorderedCard>
+              </li>
             ))}
           </ul>
         </div>

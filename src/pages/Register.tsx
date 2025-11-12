@@ -41,7 +41,7 @@ export const Register: React.FC = () => {
 
   const onSubmit: SubmitHandler<SignUpSchema> = async (e) => {
     const data = {
-      email: e.email_address,
+      email: e.email_address?.toLowerCase(),
       first_name: e.first_name,
       last_name: e.last_name,
       password: e.password,

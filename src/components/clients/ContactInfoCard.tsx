@@ -139,7 +139,7 @@ export const ContactInfoCard: React.FC = () => {
           APP_ACTIONS.ClientContactAccess
         )}
       >
-        <div className="space-y-6">
+        <div className="space-y-3">
           {selectedClient?.contacts && selectedClient?.contacts.length > 0 ? (
             selectedClient?.contacts
               .sort((a, b) => {

@@ -119,6 +119,7 @@ export const MedicationCard: React.FC = () => {
   return (
     <React.Fragment>
       <Card
+        childrenClasses="!p-2"
         title="Medications"
         buttonText={<ICONS.plus size={16} />}
         ariaLabel="Add New Medication"
@@ -128,7 +129,7 @@ export const MedicationCard: React.FC = () => {
           APP_ACTIONS.EditClientMedicalInfo
         )}
       >
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-1">
           {selectedClient?.medications?.map((medication: ClientMedications) => (
             <MedicationItem
               key={medication.id}
