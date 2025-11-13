@@ -27,7 +27,7 @@ export const HealthCareProviderCard: React.FC = () => {
   const { handleFilterPermission } = useAuthContext();
   const addHealthCareProviderMutation = useAddHealthCareMutation();
   const updateHealthCareProviderMutation = useUpdateHealthCareMutation();
-  const deleteHealthCareProviderMutation = useDeleteHealthCareMutation();
+  const deleteHealthCareProviderMutation = useDeleteHealthCareMutation(); //
   const {
     selectedClient,
     addClientHealthCareProvider,
