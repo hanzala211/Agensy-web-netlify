@@ -162,18 +162,40 @@ export const AppHeader: React.FC = () => {
 
           {/* Page Title with Back Button - Starts after sidebar on desktop */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0 flex-1 lg:pl-20">
-            {headerConfig.showBackButton && (
-              <button
-                onClick={handleBackClick}
-                title="Back"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 focus:outline-none"
-              >
-                <ICONS.leftArrow size={18} className="text-gray-600" />
-              </button>
+            {/* Chat page header for small screens (< 640px) */}
+            {headerConfig.chatPageBackLink && (
+              <div className="flex items-center gap-1.5 sm:hidden min-w-0 flex-1">
+                <a
+                  href={headerConfig.chatPageBackLink}
+                  title="Back"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 focus:outline-none flex-shrink-0"
+                >
+                  <ICONS.leftArrow size={18} className="text-gray-600" />
+                </a>
+                <h1 className="text-sm font-bold text-darkGray truncate leading-tight">
+                  {headerConfig.title || pageTitle}
+                </h1>
+              </div>
             )}
-            <h1 className="text-sm sm:text-md md:text-base lg:text-xl xl:text-2xl font-bold text-darkGray truncate leading-tight">
-              {pageTitle}
-            </h1>
+            {/* Regular header for larger screens (>= 640px) or non-chat pages */}
+            <div
+              className={`${
+                headerConfig.chatPageBackLink ? "hidden sm:flex" : "flex"
+              } items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0 flex-1`}
+            >
+              {headerConfig.showBackButton && (
+                <button
+                  onClick={handleBackClick}
+                  title="Back"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-300 focus:outline-none"
+                >
+                  <ICONS.leftArrow size={18} className="text-gray-600" />
+                </button>
+              )}
+              <h1 className="text-sm sm:text-md md:text-base lg:text-xl xl:text-2xl font-bold text-darkGray truncate leading-tight">
+                {pageTitle}
+              </h1>
+            </div>
           </div>
         </div>
 

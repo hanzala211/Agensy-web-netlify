@@ -6,7 +6,11 @@ import {
   MessageList,
 } from "@agensy/components";
 import { ICONS, ROUTES, ROLES } from "@agensy/constants";
-import { useAuthContext, useMessagesContext } from "@agensy/context";
+import {
+  useAuthContext,
+  useMessagesContext,
+  useHeaderContext,
+} from "@agensy/context";
 import type {
   Client,
   IUser,
@@ -54,6 +58,7 @@ export const ChatPage: React.FC = () => {
     leaveThread,
     deleteThread,
   } = useMessagesContext();
+  const { setHeaderConfig, resetHeaderConfig } = useHeaderContext();
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -75,28 +80,29 @@ export const ChatPage: React.FC = () => {
     setCachedThreadType(null);
   };
 
-  const formatGroupParticipantNames = (
-    thread: Thread | PendingThreadData
-  ): string => {
-    if (!thread.participants) return "Group Chat";
+  const formatGroupParticipantNames = useCallback(
+    (thread: Thread | PendingThreadData): string => {
+      if (!thread.participants) return "Group Chat";
 
-    const participantNames = thread.participants
-      .filter((participant) => {
-        const isCurrentUser = participant.id === userData?.id;
-        const isLeftParticipant =
-          "left_participants_ids" in thread &&
-          thread.left_participants_ids?.includes(participant.id as string);
-        return !isCurrentUser && !isLeftParticipant;
-      })
-      .map((participant) => participant.first_name)
-      .join(", ")
-      .concat(", You");
+      const participantNames = thread.participants
+        .filter((participant) => {
+          const isCurrentUser = participant.id === userData?.id;
+          const isLeftParticipant =
+            "left_participants_ids" in thread &&
+            thread.left_participants_ids?.includes(participant.id as string);
+          return !isCurrentUser && !isLeftParticipant;
+        })
+        .map((participant) => participant.first_name)
+        .join(", ")
+        .concat(", You");
 
-    if (participantNames && participantNames.length > 15) {
-      return participantNames.substring(0, 15) + "...";
-    }
-    return participantNames || "Group Chat";
-  };
+      if (participantNames && participantNames.length > 15) {
+        return participantNames.substring(0, 15) + "...";
+      }
+      return participantNames || "Group Chat";
+    },
+    [userData?.id]
+  );
 
   const processThreadForUser = useCallback(
     (thread: Thread | PendingThreadData): IUser | null => {
@@ -163,7 +169,7 @@ export const ChatPage: React.FC = () => {
     cachedThreadType,
   ]);
 
-  const getThreadDisplayName = () => {
+  const getThreadDisplayName = useCallback(() => {
     const currentThread = selectedThread || pendingThreadData;
     let displayName: string;
 
@@ -206,7 +212,16 @@ export const ChatPage: React.FC = () => {
     return displayName && displayName.length > 15
       ? displayName.substring(0, 15) + "..."
       : displayName;
-  };
+  }, [
+    selectedThread,
+    pendingThreadData,
+    cachedThreadType,
+    cachedBroadcastName,
+    cachedUser,
+    cachedGroupName,
+    selectedUser,
+    formatGroupParticipantNames,
+  ]);
 
   const selectedClient = useMemo(() => {
     const currentThread = selectedThread || pendingThreadData;
@@ -390,8 +405,37 @@ export const ChatPage: React.FC = () => {
   useEffect(() => {
     return () => {
       clearCachedData();
+      resetHeaderConfig();
     };
   }, []);
+
+  // Update header config for small screens
+  useEffect(() => {
+    const displayName = getThreadDisplayName();
+    const backLink = params.clientId
+      ? `/${ROUTES.clients}/${params.clientId}/${ROUTES.clientMessages}`
+      : ROUTES.messages;
+
+    if (displayName) {
+      if (window.innerWidth < 640) {
+        setHeaderConfig({
+          title: displayName,
+          chatPageBackLink: backLink,
+          showBackButton: false, // We'll handle back button separately in AppHeader
+        });
+      }
+    }
+
+    return () => {
+      resetHeaderConfig();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    params.clientId,
+    params.threadId,
+    selectedThread?.id,
+    pendingThreadData?.id,
+  ]);
 
   const renderTypingIndicator = () => {
     const currentThreadId = selectedThread?.id || pendingThreadData?.id;

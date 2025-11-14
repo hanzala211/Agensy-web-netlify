@@ -243,7 +243,7 @@ export const MessageList: React.FC<MessageListProps> = ({ currentUserId }) => {
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="flex flex-col gap-3 pl-5 pr-1 sm:gap-4 sm:p-4 py-1">
+      <div className="flex flex-col gap-3 pl-5 pr-1 sm:gap-4 sm:p-4 py-3">
         {sortedDates.map((date) => (
           <React.Fragment key={date}>
             <div className="flex justify-center">

@@ -13,6 +13,7 @@ interface HeaderConfig {
   showBackButton?: boolean;
   disabled?: boolean;
   title?: string; // Optional override for title
+  chatPageBackLink?: string; // Back link for chat page (uses anchor tag to reload app)
 }
 
 interface HeaderContextType {
