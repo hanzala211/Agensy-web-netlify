@@ -8,11 +8,15 @@ import {
   TabLink,
 } from "@agensy/components";
 import { ROUTES } from "@agensy/constants";
-import { useAppointmentsContext, useHeaderContext } from "@agensy/context";
-import type { AppointmentFormData } from "@agensy/types";
+import {
+  useAppointmentsContext,
+  useClientContext,
+  useHeaderContext,
+} from "@agensy/context";
+import type { Appointment, AppointmentFormData } from "@agensy/types";
 import { DateUtils, toast } from "@agensy/utils";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Outlet } from "react-router-dom";
 
 export const AppointmentsManager: React.FC = () => {
@@ -29,6 +33,18 @@ export const AppointmentsManager: React.FC = () => {
     isLoading: isLoadingAppointments,
     refetch: loadAppointments,
   } = useGetClientAppointmentQuery();
+  const { selectedClientId } = useClientContext();
+
+  const filteredAppointments = useMemo(() => {
+    if (!appointments) return [];
+    if (selectedClientId) {
+      return appointments.filter(
+        (appointment: Appointment) =>
+          appointment.client_id?.toString() === selectedClientId
+      );
+    }
+    return appointments;
+  }, [appointments, selectedClientId]);
 
   useEffect(() => {
     setHeaderConfig({
@@ -42,10 +58,10 @@ export const AppointmentsManager: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (appointments) {
-      setAppointments(appointments);
+    if (filteredAppointments) {
+      setAppointments(filteredAppointments);
     }
-  }, [appointments]);
+  }, [filteredAppointments]);
 
   useEffect(() => {
     if (addClientAppointmentMutation.status === "success") {

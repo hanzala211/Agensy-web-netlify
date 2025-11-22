@@ -46,6 +46,8 @@ export interface AuthContextType {
 export interface ClientContextType {
   selectedClient: Client | null;
   setSelectedClient: React.Dispatch<React.SetStateAction<Client | null>>;
+  selectedClientId: string | null;
+  setSelectedClientId: React.Dispatch<React.SetStateAction<string | null>>;
   addClientContact: (contact: ClientContact) => void;
   updateClientContact: (contact: ClientContact) => void;
   deleteClientContact: (contactId: string) => void;

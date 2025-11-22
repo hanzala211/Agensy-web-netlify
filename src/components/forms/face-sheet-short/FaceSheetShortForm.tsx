@@ -414,6 +414,7 @@ export const FaceSheetShortForm: React.FC = () => {
             ? DateUtils.changetoISO(item.nextVisit)
             : null,
           id: item.id,
+          fax: item.fax ? item.fax : null,
         };
         if (provider.provider_type?.length === 0) {
           delete provider.provider_type;

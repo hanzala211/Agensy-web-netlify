@@ -3,6 +3,7 @@ import { useLocation, useNavigate, type To } from "react-router-dom";
 import { ROUTES, ICONS, IMAGES } from "@agensy/constants";
 import { PrimaryButton, SecondaryButton } from "@agensy/components";
 import { NavItem } from "./NavItem";
+import { ClientSelector } from "./ClientSelector";
 import {
   useHeaderContext,
   useAuthContext,
@@ -197,6 +198,11 @@ export const AppHeader: React.FC = () => {
               </h1>
             </div>
           </div>
+        </div>
+
+        {/* Client Selector */}
+        <div className="flex items-center flex-shrink-0 mr-3">
+          <ClientSelector />
         </div>
 
         {/* Right Section: Buttons + Profile */}

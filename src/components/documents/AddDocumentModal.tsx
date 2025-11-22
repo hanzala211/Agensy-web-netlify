@@ -18,7 +18,7 @@ import {
   SUBSCRIPTION_STATUSES,
 } from "@agensy/constants";
 import { isHeicImage, convertHeicToJpeg } from "../../utils/heicUtils";
-import { useAuthContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 
 interface AddDocumentModalProps {
   isOpen: boolean;
@@ -41,7 +41,8 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   analyzedDocRes,
   showPrimaryUser = false,
 }) => {
-  const { accessUsers, userData } = useAuthContext();
+  const { accessUsers, userData, clients: authClients } = useAuthContext();
+  const { selectedClientId } = useClientContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | undefined>(undefined);
@@ -311,6 +312,32 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
   }, [fileType]);
 
   const primaryUsers = useMemo(() => {
+    if (selectedClientId && authClients) {
+      const selectedClient = authClients.find(
+        (client) => client?.id?.toString() === selectedClientId
+      );
+
+      if (selectedClient?.primary_user_id) {
+        const allUsers = userData ? [userData, ...accessUsers] : accessUsers;
+        const clientPrimaryUser = allUsers.find(
+          (user: IUser) =>
+            user.id?.toString() === selectedClient.primary_user_id
+        );
+
+        if (
+          clientPrimaryUser &&
+          (clientPrimaryUser.UserRoles || clientPrimaryUser.Roles)?.some(
+            (role) => role.role === ROLES.PRIMARY_USER
+          ) &&
+          clientPrimaryUser.subscription_status === SUBSCRIPTION_STATUSES.ACTIVE
+        ) {
+          return [clientPrimaryUser];
+        }
+        return [];
+      }
+    }
+
+    // Default behavior: show all primary users with active subscriptions
     const filteredUsers = accessUsers.filter((user: IUser) => {
       return (user.UserRoles || user.Roles)?.some(
         (role) => role.role === ROLES.PRIMARY_USER
@@ -330,7 +357,7 @@ export const AddDocumentModal: React.FC<AddDocumentModalProps> = ({
     }
 
     return subscribedUsers;
-  }, [accessUsers, userData]);
+  }, [accessUsers, userData, selectedClientId, authClients]);
 
   const renderFilePreview = () => {
     if (!filePreview) return null;

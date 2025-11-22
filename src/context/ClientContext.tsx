@@ -13,7 +13,7 @@ import type {
   OpenedFileData,
 } from "@agensy/types";
 import { toast } from "@agensy/utils";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuthContext } from "./AuthContext";
 
 const ClientContext = createContext<ClientContextType | undefined>(undefined);
@@ -21,6 +21,15 @@ const ClientContext = createContext<ClientContextType | undefined>(undefined);
 export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
   const { userData } = useAuthContext();
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(
+    () => {
+      if (typeof window !== "undefined") {
+        const storedClientId = localStorage.getItem("selectedClientId");
+        return storedClientId || null;
+      }
+      return null;
+    }
+  );
   const [openedFileData, setOpenedFileData] = useState<OpenedFileData | null>(
     null
   );
@@ -212,6 +221,15 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
       };
     });
   };
+
+  useEffect(() => {
+    if (selectedClientId) {
+      localStorage.setItem("selectedClientId", selectedClientId);
+    } else {
+      localStorage.removeItem("selectedClientId");
+    }
+  }, [selectedClientId]);
+
   const handleDownload = async (doc: Document) => {
     try {
       toast.info("Processing Document...");
@@ -244,6 +262,8 @@ export const ClientProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         selectedClient,
         setSelectedClient,
+        selectedClientId,
+        setSelectedClientId,
         addClientContact,
         updateClientContact,
         deleteClientContact,

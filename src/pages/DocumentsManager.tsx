@@ -13,13 +13,17 @@ import {
   SearchFilterBar,
 } from "@agensy/components";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   useDeleteDocumentMutation,
   useDeleteGeneralDocumentMutation,
   useGetGeneralDocumentsQuery,
 } from "@agensy/api";
-import { useAuthContext, useDocumentContext } from "@agensy/context";
+import {
+  useAuthContext,
+  useClientContext,
+  useDocumentContext,
+} from "@agensy/context";
 import { toast } from "@agensy/utils";
 import { useNavigate } from "react-router-dom";
 import { useDocumentManager } from "@agensy/hooks";
@@ -35,8 +39,20 @@ export const DocumentsManager: React.FC = () => {
     isLoading: isLoadingGeneralDocuments,
   } = useGetGeneralDocumentsQuery();
   const { setIsAddDocumentModalOpen } = useDocumentContext();
+  const { selectedClientId } = useClientContext();
   const deleteDocumentMutation = useDeleteGeneralDocumentMutation();
   const deleteClientDocumentMutation = useDeleteDocumentMutation();
+
+  const filteredDocuments = useMemo(() => {
+    if (!generalDocuments) return [];
+    if (selectedClientId) {
+      return generalDocuments.filter(
+        (doc: Document) => doc.client_id?.toString() === selectedClientId
+      );
+    }
+    return generalDocuments;
+  }, [generalDocuments, selectedClientId]);
+
   const {
     totalPages,
     paginatedDocuments,
@@ -52,7 +68,7 @@ export const DocumentsManager: React.FC = () => {
     setUploadType,
     handleDeleteMoveToLastPage,
   } = useDocumentManager({
-    documents: generalDocuments || [],
+    documents: filteredDocuments,
     initialItemsPerPage: itemsPerPage,
   });
   const navigate = useNavigate();
@@ -95,7 +111,7 @@ export const DocumentsManager: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterBy, sortBy]);
+  }, [searchTerm, filterBy, sortBy, selectedClientId]);
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -176,14 +192,16 @@ export const DocumentsManager: React.FC = () => {
             />
           ))
         )}
-        {paginatedDocuments && paginatedDocuments.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPrevPage={handlePrevPage}
-            onNextPage={handleNextPage}
-          />
-        )}
+        {!selectedClientId &&
+          paginatedDocuments &&
+          paginatedDocuments.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPrevPage={handlePrevPage}
+              onNextPage={handleNextPage}
+            />
+          )}
       </div>
     </div>
   );

@@ -68,19 +68,37 @@ export const Clients: React.FC = () => {
   const clientsQuery = useGetClientsWithFiltersQuery(queryParams);
 
   const clientsData = clientsQuery.data;
-  const clients = clientsData?.data || [];
+  const queryClients = useMemo(
+    () => clientsData?.data || [],
+    [clientsData?.data]
+  );
   const pagination = clientsData?.pagination;
+  const isLoading = clientsQuery.isLoading;
+  const error = clientsQuery.error;
+
+  const addClientMutation = useAddClientMutation();
+  const { setSelectedClient, selectedClientId } = useClientContext();
+  const {
+    isPrimaryUserSubscriptionActive,
+    userData,
+    clients: authClients,
+  } = useAuthContext();
+
+  const clients = useMemo(() => {
+    if (selectedClientId && authClients) {
+      const foundClient = authClients.find(
+        (client: Client) => client?.id?.toString() === selectedClientId
+      );
+      return foundClient ? [foundClient] : [];
+    }
+    return queryClients;
+  }, [selectedClientId, authClients, queryClients]);
+
   useEffect(() => {
     if (pagination && pagination?.totalPages > 0) {
       setTotalPages(pagination?.totalPages || 0);
     }
   }, [pagination?.totalPages]);
-  const isLoading = clientsQuery.isLoading;
-  const error = clientsQuery.error;
-
-  const addClientMutation = useAddClientMutation();
-  const { setSelectedClient } = useClientContext();
-  const { isPrimaryUserSubscriptionActive, userData } = useAuthContext();
   const [isAddClientModalOpen, setIsAddClientModalOpen] =
     useState<boolean>(false);
   const navigate = useNavigate();
@@ -265,12 +283,14 @@ export const Clients: React.FC = () => {
         )}
       </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPrevPage={handlePrevPage}
-        onNextPage={handleNextPage}
-      />
+      {!selectedClientId && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrevPage={handlePrevPage}
+          onNextPage={handleNextPage}
+        />
+      )}
       <AddClientModal
         isOpen={isAddClientModalOpen}
         setIsOpen={setIsAddClientModalOpen}

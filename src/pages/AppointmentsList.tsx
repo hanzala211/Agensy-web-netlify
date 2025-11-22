@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   AddAppointmentModal,
   AppointmentCard,
@@ -14,11 +14,16 @@ import {
 } from "@agensy/constants";
 import type { Appointment, Client } from "@agensy/types";
 import { useAppointmentManager, useCalendarState } from "@agensy/hooks";
-import { useAppointmentsContext, useAuthContext } from "@agensy/context";
+import {
+  useAppointmentsContext,
+  useAuthContext,
+  useClientContext,
+} from "@agensy/context";
 
 export const AppointmentsList: React.FC = () => {
   const { appointments, setIsAddAppointmentModalOpen } =
     useAppointmentsContext();
+  const { selectedClientId } = useClientContext();
   const {
     handleDelete,
     handleEdit,
@@ -31,6 +36,18 @@ export const AppointmentsList: React.FC = () => {
     editClientAppointmentMutation,
   } = useCalendarState(appointments as Appointment[]);
   const { clients, handleFilterPermission } = useAuthContext();
+
+  const filteredAppointments = useMemo(() => {
+    if (!appointments) return [];
+    if (selectedClientId) {
+      return appointments.filter(
+        (appointment: Appointment) =>
+          appointment.client_id?.toString() === selectedClientId
+      );
+    }
+    return appointments;
+  }, [appointments, selectedClientId]);
+
   const {
     searchTerm,
     setSearchTerm,
@@ -52,7 +69,7 @@ export const AppointmentsList: React.FC = () => {
     handleDeleteMoveToLastPage,
     dateError,
   } = useAppointmentManager({
-    appointments: appointments as Appointment[],
+    appointments: filteredAppointments as Appointment[],
     initialItemsPerPage: 4,
   });
 
@@ -128,7 +145,7 @@ export const AppointmentsList: React.FC = () => {
         )}
       </div>
 
-      {paginatedAppointments.length > 0 && (
+      {!selectedClientId && paginatedAppointments.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

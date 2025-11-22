@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { AddThreadFormData, IUser, Thread } from "@agensy/types";
 import {
   AddThreadModal,
@@ -8,6 +8,7 @@ import {
 import { ICONS, ROUTES } from "@agensy/constants";
 import {
   useAuthContext,
+  useClientContext,
   useHeaderContext,
   useMessagesContext,
 } from "@agensy/context";
@@ -17,7 +18,8 @@ import { v4 as uuidv4 } from "uuid";
 export const Messages: React.FC = () => {
   const params = useParams();
   const { setHeaderConfig } = useHeaderContext();
-  const { userData, accessUsers } = useAuthContext();
+  const { userData, accessUsers, clients: authClients } = useAuthContext();
+  const { selectedClientId } = useClientContext();
   const {
     showThreadList,
     setShowThreadList,
@@ -115,6 +117,47 @@ export const Messages: React.FC = () => {
     navigate(`${ROUTES.messages}/${thread.id}`);
   };
 
+  // Filter threads by selectedClientId if present
+  const filteredThreads = useMemo(() => {
+    if (!selectedClientId || !authClients) {
+      return threads;
+    }
+
+    const selectedClient = authClients.find(
+      (client) => client?.id?.toString() === selectedClientId
+    );
+
+    if (!selectedClient) {
+      return threads;
+    }
+
+    // Get user IDs from the selected client's Users array
+    const clientUserIds =
+      selectedClient.Users?.map((user) => user.id?.toString()) || [];
+
+    return threads.filter((thread: Thread) => {
+      // Show client-specific threads for the selected client
+      if (thread.client_id?.toString() === selectedClientId) {
+        return true;
+      }
+
+      // Show general threads where any participant is in the selected client's users
+      if (!thread.client_id && thread.type !== "broadcast") {
+        const hasClientUser = thread.participants_ids?.some((participantId) =>
+          clientUserIds.includes(participantId?.toString())
+        );
+        return hasClientUser;
+      }
+
+      // Show broadcast threads (they're visible to everyone)
+      if (thread.type === "broadcast") {
+        return true;
+      }
+
+      return false;
+    });
+  }, [threads, selectedClientId, authClients]);
+
   return (
     <React.Fragment>
       <div className="h-[calc(100vh-72px)] flex flex-col bg-gray-50">
@@ -132,7 +175,7 @@ export const Messages: React.FC = () => {
               selectedThreadId={params.threadId}
               onAddThread={() => setIsAddThreadModalOpen(true)}
               className="pt-[calc(60px+1.25rem)]"
-              threads={threads}
+              threads={filteredThreads}
               onThreadClick={handleThreadClick}
               showHeader={false}
             />

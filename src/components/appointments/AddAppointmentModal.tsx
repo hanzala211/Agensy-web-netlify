@@ -22,7 +22,7 @@ import {
   ROLES,
   SUBSCRIPTION_STATUSES,
 } from "@agensy/constants";
-import { useAuthContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
 import { DateUtils } from "@agensy/utils";
 
 interface AddAppointmentModalProps {
@@ -43,6 +43,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   const { handleFilterPermission } = useAuthContext();
   const inputRef = useRef<HTMLInputElement>(null);
   const { clients } = useAuthContext();
+  const { selectedClientId: contextSelectedClientId } = useClientContext();
 
   const {
     register,
@@ -61,7 +62,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
       start_time: "",
       end_time: "",
       notes: "",
-      clientId: "",
+      clientId: contextSelectedClientId || "",
       healthcare_provider_id: "",
     },
   });
@@ -78,7 +79,15 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     if (!clients) {
       return [];
     }
-    return clients
+
+    let filteredClients = clients;
+    if (contextSelectedClientId) {
+      filteredClients = clients.filter(
+        (client: Client) => client.id?.toString() === contextSelectedClientId
+      );
+    }
+
+    return filteredClients
       .filter(
         (item) =>
           item.Users.find((user) => user.UserRoles.role === ROLES.PRIMARY_USER)
@@ -125,12 +134,12 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
           start_time: "",
           end_time: "",
           notes: "",
-          clientId: "",
+          clientId: contextSelectedClientId || "",
           healthcare_provider_id: "",
         });
       }, 300);
     }
-  }, [isOpen, reset]);
+  }, [isOpen, contextSelectedClientId]);
 
   useEffect(() => {
     if (editData) {
@@ -148,8 +157,10 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         clientId: editData.client_id || "",
         healthcare_provider_id: editData.healthcare_provider_id || "",
       });
+    } else if (isOpen && contextSelectedClientId) {
+      setValue("clientId", contextSelectedClientId);
     }
-  }, [editData, reset]);
+  }, [editData, isOpen, contextSelectedClientId]);
 
   const handleClose = () => {
     reset();

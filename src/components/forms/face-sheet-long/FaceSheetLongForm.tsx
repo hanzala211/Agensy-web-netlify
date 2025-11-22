@@ -298,7 +298,7 @@ export const FaceSheetLongForm: React.FC = () => {
         city: faceSheetLongData?.client_info?.city || "",
         state: faceSheetLongData?.client_info?.state || "",
         zip: faceSheetLongData?.client_info?.zip || "",
-        phoneNumber: faceSheetLongData?.client_info?.phone || "",
+        phone: faceSheetLongData?.client_info?.phone || "",
         preferredName: faceSheetLongData?.client_info?.preferred_name || "",
         dateOfBirth: DateUtils.formatDateToRequiredFormat(
           faceSheetLongData?.client_info?.date_of_birth || ""
@@ -620,6 +620,7 @@ export const FaceSheetLongForm: React.FC = () => {
             ? DateUtils.changetoISO(item.nextVisit)
             : null,
           id: item.id,
+          fax: item.fax ? item.fax : null,
         };
         if (provider.provider_type?.length === 0) {
           delete provider.provider_type;

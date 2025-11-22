@@ -8,7 +8,7 @@ import {
   createCalendarComponents,
   AppointmentDetailsModal,
 } from "@agensy/components";
-import { useAppointmentsContext } from "@agensy/context";
+import { useAppointmentsContext, useClientContext } from "@agensy/context";
 import { enUS } from "date-fns/locale";
 import { useCalendarState } from "@agensy/hooks";
 import { CalendarUtils } from "@agensy/utils";
@@ -27,6 +27,7 @@ const localizer = dateFnsLocalizer({
 export const AppointmentsCalendar: React.FC = () => {
   const { appointments, setIsAddAppointmentModalOpen } =
     useAppointmentsContext();
+  const { selectedClientId } = useClientContext();
 
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
@@ -45,26 +46,36 @@ export const AppointmentsCalendar: React.FC = () => {
     setTypeFilter,
   } = useCalendarState(appointments);
 
+  const clientFilteredAppointments = useMemo(() => {
+    if (!appointments) return [];
+    if (selectedClientId) {
+      return appointments.filter(
+        (appointment) => appointment.client_id?.toString() === selectedClientId
+      );
+    }
+    return appointments;
+  }, [appointments, selectedClientId]);
+
   const filteredAppointments = useMemo(() => {
     if (clientFilter === "all" && typeFilter === "all") {
-      return appointments;
+      return clientFilteredAppointments;
     }
     if (clientFilter === "all") {
-      return appointments.filter(
+      return clientFilteredAppointments.filter(
         (appointment) => appointment.appointment_type === typeFilter
       );
     }
     if (typeFilter === "all") {
-      return appointments.filter(
+      return clientFilteredAppointments.filter(
         (appointment) => appointment.client_id === clientFilter
       );
     }
-    return appointments.filter(
+    return clientFilteredAppointments.filter(
       (appointment) =>
         appointment.client_id === clientFilter &&
         appointment.appointment_type === typeFilter
     );
-  }, [appointments, clientFilter, typeFilter]);
+  }, [clientFilteredAppointments, clientFilter, typeFilter]);
 
   const events = useMemo(() => {
     return filteredAppointments.map((appointment) => ({
