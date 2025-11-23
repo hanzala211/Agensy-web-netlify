@@ -10,6 +10,7 @@ import {
   useActivityFeedContext,
   useClientContext,
   useSocketContext,
+  useAuthContext,
 } from "@agensy/context";
 import { useGetActivitiesQuery } from "@agensy/api";
 import { DateUtils } from "@agensy/utils";
@@ -334,7 +335,8 @@ const truncateName = (
 
 export const ActivityFeed: React.FC = () => {
   const { isActivityFeedOpen, closeActivityFeed } = useActivityFeedContext();
-  const { selectedClient } = useClientContext();
+  const { selectedClient, selectedClientId } = useClientContext();
+  const { clients: authClients } = useAuthContext();
   const { socket } = useSocketContext();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -344,6 +346,9 @@ export const ActivityFeed: React.FC = () => {
   const params = useParams();
   const observerTarget = useRef<HTMLDivElement>(null);
 
+  const clientIdForQuery =
+    selectedClientId || (params.clientId ? String(params.clientId) : undefined);
+
   const {
     data,
     isLoading,
@@ -352,17 +357,37 @@ export const ActivityFeed: React.FC = () => {
     fetchNextPage,
     refetch,
   } = useGetActivitiesQuery({
-    client_id: params.clientId ? String(params.clientId) : undefined,
+    client_id: clientIdForQuery,
     category: activeFilter === "all" ? undefined : activeFilter,
     limit: 50,
   });
 
+  // Get the client to display - use selectedClient from context or find from authClients
+  const displayClient = useMemo(() => {
+    if (selectedClient) return selectedClient;
+    if (selectedClientId && authClients) {
+      return authClients.find(
+        (client) => client?.id?.toString() === selectedClientId
+      );
+    }
+    return null;
+  }, [selectedClient, selectedClientId, authClients]);
+
   const allActivities = useMemo(() => {
     if (!data?.pages) return [];
-    return data.pages.flatMap((page) =>
+    const transformed = data.pages.flatMap((page) =>
       (page?.activities || []).map(transformActivity)
     );
-  }, [data]);
+
+    // Filter by selectedClientId if present
+    if (selectedClientId) {
+      return transformed.filter(
+        (activity) => activity.client_id?.toString() === selectedClientId
+      );
+    }
+
+    return transformed;
+  }, [data, selectedClientId]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -404,7 +429,7 @@ export const ActivityFeed: React.FC = () => {
     if (isActivityFeedOpen) {
       refetch();
     }
-  }, [activeFilter, selectedClient?.id, isActivityFeedOpen]);
+  }, [activeFilter, selectedClientId, isActivityFeedOpen, refetch]);
 
   useEffect(() => {
     if (socket) {
@@ -581,11 +606,11 @@ export const ActivityFeed: React.FC = () => {
             <h2 className="text-base sm:text-lg font-semibold text-darkGray">
               Activity Feed
             </h2>
-            {params.clientId && (
+            {(params.clientId || selectedClientId) && displayClient && (
               <p className="text-sm text-slateGrey">
                 <span className="font-semibold">Re:</span>{" "}
                 {truncateName(
-                  `${selectedClient?.first_name} ${selectedClient?.last_name}`
+                  `${displayClient?.first_name} ${displayClient?.last_name}`
                 )}
               </p>
             )}
