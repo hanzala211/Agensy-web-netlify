@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useGetClientsQuery } from "@agensy/api";
-import { useClientContext } from "@agensy/context";
-import { ICONS, ROUTES, COLORS } from "@agensy/constants";
+import { useClientContext, useAuthContext } from "@agensy/context";
+import { ICONS, ROUTES, COLORS, ROLE_MAP } from "@agensy/constants";
 import type { Client } from "@agensy/types";
 import { CommonLoader } from "../common/CommonLoader";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,6 +9,7 @@ import { Tooltip } from "antd";
 
 export const ClientSelector: React.FC = () => {
   const { selectedClientId, setSelectedClientId } = useClientContext();
+  const { userData } = useAuthContext();
   const params = useParams();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -16,6 +17,16 @@ export const ClientSelector: React.FC = () => {
 
   // Enable the query and fetch clients
   const { data: clients, isLoading, refetch } = useGetClientsQuery();
+
+  const formatRoleToProperStr = (str: string) => {
+    return ROLE_MAP[str] || str;
+  };
+
+  const getUserRoleForClient = (client: Client): string => {
+    const userRole = client.Users?.find((item) => item.id === userData?.id)
+      ?.UserRoles?.role;
+    return formatRoleToProperStr(userRole || "System Admin");
+  };
 
   // Fetch clients on mount
   useEffect(() => {
@@ -65,6 +76,10 @@ export const ClientSelector: React.FC = () => {
     ? `${selectedClient.first_name} ${selectedClient.last_name}`
     : "All Care Recipients";
 
+  const selectedClientRole = selectedClient
+    ? getUserRoleForClient(selectedClient)
+    : null;
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* @ts-expect-error/ TODO TS error */}
@@ -89,7 +104,14 @@ export const ClientSelector: React.FC = () => {
             size={16}
             className="sm:w-[18px] sm:h-[18px] text-primaryColor flex-shrink-0"
           />
-          <span className="truncate flex-1 text-left">{displayText}</span>
+          <div className="flex flex-col flex-1 min-w-0 text-left">
+            <span className="truncate">{displayText}</span>
+            {selectedClientRole && (
+              <span className="text-[10px] sm:text-xs text-gray-500 truncate">
+                {selectedClientRole}
+              </span>
+            )}
+          </div>
           <ICONS.downArrow
             size={14}
             className={`sm:w-4 sm:h-4 text-gray-400 flex-shrink-0 transition-transform ${
@@ -139,6 +161,7 @@ export const ClientSelector: React.FC = () => {
                 const clientIdStr = String(client.id);
                 const isSelected = clientIdStr === selectedClientId;
                 const clientName = `${client.first_name} ${client.last_name}`;
+                const clientRole = getUserRoleForClient(client);
                 return (
                   <button
                     key={clientIdStr}
@@ -157,9 +180,14 @@ export const ClientSelector: React.FC = () => {
                           isSelected ? "text-primaryColor" : "text-gray-400"
                         }`}
                       />
-                      <span className="truncate flex-1" title={clientName}>
-                        {clientName}
-                      </span>
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="truncate" title={clientName}>
+                          {clientName}
+                        </span>
+                        <span className="text-[10px] sm:text-xs text-gray-500 truncate">
+                          {clientRole}
+                        </span>
+                      </div>
                       {isSelected && (
                         <ICONS.check
                           size={14}

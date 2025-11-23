@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, EmptyStateCard, BorderedCard } from "@agensy/components";
 import { ICONS, ROUTES } from "@agensy/constants";
 import { useNavigate } from "react-router-dom";
+import { ConfirmationModal } from "../common/ConfirmationModal";
+import { useClientContext } from "@agensy/context";
 
 interface QuickAccessCareRecipientsCardProps {
   clients?: Array<{
@@ -16,6 +18,15 @@ export const QuickAccessCareRecipientsCard: React.FC<
   QuickAccessCareRecipientsCardProps
 > = ({ clients = [] }) => {
   const navigate = useNavigate();
+  const { selectedClientId, setSelectedClientId } = useClientContext();
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedClientForSwitch, setSelectedClientForSwitch] = useState<
+    (typeof clients)[0] | null
+  >(null);
+  const [pendingNavigation, setPendingNavigation] = useState<{
+    type: "overview" | "questionnaire" | "medical";
+    clientId: string;
+  } | null>(null);
 
   const getInitials = (firstName: string, lastName: string): string => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -47,19 +58,81 @@ export const QuickAccessCareRecipientsCard: React.FC<
   };
 
   const handleClientClick = (client: (typeof clients)[0]) => {
-    navigate(`/${ROUTES.clients}/${client.id}/${ROUTES.clientOverview}`);
+    if (selectedClientId === client.id?.toString()) {
+      navigate(`/${ROUTES.clients}/${client.id}/${ROUTES.clientOverview}`);
+      return;
+    }
+    setSelectedClientForSwitch(client);
+    setPendingNavigation({ type: "overview", clientId: String(client.id) });
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmSwitch = () => {
+    if (selectedClientForSwitch && pendingNavigation) {
+      const clientIdStr = String(selectedClientForSwitch.id);
+      setSelectedClientId(clientIdStr);
+      localStorage.setItem("selectedClientId", clientIdStr);
+
+      switch (pendingNavigation.type) {
+        case "overview":
+          navigate(
+            `/${ROUTES.clients}/${selectedClientForSwitch.id}/${ROUTES.clientOverview}`
+          );
+          break;
+        case "questionnaire":
+          navigate(
+            `/${ROUTES.clients}/${selectedClientForSwitch.id}/${ROUTES.agensyFormsFolders}/assessment/care-recipient-questionnaire`
+          );
+          break;
+        case "medical":
+          navigate(
+            `/${ROUTES.clients}/${selectedClientForSwitch.id}/${ROUTES.clientMedical}`
+          );
+          break;
+      }
+
+      setIsConfirmModalOpen(false);
+      setSelectedClientForSwitch(null);
+      setPendingNavigation(null);
+    }
+  };
+
+  const handleCancelSwitch = () => {
+    setIsConfirmModalOpen(false);
+    setSelectedClientForSwitch(null);
+    setPendingNavigation(null);
   };
 
   const handleQuestionnaireClick = (e: React.MouseEvent, clientId: string) => {
     e.stopPropagation();
-    navigate(
-      `/${ROUTES.clients}/${clientId}/${ROUTES.agensyFormsFolders}/assessment/care-recipient-questionnaire`
-    );
+    const client = clients.find((c) => c.id === clientId);
+    if (!client) return;
+
+    if (selectedClientId === clientId) {
+      navigate(
+        `/${ROUTES.clients}/${clientId}/${ROUTES.agensyFormsFolders}/assessment/care-recipient-questionnaire`
+      );
+      return;
+    }
+    // Show confirmation modal for different client
+    setSelectedClientForSwitch(client);
+    setPendingNavigation({ type: "questionnaire", clientId });
+    setIsConfirmModalOpen(true);
   };
 
   const handleMedsClick = (e: React.MouseEvent, clientId: string) => {
     e.stopPropagation();
-    navigate(`/${ROUTES.clients}/${clientId}/${ROUTES.clientMedical}`);
+    const client = clients.find((c) => c.id === clientId);
+    if (!client) return;
+
+    if (selectedClientId === clientId) {
+      navigate(`/${ROUTES.clients}/${clientId}/${ROUTES.clientMedical}`);
+      return;
+    }
+    // Show confirmation modal for different client
+    setSelectedClientForSwitch(client);
+    setPendingNavigation({ type: "medical", clientId });
+    setIsConfirmModalOpen(true);
   };
 
   return (
@@ -126,6 +199,25 @@ export const QuickAccessCareRecipientsCard: React.FC<
           onClick={() => navigate(`/${ROUTES.clients}`)}
         />
       )}
+      <ConfirmationModal
+        title="Switch Care Recipient"
+        isModalOpen={isConfirmModalOpen}
+        onOk={handleConfirmSwitch}
+        onCancel={handleCancelSwitch}
+        okText="Yes, Switch"
+        cancelText="Cancel"
+      >
+        <p>
+          Do you want to switch to{" "}
+          <span className="font-semibold">
+            {selectedClientForSwitch
+              ? `${selectedClientForSwitch.first_name} ${selectedClientForSwitch.last_name}`
+              : ""}
+          </span>
+          ? This will filter all content to show only this care recipient's
+          information.
+        </p>
+      </ConfirmationModal>
     </Card>
   );
 };
