@@ -62,12 +62,13 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
       start_time: "",
       end_time: "",
       notes: "",
-      clientId: contextSelectedClientId || "",
+      clientId: "",
       healthcare_provider_id: "",
     },
   });
 
   const selectedClientId = watch("clientId");
+  const healthcareProviderId = watch("healthcare_provider_id");
   const healthCares = useMemo(() => {
     const selectedClient = clients?.find(
       (client: Client) => client.id === selectedClientId
@@ -75,7 +76,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     return selectedClient?.healthcareProviders || [];
   }, [clients, selectedClientId]);
 
-  const clientArray = (): { label: string; value: string }[] => {
+  const clientArray = useMemo((): { label: string; value: string }[] => {
     if (!clients) {
       return [];
     }
@@ -109,24 +110,31 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
       .filter(
         (item): item is { label: string; value: string } => item !== null
       );
-  };
+  }, [clients, contextSelectedClientId]);
 
   useEffect(() => {
-    if (
-      watch("healthcare_provider_id") &&
-      watch("healthcare_provider_id").length > 0
-    ) {
+    if (healthcareProviderId && healthcareProviderId.length > 0) {
       setValue(
         "location",
-        healthCares.find((item) => item.id === watch("healthcare_provider_id"))
-          ?.address || ""
+        healthCares.find((item) => item.id === healthcareProviderId)?.address ||
+          ""
       );
     }
-  }, [watch("healthcare_provider_id")]);
+  }, [healthcareProviderId, healthCares]);
 
   useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
+        let defaultClientId = "";
+        if (contextSelectedClientId) {
+          const hasPermission = handleFilterPermission(
+            contextSelectedClientId,
+            APP_ACTIONS.ClientAppointmentAdd
+          );
+          if (hasPermission) {
+            defaultClientId = contextSelectedClientId;
+          }
+        }
         reset({
           title: "",
           appointment_type: "",
@@ -134,7 +142,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
           start_time: "",
           end_time: "",
           notes: "",
-          clientId: contextSelectedClientId || "",
+          clientId: defaultClientId,
           healthcare_provider_id: "",
         });
       }, 300);
@@ -158,9 +166,29 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         healthcare_provider_id: editData.healthcare_provider_id || "",
       });
     } else if (isOpen && contextSelectedClientId) {
-      setValue("clientId", contextSelectedClientId);
+      const hasPermission = handleFilterPermission(
+        contextSelectedClientId,
+        APP_ACTIONS.ClientAppointmentAdd
+      );
+      if (hasPermission) {
+        setValue("clientId", contextSelectedClientId);
+      } else {
+        setValue("clientId", "");
+      }
     }
   }, [editData, isOpen, contextSelectedClientId]);
+
+  useEffect(() => {
+    if (selectedClientId && isOpen) {
+      const clientExists = clientArray.some(
+        (client: { label: string; value: string }) =>
+          client.value === selectedClientId?.toString()
+      );
+      if (!clientExists) {
+        setValue("clientId", "");
+      }
+    }
+  }, [selectedClientId, isOpen, clientArray]);
 
   const handleClose = () => {
     reset();
@@ -212,7 +240,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
           control={control}
           name="clientId"
           label="Care Recipient"
-          data={clientArray()}
+          data={clientArray}
           labelOption="Select Care Recipient"
         />
 
