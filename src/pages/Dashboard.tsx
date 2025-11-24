@@ -7,26 +7,30 @@ import {
   RecentDocumentsCard,
   CardSkeleton,
 } from "@agensy/components";
-import { useHeaderContext } from "@agensy/context";
+import { useHeaderContext, useClientContext } from "@agensy/context";
 import { useGetDashboardData } from "@agensy/api";
 
 export const Dashboard: React.FC = () => {
   const { setHeaderConfig } = useHeaderContext();
+  const { selectedClientId } = useClientContext();
   const {
     data: dashboardData,
     isLoading,
     isError,
     refetch,
-  } = useGetDashboardData();
+  } = useGetDashboardData(selectedClientId);
 
   useEffect(() => {
-    refetch();
     setHeaderConfig({
       title: "Dashboard",
       showBackButton: false,
       showButton: false,
     });
   }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [selectedClientId]);
 
   if (isLoading) {
     return (

@@ -1,10 +1,11 @@
 import { sendRequest } from "@agensy/utils";
 
-export const getDashboardData = async () => {
+export const getDashboardData = async (clientId?: string) => {
   try {
+    const url = clientId ? `/dashboard?clientId=${clientId}` : `/dashboard`;
     const response = await sendRequest({
       method: "GET",
-      url: "/dashboard",
+      url,
     });
     return response.data.data;
   } catch (error) {
