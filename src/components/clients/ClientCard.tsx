@@ -7,7 +7,8 @@ import {
 } from "@agensy/api";
 import { BorderedCard, ConfirmationModal } from "@agensy/components";
 import { APP_ACTIONS, COLORS, ROLE_MAP, ROLES } from "@agensy/constants";
-import { useAuthContext } from "@agensy/context";
+import { useAuthContext, useClientContext } from "@agensy/context";
+import { useQueryClient } from "@tanstack/react-query";
 import { Tooltip } from "antd";
 
 interface ClientCardProps {
@@ -28,6 +29,8 @@ export const ClientCard: React.FC<ClientCardProps> = ({
   isPrimaryUserSubscribed,
 }) => {
   const { handleFilterPermission, userData } = useAuthContext();
+  const { selectedClientId, setSelectedClientId } = useClientContext();
+  const queryClient = useQueryClient();
   const updateClientStatusMutation = useUpdateClientStatusMutation();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const deleteClientMutation = useDeleteClientMutation();
@@ -50,6 +53,14 @@ export const ClientCard: React.FC<ClientCardProps> = ({
 
   useEffect(() => {
     if (deleteClientMutation.status === "success") {
+      if (selectedClientId === String(client.id)) {
+        setSelectedClientId(null);
+      }
+      queryClient.setQueryData(["clients"], (old: Client[] | undefined) => {
+        if (!old) return old;
+        return old.filter((c) => String(c.id) !== String(client.id));
+      });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
       loadClients?.();
       toast.success(
         "Care Recipient deleted successfully",
@@ -58,7 +69,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
     } else if (deleteClientMutation.status === "error") {
       toast.error(
         "Failed to delete care recipient",
-        deleteClientMutation.error.message
+        deleteClientMutation.error?.message || "Unknown error occurred"
       );
     }
   }, [deleteClientMutation.status]);

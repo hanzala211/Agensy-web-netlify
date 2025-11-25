@@ -27,6 +27,7 @@ import {
   useClientContext,
   useHeaderContext,
 } from "@agensy/context";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Clients: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -77,6 +78,7 @@ export const Clients: React.FC = () => {
   const error = clientsQuery.error;
 
   const addClientMutation = useAddClientMutation();
+  const queryClient = useQueryClient();
   const { setSelectedClient, selectedClientId } = useClientContext();
   const {
     isPrimaryUserSubscriptionActive,
@@ -154,6 +156,14 @@ export const Clients: React.FC = () => {
   useEffect(() => {
     if (addClientMutation.status === "success") {
       setIsAddClientModalOpen(false);
+      queryClient.setQueryData(["clients"], (old: Client[] | undefined) => {
+        if (!old) return old;
+        if (addClientMutation.data) {
+          return [...old, addClientMutation.data];
+        }
+        return old;
+      });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
       addClientMutation.reset();
       refetchClients();
     } else if (addClientMutation.status === "error") {

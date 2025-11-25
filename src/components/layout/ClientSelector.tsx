@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useGetClientsQuery } from "@agensy/api";
 import { useClientContext, useAuthContext } from "@agensy/context";
 import { ICONS, ROUTES, COLORS, ROLE_MAP } from "@agensy/constants";
@@ -17,6 +17,24 @@ export const ClientSelector: React.FC = () => {
 
   // Enable the query and fetch clients
   const { data: clients, isLoading, refetch } = useGetClientsQuery();
+
+  // Sort clients by name (first_name, then last_name)
+  const sortedClients = useMemo(() => {
+    if (!clients || clients.length === 0) return [];
+    return [...clients].sort((a: Client, b: Client) => {
+      const aFirstName = (a.first_name || "").toLowerCase();
+      const bFirstName = (b.first_name || "").toLowerCase();
+      const aLastName = (a.last_name || "").toLowerCase();
+      const bLastName = (b.last_name || "").toLowerCase();
+
+      // First compare by first name
+      if (aFirstName !== bFirstName) {
+        return aFirstName.localeCompare(bFirstName);
+      }
+      // If first names are equal, compare by last name
+      return aLastName.localeCompare(bLastName);
+    });
+  }, [clients]);
 
   const formatRoleToProperStr = (str: string) => {
     return ROLE_MAP[str] || str;
@@ -127,7 +145,7 @@ export const ClientSelector: React.FC = () => {
             <div className="flex items-center justify-center py-8">
               <CommonLoader size={32} />
             </div>
-          ) : clients && clients.length > 0 ? (
+          ) : sortedClients && sortedClients.length > 0 ? (
             <div className="py-1">
               {/* All option */}
               <button
@@ -157,7 +175,7 @@ export const ClientSelector: React.FC = () => {
                   )}
                 </div>
               </button>
-              {clients.map((client: Client) => {
+              {sortedClients.map((client: Client) => {
                 const clientIdStr = String(client.id);
                 const isSelected = clientIdStr === selectedClientId;
                 const clientName = `${client.first_name} ${client.last_name}`;
