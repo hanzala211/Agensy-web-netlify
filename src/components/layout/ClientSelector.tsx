@@ -4,7 +4,7 @@ import { useClientContext, useAuthContext } from "@agensy/context";
 import { ICONS, ROUTES, COLORS, ROLE_MAP } from "@agensy/constants";
 import type { Client } from "@agensy/types";
 import { CommonLoader } from "../common/CommonLoader";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Tooltip } from "antd";
 
 export const ClientSelector: React.FC = () => {
@@ -12,6 +12,7 @@ export const ClientSelector: React.FC = () => {
   const { userData } = useAuthContext();
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -81,6 +82,8 @@ export const ClientSelector: React.FC = () => {
       localStorage.setItem("selectedClientId", clientIdStr);
       if (params.clientId) {
         navigate(`/${ROUTES.clients}/${clientId}/${ROUTES.clientOverview}`);
+      } else if (location.pathname.includes(ROUTES.documents)) {
+        navigate(`/${ROUTES.clients}/${clientId}/${ROUTES.clientDocuments}`);
       }
     }
     setIsOpen(false);

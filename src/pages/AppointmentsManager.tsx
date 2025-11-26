@@ -115,7 +115,7 @@ export const AppointmentsManager: React.FC = () => {
           </TabLink>
         </div>
       </div>
-      <main className="mt-8">
+      <main className="mt-8 overflow-x-auto pb-4">
         {isLoadingAppointments ? <AppointmentsSkeleton /> : <Outlet />}
       </main>
     </div>

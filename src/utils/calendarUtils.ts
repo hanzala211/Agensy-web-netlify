@@ -46,9 +46,9 @@ export const getHeaderDate = (
     case "month":
       return format(currentDate, "MMMM, yyyy");
     case "week":
-      return `${format(startOfWeek(currentDate), "MMMM d")} - ${format(
+      return `${format(startOfWeek(currentDate), "MMM d")} - ${format(
         endOfWeek(currentDate),
-        "MMMM d, yyyy"
+        "MMM d, yyyy"
       )}`;
     case "day":
       return format(currentDate, "MMMM d, yyyy");

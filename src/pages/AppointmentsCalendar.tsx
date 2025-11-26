@@ -1,7 +1,7 @@
 import { Calendar, Views, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   AppointmentsCalendarCard,
   CalendarHeader,
@@ -32,6 +32,15 @@ export const AppointmentsCalendar: React.FC = () => {
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const {
     currentDate,
@@ -124,8 +133,8 @@ export const AppointmentsCalendar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="bg-white rounded-md border border-gray-200 md:p-4 p-3 shadow-sm">
+    <div className="flex flex-col gap-4 overflow-hidden">
+      <div className="bg-white rounded-md border border-gray-200 md:p-4 p-3 shadow-sm overflow-hidden">
         <CalendarHeader
           currentDate={currentDate}
           viewMode={viewMode}
@@ -143,8 +152,10 @@ export const AppointmentsCalendar: React.FC = () => {
           startAccessor="start"
           endAccessor="end"
           style={{
-            height: window.innerWidth > 768 ? 600 : 350,
-            width: window.innerWidth > 540 ? "auto" : 310,
+            height: "70vh",
+            minHeight: 400,
+            width:
+              viewMode === "week" && windowWidth <= 540 ? 310 : "100%",
           }}
           view={viewMode}
           onView={(newView) => setViewMode(newView as ViewMode)}
@@ -153,13 +164,13 @@ export const AppointmentsCalendar: React.FC = () => {
           components={components}
           views={[Views.MONTH, Views.WEEK, Views.DAY]}
           toolbar={false}
-          selectable={true} // it is used to enable selection
+          selectable={true}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleEventClick}
           step={60}
           timeslots={1}
-          min={new Date(0, 0, 0, 0, 0, 0)} // it is used to show starting of time in day view
-          max={new Date(0, 0, 0, 23, 59, 59)} // it is used to show ending of time in day view
+          min={new Date(0, 0, 0, 0, 0, 0)}
+          max={new Date(0, 0, 0, 23, 59, 59)}
         />
       </div>
       <AppointmentsCalendarCard

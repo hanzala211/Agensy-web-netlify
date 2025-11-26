@@ -201,27 +201,29 @@ export const AppointmentDetailsModal: React.FC<
             </h3>
             <div className="space-y-4">
               {appointment.notes && (
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 overflow-x-hidden max-h-48 overflow-y-auto">
                   <div className="flex items-start gap-3">
-                    <ICONS.uploadDoc className="text-gray-500 mt-1" size={18} />
-                    <div>
+                    <ICONS.uploadDoc className="text-gray-500 mt-1 flex-shrink-0" size={18} />
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-gray-700 mb-1">
                         Appointment Notes
                       </p>
-                      <p className="text-gray-600">{appointment.notes}</p>
+                      <p className="text-sm break-words break-all whitespace-pre-line text-gray-600 max-w-full">
+                        {appointment.notes}
+                      </p>
                     </div>
                   </div>
                 </div>
               )}
               {appointment.post_appointment_notes && (
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 overflow-x-hidden max-h-48 overflow-y-auto">
                   <div className="flex items-start gap-3">
-                    <ICONS.uploadDoc className="text-gray-500 mt-1" size={18} />
-                    <div>
+                    <ICONS.uploadDoc className="text-gray-500 mt-1 flex-shrink-0" size={18} />
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-gray-700 mb-1">
                         Post Appointment Notes
                       </p>
-                      <p className="text-gray-600">
+                      <p className="text-sm break-words break-all whitespace-pre-line text-gray-600 max-w-full">
                         {appointment.post_appointment_notes}
                       </p>
                     </div>

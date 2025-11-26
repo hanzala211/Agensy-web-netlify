@@ -33,7 +33,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   return (
     <div className="flex items-center 2xl:justify-between 2xl:flex-row flex-col gap-3 mb-4">
       <div className="flex items-center gap-3 w-full justify-between 2xl:justify-start 2xl:w-fit">
-        <h2 className="text-base font-semibold text-gray-800">
+        <h2 className="sm:text-base text-xs font-semibold text-gray-800">
           {CalendarUtils.getHeaderDate(currentDate, viewMode)}
         </h2>
         <div className="flex gap-1.5 bg-gray-100 p-1 rounded-md">

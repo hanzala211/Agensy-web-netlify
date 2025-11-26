@@ -293,7 +293,7 @@ export const Clients: React.FC = () => {
         )}
       </div>
 
-      {!selectedClientId && (
+      {!selectedClientId && (isLoading || clients.length > 0) && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
