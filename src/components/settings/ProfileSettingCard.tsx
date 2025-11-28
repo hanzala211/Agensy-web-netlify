@@ -1,4 +1,4 @@
-import { ICONS } from "@agensy/constants";
+import { ICONS, EMAIL_NOTIFICATION_PREFERENCES } from "@agensy/constants";
 import { Card, EditProfileSettingsModal } from "@agensy/components";
 import { useAuthContext } from "@agensy/context";
 import React, { useEffect, useRef, useState } from "react";
@@ -83,6 +83,16 @@ export const ProfileSettingCard: React.FC = () => {
     return name.length > maxLength
       ? name.substring(0, maxLength) + "..."
       : name;
+  };
+
+  const getEmailNotificationLabel = (
+    value: string | undefined
+  ): string => {
+    if (!value) return "Not provided";
+    const preference = EMAIL_NOTIFICATION_PREFERENCES.find(
+      (pref) => pref.value === value
+    );
+    return preference?.label || "Not provided";
   };
 
   return (
@@ -173,6 +183,15 @@ export const ProfileSettingCard: React.FC = () => {
                 <ICONS.phone size={18} className="text-gray-500" />
                 <p className="text-darkGray">
                   {userData?.phone || "Not provided"}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">Email Notification Preferences</label>
+              <div className="flex items-center gap-3 p-2 bg-lightGray rounded-xl">
+                <ICONS.mail size={18} className="text-gray-500" />
+                <p className="text-darkGray">
+                  {getEmailNotificationLabel(userData?.email_notification_preferences)}
                 </p>
               </div>
             </div>

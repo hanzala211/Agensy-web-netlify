@@ -6,8 +6,10 @@ import {
   Input,
   PrimaryButton,
   PhoneNumberInput,
+  Select,
 } from "@agensy/components";
 import { profileSchema, type IUser, type ProfileFormData } from "@agensy/types";
+import { EMAIL_NOTIFICATION_PREFERENCES } from "@agensy/constants";
 
 interface EditProfileSettingsModalProps {
   isOpen: boolean;
@@ -33,6 +35,7 @@ export const EditProfileSettingsModal: React.FC<
       first_name: "",
       last_name: "",
       phone: "",
+      email_notification_preferences: undefined,
     },
   });
 
@@ -49,6 +52,7 @@ export const EditProfileSettingsModal: React.FC<
           first_name: "",
           last_name: "",
           phone: "",
+          email_notification_preferences: undefined,
         });
       }, 300);
     }
@@ -96,6 +100,13 @@ export const EditProfileSettingsModal: React.FC<
         />
 
         <PhoneNumberInput control={control} name="phone" label="Phone Number" />
+
+        <Select
+          control={control}
+          name="email_notification_preferences"
+          label="Email Notification Preferences"
+          data={EMAIL_NOTIFICATION_PREFERENCES}
+        />
 
         <input type="submit" ref={inputRef} className="hidden" />
       </form>

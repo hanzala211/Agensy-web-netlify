@@ -28,7 +28,8 @@ export interface IUser extends BaseSchema {
   UserRoles?: {
     client_id: string;
     role: string;
-  }[];
+  }[];  
+  email_notification_preferences?: "all_emails" | "daily_digest" | "weekly_digest" | "no_emails";
 }
 
 export interface Client extends BaseSchema {

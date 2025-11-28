@@ -450,3 +450,10 @@ export const STATES = [
   { label: "Wisconsin", value: "WI" },
   { label: "Wyoming", value: "WY" },
 ];
+
+export const EMAIL_NOTIFICATION_PREFERENCES = [
+  { label: "All Emails", value: "all_emails" },
+  { label: "Daily Digest", value: "daily_digest" },
+  { label: "Weekly Digest", value: "weekly_digest" },
+  { label: "No Emails", value: "no_emails" },
+];

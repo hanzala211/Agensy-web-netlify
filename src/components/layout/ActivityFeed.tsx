@@ -346,8 +346,7 @@ export const ActivityFeed: React.FC = () => {
   const params = useParams();
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  const clientIdForQuery =
-    selectedClientId || (params.clientId ? String(params.clientId) : undefined);
+  const clientIdForQuery = selectedClientId || undefined;
 
   const {
     data,

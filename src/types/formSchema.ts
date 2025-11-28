@@ -340,6 +340,9 @@ export const profileSchema = z.object({
   first_name: z.string().min(1, "First name is required").transform(trimString),
   last_name: z.string().min(1, "Last name is required").transform(trimString),
   phone: z.string().min(1, "Phone number is required").transform(trimString),
+  email_notification_preferences: z
+    .enum(["all_emails", "daily_digest", "weekly_digest", "no_emails"])
+    .optional(),
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
